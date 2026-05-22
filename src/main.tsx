@@ -10,9 +10,10 @@ import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { useAuthStore } from '@/stores/auth-store'
 import { handleServerError } from '@/lib/handle-server-error'
-import { DirectionProvider } from './stores/others/direction-provider'
+import { Toaster } from './components/ui/sonner'
 // Generated Routes
 import { routeTree } from './routeTree.gen'
+import { DirectionProvider } from './stores/others/direction-provider'
 // Styles
 import './styles/index.css'
 
@@ -93,6 +94,7 @@ if (!rootElement.innerHTML) {
       <QueryClientProvider client={queryClient}>
         <DirectionProvider>
           <RouterProvider router={router} />
+          <Toaster />
         </DirectionProvider>
       </QueryClientProvider>
     </StrictMode>
