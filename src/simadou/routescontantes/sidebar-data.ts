@@ -1,0 +1,246 @@
+import {
+  LayoutDashboard,
+  Users,
+  Command,
+  Package,
+  ShieldCheck,
+  Settings,
+  MapPin,
+  LayoutGrid,
+  User,
+  UserCog,
+  Briefcase,
+  Handshake,
+  Map,
+  FileText,
+  ClipboardList,
+  BookOpen,
+  SlidersHorizontal,
+  FileStack,
+  BarChart2,
+  Target,
+  TrendingUp,
+  FolderOpen,
+  CalendarDays,
+  Activity,
+  Eye,
+  Gauge,
+  ListTodo,
+  Layers,
+} from 'lucide-react'
+import { type SidebarData } from '../../components/layout/others/types'
+
+export const sidebarData: SidebarData = {
+  user: {
+    name: 'simadou',
+    email: 'simadou.com',
+    avatar: '/avatars/shadcn.jpg',
+  },
+  teams: [
+    {
+      name: 'SIMADOU',
+      logo: Command,
+      plan: 'simadou',
+    },
+  ],
+  navGroups: [
+    {
+      title: 'General',
+      items: [
+        {
+          title: 'Dashboard',
+          url: '/',
+          icon: LayoutDashboard,
+        },
+        {
+          title: 'Apps',
+          url: '/apps',
+          icon: Package,
+        },
+        {
+          title: 'Users',
+          url: '/users',
+          icon: Users,
+        },
+
+        // ── Paramétrage ──────────────────────────────────────
+        {
+          title: 'Paramétrage',
+          icon: Settings,
+          items: [
+            {
+              title: 'Localités',
+              url: '/localites',
+              icon: MapPin,
+            },
+            {
+              title: 'Unités de gestion',
+              url: '/parametrage/unites-de-gestion',
+              icon: LayoutGrid,
+            },
+            {
+              title: 'Acteurs',
+              url: '/parametrage/acteurs',
+              icon: User,
+            },
+            {
+              title: 'Utilisateurs',
+              url: '/parametrage/utilisateurs',
+              icon: UserCog,
+            },
+            {
+              title: 'Fonctions',
+              url: '/parametrage/fonctions',
+              icon: Briefcase,
+            },
+            {
+              title: 'Partenaire Financier',
+              url: '/parametrage/partenaire-financier',
+              icon: Handshake,
+            },
+            {
+              title: 'Zone de Collecte',
+              url: '/parametrage/zone-de-collecte',
+              icon: Map,
+            },
+            {
+              title: 'Conventions',
+              url: '/parametrage/conventions',
+              icon: FileText,
+            },
+            {
+              title: 'Plans de Site',
+              url: '/parametrage/plans-de-site',
+              icon: ClipboardList,
+            },
+            {
+              title: 'Dictionnaire des indicateurs',
+              url: '/parametrage/dictionnaire-indicateurs',
+              icon: BookOpen,
+            },
+            {
+              title: 'Autres paramétrages',
+              url: '/parametrage/autres',
+              icon: SlidersHorizontal,
+            },
+          ],
+        },
+
+        // ── Politique ─────────────────────────────────────────
+        {
+          title: 'Politique',
+          icon: FileStack,
+          items: [
+            {
+              title: 'Liste des politiques et stratégies',
+              url: '/politique/liste',
+              icon: FileStack,
+            },
+            {
+              title: 'Cadre analytique',
+              url: '/politique/cadre-analytique',
+              icon: BarChart2,
+            },
+            {
+              title: 'Cadre stratégique',
+              url: '/politique/cadre-strategique',
+              icon: Target,
+            },
+            {
+              title: 'Indicateurs strategique',
+              url: '/politique/indicateurs-strategique',
+              icon: TrendingUp,
+            },
+            {
+              title: 'Indicateurs du CMR',
+              url: '/politique/indicateurs-cmr',
+              icon: TrendingUp,
+            },
+          ],
+        },
+
+        // ── Programmation ─────────────────────────────────────
+        {
+          title: 'Programmation',
+          icon: CalendarDays,
+          items: [
+            {
+              title: 'Liste des projets',
+              url: '/programmation/projets',
+              icon: FolderOpen,
+            },
+            {
+              title: 'PTBA',
+              url: '/programmation/ptba',
+              icon: ClipboardList,
+            },
+            {
+              title: 'Indicateurs activités PTBA',
+              url: '/programmation/indicateurs-activites-ptba',
+              icon: Activity,
+            },
+            {
+              title: 'Suivi du PTBA',
+              url: '/programmation/suivi-ptba',
+              icon: Eye,
+            },
+            {
+              title: 'Indicateurs de performance',
+              url: '/programmation/indicateurs-performance',
+              icon: Gauge,
+            },
+            {
+              title: 'Activités projet',
+              url: '/programmation/activites-projet',
+              icon: ListTodo,
+            },
+            {
+              title: 'Activités programme',
+              url: '/programmation/activites-programme',
+              icon: Layers,
+            },
+          ],
+        },
+      ],
+    },
+
+    {
+      title: 'Pages',
+      items: [
+        {
+          title: 'Auth',
+          icon: ShieldCheck,
+          items: [
+            {
+              title: 'Sign In',
+              url: '/sign-in',
+            },
+            {
+              title: 'Sign Up',
+              url: '/sign-up',
+            },
+            {
+              title: 'Forgot Password',
+              url: '/forgot-password',
+            },
+            {
+              title: 'OTP',
+              url: '/otp',
+            },
+          ],
+        },
+      ],
+    },
+
+    // {
+    //   title: 'Other',
+    //   items: [
+    //     {
+    //       title: 'Help Center',
+    //       url: '/help-center',
+    //       icon: HelpCircle,
+    //     },
+    //   ],
+    // },
+  ],
+}
