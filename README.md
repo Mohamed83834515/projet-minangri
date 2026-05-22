@@ -6,10 +6,12 @@
 Dans authenticated : 
 1)  créer fichier :  localites/index.tsx  (la route se crée automatiquement)
 
+```
 ── routes
 │   │   ├── _authenticated
 │   │   │   ├── localites
 │   │   │   │   └── index.tsx
+```
 
 2)  Dans SIMADOU : 
 Dans allfonctionalities, on part de l'exemple de users, vous créez un autre dossier : localités qui contiendra tous les composants (fichiers necessaires) 
