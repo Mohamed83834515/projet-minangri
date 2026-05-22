@@ -1,6 +1,6 @@
 import { DynamicForm } from '@/Global/Forms/DynamicForm'
 // import { useAddUser } from "@/hooks/admin/userHooks";
-import { getUserFormConfig } from '@/simadou/allfieldsConfig/userFormConfig'
+import { getUserFormConfig } from '@/simadou/allfieldsConfig/exempleFormConfig'
 import type { OpenProps } from '@/simadou/interfaces/interfaceTable'
 import { userSchema } from '@/simadou/schemas/allSchema'
 import {

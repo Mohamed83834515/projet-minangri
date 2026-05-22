@@ -6,7 +6,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { DynamicForm } from "@/Global/Forms/DynamicForm";
-import { getUserFormConfig } from "@/simadou/allfieldsConfig/userFormConfig";
+import { getUserFormConfig } from "@/simadou/allfieldsConfig/exempleFormConfig";
 import { userSchema, type User } from "@/simadou/schemas/allSchema";
 
 interface EditUserProps {
