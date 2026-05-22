@@ -4,11 +4,11 @@ import { createFileRoute } from '@tanstack/react-router'
 // import { ProfileDropdown } from '@/components/profile-dropdown'
 // import { Search } from '@/components/search'
 // import { ThemeSwitch } from '@/components/theme-switch'
-import { ForbiddenError } from '@/simadou/allfonctionalities/errors/forbidden'
-import { GeneralError } from '@/simadou/allfonctionalities/errors/general-error'
-import { MaintenanceError } from '@/simadou/allfonctionalities/errors/maintenance-error'
-import { NotFoundError } from '@/simadou/allfonctionalities/errors/not-found-error'
-import { UnauthorisedError } from '@/simadou/allfonctionalities/errors/unauthorized-error'
+import { ForbiddenError } from '@/components/errors/forbidden'
+import { GeneralError } from '@/components/errors/general-error'
+import { MaintenanceError } from '@/components/errors/maintenance-error'
+import { NotFoundError } from '@/components/errors/not-found-error'
+import { UnauthorisedError } from '@/components/errors/unauthorized-error'
 
 export const Route = createFileRoute('/_authenticated/errors/$error')({
   component: RouteComponent,

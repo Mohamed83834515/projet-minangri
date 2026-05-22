@@ -1,10 +1,10 @@
 # simandu-refonte
 
+# Comment créer une fonctionnalité dans l'application
 
-# Comment créer une fonctionnalité dans l'application 
+Dans authenticated :
 
-Dans authenticated : 
-1)  créer fichier :  localites/index.tsx  (la route se crée automatiquement)
+1) créer fichier :  localites/index.tsx  (la route se crée automatiquement)
 
 ```
 ── routes
@@ -13,8 +13,8 @@ Dans authenticated :
 │   │   │   │   └── index.tsx
 ```
 
-2)  Dans SIMADOU : 
-Dans allfonctionalities, on part de l'exemple de users, vous créez un autre dossier : localités qui contiendra tous les composants (fichiers necessaires) 
+2) Dans SIMADOU :
+   Dans allfonctionalities, on part de l'exemple de users, vous créez un autre dossier : localités qui contiendra tous les composants (fichiers necessaires)
 
 ```
 ── simadou
@@ -25,7 +25,7 @@ Dans allfonctionalities, on part de l'exemple de users, vous créez un autre dos
 │   │   │       └── ListeUsers.tsx
 ```
 
-3)  Revenir dans la route crée au niveau de _authenticated puis : 
+3) Revenir dans la route crée au niveau de _authenticated puis :
 
 ```js
 import { createFileRoute } from '@tanstack/react-router'
@@ -70,9 +70,8 @@ function RouteComponent() {
 }
 ```
 
-
 4) Ajout de la route de la fonctionnalité crée
-Dans #sidebar-data.ts  il y a toutes les routes
+   Dans #sidebar-data.ts  il y a toutes les routes
 
 ```
 ├── simadou
@@ -164,7 +163,7 @@ const AddUser = ({ open, onOpenChange }: OpenProps) => {
           schema={userSchema}
         //1c) configuration des champs de renitialisation
           defaultValues={STAFF}
-    
+  
           onSubmit={onSubmit}
           submitText="Ajouter l'utilisateur"
           loadingText='Ajout en cours...'
@@ -176,7 +175,6 @@ const AddUser = ({ open, onOpenChange }: OpenProps) => {
 
 export default AddUser
 ```
-
 
 ### Regardons de plus prêt
 
@@ -192,8 +190,8 @@ Donc ici comme prévu chacun créera un fichier correspondant a la classe qu'il 
 
 Dans userFormConfig.ts
 
-
 ### Ce premier cas concerne que le DynamicForm
+
 ```js
 import type { FormConfig } from "../../Global/types/formConfig";
 export const getUserFormConfig = (): FormConfig => ({
@@ -215,8 +213,8 @@ export const getUserFormConfig = (): FormConfig => ({
 });
 ```
 
-
 ### Ce deuxième cas concerne le StepDynamicForm
+
 ```js
 import type { FormConfig } from "../../Global/types/formConfig";
 export const getUserFormConfig = (): FormConfig => ({
@@ -308,9 +306,9 @@ sa ce fais ici donc
 │   │   │   └── resetField.ts
 ```
 
-exemple : 
+exemple :
 
-### Interface 
+### Interface
 
 ```js
 //====================Absence======================
@@ -343,6 +341,7 @@ export interface AbsenceForm {
 ```
 
 ### reset fields
+
 ```js
 //==========absence==================
 export const ABSENCE: AbsenceFormSchema = {
@@ -375,6 +374,7 @@ export type AbsenceFormSchema = z.infer<typeof absenceFormSchema>;
 ### Formulaire
 
 ici comme le formulaire d'absence est trop long je vais juste prend un autre exemple et expliquer ici
+
 ```js
 const AddUser = ({ open, onOpenChange }: OpenProps) => {
 // le mutate pour la création d'un user
@@ -404,8 +404,7 @@ const AddUser = ({ open, onOpenChange }: OpenProps) => {
 export default AddUser;
 ```
 
-
-# Gestion des hooks pour chaque fonctionnalité (contacter des apis) 
+# Gestion des hooks pour chaque fonctionnalité (contacter des apis)
 
 ### 1) Manipulation d'un hook simple
 
@@ -501,7 +500,8 @@ export const useDeleteProduitLocal = () => {
 };
 ```
 
-
 ### 2) Manipulation de hook Generic
 
 
+
+# EN COURS DE REDACTION

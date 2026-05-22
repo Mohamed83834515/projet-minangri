@@ -4,8 +4,8 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import { Toaster } from '@/components/ui/sonner'
 import { NavigationProgress } from '@/components/others/navigation-progress'
-import { GeneralError } from '@/simadou/allfonctionalities/errors/general-error'
-import { NotFoundError } from '@/simadou/allfonctionalities/errors/not-found-error'
+import { GeneralError } from '@/components/errors/general-error'
+import { NotFoundError } from '@/components/errors/not-found-error'
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
