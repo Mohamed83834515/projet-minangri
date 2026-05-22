@@ -1,0 +1,34 @@
+import { apiClient } from "../lib/api";
+import { IndicateurStrategique } from "../types/indicateurStrategique";
+
+const BASE_URL = "/indicateur_strategique/";
+
+export const indicateurStrategiqueService = {
+  // Récupérer tous les indicateurs stratégiques
+  async getAll(): Promise<IndicateurStrategique[]> {
+    return await apiClient.request<IndicateurStrategique[]>(BASE_URL);
+  },
+
+  // Créer un nouvel indicateur
+  async create(data: IndicateurStrategique): Promise<IndicateurStrategique> {
+    return await apiClient.request<IndicateurStrategique>(BASE_URL, {
+      method: "POST",
+      data,
+    });
+  },
+
+  // Mettre à jour un indicateur
+  async update(id: number, data: IndicateurStrategique): Promise<IndicateurStrategique> {
+    return await apiClient.request<IndicateurStrategique>(`${BASE_URL}${id}/`, {
+      method: "PUT",
+      data,
+    });
+  },
+
+  // Supprimer un indicateur
+  async delete(id: number): Promise<void> {
+    await apiClient.request<void>(`${BASE_URL}${id}/`, {
+      method: "DELETE",
+    });
+  }
+};

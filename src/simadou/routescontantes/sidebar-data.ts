@@ -70,7 +70,7 @@ export const sidebarData: SidebarData = {
           items: [
             {
               title: 'Localités',
-              url: '/localites',
+              url: '/parametrage/localites',
               icon: MapPin,
             },
             {
@@ -133,27 +133,27 @@ export const sidebarData: SidebarData = {
           items: [
             {
               title: 'Liste des politiques et stratégies',
-              url: '/politique/liste',
+              url: '/programme/liste',
               icon: FileStack,
             },
             {
               title: 'Cadre analytique',
-              url: '/politique/cadre-analytique',
+              url: '/programme/cadre-analytique',
               icon: BarChart2,
             },
             {
               title: 'Cadre stratégique',
-              url: '/politique/cadre-strategique',
+              url: '/programme/cadre-strategique',
               icon: Target,
             },
             {
               title: 'Indicateurs strategique',
-              url: '/politique/indicateurs-strategique',
+              url: '/programme/indicateurs-strategique',
               icon: TrendingUp,
             },
             {
               title: 'Indicateurs du CMR',
-              url: '/politique/indicateurs-cmr',
+              url: '/programme/indicateurs-cmr',
               icon: TrendingUp,
             },
           ],

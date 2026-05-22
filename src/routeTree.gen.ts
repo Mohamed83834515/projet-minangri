@@ -23,7 +23,6 @@ import { Route as authForgotPasswordRouteImport } from './routes/(auth)/forgot-p
 import { Route as AuthenticatedSettingsRouteRouteImport } from './routes/_authenticated/settings/route'
 import { Route as AuthenticatedUsersIndexRouteImport } from './routes/_authenticated/users/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
-import { Route as AuthenticatedLocalitesIndexRouteImport } from './routes/_authenticated/localites/index'
 import { Route as AuthenticatedHelpCenterIndexRouteImport } from './routes/_authenticated/help-center/index'
 import { Route as AuthenticatedAppsIndexRouteImport } from './routes/_authenticated/apps/index'
 import { Route as AuthenticatedSettingsNotificationsRouteImport } from './routes/_authenticated/settings/notifications'
@@ -31,7 +30,29 @@ import { Route as AuthenticatedSettingsDisplayRouteImport } from './routes/_auth
 import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_authenticated/settings/appearance'
 import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
+import { Route as AuthenticatedProgrammeListeIndexRouteImport } from './routes/_authenticated/programme/liste/index'
+import { Route as AuthenticatedProgrammeIndicateursPerformanceIndexRouteImport } from './routes/_authenticated/programme/indicateurs-performance/index'
+import { Route as AuthenticatedProgrammeIndicateursCmrIndexRouteImport } from './routes/_authenticated/programme/indicateurs-cmr/index'
+import { Route as AuthenticatedProgrammeCadreStrategiqueIndexRouteImport } from './routes/_authenticated/programme/cadre-strategique/index'
+import { Route as AuthenticatedProgrammeCadreAnalytiqueIndexRouteImport } from './routes/_authenticated/programme/cadre-analytique/index'
+import { Route as AuthenticatedProgrammationSuiviPtbaIndexRouteImport } from './routes/_authenticated/programmation/suivi-ptba/index'
+import { Route as AuthenticatedProgrammationPtbaIndexRouteImport } from './routes/_authenticated/programmation/ptba/index'
+import { Route as AuthenticatedProgrammationProjetsIndexRouteImport } from './routes/_authenticated/programmation/projets/index'
+import { Route as AuthenticatedProgrammationIndicateursPerformanceIndexRouteImport } from './routes/_authenticated/programmation/indicateurs-performance/index'
+import { Route as AuthenticatedProgrammationIndicateursActivitesPtbaIndexRouteImport } from './routes/_authenticated/programmation/indicateurs-activites-ptba/index'
+import { Route as AuthenticatedProgrammationActivitesProjetIndexRouteImport } from './routes/_authenticated/programmation/activites-projet/index'
+import { Route as AuthenticatedProgrammationActivitesProgrammeIndexRouteImport } from './routes/_authenticated/programmation/activites-programme/index'
+import { Route as AuthenticatedParametrageZoneDeCollecteIndexRouteImport } from './routes/_authenticated/parametrage/zone-de-collecte/index'
+import { Route as AuthenticatedParametrageUtilisateursIndexRouteImport } from './routes/_authenticated/parametrage/utilisateurs/index'
+import { Route as AuthenticatedParametrageUnitesDeGestionIndexRouteImport } from './routes/_authenticated/parametrage/unites-de-gestion/index'
+import { Route as AuthenticatedParametragePlansDeSiteIndexRouteImport } from './routes/_authenticated/parametrage/plans-de-site/index'
+import { Route as AuthenticatedParametragePartenaireFinancierIndexRouteImport } from './routes/_authenticated/parametrage/partenaire-financier/index'
 import { Route as AuthenticatedParametrageLocalitesIndexRouteImport } from './routes/_authenticated/parametrage/localites/index'
+import { Route as AuthenticatedParametrageFonctionsIndexRouteImport } from './routes/_authenticated/parametrage/fonctions/index'
+import { Route as AuthenticatedParametrageDictionnaireIndicateursIndexRouteImport } from './routes/_authenticated/parametrage/dictionnaire-indicateurs/index'
+import { Route as AuthenticatedParametrageConventionsIndexRouteImport } from './routes/_authenticated/parametrage/conventions/index'
+import { Route as AuthenticatedParametrageAutresIndexRouteImport } from './routes/_authenticated/parametrage/autres/index'
+import { Route as AuthenticatedParametrageActeursIndexRouteImport } from './routes/_authenticated/parametrage/acteurs/index'
 
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
@@ -104,12 +125,6 @@ const AuthenticatedSettingsIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedSettingsRouteRoute,
   } as any)
-const AuthenticatedLocalitesIndexRoute =
-  AuthenticatedLocalitesIndexRouteImport.update({
-    id: '/localites/',
-    path: '/localites/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedHelpCenterIndexRoute =
   AuthenticatedHelpCenterIndexRouteImport.update({
     id: '/help-center/',
@@ -151,10 +166,142 @@ const AuthenticatedErrorsErrorRoute =
     path: '/errors/$error',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedProgrammeListeIndexRoute =
+  AuthenticatedProgrammeListeIndexRouteImport.update({
+    id: '/programme/liste/',
+    path: '/programme/liste/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedProgrammeIndicateursPerformanceIndexRoute =
+  AuthenticatedProgrammeIndicateursPerformanceIndexRouteImport.update({
+    id: '/programme/indicateurs-performance/',
+    path: '/programme/indicateurs-performance/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedProgrammeIndicateursCmrIndexRoute =
+  AuthenticatedProgrammeIndicateursCmrIndexRouteImport.update({
+    id: '/programme/indicateurs-cmr/',
+    path: '/programme/indicateurs-cmr/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedProgrammeCadreStrategiqueIndexRoute =
+  AuthenticatedProgrammeCadreStrategiqueIndexRouteImport.update({
+    id: '/programme/cadre-strategique/',
+    path: '/programme/cadre-strategique/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedProgrammeCadreAnalytiqueIndexRoute =
+  AuthenticatedProgrammeCadreAnalytiqueIndexRouteImport.update({
+    id: '/programme/cadre-analytique/',
+    path: '/programme/cadre-analytique/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedProgrammationSuiviPtbaIndexRoute =
+  AuthenticatedProgrammationSuiviPtbaIndexRouteImport.update({
+    id: '/programmation/suivi-ptba/',
+    path: '/programmation/suivi-ptba/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedProgrammationPtbaIndexRoute =
+  AuthenticatedProgrammationPtbaIndexRouteImport.update({
+    id: '/programmation/ptba/',
+    path: '/programmation/ptba/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedProgrammationProjetsIndexRoute =
+  AuthenticatedProgrammationProjetsIndexRouteImport.update({
+    id: '/programmation/projets/',
+    path: '/programmation/projets/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedProgrammationIndicateursPerformanceIndexRoute =
+  AuthenticatedProgrammationIndicateursPerformanceIndexRouteImport.update({
+    id: '/programmation/indicateurs-performance/',
+    path: '/programmation/indicateurs-performance/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedProgrammationIndicateursActivitesPtbaIndexRoute =
+  AuthenticatedProgrammationIndicateursActivitesPtbaIndexRouteImport.update({
+    id: '/programmation/indicateurs-activites-ptba/',
+    path: '/programmation/indicateurs-activites-ptba/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedProgrammationActivitesProjetIndexRoute =
+  AuthenticatedProgrammationActivitesProjetIndexRouteImport.update({
+    id: '/programmation/activites-projet/',
+    path: '/programmation/activites-projet/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedProgrammationActivitesProgrammeIndexRoute =
+  AuthenticatedProgrammationActivitesProgrammeIndexRouteImport.update({
+    id: '/programmation/activites-programme/',
+    path: '/programmation/activites-programme/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedParametrageZoneDeCollecteIndexRoute =
+  AuthenticatedParametrageZoneDeCollecteIndexRouteImport.update({
+    id: '/parametrage/zone-de-collecte/',
+    path: '/parametrage/zone-de-collecte/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedParametrageUtilisateursIndexRoute =
+  AuthenticatedParametrageUtilisateursIndexRouteImport.update({
+    id: '/parametrage/utilisateurs/',
+    path: '/parametrage/utilisateurs/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedParametrageUnitesDeGestionIndexRoute =
+  AuthenticatedParametrageUnitesDeGestionIndexRouteImport.update({
+    id: '/parametrage/unites-de-gestion/',
+    path: '/parametrage/unites-de-gestion/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedParametragePlansDeSiteIndexRoute =
+  AuthenticatedParametragePlansDeSiteIndexRouteImport.update({
+    id: '/parametrage/plans-de-site/',
+    path: '/parametrage/plans-de-site/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedParametragePartenaireFinancierIndexRoute =
+  AuthenticatedParametragePartenaireFinancierIndexRouteImport.update({
+    id: '/parametrage/partenaire-financier/',
+    path: '/parametrage/partenaire-financier/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedParametrageLocalitesIndexRoute =
   AuthenticatedParametrageLocalitesIndexRouteImport.update({
     id: '/parametrage/localites/',
     path: '/parametrage/localites/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedParametrageFonctionsIndexRoute =
+  AuthenticatedParametrageFonctionsIndexRouteImport.update({
+    id: '/parametrage/fonctions/',
+    path: '/parametrage/fonctions/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedParametrageDictionnaireIndicateursIndexRoute =
+  AuthenticatedParametrageDictionnaireIndicateursIndexRouteImport.update({
+    id: '/parametrage/dictionnaire-indicateurs/',
+    path: '/parametrage/dictionnaire-indicateurs/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedParametrageConventionsIndexRoute =
+  AuthenticatedParametrageConventionsIndexRouteImport.update({
+    id: '/parametrage/conventions/',
+    path: '/parametrage/conventions/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedParametrageAutresIndexRoute =
+  AuthenticatedParametrageAutresIndexRouteImport.update({
+    id: '/parametrage/autres/',
+    path: '/parametrage/autres/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedParametrageActeursIndexRoute =
+  AuthenticatedParametrageActeursIndexRouteImport.update({
+    id: '/parametrage/acteurs/',
+    path: '/parametrage/acteurs/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 
@@ -177,10 +324,31 @@ export interface FileRoutesByFullPath {
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/apps/': typeof AuthenticatedAppsIndexRoute
   '/help-center/': typeof AuthenticatedHelpCenterIndexRoute
-  '/localites/': typeof AuthenticatedLocalitesIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/users/': typeof AuthenticatedUsersIndexRoute
+  '/parametrage/acteurs/': typeof AuthenticatedParametrageActeursIndexRoute
+  '/parametrage/autres/': typeof AuthenticatedParametrageAutresIndexRoute
+  '/parametrage/conventions/': typeof AuthenticatedParametrageConventionsIndexRoute
+  '/parametrage/dictionnaire-indicateurs/': typeof AuthenticatedParametrageDictionnaireIndicateursIndexRoute
+  '/parametrage/fonctions/': typeof AuthenticatedParametrageFonctionsIndexRoute
   '/parametrage/localites/': typeof AuthenticatedParametrageLocalitesIndexRoute
+  '/parametrage/partenaire-financier/': typeof AuthenticatedParametragePartenaireFinancierIndexRoute
+  '/parametrage/plans-de-site/': typeof AuthenticatedParametragePlansDeSiteIndexRoute
+  '/parametrage/unites-de-gestion/': typeof AuthenticatedParametrageUnitesDeGestionIndexRoute
+  '/parametrage/utilisateurs/': typeof AuthenticatedParametrageUtilisateursIndexRoute
+  '/parametrage/zone-de-collecte/': typeof AuthenticatedParametrageZoneDeCollecteIndexRoute
+  '/programmation/activites-programme/': typeof AuthenticatedProgrammationActivitesProgrammeIndexRoute
+  '/programmation/activites-projet/': typeof AuthenticatedProgrammationActivitesProjetIndexRoute
+  '/programmation/indicateurs-activites-ptba/': typeof AuthenticatedProgrammationIndicateursActivitesPtbaIndexRoute
+  '/programmation/indicateurs-performance/': typeof AuthenticatedProgrammationIndicateursPerformanceIndexRoute
+  '/programmation/projets/': typeof AuthenticatedProgrammationProjetsIndexRoute
+  '/programmation/ptba/': typeof AuthenticatedProgrammationPtbaIndexRoute
+  '/programmation/suivi-ptba/': typeof AuthenticatedProgrammationSuiviPtbaIndexRoute
+  '/programme/cadre-analytique/': typeof AuthenticatedProgrammeCadreAnalytiqueIndexRoute
+  '/programme/cadre-strategique/': typeof AuthenticatedProgrammeCadreStrategiqueIndexRoute
+  '/programme/indicateurs-cmr/': typeof AuthenticatedProgrammeIndicateursCmrIndexRoute
+  '/programme/indicateurs-performance/': typeof AuthenticatedProgrammeIndicateursPerformanceIndexRoute
+  '/programme/liste/': typeof AuthenticatedProgrammeListeIndexRoute
 }
 export interface FileRoutesByTo {
   '/forgot-password': typeof authForgotPasswordRoute
@@ -200,10 +368,31 @@ export interface FileRoutesByTo {
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/apps': typeof AuthenticatedAppsIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
-  '/localites': typeof AuthenticatedLocalitesIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
+  '/parametrage/acteurs': typeof AuthenticatedParametrageActeursIndexRoute
+  '/parametrage/autres': typeof AuthenticatedParametrageAutresIndexRoute
+  '/parametrage/conventions': typeof AuthenticatedParametrageConventionsIndexRoute
+  '/parametrage/dictionnaire-indicateurs': typeof AuthenticatedParametrageDictionnaireIndicateursIndexRoute
+  '/parametrage/fonctions': typeof AuthenticatedParametrageFonctionsIndexRoute
   '/parametrage/localites': typeof AuthenticatedParametrageLocalitesIndexRoute
+  '/parametrage/partenaire-financier': typeof AuthenticatedParametragePartenaireFinancierIndexRoute
+  '/parametrage/plans-de-site': typeof AuthenticatedParametragePlansDeSiteIndexRoute
+  '/parametrage/unites-de-gestion': typeof AuthenticatedParametrageUnitesDeGestionIndexRoute
+  '/parametrage/utilisateurs': typeof AuthenticatedParametrageUtilisateursIndexRoute
+  '/parametrage/zone-de-collecte': typeof AuthenticatedParametrageZoneDeCollecteIndexRoute
+  '/programmation/activites-programme': typeof AuthenticatedProgrammationActivitesProgrammeIndexRoute
+  '/programmation/activites-projet': typeof AuthenticatedProgrammationActivitesProjetIndexRoute
+  '/programmation/indicateurs-activites-ptba': typeof AuthenticatedProgrammationIndicateursActivitesPtbaIndexRoute
+  '/programmation/indicateurs-performance': typeof AuthenticatedProgrammationIndicateursPerformanceIndexRoute
+  '/programmation/projets': typeof AuthenticatedProgrammationProjetsIndexRoute
+  '/programmation/ptba': typeof AuthenticatedProgrammationPtbaIndexRoute
+  '/programmation/suivi-ptba': typeof AuthenticatedProgrammationSuiviPtbaIndexRoute
+  '/programme/cadre-analytique': typeof AuthenticatedProgrammeCadreAnalytiqueIndexRoute
+  '/programme/cadre-strategique': typeof AuthenticatedProgrammeCadreStrategiqueIndexRoute
+  '/programme/indicateurs-cmr': typeof AuthenticatedProgrammeIndicateursCmrIndexRoute
+  '/programme/indicateurs-performance': typeof AuthenticatedProgrammeIndicateursPerformanceIndexRoute
+  '/programme/liste': typeof AuthenticatedProgrammeListeIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -226,10 +415,31 @@ export interface FileRoutesById {
   '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/_authenticated/apps/': typeof AuthenticatedAppsIndexRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
-  '/_authenticated/localites/': typeof AuthenticatedLocalitesIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
+  '/_authenticated/parametrage/acteurs/': typeof AuthenticatedParametrageActeursIndexRoute
+  '/_authenticated/parametrage/autres/': typeof AuthenticatedParametrageAutresIndexRoute
+  '/_authenticated/parametrage/conventions/': typeof AuthenticatedParametrageConventionsIndexRoute
+  '/_authenticated/parametrage/dictionnaire-indicateurs/': typeof AuthenticatedParametrageDictionnaireIndicateursIndexRoute
+  '/_authenticated/parametrage/fonctions/': typeof AuthenticatedParametrageFonctionsIndexRoute
   '/_authenticated/parametrage/localites/': typeof AuthenticatedParametrageLocalitesIndexRoute
+  '/_authenticated/parametrage/partenaire-financier/': typeof AuthenticatedParametragePartenaireFinancierIndexRoute
+  '/_authenticated/parametrage/plans-de-site/': typeof AuthenticatedParametragePlansDeSiteIndexRoute
+  '/_authenticated/parametrage/unites-de-gestion/': typeof AuthenticatedParametrageUnitesDeGestionIndexRoute
+  '/_authenticated/parametrage/utilisateurs/': typeof AuthenticatedParametrageUtilisateursIndexRoute
+  '/_authenticated/parametrage/zone-de-collecte/': typeof AuthenticatedParametrageZoneDeCollecteIndexRoute
+  '/_authenticated/programmation/activites-programme/': typeof AuthenticatedProgrammationActivitesProgrammeIndexRoute
+  '/_authenticated/programmation/activites-projet/': typeof AuthenticatedProgrammationActivitesProjetIndexRoute
+  '/_authenticated/programmation/indicateurs-activites-ptba/': typeof AuthenticatedProgrammationIndicateursActivitesPtbaIndexRoute
+  '/_authenticated/programmation/indicateurs-performance/': typeof AuthenticatedProgrammationIndicateursPerformanceIndexRoute
+  '/_authenticated/programmation/projets/': typeof AuthenticatedProgrammationProjetsIndexRoute
+  '/_authenticated/programmation/ptba/': typeof AuthenticatedProgrammationPtbaIndexRoute
+  '/_authenticated/programmation/suivi-ptba/': typeof AuthenticatedProgrammationSuiviPtbaIndexRoute
+  '/_authenticated/programme/cadre-analytique/': typeof AuthenticatedProgrammeCadreAnalytiqueIndexRoute
+  '/_authenticated/programme/cadre-strategique/': typeof AuthenticatedProgrammeCadreStrategiqueIndexRoute
+  '/_authenticated/programme/indicateurs-cmr/': typeof AuthenticatedProgrammeIndicateursCmrIndexRoute
+  '/_authenticated/programme/indicateurs-performance/': typeof AuthenticatedProgrammeIndicateursPerformanceIndexRoute
+  '/_authenticated/programme/liste/': typeof AuthenticatedProgrammeListeIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -252,10 +462,31 @@ export interface FileRouteTypes {
     | '/settings/notifications'
     | '/apps/'
     | '/help-center/'
-    | '/localites/'
     | '/settings/'
     | '/users/'
+    | '/parametrage/acteurs/'
+    | '/parametrage/autres/'
+    | '/parametrage/conventions/'
+    | '/parametrage/dictionnaire-indicateurs/'
+    | '/parametrage/fonctions/'
     | '/parametrage/localites/'
+    | '/parametrage/partenaire-financier/'
+    | '/parametrage/plans-de-site/'
+    | '/parametrage/unites-de-gestion/'
+    | '/parametrage/utilisateurs/'
+    | '/parametrage/zone-de-collecte/'
+    | '/programmation/activites-programme/'
+    | '/programmation/activites-projet/'
+    | '/programmation/indicateurs-activites-ptba/'
+    | '/programmation/indicateurs-performance/'
+    | '/programmation/projets/'
+    | '/programmation/ptba/'
+    | '/programmation/suivi-ptba/'
+    | '/programme/cadre-analytique/'
+    | '/programme/cadre-strategique/'
+    | '/programme/indicateurs-cmr/'
+    | '/programme/indicateurs-performance/'
+    | '/programme/liste/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/forgot-password'
@@ -275,10 +506,31 @@ export interface FileRouteTypes {
     | '/settings/notifications'
     | '/apps'
     | '/help-center'
-    | '/localites'
     | '/settings'
     | '/users'
+    | '/parametrage/acteurs'
+    | '/parametrage/autres'
+    | '/parametrage/conventions'
+    | '/parametrage/dictionnaire-indicateurs'
+    | '/parametrage/fonctions'
     | '/parametrage/localites'
+    | '/parametrage/partenaire-financier'
+    | '/parametrage/plans-de-site'
+    | '/parametrage/unites-de-gestion'
+    | '/parametrage/utilisateurs'
+    | '/parametrage/zone-de-collecte'
+    | '/programmation/activites-programme'
+    | '/programmation/activites-projet'
+    | '/programmation/indicateurs-activites-ptba'
+    | '/programmation/indicateurs-performance'
+    | '/programmation/projets'
+    | '/programmation/ptba'
+    | '/programmation/suivi-ptba'
+    | '/programme/cadre-analytique'
+    | '/programme/cadre-strategique'
+    | '/programme/indicateurs-cmr'
+    | '/programme/indicateurs-performance'
+    | '/programme/liste'
   id:
     | '__root__'
     | '/_authenticated'
@@ -300,10 +552,31 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/notifications'
     | '/_authenticated/apps/'
     | '/_authenticated/help-center/'
-    | '/_authenticated/localites/'
     | '/_authenticated/settings/'
     | '/_authenticated/users/'
+    | '/_authenticated/parametrage/acteurs/'
+    | '/_authenticated/parametrage/autres/'
+    | '/_authenticated/parametrage/conventions/'
+    | '/_authenticated/parametrage/dictionnaire-indicateurs/'
+    | '/_authenticated/parametrage/fonctions/'
     | '/_authenticated/parametrage/localites/'
+    | '/_authenticated/parametrage/partenaire-financier/'
+    | '/_authenticated/parametrage/plans-de-site/'
+    | '/_authenticated/parametrage/unites-de-gestion/'
+    | '/_authenticated/parametrage/utilisateurs/'
+    | '/_authenticated/parametrage/zone-de-collecte/'
+    | '/_authenticated/programmation/activites-programme/'
+    | '/_authenticated/programmation/activites-projet/'
+    | '/_authenticated/programmation/indicateurs-activites-ptba/'
+    | '/_authenticated/programmation/indicateurs-performance/'
+    | '/_authenticated/programmation/projets/'
+    | '/_authenticated/programmation/ptba/'
+    | '/_authenticated/programmation/suivi-ptba/'
+    | '/_authenticated/programme/cadre-analytique/'
+    | '/_authenticated/programme/cadre-strategique/'
+    | '/_authenticated/programme/indicateurs-cmr/'
+    | '/_authenticated/programme/indicateurs-performance/'
+    | '/_authenticated/programme/liste/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -419,13 +692,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsIndexRouteImport
       parentRoute: typeof AuthenticatedSettingsRouteRoute
     }
-    '/_authenticated/localites/': {
-      id: '/_authenticated/localites/'
-      path: '/localites'
-      fullPath: '/localites/'
-      preLoaderRoute: typeof AuthenticatedLocalitesIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/help-center/': {
       id: '/_authenticated/help-center/'
       path: '/help-center'
@@ -475,11 +741,165 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedErrorsErrorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/programme/liste/': {
+      id: '/_authenticated/programme/liste/'
+      path: '/programme/liste'
+      fullPath: '/programme/liste/'
+      preLoaderRoute: typeof AuthenticatedProgrammeListeIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/programme/indicateurs-performance/': {
+      id: '/_authenticated/programme/indicateurs-performance/'
+      path: '/programme/indicateurs-performance'
+      fullPath: '/programme/indicateurs-performance/'
+      preLoaderRoute: typeof AuthenticatedProgrammeIndicateursPerformanceIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/programme/indicateurs-cmr/': {
+      id: '/_authenticated/programme/indicateurs-cmr/'
+      path: '/programme/indicateurs-cmr'
+      fullPath: '/programme/indicateurs-cmr/'
+      preLoaderRoute: typeof AuthenticatedProgrammeIndicateursCmrIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/programme/cadre-strategique/': {
+      id: '/_authenticated/programme/cadre-strategique/'
+      path: '/programme/cadre-strategique'
+      fullPath: '/programme/cadre-strategique/'
+      preLoaderRoute: typeof AuthenticatedProgrammeCadreStrategiqueIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/programme/cadre-analytique/': {
+      id: '/_authenticated/programme/cadre-analytique/'
+      path: '/programme/cadre-analytique'
+      fullPath: '/programme/cadre-analytique/'
+      preLoaderRoute: typeof AuthenticatedProgrammeCadreAnalytiqueIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/programmation/suivi-ptba/': {
+      id: '/_authenticated/programmation/suivi-ptba/'
+      path: '/programmation/suivi-ptba'
+      fullPath: '/programmation/suivi-ptba/'
+      preLoaderRoute: typeof AuthenticatedProgrammationSuiviPtbaIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/programmation/ptba/': {
+      id: '/_authenticated/programmation/ptba/'
+      path: '/programmation/ptba'
+      fullPath: '/programmation/ptba/'
+      preLoaderRoute: typeof AuthenticatedProgrammationPtbaIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/programmation/projets/': {
+      id: '/_authenticated/programmation/projets/'
+      path: '/programmation/projets'
+      fullPath: '/programmation/projets/'
+      preLoaderRoute: typeof AuthenticatedProgrammationProjetsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/programmation/indicateurs-performance/': {
+      id: '/_authenticated/programmation/indicateurs-performance/'
+      path: '/programmation/indicateurs-performance'
+      fullPath: '/programmation/indicateurs-performance/'
+      preLoaderRoute: typeof AuthenticatedProgrammationIndicateursPerformanceIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/programmation/indicateurs-activites-ptba/': {
+      id: '/_authenticated/programmation/indicateurs-activites-ptba/'
+      path: '/programmation/indicateurs-activites-ptba'
+      fullPath: '/programmation/indicateurs-activites-ptba/'
+      preLoaderRoute: typeof AuthenticatedProgrammationIndicateursActivitesPtbaIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/programmation/activites-projet/': {
+      id: '/_authenticated/programmation/activites-projet/'
+      path: '/programmation/activites-projet'
+      fullPath: '/programmation/activites-projet/'
+      preLoaderRoute: typeof AuthenticatedProgrammationActivitesProjetIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/programmation/activites-programme/': {
+      id: '/_authenticated/programmation/activites-programme/'
+      path: '/programmation/activites-programme'
+      fullPath: '/programmation/activites-programme/'
+      preLoaderRoute: typeof AuthenticatedProgrammationActivitesProgrammeIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/parametrage/zone-de-collecte/': {
+      id: '/_authenticated/parametrage/zone-de-collecte/'
+      path: '/parametrage/zone-de-collecte'
+      fullPath: '/parametrage/zone-de-collecte/'
+      preLoaderRoute: typeof AuthenticatedParametrageZoneDeCollecteIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/parametrage/utilisateurs/': {
+      id: '/_authenticated/parametrage/utilisateurs/'
+      path: '/parametrage/utilisateurs'
+      fullPath: '/parametrage/utilisateurs/'
+      preLoaderRoute: typeof AuthenticatedParametrageUtilisateursIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/parametrage/unites-de-gestion/': {
+      id: '/_authenticated/parametrage/unites-de-gestion/'
+      path: '/parametrage/unites-de-gestion'
+      fullPath: '/parametrage/unites-de-gestion/'
+      preLoaderRoute: typeof AuthenticatedParametrageUnitesDeGestionIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/parametrage/plans-de-site/': {
+      id: '/_authenticated/parametrage/plans-de-site/'
+      path: '/parametrage/plans-de-site'
+      fullPath: '/parametrage/plans-de-site/'
+      preLoaderRoute: typeof AuthenticatedParametragePlansDeSiteIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/parametrage/partenaire-financier/': {
+      id: '/_authenticated/parametrage/partenaire-financier/'
+      path: '/parametrage/partenaire-financier'
+      fullPath: '/parametrage/partenaire-financier/'
+      preLoaderRoute: typeof AuthenticatedParametragePartenaireFinancierIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/parametrage/localites/': {
       id: '/_authenticated/parametrage/localites/'
       path: '/parametrage/localites'
       fullPath: '/parametrage/localites/'
       preLoaderRoute: typeof AuthenticatedParametrageLocalitesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/parametrage/fonctions/': {
+      id: '/_authenticated/parametrage/fonctions/'
+      path: '/parametrage/fonctions'
+      fullPath: '/parametrage/fonctions/'
+      preLoaderRoute: typeof AuthenticatedParametrageFonctionsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/parametrage/dictionnaire-indicateurs/': {
+      id: '/_authenticated/parametrage/dictionnaire-indicateurs/'
+      path: '/parametrage/dictionnaire-indicateurs'
+      fullPath: '/parametrage/dictionnaire-indicateurs/'
+      preLoaderRoute: typeof AuthenticatedParametrageDictionnaireIndicateursIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/parametrage/conventions/': {
+      id: '/_authenticated/parametrage/conventions/'
+      path: '/parametrage/conventions'
+      fullPath: '/parametrage/conventions/'
+      preLoaderRoute: typeof AuthenticatedParametrageConventionsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/parametrage/autres/': {
+      id: '/_authenticated/parametrage/autres/'
+      path: '/parametrage/autres'
+      fullPath: '/parametrage/autres/'
+      preLoaderRoute: typeof AuthenticatedParametrageAutresIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/parametrage/acteurs/': {
+      id: '/_authenticated/parametrage/acteurs/'
+      path: '/parametrage/acteurs'
+      fullPath: '/parametrage/acteurs/'
+      preLoaderRoute: typeof AuthenticatedParametrageActeursIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
   }
@@ -514,9 +934,30 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
-  AuthenticatedLocalitesIndexRoute: typeof AuthenticatedLocalitesIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
+  AuthenticatedParametrageActeursIndexRoute: typeof AuthenticatedParametrageActeursIndexRoute
+  AuthenticatedParametrageAutresIndexRoute: typeof AuthenticatedParametrageAutresIndexRoute
+  AuthenticatedParametrageConventionsIndexRoute: typeof AuthenticatedParametrageConventionsIndexRoute
+  AuthenticatedParametrageDictionnaireIndicateursIndexRoute: typeof AuthenticatedParametrageDictionnaireIndicateursIndexRoute
+  AuthenticatedParametrageFonctionsIndexRoute: typeof AuthenticatedParametrageFonctionsIndexRoute
   AuthenticatedParametrageLocalitesIndexRoute: typeof AuthenticatedParametrageLocalitesIndexRoute
+  AuthenticatedParametragePartenaireFinancierIndexRoute: typeof AuthenticatedParametragePartenaireFinancierIndexRoute
+  AuthenticatedParametragePlansDeSiteIndexRoute: typeof AuthenticatedParametragePlansDeSiteIndexRoute
+  AuthenticatedParametrageUnitesDeGestionIndexRoute: typeof AuthenticatedParametrageUnitesDeGestionIndexRoute
+  AuthenticatedParametrageUtilisateursIndexRoute: typeof AuthenticatedParametrageUtilisateursIndexRoute
+  AuthenticatedParametrageZoneDeCollecteIndexRoute: typeof AuthenticatedParametrageZoneDeCollecteIndexRoute
+  AuthenticatedProgrammationActivitesProgrammeIndexRoute: typeof AuthenticatedProgrammationActivitesProgrammeIndexRoute
+  AuthenticatedProgrammationActivitesProjetIndexRoute: typeof AuthenticatedProgrammationActivitesProjetIndexRoute
+  AuthenticatedProgrammationIndicateursActivitesPtbaIndexRoute: typeof AuthenticatedProgrammationIndicateursActivitesPtbaIndexRoute
+  AuthenticatedProgrammationIndicateursPerformanceIndexRoute: typeof AuthenticatedProgrammationIndicateursPerformanceIndexRoute
+  AuthenticatedProgrammationProjetsIndexRoute: typeof AuthenticatedProgrammationProjetsIndexRoute
+  AuthenticatedProgrammationPtbaIndexRoute: typeof AuthenticatedProgrammationPtbaIndexRoute
+  AuthenticatedProgrammationSuiviPtbaIndexRoute: typeof AuthenticatedProgrammationSuiviPtbaIndexRoute
+  AuthenticatedProgrammeCadreAnalytiqueIndexRoute: typeof AuthenticatedProgrammeCadreAnalytiqueIndexRoute
+  AuthenticatedProgrammeCadreStrategiqueIndexRoute: typeof AuthenticatedProgrammeCadreStrategiqueIndexRoute
+  AuthenticatedProgrammeIndicateursCmrIndexRoute: typeof AuthenticatedProgrammeIndicateursCmrIndexRoute
+  AuthenticatedProgrammeIndicateursPerformanceIndexRoute: typeof AuthenticatedProgrammeIndicateursPerformanceIndexRoute
+  AuthenticatedProgrammeListeIndexRoute: typeof AuthenticatedProgrammeListeIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -525,10 +966,52 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
-  AuthenticatedLocalitesIndexRoute: AuthenticatedLocalitesIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
+  AuthenticatedParametrageActeursIndexRoute:
+    AuthenticatedParametrageActeursIndexRoute,
+  AuthenticatedParametrageAutresIndexRoute:
+    AuthenticatedParametrageAutresIndexRoute,
+  AuthenticatedParametrageConventionsIndexRoute:
+    AuthenticatedParametrageConventionsIndexRoute,
+  AuthenticatedParametrageDictionnaireIndicateursIndexRoute:
+    AuthenticatedParametrageDictionnaireIndicateursIndexRoute,
+  AuthenticatedParametrageFonctionsIndexRoute:
+    AuthenticatedParametrageFonctionsIndexRoute,
   AuthenticatedParametrageLocalitesIndexRoute:
     AuthenticatedParametrageLocalitesIndexRoute,
+  AuthenticatedParametragePartenaireFinancierIndexRoute:
+    AuthenticatedParametragePartenaireFinancierIndexRoute,
+  AuthenticatedParametragePlansDeSiteIndexRoute:
+    AuthenticatedParametragePlansDeSiteIndexRoute,
+  AuthenticatedParametrageUnitesDeGestionIndexRoute:
+    AuthenticatedParametrageUnitesDeGestionIndexRoute,
+  AuthenticatedParametrageUtilisateursIndexRoute:
+    AuthenticatedParametrageUtilisateursIndexRoute,
+  AuthenticatedParametrageZoneDeCollecteIndexRoute:
+    AuthenticatedParametrageZoneDeCollecteIndexRoute,
+  AuthenticatedProgrammationActivitesProgrammeIndexRoute:
+    AuthenticatedProgrammationActivitesProgrammeIndexRoute,
+  AuthenticatedProgrammationActivitesProjetIndexRoute:
+    AuthenticatedProgrammationActivitesProjetIndexRoute,
+  AuthenticatedProgrammationIndicateursActivitesPtbaIndexRoute:
+    AuthenticatedProgrammationIndicateursActivitesPtbaIndexRoute,
+  AuthenticatedProgrammationIndicateursPerformanceIndexRoute:
+    AuthenticatedProgrammationIndicateursPerformanceIndexRoute,
+  AuthenticatedProgrammationProjetsIndexRoute:
+    AuthenticatedProgrammationProjetsIndexRoute,
+  AuthenticatedProgrammationPtbaIndexRoute:
+    AuthenticatedProgrammationPtbaIndexRoute,
+  AuthenticatedProgrammationSuiviPtbaIndexRoute:
+    AuthenticatedProgrammationSuiviPtbaIndexRoute,
+  AuthenticatedProgrammeCadreAnalytiqueIndexRoute:
+    AuthenticatedProgrammeCadreAnalytiqueIndexRoute,
+  AuthenticatedProgrammeCadreStrategiqueIndexRoute:
+    AuthenticatedProgrammeCadreStrategiqueIndexRoute,
+  AuthenticatedProgrammeIndicateursCmrIndexRoute:
+    AuthenticatedProgrammeIndicateursCmrIndexRoute,
+  AuthenticatedProgrammeIndicateursPerformanceIndexRoute:
+    AuthenticatedProgrammeIndicateursPerformanceIndexRoute,
+  AuthenticatedProgrammeListeIndexRoute: AuthenticatedProgrammeListeIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
