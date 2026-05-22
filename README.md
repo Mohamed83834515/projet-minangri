@@ -16,12 +16,14 @@ Dans authenticated :
 2)  Dans SIMADOU : 
 Dans allfonctionalities, on part de l'exemple de users, vous créez un autre dossier : localités qui contiendra tous les composants (fichiers necessaires) 
 
+```
 ── simadou
 │   │   ├── allfonctionalities
 │   │   │   └── users
 │   │   │       ├── AddUser.tsx
 │   │   │       ├── EditUser.tsx
 │   │   │       └── ListeUsers.tsx
+```
 
 3)  Revenir dans la route crée au niveau de _authenticated puis : 
 
@@ -72,9 +74,11 @@ function RouteComponent() {
 4) Ajout de la route de la fonctionnalité crée
 Dans #sidebar-data.ts  il y a toutes les routes
 
+```
 ├── simadou
 │   │   ├── routescontantes
 │   │   │   └── sidebar-data.ts
+```
 
 ```js
 import {
@@ -179,9 +183,12 @@ export default AddUser
 ### 1a) Config des champs
 
 Donc ici comme prévu chacun créera un fichier correspondant a la classe qu'il voudra manipuler
+
+```
 ├── simadou
 │   │   ├── allfieldsConfig
 │   │   │   └── userFormConfig.ts
+```
 
 Dans userFormConfig.ts
 
@@ -285,16 +292,21 @@ export const getAbsenceFormConfig = (
 
 Chacun viendra donc dans schemas créer propres schemas
 
+```
 ├── simadou
 │   │   └── schemas
 │   │       └── allSchema.ts
+```
+
 ### 1c) configuration des champs de renitialisation
 
 sa ce fais ici donc
 
+```
 ├── simadou
 │   │   ├── allResetFields
 │   │   │   └── resetField.ts
+```
 
 exemple : 
 
