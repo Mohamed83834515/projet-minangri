@@ -11,7 +11,7 @@ export interface SuiviTacheActivite {
   livrable_suivi: string;
   /** L’API renvoie souvent la tâche imbriquée au lieu de l’id seul */
   id_groupe_tache: number | TacheActivitePtba;
-  id_activite_ptba: number;
+  id_activite_ptba: number | { id_ptba?: number };
 }
 
 export function resolveIdGroupeTache(
@@ -19,7 +19,43 @@ export function resolveIdGroupeTache(
 ): number | undefined {
   if (ref == null) return undefined;
   if (typeof ref === "object") return ref.id_groupe_tache;
-  return ref;
+  const n = Number(ref);
+  return Number.isFinite(n) ? n : undefined;
+}
+
+export function resolveIdActivitePtba(
+  ref: number | { id_ptba?: number } | undefined | null,
+): number | undefined {
+  if (ref == null) return undefined;
+  if (typeof ref === "number" && Number.isFinite(ref)) return ref;
+  if (typeof ref === "object" && "id_ptba" in ref) {
+    const n = Number(ref.id_ptba);
+    return Number.isFinite(n) ? n : undefined;
+  }
+  return undefined;
+}
+
+export function parseSuiviValide(raw: unknown): boolean {
+  if (typeof raw === "boolean") return raw;
+  if (raw === "true" || raw === 1 || raw === "1") return true;
+  return false;
+}
+
+/** Champs tableau Suivi des tâches (date, validé, observation). */
+export function getSuiviTableDisplayFields(suivi?: SuiviTacheActivite) {
+  if (!suivi) {
+    return {
+      dateRealisation: undefined as string | undefined,
+      valide: undefined as boolean | undefined,
+      observation: undefined as string | undefined,
+    };
+  }
+  const dateRaw = suivi.date_reele?.trim();
+  return {
+    dateRealisation: dateRaw || undefined,
+    valide: suivi.valide,
+    observation: suivi.observation_suivi?.trim() || undefined,
+  };
 }
 
 /** Ids de tâches déjà couvertes par un suivi (hors suivi en cours d’édition). */

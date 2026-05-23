@@ -1,6 +1,10 @@
 import { apiClient } from "@/axios/api";
 import type { SuiviTacheActiviteFormData } from "../schemas/suiviTacheActiviteSchemas";
 import type { SuiviTacheActivite } from "../allTypes";
+import {
+  resolveIdActivitePtba,
+  parseSuiviValide,
+} from "../allTypes/suiviTacheActivite";
 
 const ENDPOINT = "/suivi-tache-activites/";
 const WITH_LIVRABLES_ENDPOINT = "/suivi-tache-activites/with-livrables/";
@@ -28,19 +32,22 @@ export function mapSuiviTacheActiviteFromApi(
   raw: Record<string, unknown>,
 ): SuiviTacheActivite {
   const dateReelle = raw.date_reele ?? raw.date_reel;
+  const idActivite = resolveIdActivitePtba(
+    raw.id_activite_ptba as SuiviTacheActivite["id_activite_ptba"],
+  );
   return {
     id_suivi_groupe_tache: Number(raw.id_suivi_groupe_tache),
     proportion_realisee: Number(
       raw.proportion_realisee ?? raw.lot_realisee ?? 0,
     ),
-    valide: Boolean(raw.valide),
+    valide: parseSuiviValide(raw.valide),
     date_reele: typeof dateReelle === "string" ? dateReelle : "",
     observation_suivi:
       typeof raw.observation_suivi === "string" ? raw.observation_suivi : "",
     livrable_suivi:
       typeof raw.livrable_suivi === "string" ? raw.livrable_suivi : "",
     id_groupe_tache: raw.id_groupe_tache as SuiviTacheActivite["id_groupe_tache"],
-    id_activite_ptba: Number(raw.id_activite_ptba),
+    id_activite_ptba: idActivite ?? 0,
   };
 }
 
@@ -93,7 +100,7 @@ const suiviTacheActiviteService = {
     });
     return normalizeList(response)
       .map(mapSuiviTacheActiviteFromApi)
-      .filter((s) => s.id_activite_ptba === idActivite);
+      .filter((s) => resolveIdActivitePtba(s.id_activite_ptba) === idActivite);
   },
 
   async create(
