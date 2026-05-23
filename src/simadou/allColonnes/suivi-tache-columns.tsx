@@ -18,6 +18,23 @@ export type SuiviTacheColumnHandlers = {
 
 const colWide = 'max-w-[220px] whitespace-normal'
 
+/** Champs affichés depuis le suivi tâche (pas depuis la tâche planifiée). */
+function getSuiviDisplayFields(suivi?: SuiviTacheActivite) {
+  if (!suivi) {
+    return {
+      dateRealisation: undefined as string | undefined,
+      valide: undefined as boolean | undefined,
+      observation: undefined as string | undefined,
+    }
+  }
+  const dateRaw = suivi.date_reele?.trim()
+  return {
+    dateRealisation: dateRaw || undefined,
+    valide: suivi.valide,
+    observation: suivi.observation_suivi?.trim() || undefined,
+  }
+}
+
 function formatDateRealisation(value: string | undefined | null): string {
   if (!value?.trim()) return '—'
   const d = new Date(value)

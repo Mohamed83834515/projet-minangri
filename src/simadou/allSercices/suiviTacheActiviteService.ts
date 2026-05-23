@@ -35,17 +35,17 @@ export function mapSuiviTacheActiviteFromApi(
   const idActivite = resolveIdActivitePtba(
     raw.id_activite_ptba as SuiviTacheActivite["id_activite_ptba"],
   );
+  const lotRealisee = Number(raw.lot_realisee ?? raw.proportion_realisee ?? 0);
   return {
     id_suivi_groupe_tache: Number(raw.id_suivi_groupe_tache),
-    proportion_realisee: Number(
-      raw.proportion_realisee ?? raw.lot_realisee ?? 0,
-    ),
+    lot_realisee: lotRealisee,
+    proportion_realisee: lotRealisee,
     valide: parseSuiviValide(raw.valide),
     date_reele: typeof dateReelle === "string" ? dateReelle : "",
     observation_suivi:
       typeof raw.observation_suivi === "string" ? raw.observation_suivi : "",
     id_groupe_tache: raw.id_groupe_tache as SuiviTacheActivite["id_groupe_tache"],
-    id_activite_ptba: idActivite ?? 0,
+    id_activite_ptba: idActivite ?? raw.id_activite_ptba ?? 0,
   };
 }
 
