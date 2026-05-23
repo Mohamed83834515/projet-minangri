@@ -251,7 +251,7 @@ export const getUserFormConfig = (): FormConfig => ({
 prenons juste un exemple (elèves et matière)
 
 ```js
-import type { FormConfig } from "../allTypes/formConfig";
+import type { FormConfig } from "";
 
 export const getAbsenceFormConfig = (
 // on passe en paramètres ici les eleves et matieres

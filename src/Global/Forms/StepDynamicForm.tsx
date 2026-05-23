@@ -16,7 +16,7 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Form } from '@/components/ui/form'
 import { FormField } from '../Fields/FormField'
-import type { FormConfig, StepConfig } from '../allTypes/formConfig'
+import type { FormConfig, StepConfig } from '../types/formConfig'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface StepDynamicFormProps {
