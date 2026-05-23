@@ -1,6 +1,7 @@
-import { toast } from "react-toastify";
-import { apiClient } from "../lib/api";
-import type { PlanSite, PlanSiteFormData } from "../types";
+import { toast } from "react-hot-toast";
+import { apiClient } from "@/axios/api";
+import type { PlanSite } from "../allTypes";
+import { PlanSiteFormData } from "../allTypes/entities";
 
 export const planSiteService = {
   // Récupérer tous les plans de site

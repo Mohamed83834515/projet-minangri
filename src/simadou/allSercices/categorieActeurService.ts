@@ -1,5 +1,5 @@
-import { apiClient } from "../lib/api";
-import { CategorieActeur } from "../types/categorieActeur";
+import { apiClient } from "@/axios/api";
+import { CategorieActeur } from "../allTypes/categorieActeur";
 
 const BASE_URL = "/categories-acteurs/";
 

@@ -1,9 +1,9 @@
-import { toast } from "react-toastify";
-import { apiClient } from "../lib/api";
+import { toast } from "react-hot-toast";
+import { apiClient } from "@/axios/api";
 import type {
   NiveauCadreResultat,
   NiveauCadreResultatFormData,
-} from "../types";
+} from "../allTypes";
 
 export const niveauCadreResultatService = {
   // Get all niveaux

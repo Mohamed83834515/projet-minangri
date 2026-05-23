@@ -1,6 +1,6 @@
-import { apiClient } from "../lib/api";
+import { apiClient } from "@/axios/api";
 import { TacheActivitePtbaFormData } from "../schemas/tacheActivitePtbaSchemas";
-import type { TacheActivitePtba } from "../types";
+import type { TacheActivitePtba } from "../allTypes";
 
 class TacheActivitePtbaService {
   async getAll(): Promise<TacheActivitePtba[]> {

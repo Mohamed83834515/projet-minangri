@@ -1,5 +1,5 @@
-import { apiClient } from "../lib/api";
-import { CadreAnalytique } from "../types/cadreAnalytique";
+import { apiClient } from "@/axios/api";
+import { CadreAnalytique } from "../allTypes/cadreAnalytique";
 
 const BASE_URL = "/cadre_analytique/";
 

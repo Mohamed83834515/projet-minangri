@@ -1,5 +1,6 @@
-import { apiClient } from "@/lib/api";
-import { GeneralParams } from '@/types/generalParams'
+
+import { apiClient } from '@/axios/api'
+import { GeneralParams } from '../allTypes/generalParams'
 
 const generalParamsServices = {
     async getAll() :   Promise<GeneralParams>{

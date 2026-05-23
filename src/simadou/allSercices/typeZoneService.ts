@@ -1,6 +1,7 @@
-import { toast } from "react-toastify";
-import { apiClient } from "../lib/api";
-import type { TypeZone, TypeZoneFormData } from "../types";
+import { toast } from "react-hot-toast";
+import { apiClient } from "@/axios/api";
+import type { TypeZone } from "../allTypes";
+import { TypeZoneFormData } from "../allTypes/entities";
 
 export const typeZoneService = {
   // Récupérer tous les types de zone

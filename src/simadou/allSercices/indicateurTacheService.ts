@@ -1,8 +1,8 @@
-import { apiClient } from "../lib/api";
+import { apiClient } from "@/axios/api";
 import type {
   IndicateurTache,
   IndicateurTacheRequest,
-} from "../types/indicateurTache";
+} from "../allTypes/indicateurTache";
 
 class IndicateurTacheService {
   async getAll(): Promise<IndicateurTache[]> {

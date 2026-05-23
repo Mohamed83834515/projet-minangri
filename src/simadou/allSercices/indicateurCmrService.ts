@@ -1,6 +1,6 @@
-import { toast } from "react-toastify";
-import { apiClient } from "../lib/api";
-import type { IndicateurCmr, IndicateurCmrFormData } from "../types";
+import { toast } from "react-hot-toast";
+import { apiClient } from "@/axios/api";
+import type { IndicateurCmr, IndicateurCmrFormData } from "../allTypes";
 
 export const indicateurCmrService = {
   // Get all indicateurs CMR

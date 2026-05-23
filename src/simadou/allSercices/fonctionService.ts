@@ -1,6 +1,7 @@
-import { toast } from "react-toastify";
-import { apiClient } from "../lib/api";
-import type { Fonction, FonctionFormData } from "../types";
+import { toast } from "react-hot-toast";
+import { apiClient } from "@/axios/api";
+import { Fonction } from "../allTypes";
+import { FonctionFormData } from "../allTypes/entities";
 
 export const fonctionService = {
   // Récupérer toutes les fonctions

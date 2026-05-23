@@ -1,6 +1,6 @@
-import { toast } from "react-toastify";
-import { apiClient } from "../lib/api";
-import { TitrePersonnel } from "../types";
+import { toast } from "react-hot-toast";
+import { apiClient } from "@/axios/api";
+import { TitrePersonnel } from "../allTypes";
 
 export const titrePersonnelService = {
   // Récupérer tous les titres

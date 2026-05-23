@@ -1,7 +1,7 @@
-import { toast } from "react-toastify";
-import { apiClient } from "../lib/api";
-import type { Personnel } from "../types";
-import { PersonnelFormData } from "@/types/entities";
+import { toast } from "react-hot-toast";
+import { apiClient } from "@/axios/api";
+import type { Personnel } from "../allTypes";
+import { PersonnelFormData } from "../allTypes/entities";
 
 
 const BASE_URL = "/personnels/";

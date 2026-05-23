@@ -1,5 +1,5 @@
-import { apiClient } from "../lib/api";
-import { Nbc } from "../types/nbc";
+import { apiClient } from "@/axios/api";
+import { Nbc } from "../allTypes/nbc";
 
 const BASE_URL = "/ugl/"; // Note: Les fonctions d'origine utilisaient cet endpoint
 

@@ -1,6 +1,6 @@
-import { toast } from "react-toastify";
-import { apiClient } from "../lib/api";
-import type { NiveauCadreStrategique } from "../types";
+import { toast } from "react-hot-toast";
+import { apiClient } from "@/axios/api";
+import type { NiveauCadreStrategique } from "../allTypes";
 
 export interface NiveauCadreStrategiqueFormData {
   nombre_nsc: number;

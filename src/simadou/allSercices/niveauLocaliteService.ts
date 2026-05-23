@@ -1,5 +1,5 @@
-import { apiClient } from "../lib/api";
-import { NiveauLocalite } from "../types/niveauLocalite";
+import { apiClient } from "@/axios/api";
+import { NiveauLocalite } from "../allTypes/niveauLocalite";
 
 const BASE_URL = "/niveau_localite_config/";
 

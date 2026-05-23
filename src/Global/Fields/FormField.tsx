@@ -33,7 +33,7 @@ import {
 } from '@/components/ui/popover'
 import { Textarea } from '@/components/ui/textarea'
 import { DateRangeField } from '../DateRange/DateRangeField'
-import type { FieldConfig } from '../types/formConfig'
+import type { FieldConfig } from '../allTypes/formConfig'
 
 interface RichSelectOption {
   value: string | number

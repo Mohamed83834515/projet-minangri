@@ -1,6 +1,6 @@
-import { apiClient } from "../lib/api";
+import { apiClient } from "@/axios/api";
 import type { SuiviTacheActiviteFormData } from "../schemas/suiviTacheActiviteSchemas";
-import type { SuiviTacheActivite } from "../types";
+import type { SuiviTacheActivite } from "../allTypes";
 
 const ENDPOINT = "/suivi_tache_activite/";
 

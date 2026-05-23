@@ -1,5 +1,5 @@
-import { apiClient } from "../lib/api";
-import type { SourceVerificationSuiviAvancementContrat } from "../types";
+import { apiClient } from "@/axios/api";
+import type { SourceVerificationSuiviAvancementContrat } from "../allTypes";
 
 const ENDPOINT = "/source_verification_suivi_avancement_contrat/";
 

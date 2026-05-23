@@ -1,5 +1,5 @@
-import { apiClient } from "../lib/api";
-import { NiveauStructure } from "../types/niveauStructure";
+import { apiClient } from "@/axios/api";
+import { NiveauStructure } from "../allTypes/niveauStructure";
 
 const BASE_URL = "/niveau_structure_config/";
 

@@ -1,6 +1,6 @@
-import { apiClient } from "../lib/api";
+import { apiClient } from "@/axios/api";
 import type { SuiviAvancementContratFormData } from "../schemas/suiviAvancementContratSchemas";
-import type { SuiviAvancementContrat } from "../types";
+import { SuiviAvancementContrat } from "../allTypes";
 
 const ENDPOINT = "/suivi-avancement-contrat/";
 const WITH_SOURCES_ENDPOINT = "/suivi-avancement-contrat/with-sources/";

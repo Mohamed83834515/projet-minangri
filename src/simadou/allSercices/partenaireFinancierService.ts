@@ -1,5 +1,5 @@
-import { apiClient } from "../lib/api";
-import { PartenaireFinancier } from "../types/partenaireFinancier";
+import { apiClient } from "@/axios/api";
+import { PartenaireFinancier } from "../allTypes/partenaireFinancier";
 
 const BASE_URL = "/partenaire_financier/";
 

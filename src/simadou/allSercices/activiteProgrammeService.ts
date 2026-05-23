@@ -1,6 +1,6 @@
-import { apiClient } from "../lib/api";
+import { apiClient } from "@/axios/api";
 import { ActiviteProgrammeFormData } from "../schemas/activiteProgrammeSchemas";
-import type { ActiviteProgramme } from "../types/activiteProgramme";
+import type { ActiviteProgramme } from "../allTypes/activiteProgramme";
 
 const BASE_URL = "/activite_programme/";
 

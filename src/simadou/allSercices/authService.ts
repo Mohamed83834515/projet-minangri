@@ -1,6 +1,6 @@
-import { toast } from "react-toastify";
-import { apiClient, tokenManager } from "../lib/api";
-import { handleApiError } from "@/lib/handleError";
+import { apiClient, tokenManager } from "@/axios/api";
+import { handleApiError } from "@/axios/handleError";
+import toast from "react-hot-toast";
 
 
 interface LoginCredentials {
@@ -77,7 +77,7 @@ export const authService = {
       toast.success("Déconnexion réussie");
     } catch {
       // Continue with logout even if server call fails
-      toast.info("Déconnexion locale effectuée");
+      toast.success("Déconnexion locale effectuée");
     }
   },
 

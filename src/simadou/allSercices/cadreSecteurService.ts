@@ -1,6 +1,6 @@
-import { toast } from "react-toastify";
-import { apiClient } from "../lib/api";
-import type { CadreSecteur, CadreSecteurFormData } from "../types";
+import { toast } from "react-hot-toast";
+import { apiClient } from "@/axios/api";
+import { CadreSecteur, CadreSecteurFormData } from "../allTypes/entities";
 
 class CadreSecteurService {
   private baseUrl = "/cadre_secteur";

@@ -1,6 +1,6 @@
-import { apiClient } from "../lib/api";
+import { apiClient } from "@/axios/api";
 import { PtbaFormData } from "../schemas/ptbaSchemas";
-import type { Ptba } from "../types";
+import type { Ptba } from "../allTypes";
 
 const ENDPOINT = "/ptba/";
 

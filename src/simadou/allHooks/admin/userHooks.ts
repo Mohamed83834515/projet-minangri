@@ -1,16 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { publicInstance } from '@/axios/axiosInstance'
+import { personnelService } from '@/simadou/allSercices/personnelService'
 
 export const useGetusers = () => {
   return useQuery({
     queryKey: ['users'],
 
     queryFn: async () => {
-      const res = await publicInstance.get('/users')
-      return res.data.map((user: any) => ({
-        ...user,
-        username: user.name, 
-      }))
+      const res = await personnelService.getAll()
+      return res
     },
   })
 }

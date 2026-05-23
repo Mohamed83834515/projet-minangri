@@ -1,6 +1,6 @@
-import { apiClient } from "../lib/api";
+import { apiClient } from "@/axios/api";
 import { TypeActiviteFormData } from "../schemas/ptbaSchemas";
-import type { TypeActivite } from "../types";
+import type { TypeActivite } from "../allTypes";
 
 const ENDPOINT = "/type_activite/";
 

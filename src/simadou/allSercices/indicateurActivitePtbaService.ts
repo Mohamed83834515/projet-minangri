@@ -1,5 +1,5 @@
-import { apiClient } from "../lib/api";
-import type { IndicateurActivitePtba } from "../types";
+import { apiClient } from "@/axios/api";
+import type { IndicateurActivitePtba } from "../allTypes";
 import type { IndicateurActivitePtbaFormData } from "../schemas";
 
 const ENDPOINT = "/indicateur_activite_ptba/";

@@ -1,5 +1,5 @@
-import { apiClient } from "../lib/api";
-import { Activite } from "../types/activite";
+import { apiClient } from "@/axios/api";
+import { Activite } from "../allTypes/activite";
 
 export const activiteService = {
   // Récupérer toutes les activités (filtrées par projet)

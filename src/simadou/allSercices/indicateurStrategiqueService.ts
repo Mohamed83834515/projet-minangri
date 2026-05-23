@@ -1,5 +1,5 @@
-import { apiClient } from "../lib/api";
-import { IndicateurStrategique } from "../types/indicateurStrategique";
+import { apiClient } from "@/axios/api";
+import { IndicateurStrategique } from "../allTypes/indicateurStrategique";
 
 const BASE_URL = "/indicateur_strategique/";
 

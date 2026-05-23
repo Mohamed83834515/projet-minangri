@@ -1,6 +1,6 @@
-import { toast } from "react-toastify";
-import { apiClient } from "../lib/api";
-import type { Convention } from "../types";
+import { toast } from "react-hot-toast";
+import { apiClient } from "@/axios/api";
+import type { Convention } from "../allTypes";
 
 // Type pour les données de formulaire Convention
 export type ConventionFormData = Omit<Convention, "id_convention">;

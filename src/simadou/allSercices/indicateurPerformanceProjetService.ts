@@ -1,5 +1,5 @@
-import { apiClient } from "../lib/api";
-import type { IndicateurPerformanceProjet } from "../types";
+import { apiClient } from "@/axios/api";
+import type { IndicateurPerformanceProjet } from "../allTypes";
 
 const indicateurPerformanceProjetService = {
   /**

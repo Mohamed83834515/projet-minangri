@@ -1,5 +1,5 @@
-import { apiClient } from "../lib/api";
-import { Action } from "../types/action";
+import { apiClient } from "@/axios/api";
+import { Action } from "../allTypes/action";
 
 const BASE_URL = "/activite_programme/";
 

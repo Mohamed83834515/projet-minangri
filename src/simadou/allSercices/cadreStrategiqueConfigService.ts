@@ -1,9 +1,9 @@
-import { toast } from "react-toastify";
-import { apiClient } from "../lib/api";
+import { toast } from "react-hot-toast";
+import { apiClient } from "@/axios/api";
 import type {
   CadreStrategiqueConfig,
   CadreStrategiqueConfigFormData,
-} from "../types";
+} from "../allTypes";
 
 export const cadreStrategiqueConfigService = {
   // Get all configurations

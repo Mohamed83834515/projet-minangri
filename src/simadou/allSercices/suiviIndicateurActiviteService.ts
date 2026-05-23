@@ -1,6 +1,6 @@
-import { apiClient } from "../lib/api";
+import { apiClient } from "@/axios/api";
 import { SuiviIndicateurActiviteFormData } from "../schemas/suiviIndicateurSchemas";
-import type { SuiviIndicateurActivite } from "../types";
+import type { SuiviIndicateurActivite } from "../allTypes";
 
 const ENDPOINT = "/suivi_indicateur_activite/";
 

@@ -30,6 +30,7 @@ import { Route as AuthenticatedSettingsDisplayRouteImport } from './routes/_auth
 import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_authenticated/settings/appearance'
 import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
+import { Route as AuthenticatedProgrammePagesTestIndexRouteImport } from './routes/_authenticated/programme/pagesTest/index'
 import { Route as AuthenticatedProgrammeListeIndexRouteImport } from './routes/_authenticated/programme/liste/index'
 import { Route as AuthenticatedProgrammeIndicateursPerformanceIndexRouteImport } from './routes/_authenticated/programme/indicateurs-performance/index'
 import { Route as AuthenticatedProgrammeIndicateursCmrIndexRouteImport } from './routes/_authenticated/programme/indicateurs-cmr/index'
@@ -164,6 +165,12 @@ const AuthenticatedErrorsErrorRoute =
   AuthenticatedErrorsErrorRouteImport.update({
     id: '/errors/$error',
     path: '/errors/$error',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedProgrammePagesTestIndexRoute =
+  AuthenticatedProgrammePagesTestIndexRouteImport.update({
+    id: '/programme/pagesTest/',
+    path: '/programme/pagesTest/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedProgrammeListeIndexRoute =
@@ -349,6 +356,7 @@ export interface FileRoutesByFullPath {
   '/programme/indicateurs-cmr/': typeof AuthenticatedProgrammeIndicateursCmrIndexRoute
   '/programme/indicateurs-performance/': typeof AuthenticatedProgrammeIndicateursPerformanceIndexRoute
   '/programme/liste/': typeof AuthenticatedProgrammeListeIndexRoute
+  '/programme/pagesTest/': typeof AuthenticatedProgrammePagesTestIndexRoute
 }
 export interface FileRoutesByTo {
   '/forgot-password': typeof authForgotPasswordRoute
@@ -393,6 +401,7 @@ export interface FileRoutesByTo {
   '/programme/indicateurs-cmr': typeof AuthenticatedProgrammeIndicateursCmrIndexRoute
   '/programme/indicateurs-performance': typeof AuthenticatedProgrammeIndicateursPerformanceIndexRoute
   '/programme/liste': typeof AuthenticatedProgrammeListeIndexRoute
+  '/programme/pagesTest': typeof AuthenticatedProgrammePagesTestIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -440,6 +449,7 @@ export interface FileRoutesById {
   '/_authenticated/programme/indicateurs-cmr/': typeof AuthenticatedProgrammeIndicateursCmrIndexRoute
   '/_authenticated/programme/indicateurs-performance/': typeof AuthenticatedProgrammeIndicateursPerformanceIndexRoute
   '/_authenticated/programme/liste/': typeof AuthenticatedProgrammeListeIndexRoute
+  '/_authenticated/programme/pagesTest/': typeof AuthenticatedProgrammePagesTestIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -487,6 +497,7 @@ export interface FileRouteTypes {
     | '/programme/indicateurs-cmr/'
     | '/programme/indicateurs-performance/'
     | '/programme/liste/'
+    | '/programme/pagesTest/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/forgot-password'
@@ -531,6 +542,7 @@ export interface FileRouteTypes {
     | '/programme/indicateurs-cmr'
     | '/programme/indicateurs-performance'
     | '/programme/liste'
+    | '/programme/pagesTest'
   id:
     | '__root__'
     | '/_authenticated'
@@ -577,6 +589,7 @@ export interface FileRouteTypes {
     | '/_authenticated/programme/indicateurs-cmr/'
     | '/_authenticated/programme/indicateurs-performance/'
     | '/_authenticated/programme/liste/'
+    | '/_authenticated/programme/pagesTest/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -739,6 +752,13 @@ declare module '@tanstack/react-router' {
       path: '/errors/$error'
       fullPath: '/errors/$error'
       preLoaderRoute: typeof AuthenticatedErrorsErrorRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/programme/pagesTest/': {
+      id: '/_authenticated/programme/pagesTest/'
+      path: '/programme/pagesTest'
+      fullPath: '/programme/pagesTest/'
+      preLoaderRoute: typeof AuthenticatedProgrammePagesTestIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/programme/liste/': {
@@ -958,6 +978,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProgrammeIndicateursCmrIndexRoute: typeof AuthenticatedProgrammeIndicateursCmrIndexRoute
   AuthenticatedProgrammeIndicateursPerformanceIndexRoute: typeof AuthenticatedProgrammeIndicateursPerformanceIndexRoute
   AuthenticatedProgrammeListeIndexRoute: typeof AuthenticatedProgrammeListeIndexRoute
+  AuthenticatedProgrammePagesTestIndexRoute: typeof AuthenticatedProgrammePagesTestIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -1012,6 +1033,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProgrammeIndicateursPerformanceIndexRoute:
     AuthenticatedProgrammeIndicateursPerformanceIndexRoute,
   AuthenticatedProgrammeListeIndexRoute: AuthenticatedProgrammeListeIndexRoute,
+  AuthenticatedProgrammePagesTestIndexRoute:
+    AuthenticatedProgrammePagesTestIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

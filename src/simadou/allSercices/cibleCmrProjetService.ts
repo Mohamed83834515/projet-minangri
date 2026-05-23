@@ -1,6 +1,6 @@
-import { toast } from "react-toastify";
-import { apiClient } from "../lib/api";
-import type { CibleCmrProjet } from "../types";
+import { toast } from "react-hot-toast";
+import { apiClient } from "@/axios/api";
+import type { CibleCmrProjet } from "../allTypes";
 
 export interface CibleCmrProjetFormData {
   annee: string;

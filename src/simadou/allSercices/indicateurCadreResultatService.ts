@@ -1,9 +1,9 @@
-import { toast } from "react-toastify";
-import { apiClient } from "../lib/api";
+import { toast } from "react-hot-toast";
+import { apiClient } from "@/axios/api";
 import type {
   IndicateurCadreResultat,
   IndicateurCadreResultatFormData,
-} from "../types";
+} from "../allTypes";
 
 export const indicateurCadreResultatService = {
   // Get all indicateurs cadre résultat

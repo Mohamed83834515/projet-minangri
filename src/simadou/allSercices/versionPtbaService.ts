@@ -1,5 +1,5 @@
-import { apiClient } from "../lib/api";
-import type { VersionPtba } from "../types";
+import { apiClient } from "@/axios/api";
+import type { VersionPtba } from "../allTypes";
 import type { VersionPtbaFormData } from "../schemas/ptbaSchemas";
 
 const ENDPOINT = "/version_ptba/";

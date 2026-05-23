@@ -1,5 +1,5 @@
-import { apiClient } from "../lib/api";
-import type { NiveauActiviteProjet } from "../types";
+import { apiClient } from "@/axios/api";
+import type { NiveauActiviteProjet } from "../allTypes";
 
 const BASE_URL = "/niveau_activite_config/";
 

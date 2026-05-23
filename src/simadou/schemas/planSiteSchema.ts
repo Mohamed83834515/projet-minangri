@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { NiveauStructureConfig } from "../types";
+import type { NiveauStructureConfig } from "../allTypes";
 
 // Schéma de validation pour Plan Site basé sur la documentation
 export const planSiteSchema = z.object({

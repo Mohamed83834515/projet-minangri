@@ -1,10 +1,10 @@
-import { toast } from "react-toastify";
-import { apiClient } from "../lib/api";
+import { toast } from "react-hot-toast";
+import { apiClient } from "@/axios/api";
 import type {
   Programme,
   ProgrammeFormData,
   ProgrammeSelectOption,
-} from "../types/programme";
+} from "../allTypes/programme";
 
 const endpoint = "/programme/";
 

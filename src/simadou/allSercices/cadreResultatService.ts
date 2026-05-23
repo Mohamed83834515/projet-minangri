@@ -1,6 +1,6 @@
-import { toast } from "react-toastify";
-import { apiClient } from "../lib/api";
-import type { CadreResultat, CadreResultatFormData } from "../types";
+import { toast } from "react-hot-toast";
+import { apiClient } from "@/axios/api";
+import type { CadreResultat, CadreResultatFormData } from "../allTypes";
 
 export const cadreResultatService = {
   // Get all cadres

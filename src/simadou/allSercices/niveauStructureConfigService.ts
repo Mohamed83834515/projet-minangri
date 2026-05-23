@@ -1,9 +1,9 @@
-import { toast } from "react-toastify";
-import { apiClient } from "../lib/api";
+import { toast } from "react-hot-toast";
+import { apiClient } from "@/axios/api";
 import type {
   NiveauStructureConfig,
-  NiveauStructureConfigFormData,
-} from "../types";
+} from "../allTypes";
+import { NiveauStructureConfigFormData } from "../allTypes/entities";
 
 export const niveauStructureConfigService = {
   // Récupérer toutes les configurations de niveau de structure

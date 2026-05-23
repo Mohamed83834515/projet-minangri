@@ -1,5 +1,5 @@
-import { apiClient } from "../lib/api";
-import type { NiveauActiviteProgramme } from "../types/niveauActiviteProgramme";
+import { apiClient } from "@/axios/api";
+import type { NiveauActiviteProgramme } from "../allTypes/niveauActiviteProgramme";
 import type { NiveauActiviteProgrammeFormData } from "../schemas/niveauActiviteProgrammeSchemas";
 
 const BASE_URL = "/niveau_activites_programme_config/";

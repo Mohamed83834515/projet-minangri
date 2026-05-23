@@ -1,5 +1,5 @@
-import { apiClient } from "../lib/api";
-import { ZoneCollecte } from "../types/zoneCollecte";
+import { apiClient } from "@/axios/api";
+import { ZoneCollecte } from "../allTypes/zoneCollecte";
 
 const BASE_URL = "/zone_collecte/";
 

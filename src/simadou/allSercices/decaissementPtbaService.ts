@@ -1,5 +1,5 @@
-import { apiClient } from "../lib/api";
-import { SuiviDecaissementPtba } from "../types/decaissementPtba";
+import { apiClient } from "@/axios/api";
+import { SuiviDecaissementPtba } from "../allTypes/decaissementPtba";
 
 const BASE_URL = "/suivi_decaissement_ptba/";
 

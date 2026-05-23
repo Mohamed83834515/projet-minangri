@@ -1,6 +1,7 @@
-import { toast } from "react-toastify";
-import { apiClient } from "../lib/api";
-import type { UniteIndicateur, UniteIndicateurFormData } from "../types";
+import { toast } from "react-hot-toast";
+import { apiClient } from "@/axios/api";
+import type { UniteIndicateur } from "../allTypes";
+import { UniteIndicateurFormData } from "../allTypes/entities";
 
 export const uniteIndicateurService = {
   // Get all unités d'indicateur

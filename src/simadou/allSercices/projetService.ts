@@ -1,5 +1,5 @@
-import { apiClient } from "../lib/api";
-import { Projet } from "../types/projet";
+import { apiClient } from "@/axios/api";
+import { Projet } from "../allTypes/projet";
 
 const BASE_URL = "/projets/";
 

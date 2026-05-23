@@ -1,6 +1,6 @@
-import { toast } from "react-toastify";
-import { apiClient } from "../lib/api";
-import type { NiveauCadreAnalytique } from "../types";
+import { toast } from "react-hot-toast";
+import { apiClient } from "@/axios/api";
+import type { NiveauCadreAnalytique } from "../allTypes";
 
 export interface NiveauCadreAnalytiqueFormData {
   nombre_nca: number;

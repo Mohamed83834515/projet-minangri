@@ -1,5 +1,5 @@
-import { apiClient } from "../lib/api";
-import { CibleIndicateurStrategique } from "../types/cibleIndicateurStrategique";
+import { apiClient } from "@/axios/api";
+import { CibleIndicateurStrategique } from "../allTypes/cibleIndicateurStrategique";
 
 const BASE_URL = "/cible_indicateur_strategique/";
 

@@ -1,5 +1,5 @@
-import { apiClient } from "../lib/api";
-import { Localite } from "../types/localite";
+import { apiClient } from "@/axios/api";
+import { Localite } from "../allTypes/localite";
 
 const BASE_URL = "/localite/";
 

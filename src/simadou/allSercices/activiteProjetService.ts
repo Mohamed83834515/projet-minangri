@@ -1,5 +1,5 @@
-import { apiClient } from "../lib/api";
-import type { ActiviteProjet } from "../types";
+import { apiClient } from "@/axios/api";
+import type { ActiviteProjet } from "../allTypes";
 
 const BASE_URL = "/activite_projet/";
 

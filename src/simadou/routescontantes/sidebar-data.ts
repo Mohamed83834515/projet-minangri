@@ -156,6 +156,11 @@ export const sidebarData: SidebarData = {
               url: '/programme/indicateurs-cmr',
               icon: TrendingUp,
             },
+            {
+              title: 'pages de test',
+              url: '/programme/pagesTest',
+              icon: TrendingUp,
+            },
           ],
         },
 

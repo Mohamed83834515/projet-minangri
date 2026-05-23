@@ -1,6 +1,6 @@
 import { useController, type Control } from "react-hook-form";
 import { cn } from "@/lib/utils";
-import type { FieldConfig } from "../types/formConfig";
+import type { FieldConfig } from "../allTypes/formConfig";
 
 interface DateRangeFieldProps {
   field: FieldConfig;

@@ -1,5 +1,6 @@
-import { apiClient } from "../lib/api";
-import type { Acteur, ActeurFormData } from "../types";
+import { apiClient } from "@/axios/api";
+import { Acteur, ActeurFormData } from "../allTypes";
+
 
   const BASE_URL = "/acteurs/"
 export const acteurService = {
