@@ -2,11 +2,70 @@ import { apiClient } from "@/axios/api";
 import type { SuiviTacheActiviteFormData } from "../schemas/suiviTacheActiviteSchemas";
 import type { SuiviTacheActivite } from "../allTypes";
 
-const ENDPOINT = "/suivi_tache_activite/";
+const ENDPOINT = "/suivi-tache-activites/";
+const WITH_LIVRABLES_ENDPOINT = "/suivi-tache-activites/with-livrables/";
 
 type SuiviFieldsJson = Omit<SuiviTacheActiviteFormData, "livrable_fichier"> & {
   id_activite_ptba: number;
+  lot_realisee: number;
 };
+
+function normalizeList(response: unknown): Record<string, unknown>[] {
+  if (Array.isArray(response)) return response as Record<string, unknown>[];
+  if (
+    response &&
+    typeof response === "object" &&
+    "results" in response &&
+    Array.isArray((response as { results: unknown }).results)
+  ) {
+    return (response as { results: Record<string, unknown>[] }).results;
+  }
+  return [];
+}
+
+/** Normalise la réponse API vers le type front (date_reele, valide, observation_suivi, etc.). */
+export function mapSuiviTacheActiviteFromApi(
+  raw: Record<string, unknown>,
+): SuiviTacheActivite {
+  const dateReelle = raw.date_reele ?? raw.date_reel;
+  return {
+    id_suivi_groupe_tache: Number(raw.id_suivi_groupe_tache),
+    proportion_realisee: Number(
+      raw.proportion_realisee ?? raw.lot_realisee ?? 0,
+    ),
+    valide: Boolean(raw.valide),
+    date_reele: typeof dateReelle === "string" ? dateReelle : "",
+    observation_suivi:
+      typeof raw.observation_suivi === "string" ? raw.observation_suivi : "",
+    livrable_suivi:
+      typeof raw.livrable_suivi === "string" ? raw.livrable_suivi : "",
+    id_groupe_tache: raw.id_groupe_tache as SuiviTacheActivite["id_groupe_tache"],
+    id_activite_ptba: Number(raw.id_activite_ptba),
+  };
+}
+
+function toApiPayload(data: SuiviFieldsJson) {
+  return {
+    id_activite_ptba: data.id_activite_ptba,
+    id_groupe_tache: data.id_groupe_tache,
+    date_reele: data.date_reele,
+    observation_suivi: data.observation_suivi,
+    lot_realisee: data.lot_realisee,
+    valide: data.valide,
+    livrables: [] as { fichier_join: string; suivi_tache_activite: number }[],
+  };
+}
+
+function toSuiviFieldsJson(
+  data: SuiviTacheActiviteFormData & { id_activite_ptba: number },
+): SuiviFieldsJson {
+  const { livrable_fichier: _files, livrable_suivi: _text, ...rest } = data;
+  return {
+    ...rest,
+    id_activite_ptba: data.id_activite_ptba,
+    lot_realisee: data.proportion_realisee,
+  };
+}
 
 function appendSuiviFormFields(
   fd: FormData,
@@ -17,70 +76,82 @@ function appendSuiviFormFields(
   fd.append("id_groupe_tache", String(data.id_groupe_tache));
   fd.append("date_reele", data.date_reele);
   fd.append("observation_suivi", data.observation_suivi);
-  fd.append("proportion_realisee", String(data.proportion_realisee));
+  fd.append("lot_realisee", String(data.lot_realisee));
   fd.append("valide", data.valide ? "true" : "false");
   if ("livrableAsFiles" in opts) {
     for (const file of opts.livrableAsFiles) {
-      fd.append("livrable_suivi", file, file.name);
+      fd.append("livrables", file, file.name);
     }
-  } else {
-    fd.append("livrable_suivi", opts.livrableAsText);
   }
 }
 
 const suiviTacheActiviteService = {
   async getByActivite(idActivite: number): Promise<SuiviTacheActivite[]> {
-    const response = await apiClient.request<SuiviTacheActivite[]>(
-      `${ENDPOINT}?id_activite=${idActivite}`,
-    );
-    return Array.isArray(response) ? response : [];
+    const response = await apiClient.request<unknown>(ENDPOINT, {
+      method: "GET",
+      params: { id_activite: idActivite },
+    });
+    return normalizeList(response)
+      .map(mapSuiviTacheActiviteFromApi)
+      .filter((s) => s.id_activite_ptba === idActivite);
   },
 
   async create(
     data: SuiviTacheActiviteFormData & { id_activite_ptba: number },
   ): Promise<SuiviTacheActivite> {
-    const { livrable_fichier, ...rest } = data;
-    const json: SuiviFieldsJson = {
-      ...rest,
-      id_activite_ptba: data.id_activite_ptba,
-    };
+    const json = toSuiviFieldsJson(data);
+    const { livrable_fichier } = data;
 
     if (livrable_fichier.length > 0) {
       const fd = new FormData();
       appendSuiviFormFields(fd, json, { livrableAsFiles: livrable_fichier });
-      return apiClient.request(ENDPOINT, { method: "POST", data: fd });
+      const raw = await apiClient.request<Record<string, unknown>>(
+        WITH_LIVRABLES_ENDPOINT,
+        { method: "POST", data: fd },
+      );
+      return mapSuiviTacheActiviteFromApi(raw);
     }
 
-    return apiClient.request(ENDPOINT, {
-      method: "POST",
-      data: json,
-    });
+    const raw = await apiClient.request<Record<string, unknown>>(
+      WITH_LIVRABLES_ENDPOINT,
+      {
+        method: "POST",
+        data: toApiPayload(json),
+      },
+    );
+    return mapSuiviTacheActiviteFromApi(raw);
   },
 
   async update(
     id: number,
     data: SuiviTacheActiviteFormData & { id_activite_ptba?: number },
   ): Promise<SuiviTacheActivite> {
-    const { livrable_fichier, ...rest } = data;
     const id_ptba = data.id_activite_ptba;
     if (id_ptba == null) {
       throw new Error("id_activite_ptba requis pour la mise à jour");
     }
-    const json: SuiviFieldsJson = { ...rest, id_activite_ptba: id_ptba };
+    const json = toSuiviFieldsJson({
+      ...data,
+      id_activite_ptba: id_ptba,
+    });
+    const { livrable_fichier } = data;
+    const url = `${ENDPOINT}${id}/with-livrables/`;
 
     if (livrable_fichier.length > 0) {
       const fd = new FormData();
       appendSuiviFormFields(fd, json, { livrableAsFiles: livrable_fichier });
-      return apiClient.request(`${ENDPOINT}${id}/`, {
+      const raw = await apiClient.request<Record<string, unknown>>(url, {
         method: "PUT",
         data: fd,
       });
+      return mapSuiviTacheActiviteFromApi(raw);
     }
 
-    return apiClient.request(`${ENDPOINT}${id}/`, {
+    const raw = await apiClient.request<Record<string, unknown>>(url, {
       method: "PUT",
-      data: json,
+      data: toApiPayload(json),
     });
+    return mapSuiviTacheActiviteFromApi(raw);
   },
 
   async delete(id: number): Promise<void> {
