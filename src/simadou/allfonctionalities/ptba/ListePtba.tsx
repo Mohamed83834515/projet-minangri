@@ -7,7 +7,6 @@ import { toast } from 'sonner'
 import useDialogState from '@/hooks/use-dialog-state'
 import { Ptba, VersionPtba } from '@/simadou/allTypes'
 import { buildPtbasColumns } from '@/simadou/allColonnes/ptbas-columns'
-import { PROGRAMME_CODE_PTBA } from '@/simadou/constants/programmation'
 import { useDeletePtba, useGetPtbas } from '@/simadou/allHooks/admin/ptbaHooks'
 import { useGetVersions } from '@/simadou/allHooks/admin/versionHooks'
 import SelectInput from 'react-select'
@@ -58,7 +57,7 @@ function ListePtbas() {
 
   // Options pour le filtre
   const versionOptions = versions
-  .filter((version: VersionPtba) => typeof version.programme === "object" && version.programme?.code_programme === PROGRAMME_CODE_PTBA)
+  .filter((version: VersionPtba) => typeof version.programme === "object" && version.programme?.code_programme === "001")
   .map((version: any) => ({
     label: `${version.version_ptba || `Version ${version.id_version_ptba}`} - ${version.annee_ptba}`,
     value: version.id_version_ptba.toString()

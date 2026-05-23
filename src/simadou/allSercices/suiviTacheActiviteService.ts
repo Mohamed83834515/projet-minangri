@@ -32,20 +32,17 @@ export function mapSuiviTacheActiviteFromApi(
   raw: Record<string, unknown>,
 ): SuiviTacheActivite {
   const dateReelle = raw.date_reele ?? raw.date_reel;
-  const idActivite = resolveIdActivitePtba(
-    raw.id_activite_ptba as SuiviTacheActivite["id_activite_ptba"],
-  );
-  const lotRealisee = Number(raw.lot_realisee ?? raw.proportion_realisee ?? 0);
   return {
     id_suivi_groupe_tache: Number(raw.id_suivi_groupe_tache),
-    lot_realisee: lotRealisee,
-    proportion_realisee: lotRealisee,
-    valide: parseSuiviValide(raw.valide),
+    proportion_realisee: Number(
+      raw.proportion_realisee ?? raw.lot_realisee ?? 0,
+    ),
+    valide: Boolean(raw.valide),
     date_reele: typeof dateReelle === "string" ? dateReelle : "",
     observation_suivi:
       typeof raw.observation_suivi === "string" ? raw.observation_suivi : "",
     id_groupe_tache: raw.id_groupe_tache as SuiviTacheActivite["id_groupe_tache"],
-    id_activite_ptba: idActivite ?? raw.id_activite_ptba ?? 0,
+    id_activite_ptba: Number(raw.id_activite_ptba),
   };
 }
 
@@ -94,7 +91,9 @@ const suiviTacheActiviteService = {
       method: "GET",
       params: { id_activite: idActivite },
     });
-    return normalizeList(response).map(mapSuiviTacheActiviteFromApi);
+    return normalizeList(response)
+      .map(mapSuiviTacheActiviteFromApi)
+      .filter((s) => s.id_activite_ptba === idActivite);
   },
 
   async create(
