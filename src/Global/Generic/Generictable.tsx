@@ -61,7 +61,11 @@ type GenericTableProps<TData> = {
 
   defaultPageSize?: number
 
-  // 👇 AJOUT ICI
+  emptyMessage?: string
+
+  showViewOptions?: boolean
+  toolbarEndSlot?: React.ReactNode
+
   initialState?: Partial<{
     columnVisibility: Record<string, boolean>
     sorting: SortingState
@@ -81,10 +85,18 @@ export function GenericTable<TData>({
   facetedFilters = [],
   bulkActionsSlot,
   defaultPageSize = 10,
+  emptyMessage = 'No results.',
+  showViewOptions = true,
+  toolbarEndSlot,
+  initialState,
 }: GenericTableProps<TData>) {
   const [rowSelection, setRowSelection] = useState({})
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
-  const [sorting, setSorting] = useState<SortingState>([])
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
+    initialState?.columnVisibility ?? {}
+  )
+  const [sorting, setSorting] = useState<SortingState>(
+    initialState?.sorting ?? []
+  )
 
   const {
     columnFilters,
@@ -141,6 +153,8 @@ export function GenericTable<TData>({
         searchPlaceholder={searchPlaceholder}
         searchKey={searchKey}
         filters={facetedFilters}
+        showViewOptions={showViewOptions}
+        toolbarEndSlot={toolbarEndSlot}
       />
 
       <div className='overflow-hidden rounded-md border'>
@@ -194,7 +208,7 @@ export function GenericTable<TData>({
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className='h-24 text-center'>
-                  No results.
+                  {emptyMessage}
                 </TableCell>
               </TableRow>
             )}

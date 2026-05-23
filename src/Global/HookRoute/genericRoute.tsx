@@ -7,8 +7,10 @@ interface PageRouteLayoutProps {
   title: string;
   boutonAddTitle?: string;
   icon: LucideIcon;
+  /** Affiche le bouton d'ajout (défaut: true) */
+  showAddButton?: boolean;
   // Dialog d'ajout (reçoit open + onOpenChange)
-  addDialogComponent: ComponentType<{
+  addDialogComponent?: ComponentType<{
     open: boolean;
     onOpenChange: (open: boolean) => void;
   }>;
@@ -21,6 +23,7 @@ export function PageRouteLayout({
   title,
   boutonAddTitle = "Ajouter",
   icon: Icon,
+  showAddButton = true,
   addDialogComponent: AddDialog,
   listComponent: ListComponent,
 }: PageRouteLayoutProps) {
@@ -30,18 +33,23 @@ export function PageRouteLayout({
 
   return (
     <div className="">
-      <div className="flex items-center justify-between p-4 rounded-lg mb-4">
-        <h3>{title}</h3>
-        <div className="">
-          {/* Bouton d'ouverture du dialog d'ajout */}
-          <Button
-            onClick={() => setShowAddDialog(true)}
-            style={{ backgroundColor: stroke }}
-            className="cursor-pointer hover:opacity-90 active:scale-100 text-white">
-            <Icon /> {boutonAddTitle}
-          </Button>
-          <AddDialog open={showAddDialog} onOpenChange={setShowAddDialog} />
+      <div className="flex items-center justify-between gap-4 p-4 rounded-lg mb-4">
+        <div className="flex items-center gap-2">
+          <Icon className="h-5 w-5 text-muted-foreground" />
+          <h3>{title}</h3>
         </div>
+        {showAddButton && AddDialog && (
+          <div>
+            <Button
+              onClick={() => setShowAddDialog(true)}
+              style={{ backgroundColor: stroke }}
+              className="cursor-pointer hover:opacity-90 active:scale-100 text-white"
+            >
+              <Icon /> {boutonAddTitle}
+            </Button>
+            <AddDialog open={showAddDialog} onOpenChange={setShowAddDialog} />
+          </div>
+        )}
       </div>
       <div className="px-4">
         <ListComponent />

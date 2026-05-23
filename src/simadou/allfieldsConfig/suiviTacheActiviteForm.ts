@@ -52,26 +52,25 @@ export const getSuiviTacheActiviteFormConfig = (): FormConfig => ({
             required: true,
             gridCols: 2,
         },
-        // select - Groupe tâche
+        // file - Livrables (optionnel)
         {
-            name: "id_groupe_tache",
-            label: "Groupe tâche",
-            type: "select",
-            placeholder: "Sélectionner une tâche",
-            required: true,
-            options: [], // À remplir dynamiquement depuis l'API
-            gridCols: 1,
-        },
-        // select - Activité PTBA
-        {
-            name: "id_activite_ptba",
-            label: "Activité PTBA",
-            type: "select",
-            placeholder: "Sélectionner une activité PTBA",
-            required: true,
-            options: [], // À remplir dynamiquement depuis l'API
-            gridCols: 1,
+            name: "livrable_fichier",
+            label: "Fichiers livrables",
+            type: "file",
+            multiple: true,
+            accept: "application/pdf,image/*,.doc,.docx",
+            maxSize: 10,
+            helperText: "PDF, images ou documents (max 10 Mo par fichier)",
+            required: false,
+            gridCols: 2,
         },
     ]
 
+})
+
+/** Formulaire suivi tâche dans le contexte d'une tâche déjà sélectionnée */
+export const getSuiviTacheActiviteFormConfigForTache = (): FormConfig => ({
+    fields: getSuiviTacheActiviteFormConfig().fields.filter(
+        (f) => f.name !== "id_groupe_tache" && f.name !== "id_activite_ptba",
+    ),
 })

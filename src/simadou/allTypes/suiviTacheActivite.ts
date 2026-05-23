@@ -41,6 +41,32 @@ export function getUsedGroupeTacheIds(
   return ids;
 }
 
+export function findSuiviForTache(
+  suivis: SuiviTacheActivite[],
+  idGroupeTache: number,
+): SuiviTacheActivite | undefined {
+  return suivis.find(
+    (s) => resolveIdGroupeTache(s.id_groupe_tache) === idGroupeTache,
+  );
+}
+
+/** Taux d'avancement global : moyenne des proportions réalisées par tâche. */
+export function tauxAvancementGlobalTaches(
+  taches: TacheActivitePtba[],
+  suivis: SuiviTacheActivite[],
+): number {
+  if (taches.length === 0) return 0;
+
+  const percents = taches.map((tache) => {
+    const suivi = findSuiviForTache(suivis, tache.id_groupe_tache);
+    return suivi?.proportion_realisee ?? 0;
+  });
+
+  return Math.round(
+    percents.reduce((sum, p) => sum + p, 0) / taches.length,
+  );
+}
+
 export function intituleGroupeTache(
   ref: number | TacheActivitePtba,
   taches: TacheActivitePtba[],

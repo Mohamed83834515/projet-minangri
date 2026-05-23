@@ -18,6 +18,8 @@ type DataTableToolbarProps<TData> = {
       icon?: React.ComponentType<{ className?: string }>
     }[]
   }[]
+  showViewOptions?: boolean
+  toolbarEndSlot?: React.ReactNode
 }
 
 export function DataTableToolbar<TData>({
@@ -25,6 +27,8 @@ export function DataTableToolbar<TData>({
   searchPlaceholder = 'Filter...',
   searchKey,
   filters = [],
+  showViewOptions = true,
+  toolbarEndSlot,
 }: DataTableToolbarProps<TData>) {
   const isFiltered =
     table.getState().columnFilters.length > 0 || table.getState().globalFilter
@@ -79,7 +83,8 @@ export function DataTableToolbar<TData>({
           </Button>
         )}
       </div>
-      <DataTableViewOptions table={table} />
+      {toolbarEndSlot ??
+        (showViewOptions ? <DataTableViewOptions table={table} /> : null)}
     </div>
   )
 }

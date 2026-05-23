@@ -22,16 +22,13 @@ export const getObservationPtbaFormConfig = (): FormConfig => ({
             required: true,
             gridCols: 1,
         },
-        // select - PTBA (optionnel)
-        {
-            name: "ptba",
-            label: "PTBA",
-            type: "select",
-            placeholder: "Sélectionner une activité PTBA (optionnel)",
-            required: false,
-            options: [], // À remplir dynamiquement depuis l'API
-            gridCols: 1,
-        },
     ]
 
+})
+
+/** Observation liée à une activité déjà connue (champ ptba masqué) */
+export const getObservationPtbaFormConfigForActivite = (): FormConfig => ({
+    fields: getObservationPtbaFormConfig().fields.filter(
+        (f) => f.name !== "ptba",
+    ),
 })
