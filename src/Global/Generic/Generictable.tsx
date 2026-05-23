@@ -47,19 +47,25 @@ export type FacetedFilter = {
 type GenericTableProps<TData> = {
   data: TData[]
   columns: ColumnDef<TData>[]
+
   search: Record<string, unknown>
   navigate: NavigateFn
-  /** Clé de colonne utilisée pour la recherche texte (toolbar input) */
+
   searchKey: string
   searchPlaceholder?: string
-  /** Config des filtres URL (synchro avec l'URL via useTableUrlState) */
+
   urlFilterConfig?: ColumnFilterConfig[]
-  /** Filtres à afficher dans la toolbar (facettés) */
   facetedFilters?: FacetedFilter[]
-  /** Slot pour les bulk actions (passer <GenericBulkActions />) */
+
   bulkActionsSlot?: (table: ReturnType<typeof useReactTable<TData>>) => React.ReactNode
-  /** Pagination par défaut */
+
   defaultPageSize?: number
+
+  // 👇 AJOUT ICI
+  initialState?: Partial<{
+    columnVisibility: Record<string, boolean>
+    sorting: SortingState
+  }>
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────

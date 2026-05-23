@@ -5,6 +5,7 @@ import { useState, type ComponentType } from 'react';
 
 interface PageRouteLayoutProps {
   title: string;
+  boutonAddTitle?: string;
   icon: LucideIcon;
   // Dialog d'ajout (reçoit open + onOpenChange)
   addDialogComponent: ComponentType<{
@@ -18,6 +19,7 @@ interface PageRouteLayoutProps {
 // Layout générique pour les pages avec un titre, un bouton d'ajout et une liste
 export function PageRouteLayout({
   title,
+  boutonAddTitle = "Ajouter",
   icon: Icon,
   addDialogComponent: AddDialog,
   listComponent: ListComponent,
@@ -36,7 +38,7 @@ export function PageRouteLayout({
             onClick={() => setShowAddDialog(true)}
             style={{ backgroundColor: stroke }}
             className="cursor-pointer hover:opacity-90 active:scale-100 text-white">
-            <Icon />
+            <Icon /> {boutonAddTitle}
           </Button>
           <AddDialog open={showAddDialog} onOpenChange={setShowAddDialog} />
         </div>
