@@ -16,6 +16,23 @@ export type SuiviTacheColumnHandlers = {
 
 const colWide = 'max-w-[220px] whitespace-normal'
 
+/** Champs affichés depuis le suivi tâche (pas depuis la tâche planifiée). */
+function getSuiviDisplayFields(suivi?: SuiviTacheActivite) {
+  if (!suivi) {
+    return {
+      dateRealisation: undefined as string | undefined,
+      valide: undefined as boolean | undefined,
+      observation: undefined as string | undefined,
+    }
+  }
+  const dateRaw = suivi.date_reele?.trim()
+  return {
+    dateRealisation: dateRaw || undefined,
+    valide: suivi.valide,
+    observation: suivi.observation_suivi?.trim() || undefined,
+  }
+}
+
 function formatDateRealisation(value: string | undefined | null): string {
   if (!value?.trim()) return '—'
   const d = new Date(value)
@@ -81,12 +98,12 @@ export function buildSuiviTacheColumns(
       <DataTableColumnHeader column={column} title='P%' />
     ),
     cell: ({ row }) => {
-      const suivi = row.original.suivi
-      return (
-        <span className='font-semibold tabular-nums'>
-          {suivi != null ? `${suivi.proportion_realisee}%` : '—'}
-        </span>
-      )
+      const raw = row.original.proportion_gt?.trim()
+      if (!raw) {
+        return <span className='text-muted-foreground'>—</span>
+      }
+      const label = raw.endsWith('%') ? raw : `${raw}%`
+      return <span className='font-semibold tabular-nums'>{label}</span>
     },
     meta: { thClassName: 'text-center', className: 'text-center' },
     enableSorting: false,
@@ -98,11 +115,14 @@ export function buildSuiviTacheColumns(
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Date réalisation' />
     ),
-    cell: ({ row }) => (
-      <span className='whitespace-nowrap text-muted-foreground'>
-        {formatDateRealisation(row.original.suivi?.date_reele)}
-      </span>
-    ),
+    cell: ({ row }) => {
+      const { dateRealisation } = getSuiviDisplayFields(row.original.suivi)
+      return (
+        <span className='whitespace-nowrap text-muted-foreground'>
+          {formatDateRealisation(dateRealisation)}
+        </span>
+      )
+    },
     meta: {
       thClassName: 'min-w-[120px] text-center',
       className: 'min-w-[120px] text-center',
@@ -117,16 +137,16 @@ export function buildSuiviTacheColumns(
       <DataTableColumnHeader column={column} title='Validé' />
     ),
     cell: ({ row }) => {
-      const suivi = row.original.suivi
-      if (!suivi) {
+      const { valide } = getSuiviDisplayFields(row.original.suivi)
+      if (valide === undefined) {
         return <span className='text-muted-foreground'>—</span>
       }
       return (
         <Badge
-          variant={suivi.valide ? 'default' : 'secondary'}
+          variant={valide ? 'default' : 'secondary'}
           className='min-w-[48px] justify-center'
         >
-          {suivi.valide ? 'Oui' : 'Non'}
+          {valide ? 'Oui' : 'Non'}
         </Badge>
       )
     },
@@ -165,16 +185,16 @@ export function buildSuiviTacheColumns(
       <DataTableColumnHeader column={column} title='Observation' />
     ),
     cell: ({ row }) => {
-      const text = row.original.suivi?.observation_suivi?.trim()
+      const { observation } = getSuiviDisplayFields(row.original.suivi)
       return (
         <p
           className={cn(
             colWide,
             'line-clamp-3 text-muted-foreground leading-relaxed'
           )}
-          title={text || undefined}
+          title={observation}
         >
-          {text || '—'}
+          {observation || '—'}
         </p>
       )
     },
