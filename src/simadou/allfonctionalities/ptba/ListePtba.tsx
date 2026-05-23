@@ -26,17 +26,17 @@ function ListePtbas() {
   const deleteMutation = useDeletePtba()
 
 
-  // Récupérer l'année courante
-  const currentYear = new Date().getFullYear()
-  const defaultVersion = versions.find((v: any) => v.annee_ptba === currentYear)
+  const defaultVersion = useMemo(
+    () => findDefaultVersionForProgramme(versions),
+    [versions]
+  )
 
-  // Initialiser la version sélectionnée avec l'année courante au chargement
   useEffect(() => {
     if (defaultVersion && !selectedVersionId) {
       setSelectedVersionId(defaultVersion.id_version_ptba.toString())
       localStorage.setItem('selectedVersionId', defaultVersion.id_version_ptba.toString())
     }
-  }, [defaultVersion])
+  }, [defaultVersion, selectedVersionId])
 
   // Gérer le changement de version pour filtrer les ptbas
   const handleChangeVersion = (versionId: string | null) => {
