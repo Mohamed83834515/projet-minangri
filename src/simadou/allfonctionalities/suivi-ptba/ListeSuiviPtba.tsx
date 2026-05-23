@@ -10,7 +10,11 @@ import { GenericTable } from '@/Global/Generic/Generictable'
 import { DIALOG_SIZES } from '@/Global/Forms/dialog'
 import type { Ptba, VersionPtba } from '@/simadou/allTypes'
 import { buildSuiviPtbaColumns } from '@/simadou/allColonnes/suivi-ptba-columns'
-import { PROGRAMME_CODE_PTBA } from '@/simadou/constants/programmation'
+import {
+  findDefaultVersionForProgramme,
+  isVersionForProgramme,
+  PROGRAMME_CODE_PTBA,
+} from '@/simadou/constants/programmation'
 import { useGetPtbas } from '@/simadou/allHooks/admin/ptbaHooks'
 import { useGetVersions } from '@/simadou/allHooks/admin/versionHooks'
 import { useSuiviPtbaActivitesProgress } from '@/simadou/allHooks/admin/suiviPtbaHooks'
@@ -39,9 +43,9 @@ export default function ListeSuiviPtba() {
   const { data: ptbas = [] } = useGetPtbas()
   const { data: versions = [] } = useGetVersions()
 
-  const currentYear = new Date().getFullYear()
-  const defaultVersion = versions.find(
-    (v: VersionPtba) => v.annee_ptba === currentYear
+  const defaultVersion = useMemo(
+    () => findDefaultVersionForProgramme(versions),
+    [versions]
   )
 
   useEffect(() => {
@@ -51,10 +55,8 @@ export default function ListeSuiviPtba() {
   }, [defaultVersion, selectedVersionId])
 
   const versionOptions = versions
-    .filter(
-      (version: VersionPtba) =>
-        typeof version.programme === 'object' &&
-        version.programme?.code_programme === PROGRAMME_CODE_PTBA
+    .filter((version: VersionPtba) =>
+      isVersionForProgramme(version, PROGRAMME_CODE_PTBA)
     )
     .map((version: VersionPtba) => ({
       label: `${version.version_ptba || `Version ${version.id_version_ptba}`} - ${version.annee_ptba}`,

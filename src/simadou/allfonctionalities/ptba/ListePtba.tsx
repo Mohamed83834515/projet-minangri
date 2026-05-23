@@ -7,7 +7,11 @@ import { toast } from 'sonner'
 import useDialogState from '@/hooks/use-dialog-state'
 import { Ptba, VersionPtba } from '@/simadou/allTypes'
 import { buildPtbasColumns } from '@/simadou/allColonnes/ptbas-columns'
-import { PROGRAMME_CODE_PTBA } from '@/simadou/constants/programmation'
+import {
+  findDefaultVersionForProgramme,
+  isVersionForProgramme,
+  PROGRAMME_CODE_PTBA,
+} from '@/simadou/constants/programmation'
 import { useGetPtbas } from '@/simadou/allHooks/admin/ptbaHooks'
 import { useGetVersions } from '@/simadou/allHooks/admin/versionHooks'
 const route = getRouteApi('/_authenticated/programmation/ptba/')
@@ -23,16 +27,16 @@ function ListePtbas() {
   const { data: ptbas = [] } = useGetPtbas()
   const { data: versions = [] } = useGetVersions()
 
-  // Récupérer l'année courante
-  const currentYear = new Date().getFullYear()
-  const defaultVersion = versions.find((v: any) => v.annee_ptba === currentYear)
+  const defaultVersion = useMemo(
+    () => findDefaultVersionForProgramme(versions),
+    [versions]
+  )
 
-  // Initialiser la version sélectionnée avec l'année courante au chargement
   useEffect(() => {
     if (defaultVersion && !selectedVersionId) {
       setSelectedVersionId(defaultVersion.id_version_ptba.toString())
     }
-  }, [defaultVersion])
+  }, [defaultVersion, selectedVersionId])
 
   // Filtrer les ptbas côté client
   const filteredPtbas = useMemo(() => {
@@ -41,7 +45,9 @@ function ListePtbas() {
   }, [ptbas, selectedVersionId])
   // Options pour le filtre
   const versionOptions = versions
-  .filter((version: VersionPtba) => typeof version.programme === "object" && version.programme?.code_programme === PROGRAMME_CODE_PTBA)
+    .filter((version: VersionPtba) =>
+      isVersionForProgramme(version, PROGRAMME_CODE_PTBA)
+    )
   .map((version: any) => ({
     label: `${version.version_ptba || `Version ${version.id_version_ptba}`} - ${version.annee_ptba}`,
     value: version.id_version_ptba.toString()

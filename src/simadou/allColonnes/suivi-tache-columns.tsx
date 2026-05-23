@@ -4,7 +4,10 @@ import { Badge } from '@/components/ui/badge'
 import { DataTableColumnHeader } from '@/components/data-table'
 import { cn } from '@/lib/utils'
 import type { TacheActivitePtba } from '@/simadou/allTypes'
-import type { SuiviTacheActivite } from '@/simadou/allTypes/suiviTacheActivite'
+import {
+  getSuiviTableDisplayFields,
+  type SuiviTacheActivite,
+} from '@/simadou/allTypes/suiviTacheActivite'
 
 export type SuiviTacheTableRow = TacheActivitePtba & {
   suivi?: SuiviTacheActivite
@@ -15,23 +18,6 @@ export type SuiviTacheColumnHandlers = {
 }
 
 const colWide = 'max-w-[220px] whitespace-normal'
-
-/** Champs affichés depuis le suivi tâche (pas depuis la tâche planifiée). */
-function getSuiviDisplayFields(suivi?: SuiviTacheActivite) {
-  if (!suivi) {
-    return {
-      dateRealisation: undefined as string | undefined,
-      valide: undefined as boolean | undefined,
-      observation: undefined as string | undefined,
-    }
-  }
-  const dateRaw = suivi.date_reele?.trim()
-  return {
-    dateRealisation: dateRaw || undefined,
-    valide: suivi.valide,
-    observation: suivi.observation_suivi?.trim() || undefined,
-  }
-}
 
 function formatDateRealisation(value: string | undefined | null): string {
   if (!value?.trim()) return '—'
@@ -116,7 +102,7 @@ export function buildSuiviTacheColumns(
       <DataTableColumnHeader column={column} title='Date réalisation' />
     ),
     cell: ({ row }) => {
-      const { dateRealisation } = getSuiviDisplayFields(row.original.suivi)
+      const { dateRealisation } = getSuiviTableDisplayFields(row.original.suivi)
       return (
         <span className='whitespace-nowrap text-muted-foreground'>
           {formatDateRealisation(dateRealisation)}
@@ -137,7 +123,7 @@ export function buildSuiviTacheColumns(
       <DataTableColumnHeader column={column} title='Validé' />
     ),
     cell: ({ row }) => {
-      const { valide } = getSuiviDisplayFields(row.original.suivi)
+      const { valide } = getSuiviTableDisplayFields(row.original.suivi)
       if (valide === undefined) {
         return <span className='text-muted-foreground'>—</span>
       }
@@ -185,7 +171,7 @@ export function buildSuiviTacheColumns(
       <DataTableColumnHeader column={column} title='Observation' />
     ),
     cell: ({ row }) => {
-      const { observation } = getSuiviDisplayFields(row.original.suivi)
+      const { observation } = getSuiviTableDisplayFields(row.original.suivi)
       return (
         <p
           className={cn(

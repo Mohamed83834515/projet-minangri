@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
 import type { Ptba, SuiviTacheActivite, TacheActivitePtba } from '@/simadou/allTypes'
+import { tacheBelongsToActivite } from '@/simadou/allTypes/tacheActivitePtba'
 import { tauxAvancementGlobalTaches } from '@/simadou/allTypes/suiviTacheActivite'
 import {
   suiviPtbaQueryKeys,
@@ -41,8 +42,8 @@ export default function SuiviTacheActiviteManager({
   )
 
   const filteredTaches = useMemo(
-    () => taches.filter((t) => t.id_activite === activite.id_ptba),
-    [taches, activite.id_ptba]
+    () => taches.filter((t) => tacheBelongsToActivite(t, activite)),
+    [taches, activite]
   )
 
   const tauxAvancementGlobal = useMemo(

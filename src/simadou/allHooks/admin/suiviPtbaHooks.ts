@@ -7,6 +7,7 @@ import indicateurActivitePtbaService from '@/simadou/allSercices/indicateurActiv
 import suiviIndicateurActiviteService from '@/simadou/allSercices/suiviIndicateurActiviteService'
 import { localiteService } from '@/simadou/allSercices/localiteService'
 import type { SuiviTacheActivite, TacheActivitePtba } from '@/simadou/allTypes'
+import { resolveIdActivite } from '@/simadou/allTypes/tacheActivitePtba'
 import { tauxAvancementGlobalTaches } from '@/simadou/allTypes/suiviTacheActivite'
 import type { SuiviIndicateurActiviteFormData } from '@/simadou/schemas/suiviIndicateurSchemas'
 import type { SuiviTacheActiviteFormData } from '@/simadou/schemas/suiviTacheActiviteSchemas'
@@ -88,10 +89,11 @@ export function useSuiviPtbaActivitesProgress(activiteIds: number[]) {
     tachesByActivite.set(id, [])
   }
   for (const tache of allTaches) {
-    if (!activiteIdSet.has(tache.id_activite)) continue
-    const list = tachesByActivite.get(tache.id_activite) ?? []
+    const activiteId = resolveIdActivite(tache)
+    if (activiteId == null || !activiteIdSet.has(activiteId)) continue
+    const list = tachesByActivite.get(activiteId) ?? []
     list.push(tache)
-    tachesByActivite.set(tache.id_activite, list)
+    tachesByActivite.set(activiteId, list)
   }
 
   const avancementByActivite = new Map<number, number>()
