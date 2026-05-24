@@ -1,25 +1,26 @@
-import { useMemo, useState } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { getRouteApi } from '@tanstack/react-router'
 import { GenericDialogs } from '@/Global/Generic/Genericdialogs'
 import { GenericTable } from '@/Global/Generic/Generictable'
 import { GenericDeleteDialog } from '@/Global/Tableaux/GenericDeleteDialog'
-import { toast } from 'sonner'
 import useDialogState from '@/hooks/use-dialog-state'
-import { Ptba } from '@/simadou/allTypes'
+import { Ptba, VersionPtba } from '@/simadou/allTypes'
 import { buildPtbasColumns } from '@/simadou/allColonnes/ptbas-columns'
-import { useActiveProgrammeCode } from '@/hooks/use-active-project'
-import { useGetPtbas } from '@/simadou/allHooks/admin/ptbaHooks'
-import { usePtbaVersionSelection } from '@/simadou/allHooks/admin/versionHooks'
+import { useDeletePtba, useGetPtbas } from '@/simadou/allHooks/admin/ptbaHooks'
+import { useGetVersions } from '@/simadou/allHooks/admin/versionHooks'
+import SelectInput from 'react-select'
+import AddPtba from './AddPtba'
 const route = getRouteApi('/_authenticated/programmation/ptba/')
 
 function ListePtbas() {
-  const codeProgramme = useActiveProgrammeCode()
-  const { selectedVersionId, setSelectedVersionId, versionOptions } =
-    usePtbaVersionSelection(codeProgramme)
+
+  // État local pour la version sélectionnée
+  const [selectedVersionId, setSelectedVersionId] = useState<string | null>(null)
 
   const search = route.useSearch()
   const navigate = route.useNavigate()
 
+  // Listes des ptbas et des versions pour les filtres et affichages
   const { data: ptbas = [] } = useGetPtbas()
   const { data: versions = [] } = useGetVersions()
   const deleteMutation = useDeletePtba()
@@ -49,10 +50,17 @@ function ListePtbas() {
   // Filtrer les ptbas côté client
   const filteredPtbas = useMemo(() => {
     if (!selectedVersionId) return ptbas
-    return ptbas.filter(
-      (ptba: Ptba) => ptba.version_ptba?.toString() === selectedVersionId
-    )
+    return ptbas.filter((ptba: Ptba) => ptba.version_ptba?.toString() === selectedVersionId)
   }, [ptbas, selectedVersionId])
+
+
+  // Options pour le filtre
+  const versionOptions = versions
+  .filter((version: VersionPtba) => typeof version.programme === "object" && version.programme?.code_programme === PROGRAMME_CODE_PTBA)
+  .map((version: any) => ({
+    label: `${version.version_ptba || `Version ${version.id_version_ptba}`} - ${version.annee_ptba}`,
+    value: version.id_version_ptba.toString()
+  }))
 
   const [open, setOpen] = useDialogState<'add' | 'edit' | 'delete'>(
     null
