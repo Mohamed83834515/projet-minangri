@@ -5,16 +5,15 @@ import { DataTableColumnHeader } from '@/components/data-table'
 import { cn } from '@/lib/utils'
 import type { TacheActivitePtba } from '@/simadou/allTypes'
 import {
-  getSuiviTableDisplayFields,
+  findSuiviForTache,
   type SuiviTacheActivite,
 } from '@/simadou/allTypes/suiviTacheActivite'
 
-export type SuiviTacheTableRow = TacheActivitePtba & {
-  suivi?: SuiviTacheActivite
-}
+export type SuiviTacheTableRow = TacheActivitePtba
 
 export type SuiviTacheColumnHandlers = {
   onSuivre: (tache: TacheActivitePtba, suivi?: SuiviTacheActivite) => void
+  suivis: SuiviTacheActivite[]
 }
 
 const colWide = 'max-w-[220px] whitespace-normal'
@@ -33,7 +32,7 @@ function formatDateRealisation(value: string | undefined | null): string {
 export function buildSuiviTacheColumns(
   handlers: SuiviTacheColumnHandlers
 ): ColumnDef<SuiviTacheTableRow>[] {
-  const { onSuivre } = handlers
+  const { onSuivre, suivis } = handlers
 
   const tacheColumn: ColumnDef<SuiviTacheTableRow> = {
     id: 'tache',
@@ -102,10 +101,11 @@ export function buildSuiviTacheColumns(
       <DataTableColumnHeader column={column} title='Date réalisation' />
     ),
     cell: ({ row }) => {
-      const { dateRealisation } = getSuiviTableDisplayFields(row.original.suivi)
+      const tache = row.original
+      const suivi = findSuiviForTache(suivis, tache.id_groupe_tache)
       return (
         <span className='whitespace-nowrap text-muted-foreground'>
-          {formatDateRealisation(dateRealisation)}
+          {formatDateRealisation(suivi?.date_reele)}
         </span>
       )
     },
@@ -123,16 +123,16 @@ export function buildSuiviTacheColumns(
       <DataTableColumnHeader column={column} title='Validé' />
     ),
     cell: ({ row }) => {
-      const { valide } = getSuiviTableDisplayFields(row.original.suivi)
-      if (valide === undefined) {
+      const suivi = findSuiviForTache(suivis, row.original.id_groupe_tache)
+      if (!suivi) {
         return <span className='text-muted-foreground'>—</span>
       }
       return (
         <Badge
-          variant={valide ? 'default' : 'secondary'}
+          variant={suivi.valide ? 'default' : 'secondary'}
           className='min-w-[48px] justify-center'
         >
-          {valide ? 'Oui' : 'Non'}
+          {suivi.valide ? 'Oui' : 'Non'}
         </Badge>
       )
     },
@@ -148,7 +148,7 @@ export function buildSuiviTacheColumns(
     ),
     cell: ({ row }) => {
       const tache = row.original
-      const suivi = tache.suivi
+      const suivi = findSuiviForTache(suivis, tache.id_groupe_tache)
       return (
         <Button
           variant='outline'
@@ -171,7 +171,8 @@ export function buildSuiviTacheColumns(
       <DataTableColumnHeader column={column} title='Observation' />
     ),
     cell: ({ row }) => {
-      const { observation } = getSuiviTableDisplayFields(row.original.suivi)
+      const suivi = findSuiviForTache(suivis, row.original.id_groupe_tache)
+      const observation = suivi?.observation_suivi?.trim()
       return (
         <p
           className={cn(

@@ -2,10 +2,7 @@ import { useMemo } from 'react'
 import { GenericTable } from '@/Global/Generic/Generictable'
 import { useEmbeddedTableState } from '@/hooks/use-embedded-table-state'
 import type { TacheActivitePtba } from '@/simadou/allTypes'
-import {
-  findSuiviForTache,
-  type SuiviTacheActivite,
-} from '@/simadou/allTypes/suiviTacheActivite'
+import type { SuiviTacheActivite } from '@/simadou/allTypes/suiviTacheActivite'
 import {
   buildSuiviTacheColumns,
   type SuiviTacheTableRow,
@@ -24,23 +21,14 @@ export default function SuiviTacheActiviteList({
 }: SuiviTacheActiviteListProps) {
   const { search, navigate } = useEmbeddedTableState()
 
-  const rows = useMemo<SuiviTacheTableRow[]>(
-    () =>
-      taches.map((tache) => ({
-        ...tache,
-        suivi: findSuiviForTache(suivis, tache.id_groupe_tache),
-      })),
-    [taches, suivis]
-  )
-
   const columns = useMemo(
-    () => buildSuiviTacheColumns({ onSuivre }),
-    [onSuivre]
+    () => buildSuiviTacheColumns({ onSuivre, suivis }),
+    [onSuivre, suivis]
   )
 
   return (
     <GenericTable<SuiviTacheTableRow>
-      data={rows}
+      data={taches}
       columns={columns}
       search={search}
       navigate={navigate}

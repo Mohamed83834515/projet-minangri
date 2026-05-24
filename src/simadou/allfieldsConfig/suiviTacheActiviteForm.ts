@@ -3,7 +3,6 @@ import type { FormConfig } from "../../Global/types/formConfig";
 export const getSuiviTacheActiviteFormConfig = (): FormConfig => ({
 
     fields: [
-        // number - Proportion réalisée
         {
             name: "proportion_realisee",
             label: "Proportion réalisée",
@@ -15,7 +14,6 @@ export const getSuiviTacheActiviteFormConfig = (): FormConfig => ({
             step: 1,
             gridCols: 1,
         },
-        // checkbox - Validé
         {
             name: "valide",
             label: "Validé",
@@ -23,7 +21,6 @@ export const getSuiviTacheActiviteFormConfig = (): FormConfig => ({
             defaultChecked: false,
             gridCols: 1,
         },
-        // date - Date réelle
         {
             name: "date_reele",
             label: "Date réelle",
@@ -32,7 +29,6 @@ export const getSuiviTacheActiviteFormConfig = (): FormConfig => ({
             required: true,
             gridCols: 1,
         },
-        // textarea - Observation suivi
         {
             name: "observation_suivi",
             label: "Observation suivi",
@@ -42,17 +38,6 @@ export const getSuiviTacheActiviteFormConfig = (): FormConfig => ({
             required: true,
             gridCols: 2,
         },
-        // textarea - Livrable suivi
-        {
-            name: "livrable_suivi",
-            label: "Livrable suivi",
-            type: "textarea",
-            placeholder: "Livrables produits...",
-            rows: 3,
-            required: true,
-            gridCols: 2,
-        },
-        // file - Livrables (optionnel)
         {
             name: "livrable_fichier",
             label: "Fichiers livrables",

@@ -3,7 +3,10 @@ import { useQueryClient } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
 import type { Ptba, SuiviTacheActivite, TacheActivitePtba } from '@/simadou/allTypes'
 import { tacheBelongsToActivite } from '@/simadou/allTypes/tacheActivitePtba'
-import { tauxAvancementGlobalTaches } from '@/simadou/allTypes/suiviTacheActivite'
+import {
+  filterSuivisForTaches,
+  tauxAvancementGlobalTaches,
+} from '@/simadou/allTypes/suiviTacheActivite'
 import {
   suiviPtbaQueryKeys,
   useGetSuiviTachesByActivite,
@@ -46,9 +49,14 @@ export default function SuiviTacheActiviteManager({
     [taches, activite]
   )
 
+  const suivisForTaches = useMemo(
+    () => filterSuivisForTaches(suivis, filteredTaches),
+    [suivis, filteredTaches]
+  )
+
   const tauxAvancementGlobal = useMemo(
-    () => tauxAvancementGlobalTaches(filteredTaches, suivis),
-    [filteredTaches, suivis]
+    () => tauxAvancementGlobalTaches(filteredTaches, suivisForTaches),
+    [filteredTaches, suivisForTaches]
   )
 
   const handleSuivre = (
@@ -103,7 +111,7 @@ export default function SuiviTacheActiviteManager({
           <div className='px-6 py-5'>
             <SuiviTacheActiviteList
               taches={filteredTaches}
-              suivis={suivis}
+              suivis={suivisForTaches}
               onSuivre={handleSuivre}
             />
           </div>
@@ -115,7 +123,7 @@ export default function SuiviTacheActiviteManager({
           <div className='flex flex-wrap items-center justify-between gap-6'>
             <TacheAvancementProgressBar percent={tauxAvancementGlobal} />
             <div className='shrink-0 text-xs text-muted-foreground'>
-              {filteredTaches.length} tâche(s) · {suivis.length} suivi(s)
+              {filteredTaches.length} tâche(s) · {suivisForTaches.length} suivi(s)
             </div>
           </div>
         </div>

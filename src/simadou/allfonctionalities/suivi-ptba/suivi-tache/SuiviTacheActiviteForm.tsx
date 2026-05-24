@@ -36,8 +36,6 @@ export default function SuiviTacheActiviteForm({
       id_groupe_tache: tache.id_groupe_tache,
       date_reele: suivi?.date_reele?.slice(0, 10) || '',
       observation_suivi: suivi?.observation_suivi || '',
-      livrable_suivi:
-        typeof suivi?.livrable_suivi === 'string' ? suivi.livrable_suivi : '',
       livrable_fichier: [],
       proportion_realisee: suivi?.proportion_realisee ?? 0,
       valide: suivi?.valide ?? false,
