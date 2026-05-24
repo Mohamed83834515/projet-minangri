@@ -35,7 +35,11 @@ export function DataTableToolbar<TData>({
 
   return (
     <div className='flex items-center justify-between'>
-      <div className='flex flex-1 flex-col-reverse items-start gap-y-2 sm:flex-row sm:items-center sm:space-x-2'>
+      <div>
+        {toolbarEndSlot ??
+          (showViewOptions ? <DataTableViewOptions table={table} /> : null)}
+      </div>
+      <div className="flex items-center gap-x-2">
         {searchKey ? (
           <Input
             placeholder={searchPlaceholder}
@@ -83,8 +87,6 @@ export function DataTableToolbar<TData>({
           </Button>
         )}
       </div>
-      {toolbarEndSlot ??
-        (showViewOptions ? <DataTableViewOptions table={table} /> : null)}
     </div>
   )
 }

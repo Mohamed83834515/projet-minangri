@@ -10,6 +10,7 @@ import { buildPtbasColumns } from '@/simadou/allColonnes/ptbas-columns'
 import { PROGRAMME_CODE_PTBA } from '@/simadou/constants/programmation'
 import { useGetPtbas } from '@/simadou/allHooks/admin/ptbaHooks'
 import { useGetVersions } from '@/simadou/allHooks/admin/versionHooks'
+import SelectInput from 'react-select'
 const route = getRouteApi('/_authenticated/programmation/ptba/')
 
 function ListePtbas() {
@@ -41,11 +42,11 @@ function ListePtbas() {
   }, [ptbas, selectedVersionId])
   // Options pour le filtre
   const versionOptions = versions
-  .filter((version: VersionPtba) => typeof version.programme === "object" && version.programme?.code_programme === PROGRAMME_CODE_PTBA)
-  .map((version: any) => ({
-    label: `${version.version_ptba || `Version ${version.id_version_ptba}`} - ${version.annee_ptba}`,
-    value: version.id_version_ptba.toString()
-  }))
+    .filter((version: VersionPtba) => typeof version.programme === "object" && version.programme?.code_programme === PROGRAMME_CODE_PTBA)
+    .map((version: any) => ({
+      label: `${version.version_ptba || `Version ${version.id_version_ptba}`} - ${version.annee_ptba}`,
+      value: version.id_version_ptba.toString()
+    }))
 
   const [open, setOpen] = useDialogState<'add' | 'edit' | 'delete'>(
     null
@@ -56,6 +57,7 @@ function ListePtbas() {
     () => buildPtbasColumns(setOpen, setCurrentRow),
     [setOpen, setCurrentRow]
   )
+  console.log('selectedVersionId', selectedVersionId)
 
   return (
     <>
@@ -66,17 +68,23 @@ function ListePtbas() {
         navigate={navigate}
         searchKey='intitule_activite_ptba'
         searchPlaceholder='Filter activities...'
+        toolbarEndSlot={
+          <SelectInput<{ label: string; value: string }>
+            placeholder="Rechercher une version..."
+            options={versionOptions}
+            value={
+              versionOptions.find((opt) => opt.value === selectedVersionId) || null
+            }
+            onChange={(selected: any) =>
+              setSelectedVersionId(selected?.value || null)
+            }
+            isClearable
+          />
+        }
         urlFilterConfig={[
           { columnId: 'intitule_activite_ptba', searchKey: 'intitule_activite_ptba', type: 'string' }
         ]}
-        facetedFilters={[
-          {
-            columnId: 'version_ptba',
-            title: 'Version PTBA',
-            options: versionOptions,
-            onValueChange: (value: any) => setSelectedVersionId(value || null),
-          } as any,
-        ]}
+
         initialState={{
           columnVisibility: {
             version_ptba: false,
