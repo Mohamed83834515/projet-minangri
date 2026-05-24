@@ -410,7 +410,6 @@ export const SUIVI_TACHE_ACTIVITE = {
   valide: false,
   date_reele: "",
   observation_suivi: "",
-  livrable_suivi: "",
   id_groupe_tache: null,
   id_activite_ptba: null,
 };

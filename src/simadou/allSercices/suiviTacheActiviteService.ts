@@ -35,19 +35,17 @@ export function mapSuiviTacheActiviteFromApi(
   const idActivite = resolveIdActivitePtba(
     raw.id_activite_ptba as SuiviTacheActivite["id_activite_ptba"],
   );
+  const lotRealisee = Number(raw.lot_realisee ?? raw.proportion_realisee ?? 0);
   return {
     id_suivi_groupe_tache: Number(raw.id_suivi_groupe_tache),
-    proportion_realisee: Number(
-      raw.proportion_realisee ?? raw.lot_realisee ?? 0,
-    ),
+    lot_realisee: lotRealisee,
+    proportion_realisee: lotRealisee,
     valide: parseSuiviValide(raw.valide),
     date_reele: typeof dateReelle === "string" ? dateReelle : "",
     observation_suivi:
       typeof raw.observation_suivi === "string" ? raw.observation_suivi : "",
-    livrable_suivi:
-      typeof raw.livrable_suivi === "string" ? raw.livrable_suivi : "",
     id_groupe_tache: raw.id_groupe_tache as SuiviTacheActivite["id_groupe_tache"],
-    id_activite_ptba: idActivite ?? 0,
+    id_activite_ptba: idActivite ?? raw.id_activite_ptba ?? 0,
   };
 }
 
@@ -66,7 +64,7 @@ function toApiPayload(data: SuiviFieldsJson) {
 function toSuiviFieldsJson(
   data: SuiviTacheActiviteFormData & { id_activite_ptba: number },
 ): SuiviFieldsJson {
-  const { livrable_fichier: _files, livrable_suivi: _text, ...rest } = data;
+  const { livrable_fichier: _files, ...rest } = data;
   return {
     ...rest,
     id_activite_ptba: data.id_activite_ptba,
@@ -77,7 +75,7 @@ function toSuiviFieldsJson(
 function appendSuiviFormFields(
   fd: FormData,
   data: SuiviFieldsJson,
-  opts: { livrableAsFiles: File[] } | { livrableAsText: string },
+  files: File[],
 ) {
   fd.append("id_activite_ptba", String(data.id_activite_ptba));
   fd.append("id_groupe_tache", String(data.id_groupe_tache));
@@ -85,10 +83,8 @@ function appendSuiviFormFields(
   fd.append("observation_suivi", data.observation_suivi);
   fd.append("lot_realisee", String(data.lot_realisee));
   fd.append("valide", data.valide ? "true" : "false");
-  if ("livrableAsFiles" in opts) {
-    for (const file of opts.livrableAsFiles) {
-      fd.append("livrables", file, file.name);
-    }
+  for (const file of files) {
+    fd.append("livrables", file, file.name);
   }
 }
 
@@ -98,9 +94,7 @@ const suiviTacheActiviteService = {
       method: "GET",
       params: { id_activite: idActivite },
     });
-    return normalizeList(response)
-      .map(mapSuiviTacheActiviteFromApi)
-      .filter((s) => resolveIdActivitePtba(s.id_activite_ptba) === idActivite);
+    return normalizeList(response).map(mapSuiviTacheActiviteFromApi);
   },
 
   async create(
@@ -111,7 +105,7 @@ const suiviTacheActiviteService = {
 
     if (livrable_fichier.length > 0) {
       const fd = new FormData();
-      appendSuiviFormFields(fd, json, { livrableAsFiles: livrable_fichier });
+      appendSuiviFormFields(fd, json, livrable_fichier);
       const raw = await apiClient.request<Record<string, unknown>>(
         WITH_LIVRABLES_ENDPOINT,
         { method: "POST", data: fd },
@@ -146,7 +140,7 @@ const suiviTacheActiviteService = {
 
     if (livrable_fichier.length > 0) {
       const fd = new FormData();
-      appendSuiviFormFields(fd, json, { livrableAsFiles: livrable_fichier });
+      appendSuiviFormFields(fd, json, livrable_fichier);
       const raw = await apiClient.request<Record<string, unknown>>(url, {
         method: "PUT",
         data: fd,

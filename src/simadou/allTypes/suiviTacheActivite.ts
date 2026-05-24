@@ -3,12 +3,13 @@ import type { TacheActivitePtba } from "./tacheActivitePtba";
 /** Suivi de tâche d'activité */
 export interface SuiviTacheActivite {
   id_suivi_groupe_tache: number;
+  /** Lot réalisé (champ API, utilisé pour le taux global). */
+  lot_realisee?: number;
   proportion_realisee: number;
   valide: boolean;
   /** Date réelle (nom champ API) */
   date_reele: string;
   observation_suivi: string;
-  livrable_suivi: string;
   /** L’API renvoie souvent la tâche imbriquée au lieu de l’id seul */
   id_groupe_tache: number | TacheActivitePtba;
   id_activite_ptba: number | { id_ptba?: number };
@@ -81,23 +82,66 @@ export function findSuiviForTache(
   suivis: SuiviTacheActivite[],
   idGroupeTache: number,
 ): SuiviTacheActivite | undefined {
+  const tacheId = Number(idGroupeTache);
+  if (!Number.isFinite(tacheId)) return undefined;
   return suivis.find(
-    (s) => resolveIdGroupeTache(s.id_groupe_tache) === idGroupeTache,
+    (s) => resolveIdGroupeTache(s.id_groupe_tache) === tacheId,
   );
 }
 
-/** Taux d'avancement global : moyenne des proportions réalisées par tâche. */
+/** Suivis rattachés aux tâches affichées (évite les suivi orphelins d'une autre activité). */
+export function filterSuivisForTaches(
+  suivis: SuiviTacheActivite[],
+  taches: Pick<TacheActivitePtba, "id_groupe_tache">[],
+): SuiviTacheActivite[] {
+  const tacheIds = new Set(
+    taches
+      .map((t) => Number(t.id_groupe_tache))
+      .filter((id) => Number.isFinite(id)),
+  );
+  return suivis.filter((s) => {
+    const id = resolveIdGroupeTache(s.id_groupe_tache);
+    return id != null && tacheIds.has(id);
+  });
+}
+
+/** Progression lot réalisée / lot prévu (0–100). */
+export function lotRealiseePercent(
+  lotRealisee: number | undefined | null,
+  nLotPrevu: number | undefined | null,
+): number {
+  const prevu = nLotPrevu ?? 0;
+  if (prevu <= 0) return 0;
+  const realise = lotRealisee ?? 0;
+  return Math.min(100, Math.round((realise / prevu) * 100));
+}
+
+/** Taux d'avancement global : lots réalisés / lots prévus (comme l'app de référence). */
 export function tauxAvancementGlobalTaches(
   taches: TacheActivitePtba[],
   suivis: SuiviTacheActivite[],
 ): number {
   if (taches.length === 0) return 0;
 
+  let totalPrevu = 0;
+  let totalRealise = 0;
+
+  for (const tache of taches) {
+    const prevu = tache.n_lot_gt ?? 0;
+    totalPrevu += prevu;
+    const suivi = findSuiviForTache(suivis, tache.id_groupe_tache);
+    totalRealise += suivi?.lot_realisee ?? suivi?.proportion_realisee ?? 0;
+  }
+
+  if (totalPrevu > 0) {
+    return Math.min(100, Math.round((totalRealise / totalPrevu) * 100));
+  }
+
   const percents = taches.map((tache) => {
     const suivi = findSuiviForTache(suivis, tache.id_groupe_tache);
-    return suivi?.proportion_realisee ?? 0;
+    const lotRealisee = suivi?.lot_realisee ?? suivi?.proportion_realisee;
+    return suivi ? lotRealiseePercent(lotRealisee, tache.n_lot_gt) : 0;
   });
-
   return Math.round(
     percents.reduce((sum, p) => sum + p, 0) / taches.length,
   );
