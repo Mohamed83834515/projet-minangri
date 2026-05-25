@@ -66,6 +66,9 @@ type GenericTableProps<TData> = {
   showViewOptions?: boolean
   toolbarEndSlot?: React.ReactNode
 
+  /** Clic sur la ligne (hors cellules qui stoppent la propagation). */
+  onRowClick?: (row: TData) => void
+
   initialState?: Partial<{
     columnVisibility: Record<string, boolean>
     sorting: SortingState
@@ -88,6 +91,7 @@ export function GenericTable<TData>({
   emptyMessage = 'No results.',
   showViewOptions = true,
   toolbarEndSlot,
+  onRowClick,
   initialState,
 }: GenericTableProps<TData>) {
   const [rowSelection, setRowSelection] = useState({})
@@ -189,7 +193,11 @@ export function GenericTable<TData>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
-                  className='group/row'
+                  className={cn(
+                    'group/row',
+                    onRowClick && 'cursor-pointer'
+                  )}
+                  onClick={() => onRowClick?.(row.original)}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
