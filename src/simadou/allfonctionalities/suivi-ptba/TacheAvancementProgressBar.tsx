@@ -23,7 +23,7 @@ export default function TacheAvancementProgressBar({
   compact = false,
 }: TacheAvancementProgressBarProps) {
   const value = clampPercent(percent)
-  const fillClass = compact ? 'bg-primary' : getTacheAvancementBarColorClass(value)
+  const fillClass = getTacheAvancementBarColorClass(value)
 
   return (
     <div className={cn(compact ? 'min-w-[100px]' : 'min-w-[200px] flex-1 max-w-md')}>
