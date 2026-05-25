@@ -362,6 +362,28 @@ export const PROJET = {
   zone_projet: [],
 };
 
+export const PROJET_CREATE_STEP1 = {
+  code_projet: "",
+  sigle_projet: "",
+  intitule_projet: "",
+  duree_projet: 0,
+  date_signature_projet: "",
+  date_demarrage_projet: "",
+};
+
+export const PROJET_CREATE_STEP2 = {
+  partenaire_projet: 0,
+  structure_projet: 0,
+  signataires_projet: [] as number[],
+  partenaires_execution_projet: [] as number[],
+  zone_projet: [] as number[],
+};
+
+export const PROJET_CREATE = {
+  ...PROJET_CREATE_STEP1,
+  ...PROJET_CREATE_STEP2,
+};
+
 // =========PROJET_ACTIVE_PERSO==================
 export const PROJET_ACTIVE_PERSO = {
   id_projet: null,

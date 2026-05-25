@@ -54,6 +54,7 @@ import { Route as AuthenticatedParametrageDictionnaireIndicateursIndexRouteImpor
 import { Route as AuthenticatedParametrageConventionsIndexRouteImport } from './routes/_authenticated/parametrage/conventions/index'
 import { Route as AuthenticatedParametrageAutresIndexRouteImport } from './routes/_authenticated/parametrage/autres/index'
 import { Route as AuthenticatedParametrageActeursIndexRouteImport } from './routes/_authenticated/parametrage/acteurs/index'
+import { Route as AuthenticatedProgrammationProjetsIdRouteImport } from './routes/_authenticated/programmation/projets/$id'
 
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
@@ -311,6 +312,12 @@ const AuthenticatedParametrageActeursIndexRoute =
     path: '/parametrage/acteurs/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedProgrammationProjetsIdRoute =
+  AuthenticatedProgrammationProjetsIdRouteImport.update({
+    id: '/programmation/projets/$id',
+    path: '/programmation/projets/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
@@ -333,6 +340,7 @@ export interface FileRoutesByFullPath {
   '/help-center/': typeof AuthenticatedHelpCenterIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/users/': typeof AuthenticatedUsersIndexRoute
+  '/programmation/projets/$id': typeof AuthenticatedProgrammationProjetsIdRoute
   '/parametrage/acteurs/': typeof AuthenticatedParametrageActeursIndexRoute
   '/parametrage/autres/': typeof AuthenticatedParametrageAutresIndexRoute
   '/parametrage/conventions/': typeof AuthenticatedParametrageConventionsIndexRoute
@@ -378,6 +386,7 @@ export interface FileRoutesByTo {
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
+  '/programmation/projets/$id': typeof AuthenticatedProgrammationProjetsIdRoute
   '/parametrage/acteurs': typeof AuthenticatedParametrageActeursIndexRoute
   '/parametrage/autres': typeof AuthenticatedParametrageAutresIndexRoute
   '/parametrage/conventions': typeof AuthenticatedParametrageConventionsIndexRoute
@@ -426,6 +435,7 @@ export interface FileRoutesById {
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
+  '/_authenticated/programmation/projets/$id': typeof AuthenticatedProgrammationProjetsIdRoute
   '/_authenticated/parametrage/acteurs/': typeof AuthenticatedParametrageActeursIndexRoute
   '/_authenticated/parametrage/autres/': typeof AuthenticatedParametrageAutresIndexRoute
   '/_authenticated/parametrage/conventions/': typeof AuthenticatedParametrageConventionsIndexRoute
@@ -474,6 +484,7 @@ export interface FileRouteTypes {
     | '/help-center/'
     | '/settings/'
     | '/users/'
+    | '/programmation/projets/$id'
     | '/parametrage/acteurs/'
     | '/parametrage/autres/'
     | '/parametrage/conventions/'
@@ -519,6 +530,7 @@ export interface FileRouteTypes {
     | '/help-center'
     | '/settings'
     | '/users'
+    | '/programmation/projets/$id'
     | '/parametrage/acteurs'
     | '/parametrage/autres'
     | '/parametrage/conventions'
@@ -566,6 +578,7 @@ export interface FileRouteTypes {
     | '/_authenticated/help-center/'
     | '/_authenticated/settings/'
     | '/_authenticated/users/'
+    | '/_authenticated/programmation/projets/$id'
     | '/_authenticated/parametrage/acteurs/'
     | '/_authenticated/parametrage/autres/'
     | '/_authenticated/parametrage/conventions/'
@@ -922,6 +935,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedParametrageActeursIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/programmation/projets/$id': {
+      id: '/_authenticated/programmation/projets/$id'
+      path: '/programmation/projets/$id'
+      fullPath: '/programmation/projets/$id'
+      preLoaderRoute: typeof AuthenticatedProgrammationProjetsIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -955,6 +975,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
+  AuthenticatedProgrammationProjetsIdRoute: typeof AuthenticatedProgrammationProjetsIdRoute
   AuthenticatedParametrageActeursIndexRoute: typeof AuthenticatedParametrageActeursIndexRoute
   AuthenticatedParametrageAutresIndexRoute: typeof AuthenticatedParametrageAutresIndexRoute
   AuthenticatedParametrageConventionsIndexRoute: typeof AuthenticatedParametrageConventionsIndexRoute
@@ -988,6 +1009,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
+  AuthenticatedProgrammationProjetsIdRoute:
+    AuthenticatedProgrammationProjetsIdRoute,
   AuthenticatedParametrageActeursIndexRoute:
     AuthenticatedParametrageActeursIndexRoute,
   AuthenticatedParametrageAutresIndexRoute:
