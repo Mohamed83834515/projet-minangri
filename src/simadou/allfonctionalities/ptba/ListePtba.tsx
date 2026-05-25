@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { getRouteApi } from '@tanstack/react-router'
 import { GenericDialogs } from '@/Global/Generic/Genericdialogs'
 import { GenericTable } from '@/Global/Generic/Generictable'
@@ -20,7 +20,6 @@ function ListePtbas() {
   const search = route.useSearch()
   const navigate = route.useNavigate()
 
-  // Listes des ptbas et des versions pour les filtres et affichages
   const { data: ptbas = [] } = useGetPtbas()
   const { data: versions = [] } = useGetVersions()
   const deleteMutation = useDeletePtba()
@@ -50,7 +49,9 @@ function ListePtbas() {
   // Filtrer les ptbas côté client
   const filteredPtbas = useMemo(() => {
     if (!selectedVersionId) return ptbas
-    return ptbas.filter((ptba: Ptba) => ptba.version_ptba?.toString() === selectedVersionId)
+    return ptbas.filter(
+      (ptba: Ptba) => ptba.version_ptba?.toString() === selectedVersionId
+    )
   }, [ptbas, selectedVersionId])
 
 
