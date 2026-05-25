@@ -46,6 +46,7 @@ export default function ActiviteTabbedDialog({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent
         className={`${DIALOG_SIZES.full} max-h-[95vh] overflow-y-auto`}
+        aria-describedby={undefined}
       >
         <DialogHeader>
           <DialogTitle>

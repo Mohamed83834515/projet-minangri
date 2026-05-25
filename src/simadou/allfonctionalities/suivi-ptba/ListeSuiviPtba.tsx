@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { getRouteApi } from '@tanstack/react-router'
 import {
   Dialog,
@@ -8,13 +8,11 @@ import {
 } from '@/components/ui/dialog'
 import { GenericTable } from '@/Global/Generic/Generictable'
 import { DIALOG_SIZES } from '@/Global/Forms/dialog'
-import type { Ptba, VersionPtba } from '@/simadou/allTypes'
+import type { Ptba } from '@/simadou/allTypes'
 import { buildSuiviPtbaColumns } from '@/simadou/allColonnes/suivi-ptba-columns'
-import {
-  PROGRAMME_CODE_PTBA,
-} from '@/simadou/constants/programmation'
+import { useActiveProgrammeCode } from '@/hooks/use-active-project'
 import { useGetPtbas } from '@/simadou/allHooks/admin/ptbaHooks'
-import { useGetVersions } from '@/simadou/allHooks/admin/versionHooks'
+import { usePtbaVersionSelection } from '@/simadou/allHooks/admin/versionHooks'
 import { useSuiviPtbaActivitesProgress } from '@/simadou/allHooks/admin/suiviPtbaHooks'
 import ActiviteTabbedDialog from './ActiviteTabbedDialog'
 import ObservationPtbaManager from './observations/ObservationPtbaManager'
@@ -25,12 +23,12 @@ import SuiviTacheActiviteManager from './suivi-tache/SuiviTacheActiviteManager'
 const route = getRouteApi('/_authenticated/programmation/suivi-ptba/')
 
 export default function ListeSuiviPtba() {
+  const codeProgramme = useActiveProgrammeCode()
   const search = route.useSearch()
   const navigate = route.useNavigate()
 
-  const [selectedVersionId, setSelectedVersionId] = useState<string | null>(
-    null
-  )
+  const { selectedVersionId, setSelectedVersionId, versionOptions } =
+    usePtbaVersionSelection(codeProgramme)
   const [suiviActivite, setSuiviActivite] = useState<Ptba | null>(null)
   const [showSuiviModal, setShowSuiviModal] = useState(false)
   const [showObservationModal, setShowObservationModal] = useState(false)
@@ -39,29 +37,6 @@ export default function ListeSuiviPtba() {
   )
 
   const { data: ptbas = [] } = useGetPtbas()
-  const { data: versions = [] } = useGetVersions()
-
-  const currentYear = new Date().getFullYear()
-  const defaultVersion = versions.find(
-    (v: VersionPtba) => v.annee_ptba === currentYear
-  )
-
-  useEffect(() => {
-    if (defaultVersion && !selectedVersionId) {
-      setSelectedVersionId(defaultVersion.id_version_ptba.toString())
-    }
-  }, [defaultVersion, selectedVersionId])
-
-  const versionOptions = versions
-    .filter(
-      (version: VersionPtba) =>
-        typeof version.programme === 'object' &&
-        version.programme?.code_programme === PROGRAMME_CODE_PTBA
-    )
-    .map((version: VersionPtba) => ({
-      label: `${version.version_ptba || `Version ${version.id_version_ptba}`} - ${version.annee_ptba}`,
-      value: version.id_version_ptba.toString(),
-    }))
 
   const filteredPtbas = useMemo(() => {
     if (!selectedVersionId) return ptbas
@@ -183,7 +158,7 @@ export default function ListeSuiviPtba() {
           if (!open) setObservationActivite(null)
         }}
       >
-        <DialogContent className={DIALOG_SIZES.lg}>
+        <DialogContent className={DIALOG_SIZES.lg} aria-describedby={undefined}>
           <DialogHeader>
             <DialogTitle>Observations</DialogTitle>
           </DialogHeader>

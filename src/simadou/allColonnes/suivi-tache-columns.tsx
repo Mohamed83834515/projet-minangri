@@ -35,7 +35,7 @@ export function buildSuiviTacheColumns(
   const { onSuivre, suivis } = handlers
 
   const tacheColumn: ColumnDef<SuiviTacheTableRow> = {
-    id: 'tache',
+    id: 'intutile_tache_gt',
     accessorKey: 'intutile_tache_gt',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Tâche' />

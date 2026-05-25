@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
-import { Check, ChevronDown, FolderKanban } from 'lucide-react'
+import { Check, ChevronDown, FolderKanban, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
@@ -12,22 +11,45 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Badge } from '@/components/ui/badge'
-import { type Project, useProjectStore } from '@/stores/projetct-store'
+import type { Programme } from '@/simadou/allTypes/programme'
+import { useProjectStore } from '@/stores/projetct-store'
 
 interface ProjectSwitcherProps {
   onHeader?: boolean
 }
 
+function programmePeriode(programme: Programme): string {
+  const debut = programme.annee_debut_programme?.slice(0, 4)
+  const fin = programme.annee_fin_programme?.slice(0, 4)
+  if (debut && fin) return `${debut} – ${fin}`
+  if (debut) return debut
+  return '—'
+}
+
+function programmeLabel(programme: Programme): string {
+  return programme.sigle_programme?.trim() || programme.code_programme
+}
+
 export function ProjectSwitcher({ onHeader = false }: ProjectSwitcherProps) {
-  const { activeProject, projects, setActiveProject } = useProjectStore()
-  const queryClient = useQueryClient()
+  const activeProgramme = useProjectStore((s) => s.activeProgramme)
+  const programmes = useProjectStore((s) => s.programmes)
+  const setActiveProgramme = useProjectStore((s) => s.setActiveProgramme)
   const [open, setOpen] = useState(false)
 
-  const handleSelect = (project: Project) => {
-    setActiveProject(project)
-    queryClient.invalidateQueries()
+  const isLoading = programmes.length === 0 && !activeProgramme
+
+  const handleSelect = (programme: Programme) => {
+    if (programme.id_programme === activeProgramme?.id_programme) {
+      setOpen(false)
+      return
+    }
+    setActiveProgramme(programme)
     setOpen(false)
   }
+
+  const triggerLabel = activeProgramme
+    ? programmeLabel(activeProgramme)
+    : 'Projet'
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
@@ -35,7 +57,8 @@ export function ProjectSwitcher({ onHeader = false }: ProjectSwitcherProps) {
         <Button
           variant='outline'
           size='sm'
-          className='flex items-center gap-2 max-w-[200px]'
+          className='flex max-w-[220px] items-center gap-2'
+          disabled={isLoading}
           style={
             onHeader
               ? {
@@ -46,68 +69,74 @@ export function ProjectSwitcher({ onHeader = false }: ProjectSwitcherProps) {
               : {}
           }
         >
-          <FolderKanban
-            className='h-4 w-4 shrink-0'
-            style={onHeader ? { color: 'var(--header-text)' } : { color: 'var(--primary)' }}
-          />
-          <span className='truncate text-xs font-semibold'>
-            {activeProject?.code ?? 'Projet'}
+          {isLoading ? (
+            <Loader2
+              className='h-4 w-4 shrink-0 animate-spin'
+              style={
+                onHeader ? { color: 'var(--header-text)' } : undefined
+              }
+            />
+          ) : (
+            <FolderKanban
+              className='h-4 w-4 shrink-0'
+              style={
+                onHeader
+                  ? { color: 'var(--header-text)' }
+                  : { color: 'var(--primary)' }
+              }
+            />
+          )}
+          <span className='truncate text-xs font-semibold' title={triggerLabel}>
+            {triggerLabel}
           </span>
           <ChevronDown className='h-3 w-3 shrink-0 opacity-50' />
         </Button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align='end' className='w-80'>
-        <DropdownMenuLabel className='text-xs text-muted-foreground font-normal'>
+        <DropdownMenuLabel className='text-xs font-normal text-muted-foreground'>
           Programme actif
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
 
-        {projects.length === 0 && (
+        {programmes.length === 0 && (
           <div className='px-3 py-4 text-center text-sm text-muted-foreground'>
-            Aucun projet disponible
+            Aucun programme disponible
           </div>
         )}
 
-        {projects.map((project) => {
-          const isActive = activeProject?.id === project.id
+        {programmes.map((programme) => {
+          const isActive =
+            activeProgramme?.id_programme === programme.id_programme
           return (
             <DropdownMenuItem
-              key={project.id}
-              onClick={() => handleSelect(project)}
+              key={programme.id_programme}
+              onClick={() => handleSelect(programme)}
               className={cn(
-                'flex flex-col items-start gap-1 p-3 cursor-pointer rounded-md my-0.5',
-                isActive &&
-                  'bg-primary text-primary-foreground focus:bg-primary focus:text-primary-foreground'
+                'my-0.5 flex cursor-pointer flex-col items-start gap-1 rounded-md p-3',
+                isActive && 'bg-primary/10 ring-1 ring-primary/25'
               )}
             >
-              <div className='flex w-full items-center justify-between'>
-                <div className='flex items-center gap-2'>
-                  {isActive && <Check className='h-3 w-3 shrink-0' />}
-                  <span className='font-semibold text-sm'>{project.code}</span>
+              <div className='flex w-full items-center justify-between gap-2'>
+                <div className='flex min-w-0 items-center gap-2'>
+                  {isActive && (
+                    <Check className='h-3.5 w-3.5 shrink-0 text-primary' />
+                  )}
+                  <span className='truncate text-sm font-semibold'>
+                    {programme.sigle_programme} | {programme.code_programme}
+                  </span>
                 </div>
-                <Badge
-                  variant={isActive ? 'secondary' : 'outline'}
-                  className='text-[10px] px-1.5 py-0'
-                >
-                  Période : {project.periode}
+                <Badge variant='outline' className='shrink-0 px-1.5 py-0 text-[10px]'>
+                  {programmePeriode(programme)}
                 </Badge>
               </div>
               <span
                 className={cn(
-                  'text-xs',
-                  isActive ? 'text-primary-foreground/90' : 'text-foreground'
+                  'line-clamp-2 text-xs',
+                  isActive ? 'text-foreground' : 'text-muted-foreground'
                 )}
               >
-                {project.nom}
-              </span>
-              <span
-                className={cn(
-                  'text-[11px]',
-                  isActive ? 'text-primary-foreground/60' : 'text-muted-foreground'
-                )}
-              >
-                {project.description}
+                {programme.nom_programme}
               </span>
             </DropdownMenuItem>
           )

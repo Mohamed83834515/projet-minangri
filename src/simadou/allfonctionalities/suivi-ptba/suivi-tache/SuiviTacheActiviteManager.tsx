@@ -122,9 +122,12 @@ export default function SuiviTacheActiviteManager({
         <div className='border-t bg-muted/40 px-6 py-5 text-sm'>
           <div className='flex flex-wrap items-center justify-between gap-6'>
             <TacheAvancementProgressBar percent={tauxAvancementGlobal} />
-            <div className='shrink-0 text-xs text-muted-foreground'>
-              {filteredTaches.length} tâche(s) · {suivisForTaches.length} suivi(s)
-            </div>
+            {filteredTaches.length > 0 && (
+              <div className='shrink-0 text-xs text-muted-foreground'>
+                {filteredTaches.length}{' '}
+                {filteredTaches.length === 1 ? 'tâche' : 'tâches'}
+              </div>
+            )}
           </div>
         </div>
       )}
