@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
 import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
 import { DynamicForm } from '@/Global/Forms/DynamicForm'
 import { getSuiviTacheActiviteFormConfigForTache } from '@/simadou/allfieldsConfig/suiviTacheActiviteForm'
 import {
@@ -76,22 +75,17 @@ export default function SuiviTacheActiviteForm({
   }
 
   return (
-    <div className='space-y-4'>
-      <DynamicForm
-        key={`${tache.id_groupe_tache}-${suivi?.id_suivi_groupe_tache ?? 'new'}`}
-        config={formConfig}
-        schema={suiviTacheActiviteSchema}
-        defaultValues={defaultValues}
-        onSubmit={onSubmit}
-        submitText={isEditing ? 'Mettre à jour' : 'Enregistrer'}
-        loadingText='Enregistrement…'
-        isLoading={createMutation.isPending || updateMutation.isPending}
-      />
-      <div className='flex justify-end'>
-        <Button type='button' variant='outline' onClick={onClose}>
-          Retour
-        </Button>
-      </div>
-    </div>
+    <DynamicForm
+      key={`${tache.id_groupe_tache}-${suivi?.id_suivi_groupe_tache ?? 'new'}`}
+      config={formConfig}
+      schema={suiviTacheActiviteSchema}
+      defaultValues={defaultValues}
+      onSubmit={onSubmit}
+      submitText={isEditing ? 'Mettre à jour' : 'Enregistrer'}
+      loadingText='Enregistrement…'
+      isLoading={createMutation.isPending || updateMutation.isPending}
+      onCancel={onClose}
+      cancelText='Retour'
+    />
   )
 }
