@@ -5,7 +5,7 @@ import suiviAvancementContratService from '@/simadou/allSercices/suiviAvancement
 import observationPtbaService from '@/simadou/allSercices/observationPtbaService'
 import indicateurActivitePtbaService from '@/simadou/allSercices/indicateurActivitePtbaService'
 import suiviIndicateurActiviteService from '@/simadou/allSercices/suiviIndicateurActiviteService'
-import { localiteService } from '@/simadou/allSercices/localiteService'
+export { useGetLocalites } from './sharedHooks'
 import type { SuiviTacheActivite, TacheActivitePtba } from '@/simadou/allTypes'
 import { resolveIdActivite } from '@/simadou/allTypes/tacheActivitePtba'
 import { tauxAvancementGlobalTaches } from '@/simadou/allTypes/suiviTacheActivite'
@@ -137,12 +137,6 @@ export const useGetAllSuivisIndicateurs = (enabled = true) =>
     queryKey: suiviPtbaQueryKeys.suivisIndicateurs,
     queryFn: () => suiviIndicateurActiviteService.getAll(),
     enabled,
-  })
-
-export const useGetLocalites = () =>
-  useQuery({
-    queryKey: suiviPtbaQueryKeys.localites,
-    queryFn: () => localiteService.getAll(),
   })
 
 export const useCreateSuiviTache = (idActivite: number) => {

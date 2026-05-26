@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 import useDialogState from '@/hooks/use-dialog-state'
 import { Ptba } from '@/simadou/allTypes'
 import { buildPtbasColumns } from '@/simadou/allColonnes/ptbas-columns'
-import { useActiveProgrammeCode } from '@/hooks/use-active-project'
+import { useActiveProgrammeCode } from '@/hooks/use-active-programme'
 import { useGetPtbas } from '@/simadou/allHooks/admin/ptbaHooks'
 import { usePtbaVersionSelection } from '@/simadou/allHooks/admin/versionHooks'
 const route = getRouteApi('/_authenticated/programmation/ptba/')

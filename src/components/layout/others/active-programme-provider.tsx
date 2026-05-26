@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { programmeService } from '@/simadou/allSercices/programmeService'
-import { useProjectStore } from '@/stores/projetct-store'
+import { useProgrammeStore } from '@/stores/programme-store'
 
 function isPersistedProgramme(
   value: unknown
@@ -22,8 +22,8 @@ export function ActiveProgrammeProvider({
 }: {
   children: React.ReactNode
 }) {
-  const setActiveProgramme = useProjectStore((s) => s.setActiveProgramme)
-  const setProgrammes = useProjectStore((s) => s.setProgrammes)
+  const setActiveProgramme = useProgrammeStore((s) => s.setActiveProgramme)
+  const setProgrammes = useProgrammeStore((s) => s.setProgrammes)
 
   const { data: programmes = [] } = useQuery({
     queryKey: ['programmes'],
@@ -36,7 +36,7 @@ export function ActiveProgrammeProvider({
 
     setProgrammes(programmes)
 
-    const current = useProjectStore.getState().activeProgramme
+    const current = useProgrammeStore.getState().activeProgramme
     const persistedId = isPersistedProgramme(current)
       ? current.id_programme
       : undefined

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import ptbaService from '@/simadou/allSercices/ptbaService'
-import { useActiveProgrammeCode } from '@/hooks/use-active-project'
+import { useActiveProgrammeCode } from '@/hooks/use-active-programme'
 
 export const useGetPtbas = () => {
   const codeProgramme = useActiveProgrammeCode()

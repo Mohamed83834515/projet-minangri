@@ -12,9 +12,9 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Badge } from '@/components/ui/badge'
 import type { Programme } from '@/simadou/allTypes/programme'
-import { useProjectStore } from '@/stores/projetct-store'
+import { useProgrammeStore } from '@/stores/programme-store'
 
-interface ProjectSwitcherProps {
+interface ProgrammeSwitcherProps {
   onHeader?: boolean
 }
 
@@ -30,10 +30,10 @@ function programmeLabel(programme: Programme): string {
   return programme.sigle_programme?.trim() || programme.code_programme
 }
 
-export function ProjectSwitcher({ onHeader = false }: ProjectSwitcherProps) {
-  const activeProgramme = useProjectStore((s) => s.activeProgramme)
-  const programmes = useProjectStore((s) => s.programmes)
-  const setActiveProgramme = useProjectStore((s) => s.setActiveProgramme)
+export function ProgrammeSwitcher({ onHeader = false }: ProgrammeSwitcherProps) {
+  const activeProgramme = useProgrammeStore((s) => s.activeProgramme)
+  const programmes = useProgrammeStore((s) => s.programmes)
+  const setActiveProgramme = useProgrammeStore((s) => s.setActiveProgramme)
   const [open, setOpen] = useState(false)
 
   const isLoading = programmes.length === 0 && !activeProgramme
