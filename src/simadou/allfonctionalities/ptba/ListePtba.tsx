@@ -56,7 +56,7 @@ function ListePtbas() {
 
   // Options pour le filtre
   const versionOptions = versions
-  .filter((version: VersionPtba) => typeof version.programme === "object" && version.programme?.code_programme === PROGRAMME_CODE_PTBA)
+  .filter((version: VersionPtba) => typeof version.programme === "object" && version.programme?.code_programme === "001")
   .map((version: any) => ({
     label: `${version.version_ptba || `Version ${version.id_version_ptba}`} - ${version.annee_ptba}`,
     value: version.id_version_ptba.toString()
