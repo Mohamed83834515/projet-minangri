@@ -15,10 +15,12 @@ import {
 } from '@/simadou/allResetFields/resetField'
 import {
   useCreateProjet,
+} from '@/simadou/allHooks/admin/projetHooks'
+import {
   useGetActeurs,
   useGetLocalites,
-} from '@/simadou/allHooks/admin/projetHooks'
-import { useActiveProgrammeId } from '@/hooks/use-active-project'
+} from '@/simadou/allHooks/admin/sharedHooks'
+import { useActiveProgrammeId } from '@/hooks/use-active-programme'
 import {
   projectCreateStep1Schema,
   projectCreateStep2Schema,
