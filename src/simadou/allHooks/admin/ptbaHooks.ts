@@ -3,11 +3,9 @@ import ptbaService from '@/simadou/allSercices/ptbaService'
 import { useActiveProgrammeCode } from '@/hooks/use-active-project'
 import { toast } from 'sonner'
 
-const codeProgramme = useActiveProgrammeCode()
-
-const queryClient = useQueryClient()
 export const useGetPtbas = () => {
 
+  const codeProgramme = useActiveProgrammeCode()
   return useQuery({
     queryKey: ['ptba-activites-all', codeProgramme],
     queryFn: () => ptbaService.getAll(codeProgramme!),
@@ -15,7 +13,8 @@ export const useGetPtbas = () => {
   })
 }
 export const useDeletePtba = () => {
-
+  const queryClient = useQueryClient()
+  const codeProgramme = useActiveProgrammeCode()
   return useMutation({
     mutationFn: (id: number) => ptbaService.delete(id),
     onSuccess: () => {
