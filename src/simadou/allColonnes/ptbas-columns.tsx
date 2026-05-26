@@ -1,9 +1,10 @@
-import { type Row } from '@tanstack/react-table'
+import { ColumnDef, type Row } from '@tanstack/react-table'
 import { GenericRowActions } from '@/Global/Tableaux/GenericRowActions'
 import { buildColumns, type OptionItem } from '@/Global/Tableaux/column-builder'
 import { UserPen, Trash2, CheckCircle, MinusCircle } from 'lucide-react'
 import { Ptba } from '../allTypes'
 import { getMoisOptions } from '../schemas/ptbaSchemas'
+import { DataTableColumnHeader } from '@/components/data-table/column-header'
 
 type PtbasDialogType = 'edit' | 'delete'
 
@@ -23,7 +24,7 @@ function PtbasRowActions({
             row={row}
             actions={[
                 {
-                    label: 'Edit',
+                    label: 'Modifier',
                     icon: <UserPen size={16} />,
                     onClick: (ptba) => {
                         setCurrentRow(ptba)
@@ -31,7 +32,7 @@ function PtbasRowActions({
                     },
                 },
                 {
-                    label: 'Delete',
+                    label: 'Supprimer',
                     icon: <Trash2 size={16} />,
                     onClick: (ptba) => {
                         setCurrentRow(ptba)
@@ -45,82 +46,108 @@ function PtbasRowActions({
     )
 }
 
-// Fonction pour vérifier si un mois est dans le chronogramme
-const isMonthInChronogramme = (chronogramme: string, monthCode: string): boolean => {
-    if (!chronogramme) return false
-    const months = chronogramme.split(',').map(m => m.trim())
-    return months.includes(monthCode)
+type Props = {
+    value: string | string[] | null | undefined
+    month: string
 }
 
+export function ChronogrammeMonthCell({ value, month }: Props) {
+    const months = parseChronogramme(value)
+
+    const isActive = months.includes(month)
+    return (
+        <div className="flex justify-center">
+            {isActive ? (
+                <CheckCircle className="h-5 w-5 text-green-500" />
+            ) : (
+                <MinusCircle className="h-5 w-5 text-gray-300" />
+            )}
+        </div>
+    )
+}
 // Personnaliser le rendu des colonnes mois
-const getMonthColumn = (mois: { value: string; label: string }, chronogramme?: string) => {
-    const isActive = chronogramme ? isMonthInChronogramme(chronogramme, mois.value) : false
+export const parseChronogramme = (value: unknown): string[] => {
+    if (!value) return []
 
-    return {
-        type: 'text' as const,
-        key: mois.value,
-        title: mois.label,
-        cell: (row: Ptba) => {
-            const isIncluded = isMonthInChronogramme(row.chronogramme || '', mois.value)
-            return (
-                <div className="flex justify-center">
-                    {isIncluded ? (
-                        <CheckCircle className="h-5 w-5 text-green-500" />
-                    ) : (
-                        <MinusCircle className="h-5 w-5 text-gray-300" />
-                    )}
-                </div>
-            )
-        },
+    if (Array.isArray(value)) {
+        return value.map(v => String(v).trim()).filter(Boolean)
     }
-}
 
+    if (typeof value !== 'string') return []
+
+    return value
+        .split(',')
+        .map(v => v.trim())
+        .filter(v => v.length > 0)
+}
 
 export const buildPtbasColumns = (
     setOpen: (dialog: PtbasDialogType | null) => void,
     setCurrentRow: React.Dispatch<React.SetStateAction<Ptba | null>>
-) =>
-    buildColumns<Ptba>([
-        { type: 'text', key: 'code_activite_ptba', title: 'Code Ptba', sticky: true },
-        { type: 'text', key: 'intitule_activite_ptba', title: 'Intitulé Activité' },
-        { type: 'text', key: 'responsable_ptba', title: 'Responsable Ptba' },
-        { type: 'text', key: 'version_ptba', title: 'Version' },
-        { type: 'text', key: 'id_ptba', title: 'Planification' },
-        ...getMoisOptions().map((mois) => ({
-            type: 'text' as const,
-            key: mois.value,
-            title: mois.label,
-            cell: ({ row }: any) => {
-                const chronogramme = row.chronogramme || ""
-
-                const isActive = chronogramme
-                    .split(', ')
-                    .map((m: string) => m.trim())
-                    .includes(mois.value)
-
-                return (
-                    <div
-                        className={
-                            isActive
-                                ? "bg-green-100 text-green-700 px-2 py-1 rounded-md font-medium"
-                                : "bg-gray-100 text-gray-400 px-2 py-1 rounded-md"
-                        }
-                    >
-                        {isActive ? "✔" : "-"} 
-                    </div>
-                )
-            },
-        })),
-        { type: 'text', key: 'cout', title: 'Coût ($)' },
-        {
-            type: 'actions',
-            cell: (props) => (
-                <PtbasRowActions
-                    {...props}
-                    setOpen={setOpen}
-                    setCurrentRow={setCurrentRow}
-                />
-            ),
-        },
+) => {
+    const baseColumns = buildColumns<Ptba>([
+        { type: "text", key: "code_activite_ptba", title: "Code", sticky: true },
+        { type: "text", key: "intitule_activite_ptba", title: "Activité" },
+        { type: "text", key: "responsable_ptba", title: "Responsable" },
     ])
 
+    const actionsColumn: ColumnDef<Ptba> = {
+        id: "actions",
+        accessorKey: 'id_ptba',
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title='Actions' />
+        ),
+        cell: (props) => (
+            <PtbasRowActions
+                {...props}
+                setOpen={setOpen}
+                setCurrentRow={setCurrentRow}
+            />
+        ),
+        enableSorting: false,
+        enableHiding: false,
+    }
+
+    const chronogrammeColumns: ColumnDef<Ptba>[] = getMoisOptions().map((mois) => ({
+        id: `chronogramme_${mois.value}`,
+        header: ({ column }) => (
+            <DataTableColumnHeader
+                column={column}
+                title={mois.label}
+                className="text-center"
+            />
+        ),
+        cell: ({ row }) => (
+            <ChronogrammeMonthCell
+                value={row.original?.chronogramme}
+                month={mois.value}
+            />
+        ),
+        meta: {
+            className: "text-center",
+        },
+        enableSorting: false,
+        enableHiding: false,
+    }))
+
+
+    const coutColumns: ColumnDef<Ptba> = {
+        id: 'cout_row',
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title='Coût' />
+        ),
+        cell: ({ row }) => (
+            <span className='tabular-nums'>300 000</span>
+        ),
+        meta: { thClassName: 'text-center', className: 'text-center' },
+        enableSorting: false,
+        enableHiding: false,
+    }
+
+    return [
+        ...baseColumns,
+        ...chronogrammeColumns,
+        coutColumns,
+        actionsColumn,
+    ]
+}

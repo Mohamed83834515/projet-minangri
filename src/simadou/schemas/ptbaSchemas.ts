@@ -54,11 +54,9 @@ export const versionPtbaSchema = z.object({
 // Schéma pour les mois du chronogramme
 export const chronogrammeSchema = z
   .string()
-  .min(1, "Le chronogramme est requis")
-  .max(100, "Le chronogramme ne peut pas dépasser 100 caractères")
+  .min(1, "Au moins un mois doit être sélectionné")
   .refine(
-    (value: string) => {
-      // Valider que le chronogramme contient des mois valides (Jan, Fév, Mar, etc.)
+    (value) => {
       const moisValides = [
         "Jan",
         "Fév",
@@ -78,10 +76,10 @@ export const chronogrammeSchema = z
     },
     {
       message:
-        "Le chronogramme doit contenir des mois valides séparés par des virgules (Jan, Fév, Mar, etc.)",
+        "Le chronogramme contient des mois invalides",
     }
+    
   );
-
 // Schéma pour Ptba
 export const ptbaSchema = z.object({
   localites_ptba: z
@@ -127,7 +125,8 @@ export const ptbaSchema = z.object({
     .string()
     .max(50, "Le code programme ne peut pas dépasser 50 caractères")
     .optional(),
-  version_ptba: z.number("La version PTBA est requise"),
+  version_ptba: z
+  .number("La version PTBA est requise"),
   type_activite: z
     .string()
     .min(1, "Le type d'activité doit être sélectionné"),

@@ -412,7 +412,7 @@ export default AddUser;
 import { axiosInstance } from "@/axios/axiosInstance";
 import type { ProduitLocal, ProduitLocalForm } from "@/interfaces/interfaceTable";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import toast from "react-hot-toast";
+import {toast} from "sonner";
 
 //========================CRUD PRODUITS LOCAUX========================
 

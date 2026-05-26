@@ -3,13 +3,14 @@ import { getRouteApi } from '@tanstack/react-router'
 import { GenericDialogs } from '@/Global/Generic/Genericdialogs'
 import { GenericTable } from '@/Global/Generic/Generictable'
 import { GenericDeleteDialog } from '@/Global/Tableaux/GenericDeleteDialog'
-import { toast } from 'sonner'
 import useDialogState from '@/hooks/use-dialog-state'
+import { useActiveProgrammeCode } from '@/hooks/use-active-programme'
 import { Ptba } from '@/simadou/allTypes'
 import { buildPtbasColumns } from '@/simadou/allColonnes/ptbas-columns'
-import { useActiveProgrammeCode } from '@/hooks/use-active-programme'
-import { useGetPtbas } from '@/simadou/allHooks/admin/ptbaHooks'
+import { useDeletePtba, useGetPtbas } from '@/simadou/allHooks/admin/ptbaHooks'
 import { usePtbaVersionSelection } from '@/simadou/allHooks/admin/versionHooks'
+import AddPtba from './AddPtba'
+
 const route = getRouteApi('/_authenticated/programmation/ptba/')
 
 function ListePtbas() {
@@ -21,6 +22,7 @@ function ListePtbas() {
   const navigate = route.useNavigate()
 
   const { data: ptbas = [] } = useGetPtbas()
+  const deleteMutation = useDeletePtba()
 
   const filteredPtbas = useMemo(() => {
     if (!selectedVersionId) return ptbas
@@ -29,9 +31,7 @@ function ListePtbas() {
     )
   }, [ptbas, selectedVersionId])
 
-  const [open, setOpen] = useDialogState<'add' | 'edit' | 'delete'>(
-    null
-  )
+  const [open, setOpen] = useDialogState<'add' | 'edit' | 'delete'>(null)
   const [currentRow, setCurrentRow] = useState<Ptba | null>(null)
 
   const columns = useMemo(
@@ -49,14 +49,20 @@ function ListePtbas() {
         searchKey='intitule_activite_ptba'
         searchPlaceholder='Filter activities...'
         urlFilterConfig={[
-          { columnId: 'intitule_activite_ptba', searchKey: 'intitule_activite_ptba', type: 'string' }
+          {
+            columnId: 'intitule_activite_ptba',
+            searchKey: 'intitule_activite_ptba',
+            type: 'string',
+          },
         ]}
         facetedFilters={[
           {
             columnId: 'version_ptba',
             title: 'Version PTBA',
             options: versionOptions,
-            onValueChange: (value: any) => setSelectedVersionId(value || null),
+            onValueChange: (value: string | undefined) =>
+              setSelectedVersionId(value || null),
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } as any,
         ]}
         initialState={{
@@ -73,24 +79,23 @@ function ListePtbas() {
         setCurrentRow={setCurrentRow}
         rowRequiredDialogs={['edit', 'delete']}
         dialogMap={{
-          //   edit: (props) => (
-          //     <EditUser
-          //       key={`user-edit-${currentRow?.id}`}
-          //       open={props.open}
-          //       onOpenChange={props.onOpenChange}
-          //       currentRow={props.currentRow as User}
-          //     />
-          //   ),
+          edit: (props) => (
+            <AddPtba
+              key={`ptba-edit-${currentRow?.id_ptba}`}
+              open={props.open}
+              onOpenChange={props.onOpenChange}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              currentRow={props.currentRow as any}
+            />
+          ),
           delete: (props) => (
             <GenericDeleteDialog<Ptba>
-              key={`ptba-delete-${currentRow?.id}`}
+              key={`ptba-delete-${currentRow?.id_ptba}`}
               {...props}
               currentRow={props.currentRow as Ptba}
               entityName='ptba'
               getEntityLabel={(row) => row.intitule_activite_ptba}
-              onDelete={(row) =>
-                toast.success(`Ptba ${row.intitule_activite_ptba} supprimé`)
-              }
+              onDelete={(row) => deleteMutation.mutate(row.id_ptba)}
             />
           ),
         }}

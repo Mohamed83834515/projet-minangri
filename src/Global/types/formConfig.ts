@@ -74,7 +74,8 @@ export type FieldType =
   | "video"
   | "audio"
   | "color"
-  | "hidden";
+  | "hidden"
+  | "checkbox-group";
 
 export interface SelectOption {
   value: string | number;
@@ -103,9 +104,9 @@ export interface FieldConfig {
   min?: number;
   max?: number;
   //numéro de l'étape du formulaire (1, 2, 3...)
-  step?: number;         
+  step?: number;
   // alias explicite si "step" entre en conflit avec le step HTML (number input)
-  formStep?: number;     
+  formStep?: number;
   rows?: number;
   cols?: number;
   accept?: string;
@@ -119,7 +120,7 @@ export interface FieldConfig {
   dependsOn?: string;
   showWhen?: ((value: any) => boolean) | Record<string, any>;
   hidden?: boolean;
-  gridCols?: 1 | 2;
+  gridCols?: 1 | 2 | 3;
   useCombobox?: boolean;
   startName?: string;
   endName?: string;
@@ -128,20 +129,20 @@ export interface FieldConfig {
 //Nouvelle interface : description d'une étape
 export interface StepConfig {
   // identifiant de l'étape (1-based)
-  step: number;           
+  step: number;
   // titre affiché dans le stepper
-  title: string;          
+  title: string;
   // sous-titre optionnel
-  description?: string;   
+  description?: string;
   // icône lucide optionnelle
-  icon?: React.ReactNode; 
+  icon?: React.ReactNode;
 }
 
 export interface FormConfig {
   fields: FieldConfig[];
   layout?: "vertical" | "horizontal" | "grid";
   columns?: number;
-  steps?: StepConfig[]; 
+  steps?: StepConfig[];
 }
 
 export function getFieldRegex(field: FieldConfig): RegExp | undefined {
