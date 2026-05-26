@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
 import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
 import { DynamicForm } from '@/Global/Forms/DynamicForm'
 import { getSuiviAvancementContratFormConfigForSuivi } from '@/simadou/allfieldsConfig/suiviAvancementContratForm'
 import {
@@ -143,13 +142,11 @@ export default function SuiviAvancementContratForm({
         defaultValues={defaultValues}
         onSubmit={onSubmit}
         submitText={isEditing ? 'Mettre à jour' : 'Enregistrer'}
+        loadingText='Enregistrement…'
         isLoading={isPending}
+        onCancel={onClose}
+        cancelText='Retour'
       />
-      <div className='flex justify-end'>
-        <Button type='button' variant='outline' onClick={onClose}>
-          Retour
-        </Button>
-      </div>
     </div>
   )
 }

@@ -1,10 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Check } from 'lucide-react'
 import { toast } from 'sonner'
-import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
-import { DialogClose } from '@/components/ui/dialog'
 import { DynamicForm } from '@/Global/Forms/DynamicForm'
+import { FormStepIndicator } from '@/Global/Forms/FormStepIndicator'
 import {
   getProjetFormConfigForCreateStep1,
   getProjetFormConfigForCreateStep2,
@@ -13,9 +10,7 @@ import {
   PROJET_CREATE_STEP1,
   PROJET_CREATE_STEP2,
 } from '@/simadou/allResetFields/resetField'
-import {
-  useCreateProjet,
-} from '@/simadou/allHooks/admin/projetHooks'
+import { useCreateProjet } from '@/simadou/allHooks/admin/projetHooks'
 import {
   useGetActeurs,
   useGetLocalites,
@@ -28,6 +23,17 @@ import {
   type ProjectCreateStep2Data,
   type ProjectCreateSubmitData,
 } from '@/simadou/schemas/projetSchema'
+
+const PROJET_STEPS = [
+  {
+    title: 'Informations générales',
+    description: 'Identité et paramètres du projet',
+  },
+  {
+    title: 'Acteurs et zones',
+    description: 'Partenaires, signataires et périmètre géographique',
+  },
+] as const
 
 type ProjetFormProps = {
   open: boolean
@@ -107,26 +113,10 @@ export default function ProjetForm({ open, onSuccess, onClose }: ProjetFormProps
 
   return (
     <div className='space-y-6'>
-      <div className='relative mb-2 flex items-center justify-between'>
-        <div className='absolute left-0 top-1/2 -z-10 h-0.5 w-full bg-border' />
-        {[1, 2].map((i) => (
-          <div
-            key={i}
-            className={cn(
-              'flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all',
-              step >= i
-                ? 'border-primary bg-primary text-primary-foreground shadow-sm'
-                : 'border-muted-foreground/30 bg-background text-muted-foreground'
-            )}
-          >
-            {step > i ? <Check className='h-5 w-5' /> : i}
-          </div>
-        ))}
-      </div>
-      <div className='flex justify-between text-sm text-muted-foreground'>
-        <span>Informations générales</span>
-        <span>Acteurs et zones</span>
-      </div>
+      <FormStepIndicator
+        steps={[...PROJET_STEPS]}
+        currentStep={step}
+      />
 
       {step === 1 && (
         <DynamicForm
@@ -137,6 +127,8 @@ export default function ProjetForm({ open, onSuccess, onClose }: ProjetFormProps
           onSubmit={handleStep1Submit}
           submitText='Suivant'
           loadingText='Validation…'
+          onCancel={handleCancel}
+          cancelText='Annuler'
         />
       )}
 
@@ -153,23 +145,11 @@ export default function ProjetForm({ open, onSuccess, onClose }: ProjetFormProps
           onFieldChange={(name, value) => {
             setStep2Data((prev) => ({ ...prev, [name]: value }))
           }}
+          onBack={() => setStep(1)}
+          onCancel={handleCancel}
+          cancelText='Annuler'
         />
       )}
-
-      <div className='relative z-10 flex justify-between border-t pt-4'>
-        {step > 1 ? (
-          <Button type='button' variant='outline' onClick={() => setStep(1)}>
-            Précédent
-          </Button>
-        ) : (
-          <div />
-        )}
-        <DialogClose asChild>
-          <Button type='button' variant='outline' onClick={handleCancel}>
-            Annuler
-          </Button>
-        </DialogClose>
-      </div>
     </div>
   )
 }

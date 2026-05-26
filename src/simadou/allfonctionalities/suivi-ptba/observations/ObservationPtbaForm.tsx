@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
 import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
 import { DynamicForm } from '@/Global/Forms/DynamicForm'
 import { getObservationPtbaFormConfigForActivite } from '@/simadou/allfieldsConfig/observationPtbaForm'
 import {
@@ -83,20 +82,16 @@ export default function ObservationPtbaForm({
   }
 
   return (
-    <div className='space-y-4'>
-      <DynamicForm
-        config={formConfig}
-        schema={observationPtbaSchema}
-        defaultValues={defaultValues}
-        onSubmit={onSubmit}
-        submitText={isEditing ? 'Mettre à jour' : 'Enregistrer'}
-        isLoading={createMutation.isPending || updateMutation.isPending}
-      />
-      <div className='flex justify-end'>
-        <Button type='button' variant='outline' onClick={onClose}>
-          Retour
-        </Button>
-      </div>
-    </div>
+    <DynamicForm
+      config={formConfig}
+      schema={observationPtbaSchema}
+      defaultValues={defaultValues}
+      onSubmit={onSubmit}
+      submitText={isEditing ? 'Mettre à jour' : 'Enregistrer'}
+      loadingText='Enregistrement…'
+      isLoading={createMutation.isPending || updateMutation.isPending}
+      onCancel={onClose}
+      cancelText='Retour'
+    />
   )
 }
