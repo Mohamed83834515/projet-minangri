@@ -421,7 +421,7 @@ export interface Ptba extends Record<string, unknown> {
   direction_ptba?: string; // Code du PlanSite direction, relation vers PlanSite via code_ds
   code_programme?: string;
   version_ptba: number; // Relation vers VersionPtba
-  type_activite: number; // Relation vers TypeActivite
+  type_activite: string ; // Relation vers TypeActivite
   created_at?: string;
   updated_at?: string;
 

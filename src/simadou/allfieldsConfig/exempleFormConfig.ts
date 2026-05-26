@@ -69,7 +69,7 @@ export const getUserFormConfig = (): FormConfig => ({
   //------------------------------------------------
   //------------------------------------------------
   // 2eme cas
-
+ 
   // vous definissez le nombre de step ici
   // steps: [
   //   {

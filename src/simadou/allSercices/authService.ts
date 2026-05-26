@@ -1,6 +1,6 @@
 import { apiClient, tokenManager } from "@/axios/api";
 import { handleApiError } from "@/axios/handleError";
-import toast from "react-hot-toast";
+import {toast} from "sonner";
 
 
 interface LoginCredentials {

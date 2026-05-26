@@ -505,10 +505,15 @@ export const FormField = ({
               <div className='relative'>
                 <MultiSelect
                   options={field.options || []}
-                  selected={controllerField.value || []}
+                  selected={
+                    Array.isArray(controllerField.value)
+                      ? controllerField.value
+                      : []
+                  }
                   onChange={(values) => {
                     controllerField.onChange(values)
                     setTouched(true)
+
                     if (trigger) trigger(field.name)
                   }}
                   placeholder={field.placeholder || 'Sélectionner'}
@@ -545,7 +550,6 @@ export const FormField = ({
                 (opt) =>
                   opt.value.toString() === controllerField.value?.toString()
               )
-
               return (
                 <div className='relative'>
                   <Popover open={comboboxOpen} onOpenChange={setComboboxOpen}>
@@ -568,7 +572,7 @@ export const FormField = ({
                             <span
                               className={cn(
                                 selectedOption.isInscrit &&
-                                  'font-medium text-green-700 dark:text-green-400'
+                                'font-medium text-green-700 dark:text-green-400'
                               )}
                             >
                               {selectedOption.label}
@@ -607,17 +611,14 @@ export const FormField = ({
                                 className={cn(
                                   'cursor-pointer',
                                   option.isInscrit &&
-                                    'bg-green-50 hover:bg-green-100 dark:bg-green-950/40 dark:hover:bg-green-950/60'
+                                  'bg-green-50 hover:bg-green-100 dark:bg-green-950/40 dark:hover:bg-green-950/60'
                                 )}
                                 onSelect={() => {
-                                  const parsedValue = isNaN(
-                                    Number(option.value)
-                                  )
-                                    ? option.value
-                                    : Number(option.value)
-                                  controllerField.onChange(parsedValue)
+                                  controllerField.onChange(option.value)
+
                                   setComboboxOpen(false)
                                   setTouched(true)
+
                                   if (trigger) trigger(field.name)
                                 }}
                               >
@@ -625,7 +626,7 @@ export const FormField = ({
                                   className={cn(
                                     'flex-1',
                                     option.isInscrit &&
-                                      'font-medium text-green-700 dark:text-green-400'
+                                    'font-medium text-green-700 dark:text-green-400'
                                   )}
                                 >
                                   {option.label}
@@ -696,8 +697,8 @@ export const FormField = ({
                             'w-full justify-between font-normal',
                             !controllerField.value && 'text-muted-foreground',
                             isValid &&
-                              !isOtherSelected &&
-                              'border-green-500 focus:ring-green-500',
+                            !isOtherSelected &&
+                            'border-green-500 focus:ring-green-500',
                             isInvalid && 'border-red-500 focus:ring-red-500'
                           )}
                           onClick={() => setTouched(true)}
@@ -812,9 +813,9 @@ export const FormField = ({
                               }
                               className={cn(
                                 otherIsValid &&
-                                  'border-green-500 pr-10 focus:ring-green-500',
+                                'border-green-500 pr-10 focus:ring-green-500',
                                 otherIsInvalid &&
-                                  'border-red-500 focus:ring-red-500'
+                                'border-red-500 focus:ring-red-500'
                               )}
                               onBlur={async () => {
                                 setTouched(true)
@@ -875,6 +876,127 @@ export const FormField = ({
           </div>
         )
 
+      // ========== CHECKBOX-GROUP ==========
+      case "checkbox-group":
+        return (
+          <Controller
+            name={field.name}
+            control={control}
+            render={({ field: controllerField, fieldState }) => {
+
+              // IMPORTANT
+              const selectedMois: string[] =
+                typeof controllerField.value === "string" &&
+                  controllerField.value.length > 0
+                  ? controllerField.value.split(",").map((m) => m.trim())
+                  : []
+
+              const moisOptions = field.options || []
+
+              const updateValue = (values: string[]) => {
+                controllerField.onChange(values.join(","))
+              }
+
+              const toggleMois = (val: string) => {
+                const exists = selectedMois.includes(val)
+
+                const newValue = exists
+                  ? selectedMois.filter((v) => v !== val)
+                  : [...selectedMois, val]
+
+                updateValue(newValue)
+              }
+
+              const selectAll = () => {
+                updateValue(moisOptions.map((m: any) => m.value))
+              }
+
+              const clearAll = () => {
+                controllerField.onChange("")
+              }
+
+              const error = fieldState.error?.message
+
+              return (
+                <div className="space-y-3">
+
+                  {/* HEADER */}
+                  <div className="flex items-center justify-between">
+                    <p className="block text-sm font-medium text-gray-700">
+                      Sélectionnez les mois de réalisation de l’activité.
+                    </p>
+
+                    <div className="flex gap-3">
+                      <button
+                        type="button"
+                        onClick={selectAll}
+                        className="text-xs text-blue-600 hover:text-blue-500"
+                      >
+                        Tout sélectionner
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={clearAll}
+                        className="text-xs text-gray-500 hover:text-gray-700"
+                      >
+                        Tout désélectionner
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* GRID MOIS */}
+                  <div className="grid grid-cols-3 sm:grid-cols-6 md:grid-cols-12 gap-2">
+                    {moisOptions.map((mois: any) => {
+                      const isSelected = selectedMois.includes(mois.value)
+
+                      return (
+                        <button
+                          key={mois.value}
+                          type="button"
+                          onClick={() => toggleMois(mois.value)}
+                          className={`
+                      relative flex flex-col items-center justify-center gap-1
+                      p-3 rounded-lg border-2 transition-all duration-150
+                      ${isSelected
+                              ? "border-green-500 bg-green-50 text-green-700 shadow-sm"
+                              : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50"
+                            }
+                    `}
+                        >
+                          <span className="text-xs font-semibold">
+                            {mois.value}
+                          </span>
+
+                          {isSelected && (
+                            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-green-500 text-white flex items-center justify-center text-[10px]">
+                              ✓
+                            </span>
+                          )}
+                        </button>
+                      )
+                    })}
+                  </div>
+
+                  {/* APERÇU */}
+                  {selectedMois.length > 0 && (
+                    <div className="rounded-lg bg-gray-50 p-3 text-sm text-gray-700">
+                      <strong>Mois sélectionnés :</strong>{" "}
+                      {selectedMois.join(", ")}
+                    </div>
+                  )}
+
+                  {/* ERROR */}
+                  {error && (
+                    <p className="text-sm text-red-600">
+                      {error}
+                    </p>
+                  )}
+                </div>
+              )
+            }}
+          />
+        )
       // ========== PASSWORD ==========
       case 'password':
         if (field.showPasswordToggle) {

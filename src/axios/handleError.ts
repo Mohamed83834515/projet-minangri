@@ -1,5 +1,5 @@
 import { AxiosError } from "axios"
-import toast from "react-hot-toast"
+import {toast} from "sonner"
 
 type ApiErrorResponse = {
   message?: string

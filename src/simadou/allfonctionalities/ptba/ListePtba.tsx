@@ -8,12 +8,14 @@ import useDialogState from '@/hooks/use-dialog-state'
 import { Ptba, VersionPtba } from '@/simadou/allTypes'
 import { buildPtbasColumns } from '@/simadou/allColonnes/ptbas-columns'
 import { PROGRAMME_CODE_PTBA } from '@/simadou/constants/programmation'
-import { useGetPtbas } from '@/simadou/allHooks/admin/ptbaHooks'
+import { useDeletePtba, useGetPtbas } from '@/simadou/allHooks/admin/ptbaHooks'
 import { useGetVersions } from '@/simadou/allHooks/admin/versionHooks'
 import SelectInput from 'react-select'
+import AddPtba from './AddPtba'
 const route = getRouteApi('/_authenticated/programmation/ptba/')
 
 function ListePtbas() {
+
   // État local pour la version sélectionnée
   const [selectedVersionId, setSelectedVersionId] = useState<string | null>(null)
 
@@ -23,6 +25,8 @@ function ListePtbas() {
   // Listes des ptbas et des versions pour les filtres et affichages
   const { data: ptbas = [] } = useGetPtbas()
   const { data: versions = [] } = useGetVersions()
+  const deleteMutation = useDeletePtba()
+
 
   // Récupérer l'année courante
   const currentYear = new Date().getFullYear()
@@ -32,14 +36,26 @@ function ListePtbas() {
   useEffect(() => {
     if (defaultVersion && !selectedVersionId) {
       setSelectedVersionId(defaultVersion.id_version_ptba.toString())
+      localStorage.setItem('selectedVersionId', defaultVersion.id_version_ptba.toString())
     }
   }, [defaultVersion])
 
+  // Gérer le changement de version pour filtrer les ptbas
+  const handleChangeVersion = (versionId: string | null) => {
+    setSelectedVersionId(versionId)
+    if (versionId) {
+      localStorage.setItem('selectedVersionId', versionId)
+    } else {
+      localStorage.removeItem('selectedVersionId')
+    }
+  }
   // Filtrer les ptbas côté client
   const filteredPtbas = useMemo(() => {
     if (!selectedVersionId) return ptbas
     return ptbas.filter((ptba: Ptba) => ptba.version_ptba?.toString() === selectedVersionId)
   }, [ptbas, selectedVersionId])
+
+
   // Options pour le filtre
   const versionOptions = versions
   .filter((version: VersionPtba) => typeof version.programme === "object" && version.programme?.code_programme === PROGRAMME_CODE_PTBA)
@@ -52,12 +68,11 @@ function ListePtbas() {
     null
   )
   const [currentRow, setCurrentRow] = useState<Ptba | null>(null)
-
+  
   const columns = useMemo(
     () => buildPtbasColumns(setOpen, setCurrentRow),
     [setOpen, setCurrentRow]
   )
-  console.log('selectedVersionId', selectedVersionId)
 
   return (
     <>
@@ -76,7 +91,7 @@ function ListePtbas() {
               versionOptions.find((opt) => opt.value === selectedVersionId) || null
             }
             onChange={(selected: any) =>
-              setSelectedVersionId(selected?.value || null)
+              handleChangeVersion(selected?.value || null)
             }
             isClearable
           />
@@ -99,14 +114,14 @@ function ListePtbas() {
         setCurrentRow={setCurrentRow}
         rowRequiredDialogs={['edit', 'delete']}
         dialogMap={{
-          //   edit: (props) => (
-          //     <EditUser
-          //       key={`user-edit-${currentRow?.id}`}
-          //       open={props.open}
-          //       onOpenChange={props.onOpenChange}
-          //       currentRow={props.currentRow as User}
-          //     />
-          //   ),
+            edit: (props) => (
+              <AddPtba
+                key={`user-edit-${currentRow?.id}`}
+                open={props.open}
+                onOpenChange={props.onOpenChange}
+                currentRow={props.currentRow as any}
+              />
+            ),
           delete: (props) => (
             <GenericDeleteDialog<Ptba>
               key={`ptba-delete-${currentRow?.id}`}
@@ -115,7 +130,7 @@ function ListePtbas() {
               entityName='ptba'
               getEntityLabel={(row) => row.intitule_activite_ptba}
               onDelete={(row) =>
-                toast.success(`Ptba ${row.intitule_activite_ptba} supprimé`)
+                deleteMutation.mutate(row.id_ptba)
               }
             />
           ),
