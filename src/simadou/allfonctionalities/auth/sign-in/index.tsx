@@ -2,6 +2,7 @@ import { Link, useSearch } from '@tanstack/react-router'
 import { AuthLayout } from '../auth-layout'
 import { UserAuthForm } from './components/user-auth-form'
 import { Logo } from '@/assets/logo'
+import { ArrowBigRight, ArrowRight } from 'lucide-react'
 
 export function SignIn() {
   const { redirect } = useSearch({ from: '/(auth)/sign-in' })
@@ -202,10 +203,12 @@ export function SignIn() {
               </div>
 
               <Link
-                to='/sign-up'
-                className='flex w-full items-center justify-center rounded-xl border border-zinc-200 py-2.5 text-sm font-medium text-zinc-700 transition-all hover:border-zinc-300 hover:bg-zinc-50'
+                to='/forgot-password'
+                className='flex w-full items-center justify-center rounded-xl border border-zinc-200 py-2.5 text-sm font-medium text-zinc-700 transition-all hover:border-zinc-300 hover:bg-zinc-50 group gap-3'
               >
-                Créer un compte
+                Définissez un mot de passe de connexion
+
+                <ArrowRight className='group-hover:translate-x-1 duration-600' />
               </Link>
             </div>
 

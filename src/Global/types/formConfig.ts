@@ -123,6 +123,8 @@ export interface FieldConfig {
   useCombobox?: boolean;
   startName?: string;
   endName?: string;
+  showPasswordChecker ? : boolean
+
 }
 
 //Nouvelle interface : description d'une étape

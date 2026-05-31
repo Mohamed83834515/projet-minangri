@@ -1,53 +1,52 @@
 import { create } from 'zustand'
-import { getCookie, setCookie, removeCookie } from '@/lib/cookies'
+import { tokenManager } from '@/axios/api'
+import { jwtDecode } from 'jwt-decode'
 
-const ACCESS_TOKEN = 'thisisjustarandomstring'
-
-interface AuthUser {
-  accountNo: string
-  email: string
-  role: string[]
+interface DecodedToken {
   exp: number
+  user_id: number
 }
 
 interface AuthState {
-  auth: {
-    user: AuthUser | null
-    setUser: (user: AuthUser | null) => void
-    accessToken: string
-    setAccessToken: (accessToken: string) => void
-    resetAccessToken: () => void
-    reset: () => void
-  }
+  isAuthenticated: boolean
+
+  hydrateFromToken: () => void
+
+  login: () => void
+
+  logout: () => void
 }
 
-export const useAuthStore = create<AuthState>()((set) => {
-  const cookieState = getCookie(ACCESS_TOKEN)
-  const initToken = cookieState ? JSON.parse(cookieState) : ''
-  return {
-    auth: {
-      user: null,
-      setUser: (user) =>
-        set((state) => ({ ...state, auth: { ...state.auth, user } })),
-      accessToken: initToken,
-      setAccessToken: (accessToken) =>
-        set((state) => {
-          setCookie(ACCESS_TOKEN, JSON.stringify(accessToken))
-          return { ...state, auth: { ...state.auth, accessToken } }
-        }),
-      resetAccessToken: () =>
-        set((state) => {
-          removeCookie(ACCESS_TOKEN)
-          return { ...state, auth: { ...state.auth, accessToken: '' } }
-        }),
-      reset: () =>
-        set((state) => {
-          removeCookie(ACCESS_TOKEN)
-          return {
-            ...state,
-            auth: { ...state.auth, user: null, accessToken: '' },
-          }
-        }),
-    },
-  }
-})
+export const useAuthStore = create<AuthState>()((set) => ({
+  isAuthenticated: false,
+
+  hydrateFromToken: () => {
+    const token = tokenManager.getAccessToken()
+    if (!token) { set({ isAuthenticated: false }); return }
+    try {
+      const decoded = jwtDecode<DecodedToken>(token)
+      if (decoded.exp * 1000 < Date.now()) {
+        tokenManager.clearTokens()
+        set({ isAuthenticated: false })
+        return
+      }
+      set({ isAuthenticated: true })
+    } catch {
+      tokenManager.clearTokens()
+      set({ isAuthenticated: false })
+    }
+  },
+
+  login: () => set({ isAuthenticated: true }),
+
+  logout: () => {
+    tokenManager.clearTokens()
+    set({ isAuthenticated: false })
+  },
+
+  // alias used by QueryCache 401 handler in main.tsx
+  reset: () => {
+    tokenManager.clearTokens()
+    set({ isAuthenticated: false })
+  },
+}))

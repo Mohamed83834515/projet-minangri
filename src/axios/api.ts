@@ -43,10 +43,25 @@ api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     console.log(error);
+
     const originalRequest = error.config as AxiosRequestConfig & {
       _retry?: boolean;
     };
 
+    // Endpoints à ignorer
+    const excludedEndpoints = ["/token/", "/token/refresh/"];
+
+    const shouldIgnore =
+      excludedEndpoints.some((url) =>
+        originalRequest.url?.includes(url)
+      );
+
+    // Si c'est un endpoint exclu → laisser le catch du service gérer
+    if (shouldIgnore) {
+      return Promise.reject(error);
+    }
+
+    // Gestion normale des 401
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
@@ -59,12 +74,14 @@ api.interceptors.response.use(
       }
 
       isRefreshing = true;
+
       const refreshToken = tokenManager.getRefreshToken();
 
       if (!refreshToken) {
         isRefreshing = false;
         tokenManager.clearTokens();
-        window.location.href = "/login";
+        window.location.href = "/sign-in";
+
         return Promise.reject(error);
       }
 
@@ -74,16 +91,22 @@ api.interceptors.response.use(
         });
 
         const { access } = response.data;
+
         tokenManager.setTokens(access, refreshToken);
 
         isRefreshing = false;
+
         onRefreshed();
+
         return api(originalRequest);
-      } catch (refreshError: unknown) {
+      } catch (refreshError) {
         isRefreshing = false;
+
         tokenManager.clearTokens();
-        window.location.href = "/login";
-        return Promise.reject(refreshError as Error);
+
+        window.location.href = "/sign-in";
+
+        return Promise.reject(refreshError);
       }
     }
 
