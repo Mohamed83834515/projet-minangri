@@ -10,16 +10,21 @@ import { useDeletePtba, useGetPtbas } from '@/simadou/allHooks/admin/ptbaHooks'
 import { useGetVersions } from '@/simadou/allHooks/admin/versionHooks'
 import SelectInput from 'react-select'
 import AddPtba from './AddPtba'
+import ActiviteTabbedDialog from './ActiviteTabbedDialog'
+import TacheActiviteManager from './panification-tache/PlanificationTacheActiviteManager'
 const route = getRouteApi('/_authenticated/programmation/ptba/')
 
 function ListePtbas() {
 
   // État local pour la version sélectionnée
   const [selectedVersionId, setSelectedVersionId] = useState<string | null>(null)
+  const [planifierActivite, setPlanifierActivite] = useState<Ptba | null>(null)
+  const [showPlanificationModal, setShowPlanificationModal] = useState<boolean>(false)
 
   const search = route.useSearch()
   const navigate = route.useNavigate()
 
+  // Listes des ptbas et des versions pour les filtres et affichages
   const { data: ptbas = [] } = useGetPtbas()
   const { data: versions = [] } = useGetVersions()
   const deleteMutation = useDeletePtba()
@@ -49,11 +54,13 @@ function ListePtbas() {
   // Filtrer les ptbas côté client
   const filteredPtbas = useMemo(() => {
     if (!selectedVersionId) return ptbas
-    return ptbas.filter(
-      (ptba: Ptba) => ptba.version_ptba?.toString() === selectedVersionId
-    )
+    return ptbas.filter((ptba: Ptba) => ptba.version_ptba?.toString() === selectedVersionId)
   }, [ptbas, selectedVersionId])
 
+  const onOpenPlanification = (activite: Ptba) => {
+    setPlanifierActivite(activite)
+    setShowPlanificationModal(true)
+  }
 
   // Options pour le filtre
   const versionOptions = versions
@@ -69,7 +76,9 @@ function ListePtbas() {
   const [currentRow, setCurrentRow] = useState<Ptba | null>(null)
   
   const columns = useMemo(
-    () => buildPtbasColumns(setOpen, setCurrentRow),
+    () => buildPtbasColumns(setOpen, setCurrentRow,
+      onOpenPlanification
+    ),
     [setOpen, setCurrentRow]
   )
 
@@ -99,6 +108,8 @@ function ListePtbas() {
           { columnId: 'intitule_activite_ptba', searchKey: 'intitule_activite_ptba', type: 'string' }
         ]}
 
+        showViewOptions={false}
+
         initialState={{
           columnVisibility: {
             version_ptba: false,
@@ -106,6 +117,35 @@ function ListePtbas() {
         }}
       />
 
+      <ActiviteTabbedDialog
+        activite={planifierActivite}
+        open={showPlanificationModal}
+        onOpenChange={(open) => {
+          setShowPlanificationModal(open)
+          if (!open) setPlanifierActivite(null)
+        }}
+        defaultTab='taches'
+        tabs={
+          planifierActivite
+            ? [
+              {
+                value: 'taches',
+                label: 'Planification des tâches',
+                content: (
+                  <TacheActiviteManager activite={planifierActivite} />
+                ),
+              },
+              // {
+              //   value: 'indicateurs',
+              //   label: 'Planification des indicateurs',
+              //   content: (
+              //     <SuiviIndicateurManager activite={planifierActivite} />
+              //   ),
+              // }
+            ]
+            : []
+        }
+      />
       <GenericDialogs<Ptba, 'add' | 'edit' | 'delete'>
         open={open}
         setOpen={setOpen}
@@ -113,14 +153,14 @@ function ListePtbas() {
         setCurrentRow={setCurrentRow}
         rowRequiredDialogs={['edit', 'delete']}
         dialogMap={{
-            edit: (props) => (
-              <AddPtba
-                key={`user-edit-${currentRow?.id}`}
-                open={props.open}
-                onOpenChange={props.onOpenChange}
-                currentRow={props.currentRow as any}
-              />
-            ),
+          edit: (props) => (
+            <AddPtba
+              key={`user-edit-${currentRow?.id}`}
+              open={props.open}
+              onOpenChange={props.onOpenChange}
+              currentRow={props.currentRow as any}
+            />
+          ),
           delete: (props) => (
             <GenericDeleteDialog<Ptba>
               key={`ptba-delete-${currentRow?.id}`}

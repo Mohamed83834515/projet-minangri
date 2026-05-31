@@ -1,14 +1,102 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { Programme } from '@/simadou/allTypes/programme'
 import type { VersionPtba } from '@/simadou/allTypes'
 import versionPtbaService from '@/simadou/allSercices/versionPtbaService'
+import { useActiveProgrammeCode } from '@/hooks/use-active-programme'
+import { toast } from 'sonner'
 
 export const useGetVersions = () => {
+
+  const codeProgramme = useActiveProgrammeCode()
+  // nous allons filtrer par programme 
   return useQuery({
-    queryKey: ['versions-ptba'],
+    queryKey: ['versions-ptba', codeProgramme],
     queryFn: () => versionPtbaService.getAll(),
+    enabled: !!codeProgramme,
   })
+}
+
+export const useSaveVersion = (
+  isEdit: boolean,
+  currentRow?: any,
+  onSuccess?: () => void
+) => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ data, file }: { data: any; file?: File }) =>
+      isEdit && currentRow?.id_version  // ✅ Utiliser id_version au lieu de id_type
+        ? versionPtbaService.update(currentRow.id_version, data, file)
+        : versionPtbaService.create(data, file),
+
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["versions-ptba"],
+      })
+
+      toast.success(
+        isEdit
+          ? "Version PTBA modifiée avec succès"
+          : "Version PTBA créée avec succès"
+      )
+
+      onSuccess?.()
+    },
+
+    onError: (error: any) => {
+      console.error("Erreur version PTBA:", error)
+      toast.error(
+        error?.response?.data?.message || 
+        "Une erreur est survenue lors de l'enregistrement"
+      )
+    },
+  })
+}
+
+export const useDeleteVersion = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: number) => versionPtbaService.delete(id),
+    onSuccess: () => {
+      toast.success('Version PTBA supprimée avec succès')
+      queryClient.invalidateQueries({
+        queryKey: ['versions-ptba'],
+      })
+    },
+    onError: () => {
+      toast.error("Erreur lors de la suppression de la version PTBA")
+    },
+  })
+}
+
+export const useValiderVersion = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: versionPtbaService.valider,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["versions-ptba"] });
+      toast.success("Version validée avec succès");
+    },
+    onError: () => {
+      toast.error("Erreur lors de la validation");
+    },
+  });
+}
+
+export const useArchiverVersion = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: versionPtbaService.archiver,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["versions-ptba"] });
+      toast.success("Version archivée avec succès");
+    },
+    onError: () => {
+      toast.error("Erreur lors de l'archivage");
+    },
+  });
 }
 
 function normalizeProgrammeCode(code: string): string {

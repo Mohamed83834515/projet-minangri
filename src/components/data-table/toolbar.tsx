@@ -19,6 +19,7 @@ type DataTableToolbarProps<TData> = {
     }[]
   }[]
   showViewOptions?: boolean
+  showSearch?: boolean
   toolbarEndSlot?: React.ReactNode
 }
 
@@ -28,6 +29,7 @@ export function DataTableToolbar<TData>({
   searchKey,
   filters = [],
   showViewOptions = true,
+  showSearch = true,
   toolbarEndSlot,
 }: DataTableToolbarProps<TData>) {
   const isFiltered =
@@ -37,27 +39,28 @@ export function DataTableToolbar<TData>({
     <div className='flex items-center justify-between'>
       <div>
         {toolbarEndSlot ??
-          (showViewOptions ? <DataTableViewOptions table={table} /> : null)}
+          (showViewOptions ? <DataTableViewOptions table={table} /> : null)
+        }
       </div>
       <div className="flex items-center gap-x-2">
-        {searchKey ? (
-          <Input
-            placeholder={searchPlaceholder}
-            value={
-              (table.getColumn(searchKey)?.getFilterValue() as string) ?? ''
-            }
-            onChange={(event) =>
-              table.getColumn(searchKey)?.setFilterValue(event.target.value)
-            }
-            className='h-8 w-37.5 lg:w-62.5'
-          />
-        ) : (
-          <Input
-            placeholder={searchPlaceholder}
-            value={table.getState().globalFilter ?? ''}
-            onChange={(event) => table.setGlobalFilter(event.target.value)}
-            className='h-8 w-37.5 lg:w-62.5'
-          />
+        {showSearch && (
+          searchKey && table.getColumn(searchKey) ? (
+            <Input
+              placeholder={searchPlaceholder}
+              value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ''}
+              onChange={(event) =>
+                table.getColumn(searchKey)?.setFilterValue(event.target.value)
+              }
+              className='h-8 w-37.5 lg:w-62.5'
+            />
+          ) : (
+            <Input
+              placeholder={searchPlaceholder}
+              value={table.getState().globalFilter ?? ''}
+              onChange={(event) => table.setGlobalFilter(event.target.value)}
+              className='h-8 w-37.5 lg:w-62.5'
+            />
+          )
         )}
         <div className='flex gap-x-2'>
           {filters.map((filter) => {

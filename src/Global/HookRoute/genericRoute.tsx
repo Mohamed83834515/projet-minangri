@@ -1,24 +1,37 @@
-import { Button } from "@/components/ui/button";
-import { CHART_COLORS, useColor } from "@/stores/others/color-store";
-import type { LucideIcon } from "lucide-react";
-import { useState, type ComponentType } from 'react';
+import { Button } from "@/components/ui/button"
+import { CHART_COLORS, useColor } from "@/stores/others/color-store"
+import type { LucideIcon } from "lucide-react"
+import { useState, type ComponentType } from "react"
 
-interface PageRouteLayoutProps {
-  title: string;
-  boutonAddTitle?: string;
-  icon: LucideIcon;
-  /** Affiche le bouton d'ajout (défaut: true) */
-  showAddButton?: boolean;
-  // Dialog d'ajout (reçoit open + onOpenChange)
-  addDialogComponent?: ComponentType<{
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
-  }>;
-  // Composant liste de la page
-  listComponent: ComponentType;
+type ActionButtonConfig = {
+  title: string
+  icon: LucideIcon
+
+  dialogComponent: ComponentType<{
+    open: boolean
+    onOpenChange: (open: boolean) => void
+  }>
+
+  variant?: "default" | "outline"
 }
 
-// Layout générique pour les pages avec un titre, un bouton d'ajout et une liste
+interface PageRouteLayoutProps {
+  title: string
+  boutonAddTitle?: string
+  icon: LucideIcon
+
+  showAddButton?: boolean
+
+  addDialogComponent?: ComponentType<{
+    open: boolean
+    onOpenChange: (open: boolean) => void
+  }>
+
+  listComponent: ComponentType
+
+  extraButtons?: ActionButtonConfig[]
+}
+
 export function PageRouteLayout({
   title,
   boutonAddTitle = "Ajouter",
@@ -26,34 +39,89 @@ export function PageRouteLayout({
   showAddButton = true,
   addDialogComponent: AddDialog,
   listComponent: ListComponent,
+  extraButtons = [],
 }: PageRouteLayoutProps) {
-  const [showAddDialog, setShowAddDialog] = useState(false);
-  const { color } = useColor();
-  const { stroke } = CHART_COLORS[color]; // Couleur dynamique selon le thème
+
+  const [showAddDialog, setShowAddDialog] = useState(false)
+
+  const [openDialogs, setOpenDialogs] = useState<Record<string, boolean>>({})
+
+  const { color } = useColor()
+  const { stroke } = CHART_COLORS[color]
+
+  const handleOpenDialog = (key: string, value: boolean) => {
+    setOpenDialogs((prev) => ({
+      ...prev,
+      [key]: value,
+    }))
+  }
 
   return (
-    <div className="">
-      <div className="flex items-center justify-between gap-4 p-4 rounded-lg mb-4">
+    <div>
+      <div className="mb-4 flex items-center justify-between gap-4 rounded-lg p-4">
+
+        {/* TITRE */}
         <div className="flex items-center gap-2">
           <Icon className="h-5 w-5 text-muted-foreground" />
           <h3>{title}</h3>
         </div>
-        {showAddButton && AddDialog && (
-          <div>
-            <Button
-              onClick={() => setShowAddDialog(true)}
-              style={{ backgroundColor: stroke }}
-              className="cursor-pointer hover:opacity-90 active:scale-100 text-white"
-            >
-              <Icon /> {boutonAddTitle}
-            </Button>
-            <AddDialog open={showAddDialog} onOpenChange={setShowAddDialog} />
-          </div>
-        )}
+
+        {/* ACTIONS */}
+        <div className="flex items-center gap-2 flex-wrap">
+
+          {/* BOUTONS SUPPLÉMENTAIRES */}
+          {extraButtons.map((button) => {
+            const DialogComponent = button.dialogComponent
+            const ButtonIcon = button.icon
+
+            return (
+              <div key={button.title}>
+                <Button
+                  variant={button.variant || "outline"}
+                  onClick={() =>
+                    handleOpenDialog(button.title, true)
+                  }
+                  className="cursor-pointer"
+                >
+                  <ButtonIcon className="mr-2 h-4 w-4" />
+                  {button.title}
+                </Button>
+
+                <DialogComponent
+                  open={!!openDialogs[button.title]}
+                  onOpenChange={(open) =>
+                    handleOpenDialog(button.title, open)
+                  }
+                />
+              </div>
+            )
+          })}
+
+          {/* BOUTON AJOUT */}
+          {showAddButton && AddDialog && (
+            <div>
+              <Button
+                onClick={() => setShowAddDialog(true)}
+                style={{ backgroundColor: stroke }}
+                className="cursor-pointer text-white hover:opacity-90 active:scale-100"
+              >
+                <Icon className="mr-2 h-4 w-4" />
+                {boutonAddTitle}
+              </Button>
+
+              <AddDialog
+                open={showAddDialog}
+                onOpenChange={setShowAddDialog}
+              />
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* LISTE */}
       <div className="px-4">
         <ListComponent />
       </div>
     </div>
-  );
+  )
 }

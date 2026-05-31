@@ -6,6 +6,7 @@ import { getLocalites } from "../allHooks/admin/localiteHooks";
 import { getPersonnels } from "../allHooks/admin/personnelHooks";
 import { getPlanSites } from "../allHooks/admin/planSiteHooks";
 import { getTypeActivites } from "../allHooks/admin/typeActivitesHooks";
+import { getUgls } from "../allHooks/admin/uglHooks";
 
 const chronogrammeOptions = [
     { label: "Jan", value: "Jan" },
@@ -35,6 +36,8 @@ const personnels = await getPersonnels();
 const cadre_strategiques = await getCadreStrategiques();
 
 const plan_Sites = await getPlanSites();
+
+const ugls = await getUgls();
 
 // Transformer les données en options pour le select
 const typeActivitesOptions = typeActivitesData?.map((item: any) => ({
@@ -73,7 +76,10 @@ const cadreStrategiqueOptions = cadre_strategiques.map((cadre) => ({
     label: cadre.intutile_cs,
 }));
 
-
+const uglOptions = ugls.map((ugl) => ({
+    value: ugl.code_ugl,
+    label: ugl.nom_ugl,
+}));
 const planSiteOptions = plan_Sites.map((planSite) => ({
     value: planSite.code_ds,
     label: planSite.intutile_ds,
@@ -107,17 +113,7 @@ export const getPtbaFormConfig = (): FormConfig => ({
             gridCols: 2,
             formStep: 1,
         },
-        // select - Cadre analytique (optionnel)
-        {
-            name: "cadre_analytique",
-            label: "Cadre analytique",
-            type: "select",
-            placeholder: "Sélectionner un cadre analytique (optionnel)",
-            required: true,
-            options: cadre_analytiquesOptions, // À remplir dynamiquement depuis l'API
-            gridCols: 2,
-            formStep: 1,
-        },
+       
         // select - Type activité
         {
             name: "type_activite",
@@ -140,7 +136,17 @@ export const getPtbaFormConfig = (): FormConfig => ({
             gridCols: 1,
             formStep: 1,
         },
-
+         // select - Cadre analytique (optionnel)
+        {
+            name: "cadre_analytique",
+            label: "Cadre analytique",
+            type: "select",
+            placeholder: "Sélectionner un cadre analytique (optionnel)",
+            required: true,
+            options: cadre_analytiquesOptions, // À remplir dynamiquement depuis l'API
+            gridCols: 1,
+            formStep: 1,
+        },
 
         // texte - Chronogramme
         {
@@ -202,12 +208,12 @@ export const getPtbaFormConfig = (): FormConfig => ({
         },
         // select - Direction PTBA (optionnel)
         {
-            name: "direction_ptba",
-            label: "Direction PTBA",
+            name: "ugl_ptba",
+            label: "Unité de gestion",
             type: "select",
-            placeholder: "Sélectionner une direction (optionnel)",
+            placeholder: "Sélectionner une unité de gestion (optionnel)",
             required: false,
-            options: planSiteOptions, // À remplir dynamiquement depuis l'API
+            options: uglOptions, // À remplir dynamiquement depuis l'API
             gridCols: 2,
             formStep: 2,
         },

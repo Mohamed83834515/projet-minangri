@@ -2,7 +2,7 @@ import { apiClient } from "@/axios/api";
 import { PtbaFormData } from "../schemas/ptbaSchemas";
 import type { Ptba } from "../allTypes";
 
-const ENDPOINT = "/ptba/";
+const ENDPOINT = "/ptbas/";
 
 const ptbaService = {
   async getAll(codeProgramme?: string): Promise<Ptba[]> {
