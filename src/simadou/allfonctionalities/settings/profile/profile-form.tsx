@@ -1,177 +1,175 @@
-import { z } from 'zod'
-import { useFieldArray, useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Link } from '@tanstack/react-router'
-import { showSubmittedData } from '@/lib/show-submitted-data'
-import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
 
-const profileFormSchema = z.object({
-  username: z
-    .string('Please enter your username.')
-    .min(2, 'Username must be at least 2 characters.')
-    .max(30, 'Username must not be longer than 30 characters.'),
-  email: z.email({
-    error: (iss) =>
-      iss.input === undefined
-        ? 'Please select an email to display.'
-        : undefined,
-  }),
-  bio: z.string().max(160).min(4),
-  urls: z
-    .array(
-      z.object({
-        value: z.url('Please enter a valid URL.'),
-      })
-    )
-    .optional(),
-})
+import { BadgeCheck, Briefcase, Building2, Dna, KeyRound, LucideIcon, Mail, MapPin, PencilIcon, Phone, UserCog } from 'lucide-react'
+import { useState } from 'react'
+import EditFieldDialog from './EditFieldDialog'
+import { useMe } from '@/simadou/allHooks/auth/authHooks'
 
-type ProfileFormValues = z.infer<typeof profileFormSchema>
+export type EditableField =
+  | "title"
+  | "telephone"
+  | "region"
+  | "password";
 
-// This can come from your database or API.
-const defaultValues: Partial<ProfileFormValues> = {
-  bio: 'I own a computer.',
-  urls: [
-    { value: 'https://shadcn.com' },
-    { value: 'http://twitter.com/shadcn' },
-  ],
-}
+
 
 export function ProfileForm() {
-  const form = useForm<ProfileFormValues>({
-    resolver: zodResolver(profileFormSchema),
-    defaultValues,
-    mode: 'onChange',
-  })
+ 
 
-  const { fields, append } = useFieldArray({
-    name: 'urls',
-    control: form.control,
-  })
+  const {data : personnel} = useMe()
+  const [openedDialog, setOpenedDialog] = useState<EditableField | null>(null)
+
+  const details : {key:string,label : string, icon : LucideIcon, value : string, isEditable : boolean}[] = [
+    {
+      label: "Nom complet",
+      value: `${personnel?.prenom_perso || ""} ${
+        personnel?.nom_perso || ""
+      }`,
+      icon: UserCog,
+      isEditable : false,
+      key :"name"
+    },
+
+    {
+      label: "Adresse email",
+      value: personnel?.email || "Non renseigné",
+      icon: Mail,
+       isEditable : false,
+        key :"email"
+    },
+     {
+      label: "Titre",
+      value: personnel?.titre_personnel?.libelle_titre || "Non renseigné",
+      icon: Dna,
+       isEditable : true,
+        key :"title"
+    },
+
+
+    {
+      label: "Téléphone",
+      value: personnel?.contact_perso || "Non renseigné",
+      icon: Phone,
+       isEditable : true,
+        key :"telephone"
+    },
+
+    {
+      label: "Fonction",
+      value: personnel?.fonction_perso?.nom_fonction ||
+        "Non renseigné",
+      icon: Briefcase,
+       isEditable : false,
+        key :"function"
+    },
+
+    {
+      label: "Service",
+      value: `${personnel?.service_perso?.intutile_ds} (${personnel?.service_perso?.code_ds})` ||
+        "Non renseigné",
+      icon: Building2,
+       isEditable : false,
+        key :"service"
+    },
+
+    {
+      label: "Structure",
+      value: personnel?.structure_perso?.nom_acteur ||
+        "Non renseigné",
+      icon: BadgeCheck,
+      isEditable : false,
+       key :"structure"
+    },
+
+    {
+      label: "Région",
+      value: personnel?.region_perso?.intitule_loca ||
+        "Non renseigné",
+      icon: MapPin,
+      isEditable : true,
+       key :"region"
+    },
+
+    {
+      label: "Mot de passe",
+      value: "Dernière modification le 12 Avril 2026",
+      icon:KeyRound,
+       isEditable : true,
+        key :"password"
+    },
+
+  ];
+
+  // const { fields, append } = useFieldArray({
+  //   name: 'urls',
+  //   control: form.control,
+  // })
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit((data) => showSubmittedData(data))}
-        className='space-y-8'
+       <div className="rounded-3xl border bg-card shadow-sm overflow-hidden">
+        
+
+       <div className="grid grid-cols-1 gap-4  md:grid-cols-3 py-4 px-6">
+  {details.map((detail) => {
+    const Icon = detail.icon;
+
+    return (
+      <div
+        key={detail.label}
+        className="
+          group
+          relative
+          flex items-start gap-4
+          rounded-2xl border
+          p-5
+          transition-colors
+          hover:bg-muted/40
+        "
       >
-        <FormField
-          control={form.control}
-          name='username'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Username</FormLabel>
-              <FormControl>
-                <Input placeholder='shadcn' {...field} />
-              </FormControl>
-              <FormDescription>
-                This is your public display name. It can be your real name or a
-                pseudonym. You can only change this once every 30 days.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name='email'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder='Select a verified email to display' />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value='m@example.com'>m@example.com</SelectItem>
-                  <SelectItem value='m@google.com'>m@google.com</SelectItem>
-                  <SelectItem value='m@support.com'>m@support.com</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormDescription>
-                You can manage verified email addresses in your{' '}
-                <Link to='/'>email settings</Link>.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name='bio'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Bio</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder='Tell us a little bit about yourself'
-                  className='resize-none'
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription>
-                You can <span>@mention</span> other users and organizations to
-                link to them.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <div>
-          {fields.map((field, index) => (
-            <FormField
-              control={form.control}
-              key={field.id}
-              name={`urls.${index}.value`}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className={cn(index !== 0 && 'sr-only')}>
-                    URLs
-                  </FormLabel>
-                  <FormDescription className={cn(index !== 0 && 'sr-only')}>
-                    Add links to your website, blog, or social media profiles.
-                  </FormDescription>
-                  <FormControl className={cn(index !== 0 && 'mt-1.5')}>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          ))}
-          <Button
-            type='button'
-            variant='outline'
-            size='sm'
-            className='mt-2'
-            onClick={() => append({ value: '' })}
-          >
-            Add URL
-          </Button>
+        {/* ICON */}
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+          <Icon className="w-5 h-5 text-primary" />
         </div>
-        <Button type='submit'>Update profile</Button>
-      </form>
-    </Form>
+
+        {/* CONTENT */}
+        <div className="flex-1 min-w-0">
+          <p className="text-sm text-muted-foreground">
+            {detail.label}
+          </p>
+
+          <p className="mt-1 text-sm font-medium break-words">
+            {detail.value}
+          </p>
+        </div>
+
+        {/* EDIT ACTION */}
+        {detail.isEditable && (
+          <button
+            type="button"
+            className="
+              opacity-0
+              group-hover:opacity-100
+              transition-opacity
+              flex h-9 w-9 items-center justify-center
+              rounded-lg
+              hover:bg-primary/10
+              text-muted-foreground
+              hover:text-primary
+            "
+            onClick={() => setOpenedDialog(detail.key as EditableField)}
+          >
+            <PencilIcon className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+    );
+  })}
+
+    <EditFieldDialog
+        open={openedDialog !== null}
+        field={openedDialog}
+        onClose={() => setOpenedDialog(null)}
+      />
+</div>
+        </div>
   )
 }

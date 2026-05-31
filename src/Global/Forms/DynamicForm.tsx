@@ -16,11 +16,8 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Form } from '@/components/ui/form'
 import { FormField } from '../Fields/FormField'
-import type { FormConfig } from '../types/formConfig'
-import {
-  formPrimaryButtonClassName,
-  formSecondaryButtonClassName,
-} from './form-footer-styles'
+import type { FormConfig } from '../allTypes/formConfig'
+import { CHART_COLORS, useColor } from '@/stores/others/color-store'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -79,7 +76,12 @@ export const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps>(
       watch,
       trigger,
       setValue,
+      reset
     } = form
+
+    useEffect(() => {
+  reset(defaultValues);
+}, [defaultValues]);
 
     useImperativeHandle(ref, () => ({
       setValue: (name: string, value: any) =>

@@ -84,5 +84,13 @@ export const changePasswordSchema = z.object({
         message: "Les mots de passe ne correspondent pas",
       })
     }
+
+    if(data.oldPassword === data.newPassword){
+      ctx.addIssue({
+        code :z.ZodIssueCode.custom,
+        path : ["newPassword"],
+        message : "L'ancien et le nouveau mot de passe ne peuvent pas être identiques"
+      })
+    }
   })
 export type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;

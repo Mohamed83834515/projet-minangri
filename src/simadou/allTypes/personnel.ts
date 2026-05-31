@@ -1,6 +1,7 @@
 import { Acteur } from "./acteur";
 import { Fonction } from "./fonction";
 import { Localite } from "./localite";
+
 import { PlanSite } from "./planSite";
 import { ProjetActivePerso } from "./projetActivitePerso";
 import { TitrePersonnel } from "./titrePersonnel";

@@ -30,11 +30,13 @@ import {
 } from 'lucide-react'
 import { type SidebarData } from '../../components/layout/others/types'
 
+
 export const sidebarData: SidebarData = {
   user: {
-    name: 'simadou',
-    email: 'simadou.com',
-    avatar: '/avatars/shadcn.jpg',
+    name: "Simadou",
+    email: "hello@gmail.com",
+    id: "zofmov",
+    statut : 1
   },
   teams: [
     {
