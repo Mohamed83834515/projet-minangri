@@ -22,11 +22,7 @@ import {
   TrendingUp,
   FolderOpen,
   CalendarDays,
-  Activity,
   Eye,
-  Gauge,
-  ListTodo,
-  Layers,
 } from 'lucide-react'
 import { type SidebarData } from '../../components/layout/others/types'
 

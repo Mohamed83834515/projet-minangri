@@ -8,7 +8,6 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Separator } from '@/components/ui/separator'
 import { useMe } from '@/simadou/allHooks/auth/authHooks'
-import { useAuthStore } from '@/stores/auth-store'
 import {
   BadgeCheck,
   Camera,
@@ -22,8 +21,6 @@ type ContentSectionProps = {
 }
 
 export function ContentSection({
-  title,
-  desc,
   children,
 }: ContentSectionProps) {
   const { data :personnel } = useMe()

@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button"
 import { DynamicForm } from "@/Global/Forms/DynamicForm"
 import { getTypeActiviteFormConfig } from "@/simadou/allfieldsConfig/typeActiviteForm"
 import { useSaveTypeActivite } from "@/simadou/allHooks/admin/typeActivitesHooks"
@@ -16,7 +15,6 @@ export default function AddTypeActivite({
   currentRow,
   onBack,
   onSuccess,
-  onCancel,
 }: Props) {
   const isEdit = !!currentRow
 

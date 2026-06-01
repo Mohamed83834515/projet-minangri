@@ -6,7 +6,6 @@ import {
   UserPen,
 } from "lucide-react"
 
-import { Badge } from "@/components/ui/badge"
 import { buildColumns } from "@/Global/Tableaux/column-builder"
 import { GenericRowActions } from "@/Global/Tableaux/GenericRowActions"
 import { VersionPtba } from "../allTypes"

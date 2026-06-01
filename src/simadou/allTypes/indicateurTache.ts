@@ -17,7 +17,9 @@ export interface IndicateurTache extends Record<string, unknown> {
 
 export interface IndicateurTacheRequest {
   intitule_indicateur_tache: string;
-  unite_ind_tache: string;
+  unite_ind_tache: number;
+  code_indicateur_ptba: string;
+  indicateur_cmr: number; 
   trimestre_1: string;
   trimestre_2: string;
   trimestre_3: string;

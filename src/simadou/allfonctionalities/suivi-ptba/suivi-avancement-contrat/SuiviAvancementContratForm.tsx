@@ -9,7 +9,6 @@ import {
 } from '@/simadou/schemas/suiviAvancementContratSchemas'
 import type { Ptba, SuiviAvancementContrat } from '@/simadou/allTypes'
 import { resolvePersonnelId } from '@/simadou/allTypes/suiviAvancementContrat'
-import { useAuthStore } from '@/stores/auth-store'
 import {
   useCreateSuiviAvancementWithSources,
   useUpdateSuiviAvancementWithSources,
@@ -65,8 +64,7 @@ export default function SuiviAvancementContratForm({
 }: SuiviAvancementContratFormProps) {
   const isEditing = !!suivi
   const idActivite = activite.id_ptba
-  const modifierPar =
-    useAuthStore((s) => s.auth.user?.email?.trim()) || 'Utilisateur'
+  const modifierPar = "16"
 
   const formConfig = useMemo(
     () => getSuiviAvancementContratFormConfigForSuivi(),

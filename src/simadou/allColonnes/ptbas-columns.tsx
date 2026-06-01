@@ -1,6 +1,6 @@
 import { ColumnDef, type Row } from '@tanstack/react-table'
 import { GenericRowActions } from '@/Global/Tableaux/GenericRowActions'
-import { buildColumns, type OptionItem } from '@/Global/Tableaux/column-builder'
+import { buildColumns } from '@/Global/Tableaux/column-builder'
 import { UserPen, Trash2, CheckCircle, MinusCircle, ClipboardList } from 'lucide-react'
 import { Ptba } from '../allTypes'
 import { getMoisOptions } from '../schemas/ptbaSchemas'
@@ -138,7 +138,7 @@ export const buildPtbasColumns = (
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title='Coût' />
         ),
-        cell: ({ row }) => (
+        cell: () => (
             <span className='tabular-nums'>300 000</span>
         ),
         meta: { thClassName: 'text-center', className: 'text-center' },

@@ -1,6 +1,5 @@
 import { useState } from "react"
 
-import { Button } from "@/components/ui/button"
 
 import { DynamicForm } from "@/Global/Forms/DynamicForm"
 
@@ -22,7 +21,6 @@ export default function AddVersionPtba({
     currentRow,
     onBack,
     onSuccess,
-    onCancel,
 }: Props) {
     const isEdit = !!currentRow
 

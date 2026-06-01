@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import 'react-phone-number-input/style.css'
 import PhoneInput from 'react-phone-number-input'
 import { Controller, type Control, type FieldErrors, type UseFormTrigger } from 'react-hook-form'
@@ -37,7 +37,6 @@ import { Textarea } from '@/components/ui/textarea'
 import { DateRangeField } from '../DateRange/DateRangeField'
 import type { FieldConfig } from '../types/formConfig'
 import PasswordChecker from '@/simadou/allfonctionalities/settings/profile/PasswordChecker'
-import { toast } from 'sonner'
 
 export interface RichSelectOption {
   value: string | number

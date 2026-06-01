@@ -7,7 +7,6 @@ import useDialogState from '@/hooks/use-dialog-state'
 import { useDeleteTachePtba } from '@/simadou/allHooks/admin/tacheActiviteHooks'
 import { toast } from 'sonner'
 import { GenericDeleteDialog } from '@/Global/Tableaux/GenericDeleteDialog'
-import { Button } from '@/components/ui/button'
 import { DataTableToolbarOutlineButton } from '@/components/data-table/toolbar-outline-button'
 
 type SuiviTacheActiviteListProps = {

@@ -1,3 +1,4 @@
+import { FieldType } from "@/Global/types/formConfig"
 import { z } from "zod"
 
 export const GeneralParamsSchema = z.object({
@@ -56,8 +57,6 @@ export type GeneralParamsInput = z.infer<typeof GeneralParamsSchema>
 
 
 
-
-import type { FieldType } from "@/pages/Parametrages/AutresParametrages/global-params/Fields"
 
 
 

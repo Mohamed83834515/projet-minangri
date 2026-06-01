@@ -6,7 +6,6 @@ import { GenericTable } from "@/Global/Generic/Generictable";
 import { GenericDialogs } from "@/Global/Generic/Genericdialogs";
 import { GenericDeleteDialog } from "@/Global/Tableaux/GenericDeleteDialog";
 import { TypeActivite } from "@/simadou/allTypes/entities";
-import { Button } from "@/components/ui/button";
 import { useEmbeddedTableState } from "@/hooks/use-embedded-table-state";
 import { DataTableToolbarOutlineButton } from "@/components/data-table/toolbar-outline-button";
 
