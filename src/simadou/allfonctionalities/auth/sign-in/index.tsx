@@ -164,7 +164,7 @@ export function SignIn() {
 
           {/* Footer gauche */}
           <p className='relative px-10 pb-6 text-xs' style={{ color: 'rgba(255,255,255,.18)' }}>
-            © {new Date().getFullYear()} GTFOD. Tous droits réservés.
+            © {new Date().getFullYear()} SIMANDOU. Tous droits réservés.
           </p>
         </div>
 
@@ -174,7 +174,7 @@ export function SignIn() {
           {/* Logo mobile uniquement */}
           <div className='mb-10 flex items-center gap-3 lg:hidden'>
             <Logo className='size-10 rounded-lg' />
-            <span className='text-lg font-semibold tracking-tight'>GTFOD</span>
+            <span className='text-lg font-semibold tracking-tight'>SIMANDOU</span>
           </div>
 
           <div className='w-full max-w-sm space-y-8'>
@@ -190,7 +190,7 @@ export function SignIn() {
             <UserAuthForm redirectTo={redirect} />
 
             {/* Séparateur + inscription */}
-            <div className='space-y-3'>
+            {/* <div className='space-y-3'>
               <div className='relative'>
                 <div className='absolute inset-0 flex items-center'>
                   <span className='w-full border-t border-zinc-100' />
@@ -210,7 +210,7 @@ export function SignIn() {
 
                 <ArrowRight className='group-hover:translate-x-1 duration-600' />
               </Link>
-            </div>
+            </div> */}
 
             {/* CGU */}
             <p className='text-center text-xs text-zinc-400'>
