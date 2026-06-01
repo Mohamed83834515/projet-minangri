@@ -16,7 +16,11 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Form } from '@/components/ui/form'
 import { FormField } from '../Fields/FormField'
-import type { FormConfig, StepConfig } from '../allTypes/formConfig'
+import type { FormConfig, StepConfig } from '../types/formConfig'
+import {
+  formPrimaryButtonClassName,
+  formSecondaryButtonClassName,
+} from './form-footer-styles'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface StepDynamicFormProps {
@@ -116,23 +120,23 @@ export const StepDynamicForm = forwardRef<
 
     const statusConfig = hasErrors
       ? {
-          icon: <CircleAlert className='h-3.5 w-3.5 text-destructive' />,
-          label: 'Corrigez les erreurs avant de continuer',
-          className: 'text-destructive',
-        }
+        icon: <CircleAlert className='h-3.5 w-3.5 text-destructive' />,
+        label: 'Corrigez les erreurs avant de continuer',
+        className: 'text-destructive',
+      }
       : isDirty
         ? {
-            icon: <CircleDot className='h-3.5 w-3.5 text-muted-foreground' />,
-            label: 'Modifications non enregistrées',
-            className: 'text-muted-foreground',
-          }
+          icon: <CircleDot className='h-3.5 w-3.5 text-muted-foreground' />,
+          label: 'Modifications non enregistrées',
+          className: 'text-muted-foreground',
+        }
         : {
-            icon: (
-              <CircleCheck className='h-3.5 w-3.5 text-muted-foreground/50' />
-            ),
-            label: `Étape ${currentStep} sur ${totalSteps}`,
-            className: 'text-muted-foreground/50',
-          }
+          icon: (
+            <CircleCheck className='h-3.5 w-3.5 text-muted-foreground/50' />
+          ),
+          label: `Étape ${currentStep} sur ${totalSteps}`,
+          className: 'text-muted-foreground/50',
+        }
 
     const handleNext = async () => {
       const valid = await trigger(currentStepFieldNames as any)
@@ -202,10 +206,10 @@ export const StepDynamicForm = forwardRef<
 
                       //Non atteint : gris discret
                       !isDone &&
-                        !isActive && [
-                          'border-border bg-muted text-muted-foreground/60',
-                          'cursor-default',
-                        ]
+                      !isActive && [
+                        'border-border bg-muted text-muted-foreground/60',
+                        'cursor-default',
+                      ]
                     )}
                   >
                     {isDone ? (
@@ -268,7 +272,15 @@ export const StepDynamicForm = forwardRef<
 
         {/* ── Champs du formulaire ────────────────────────────────── */}
         <Form {...form}>
-          <form onSubmit={handleSubmit(onSubmit as any)}>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+
+              if (!isLastStep) return
+
+              handleSubmit(onSubmit as any)(e)
+            }}
+          >
             <div className='p-6'>
               <div className='grid grid-cols-1 gap-x-5 gap-y-5 sm:grid-cols-2'>
                 {visibleFields.map((field, index) => (
@@ -317,7 +329,7 @@ export const StepDynamicForm = forwardRef<
                     variant='outline'
                     size='sm'
                     onClick={handleBack}
-                    className='gap-1.5'
+                    className={formSecondaryButtonClassName}
                   >
                     <ArrowLeft className='h-3.5 w-3.5' />
                     <span>Retour</span>
@@ -329,7 +341,7 @@ export const StepDynamicForm = forwardRef<
                     type='submit'
                     disabled={isLoading}
                     size='sm'
-                    className='group relative gap-2 px-5 font-medium tracking-wide transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-60'
+                    className={formPrimaryButtonClassName}
                   >
                     {isLoading ? (
                       <>
@@ -348,7 +360,7 @@ export const StepDynamicForm = forwardRef<
                     type='button'
                     size='sm'
                     onClick={handleNext}
-                    className='group gap-2 px-5 font-medium tracking-wide'
+                    className={formPrimaryButtonClassName}
                   >
                     <span>Suivant</span>
                     <ArrowRight className='h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5' />

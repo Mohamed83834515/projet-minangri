@@ -27,4 +27,5 @@ export const Route = createRootRouteWithContext<{
   },
   notFoundComponent: NotFoundError,
   errorComponent: GeneralError,
+ 
 })

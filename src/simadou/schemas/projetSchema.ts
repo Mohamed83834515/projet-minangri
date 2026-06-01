@@ -5,7 +5,7 @@ export const projectCreateSchema = z.object({
   code_projet: z.string().min(1, "Code requis"),
   sigle_projet: z.string().min(1, "Sigle requis"),
   intitule_projet: z.string().min(1, "Intitulé requis"),
-  duree_projet: z.number().min(1, "Durée requise"),
+  duree_projet: z.coerce.number().min(1, "Durée requise"),
   date_signature_projet: z.string().min(1, "Date de signature requise"),
   date_demarrage_projet: z.string().min(1, "Date de démarrage requise"),
 
@@ -21,7 +21,26 @@ export const projectCreateSchema = z.object({
   zone_projet: z.array(z.number()).min(1, "Zones requises"),
 });
 
+export const projectCreateStep1Schema = projectCreateSchema.pick({
+  code_projet: true,
+  sigle_projet: true,
+  intitule_projet: true,
+  duree_projet: true,
+  date_signature_projet: true,
+  date_demarrage_projet: true,
+});
+
+export const projectCreateStep2Schema = projectCreateSchema.pick({
+  partenaire_projet: true,
+  structure_projet: true,
+  signataires_projet: true,
+  partenaires_execution_projet: true,
+  zone_projet: true,
+});
+
 export type ProjectCreateData = z.infer<typeof projectCreateSchema>;
+export type ProjectCreateStep1Data = z.infer<typeof projectCreateStep1Schema>;
+export type ProjectCreateStep2Data = z.infer<typeof projectCreateStep2Schema>;
 export type ProjectCreateSubmitData = Omit<
   ProjectCreateData,
   "structure_projet"

@@ -1,4 +1,7 @@
+import { PageRouteLayout } from '@/Global/HookRoute/genericRoute'
+import ListeSuiviPtba from '@/simadou/allfonctionalities/suivi-ptba/ListeSuiviPtba'
 import { createFileRoute } from '@tanstack/react-router'
+import { Eye } from 'lucide-react'
 
 export const Route = createFileRoute(
   '/_authenticated/programmation/suivi-ptba/',
@@ -7,5 +10,12 @@ export const Route = createFileRoute(
 })
 
 function RouteComponent() {
-  return <div>Hello "/_authenticated/programmation/suivi-ptba/"!</div>
+  return (
+    <PageRouteLayout
+      title='Suivi du PTBA'
+      icon={Eye}
+      showAddButton={false}
+      listComponent={ListeSuiviPtba}
+    />
+  )
 }

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
-import { ProjectSwitcher } from './project-switcher'
+import { ProgrammeSwitcher } from './programme-switcher'
 
 type HeaderProps = React.HTMLAttributes<HTMLElement> & {
   fixed?: boolean
@@ -49,7 +49,7 @@ export function Header({ className, fixed, children, ...props }: HeaderProps) {
 
         {/* Droite : sélecteur de projet */}
         <div className='ml-auto flex items-center gap-2'>
-          <ProjectSwitcher />
+          <ProgrammeSwitcher />
         </div>
       </div>
     </header>

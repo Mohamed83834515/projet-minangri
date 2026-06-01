@@ -2,24 +2,30 @@ import { z } from "zod";
 
 // Schéma de validation pour IndicateurTache
 export const indicateurTacheSchema = z.object({
-  tache: z
-    .number()
-    .int("L'ID de la tâche doit être un entier")
-    .positive("L'ID de la tâche doit être positif"),
-
   intitule_indicateur_tache: z
     .string()
     .min(1, "L'intitulé de l'indicateur est requis")
     .max(200, "L'intitulé ne peut pas dépasser 200 caractères"),
 
-  Responsable_ind_tache: z
+  trimestre_1: z
     .string()
-    .min(1, "Le responsable de l'indicateur est requis")
-    .max(100, "Le responsable ne peut pas dépasser 100 caractères"),
+    .optional(),
+
+  trimestre_2: z
+    .string()
+    .optional(),
+
+  trimestre_3: z
+    .string()
+    .optional(),
+
+  trimestre_4: z
+    .string()
+    .optional(),
 
   unite_ind_tache: z
-    .string()
-    .min(1, "L'unité de mesure est requise")
+    .number()
+    .int("L'unité de mesure doit être un entier")
     .max(50, "L'unité ne peut pas dépasser 50 caractères"),
 
   code_indicateur_ptba: z

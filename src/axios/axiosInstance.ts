@@ -2,7 +2,7 @@ import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios'
 
 // URL de base pour les requêtes API, configurable via une variable d'environnement
 const BASE_URL =
-  import.meta.env.VITE_API_URL || 'https://api.escuelajs.co/api/v1'
+  import.meta.env.VITE_API_URL || 'https://api.ruche-sectoriel.net/api'
 
 // Instance Axios publique sans gestion des tokens
 export const publicInstance = axios.create({

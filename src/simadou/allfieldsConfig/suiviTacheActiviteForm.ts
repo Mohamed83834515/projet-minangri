@@ -3,7 +3,6 @@ import type { FormConfig } from "../../Global/types/formConfig";
 export const getSuiviTacheActiviteFormConfig = (): FormConfig => ({
 
     fields: [
-        // number - Proportion réalisée
         {
             name: "proportion_realisee",
             label: "Proportion réalisée",
@@ -15,7 +14,6 @@ export const getSuiviTacheActiviteFormConfig = (): FormConfig => ({
             step: 1,
             gridCols: 1,
         },
-        // checkbox - Validé
         {
             name: "valide",
             label: "Validé",
@@ -23,7 +21,6 @@ export const getSuiviTacheActiviteFormConfig = (): FormConfig => ({
             defaultChecked: false,
             gridCols: 1,
         },
-        // date - Date réelle
         {
             name: "date_reele",
             label: "Date réelle",
@@ -32,7 +29,6 @@ export const getSuiviTacheActiviteFormConfig = (): FormConfig => ({
             required: true,
             gridCols: 1,
         },
-        // textarea - Observation suivi
         {
             name: "observation_suivi",
             label: "Observation suivi",
@@ -42,36 +38,24 @@ export const getSuiviTacheActiviteFormConfig = (): FormConfig => ({
             required: true,
             gridCols: 2,
         },
-        // textarea - Livrable suivi
         {
-            name: "livrable_suivi",
-            label: "Livrable suivi",
-            type: "textarea",
-            placeholder: "Livrables produits...",
-            rows: 3,
-            required: true,
+            name: "livrable_fichier",
+            label: "Fichiers livrables",
+            type: "file",
+            multiple: true,
+            accept: "application/pdf,image/*,.doc,.docx",
+            maxSize: 10,
+            helperText: "PDF, images ou documents (max 10 Mo par fichier)",
+            required: false,
             gridCols: 2,
-        },
-        // select - Groupe tâche
-        {
-            name: "id_groupe_tache",
-            label: "Groupe tâche",
-            type: "select",
-            placeholder: "Sélectionner une tâche",
-            required: true,
-            options: [], // À remplir dynamiquement depuis l'API
-            gridCols: 1,
-        },
-        // select - Activité PTBA
-        {
-            name: "id_activite_ptba",
-            label: "Activité PTBA",
-            type: "select",
-            placeholder: "Sélectionner une activité PTBA",
-            required: true,
-            options: [], // À remplir dynamiquement depuis l'API
-            gridCols: 1,
         },
     ]
 
+})
+
+/** Formulaire suivi tâche dans le contexte d'une tâche déjà sélectionnée */
+export const getSuiviTacheActiviteFormConfigForTache = (): FormConfig => ({
+    fields: getSuiviTacheActiviteFormConfig().fields.filter(
+        (f) => f.name !== "id_groupe_tache" && f.name !== "id_activite_ptba",
+    ),
 })

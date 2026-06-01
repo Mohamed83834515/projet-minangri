@@ -12,6 +12,7 @@ import { Search } from '@/components/others/search'
 import { SkipToMain } from '@/components/others/skip-to-main'
 import { ThemeSwitch } from '@/components/others/theme-switch'
 import { AppTopbar } from './top-nav'
+import { ActiveProgrammeProvider } from './active-programme-provider'
 import { useSearchStore } from '@/stores/others/search-store'
 import { useLayout } from '@/stores/others/layout-store'
 
@@ -37,12 +38,12 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   }, [setOpen])
 
   return (
-    <>
+    <ActiveProgrammeProvider>
       <AuthenticatedLayoutInner defaultOpen={defaultOpen}>
         {children}
       </AuthenticatedLayoutInner>
       <CommandMenu />
-    </>
+    </ActiveProgrammeProvider>
   )
 }
 

@@ -16,7 +16,7 @@ import { SidebarTrigger }                            from '@/components/ui/sideb
 import { type NavCollapsible, type NavItem, type NavLink } from './types'
 import { CHART_COLORS, HEADER_COLORS, useColorStore } from '@/stores/others/color-store'
 import { sidebarData }                               from '../../../simadou/routescontantes/sidebar-data'
-import { ProjectSwitcher }                           from './project-switcher'
+import { ProgrammeSwitcher }                           from './programme-switcher'
 
 const t = (key: string) => key
 
@@ -340,7 +340,7 @@ export function AppTopbar() {
               <SearchDesktop />
             </div>
 
-            <ProjectSwitcher onHeader />
+            <ProgrammeSwitcher onHeader />
             <ThemeSwitch />
             <ConfigDrawer />
             <ProfileDropdown />

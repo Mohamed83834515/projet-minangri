@@ -12,8 +12,7 @@ export const getVersionPtbaFormConfig = (): FormConfig => ({
             required: true,
             min: 2000,
             max: 2100,
-            step: 1,
-            gridCols: 1,
+            gridCols: 2,
         },
         // texte - Version PTBA (optionnel)
         {
@@ -23,7 +22,7 @@ export const getVersionPtbaFormConfig = (): FormConfig => ({
             placeholder: "Ex: v1.0, v2.0, bêta...",
             required: false,
             maxLength: 30,
-            gridCols: 1,
+            gridCols: 2,
         },
         // date - Date validation
         {
@@ -32,18 +31,24 @@ export const getVersionPtbaFormConfig = (): FormConfig => ({
             type: "date",
             placeholder: "AAAA-MM-JJ",
             required: true,
-            gridCols: 1,
-        },
-        // textarea - Observation (optionnel)
-        {
-            name: "observation",
-            label: "Observation",
-            type: "textarea",
-            placeholder: "Observations éventuelles...",
-            rows: 3,
-            required: false,
             gridCols: 2,
         },
+
+        // select - Statut version (optionnel)
+        // {
+        //     name: "statut_version",
+        //     label: "Statut version",
+        //     type: "select",
+        //     placeholder: "Sélectionner un statut",
+        //     required: false,
+        //     options: [
+        //         { value: 0, label: "En Cours" },
+        //         { value: 1, label: "Validée" },
+        //         { value: 2, label: "Archivée" }
+        //     ],
+        //     gridCols: 2,
+        // },
+
         // file - Document (optionnel)
         {
             name: "documentUrl",
@@ -55,47 +60,14 @@ export const getVersionPtbaFormConfig = (): FormConfig => ({
             required: false,
             gridCols: 2,
         },
-        // select - Statut version (optionnel)
+        // textarea - Observation (optionnel)
         {
-            name: "statut_version",
-            label: "Statut version",
-            type: "select",
-            placeholder: "Sélectionner un statut",
+            name: "observation",
+            label: "Observation",
+            type: "textarea",
+            placeholder: "Observations éventuelles...",
+            rows: 2,
             required: false,
-            options: [
-                { value: 0, label: "En construction" },
-                { value: 1, label: "Validée" },
-                { value: 2, label: "Archivée" }
-            ],
-            gridCols: 1,
-        },
-        // texte - État (optionnel)
-        {
-            name: "etat",
-            label: "État",
-            type: "text",
-            placeholder: "Ex: Actif, Inactif...",
-            required: false,
-            gridCols: 1,
-        },
-        // select - Programme (optionnel)
-        {
-            name: "programme",
-            label: "Programme",
-            type: "select",
-            placeholder: "Sélectionner un programme (optionnel)",
-            required: false,
-            options: [], // À remplir dynamiquement depuis l'API
-            gridCols: 1,
-        },
-        // select - Personnel (optionnel)
-        {
-            name: "id_personnel",
-            label: "Personnel",
-            type: "select",
-            placeholder: "Sélectionner un personnel (optionnel)",
-            required: false,
-            options: [], // À remplir dynamiquement depuis l'API
             gridCols: 1,
         },
     ]

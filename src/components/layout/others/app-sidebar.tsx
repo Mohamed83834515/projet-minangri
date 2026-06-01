@@ -12,11 +12,14 @@ import { NavUser } from './nav-user'
 import { TeamSwitcher } from './team-switcher'
 import { useLayout } from '@/stores/others/layout-store'
 import { CHART_COLORS, useColor } from '@/stores/others/color-store'
+import { useMe } from '@/simadou/allHooks/auth/authHooks'
 
 export function AppSidebar() {
   const { collapsible, variant } = useLayout()
   const { color } = useColor()                     
-  const { stroke } = CHART_COLORS[color]      
+  const { stroke } = CHART_COLORS[color]  
+  const {data : user} = useMe()  
+    console.log("user",user)
 
   return (
     <Sidebar
@@ -38,7 +41,10 @@ export function AppSidebar() {
         ))}
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={sidebarData.user} />
+        {user && (
+          <NavUser user={{name : user.nom_perso ?? "Simadou", email : user.email ?? "hello@gmail.com", id : user.id_personnel_perso ?? "4", statut : user.statut ?? 1}} />
+        )}
+        
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

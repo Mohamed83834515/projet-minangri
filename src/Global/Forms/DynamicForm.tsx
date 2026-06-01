@@ -2,14 +2,25 @@ import { useEffect, useImperativeHandle, forwardRef } from 'react'
 import type { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Loader2, Send, AlertCircle, PenLine, CheckCircle2 } from 'lucide-react'
+import {
+  Loader2,
+  AlertCircle,
+  PenLine,
+  CheckCircle2,
+  ArrowLeft,
+  ArrowRight,
+  X,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Form } from '@/components/ui/form'
 import { FormField } from '../Fields/FormField'
-import type { FormConfig } from '../allTypes/formConfig'
-import { CHART_COLORS, useColor } from '@/stores/others/color-store'
+import type { FormConfig } from '../types/formConfig'
+import {
+  formPrimaryButtonClassName,
+  formSecondaryButtonClassName,
+} from './form-footer-styles'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -22,6 +33,12 @@ interface DynamicFormProps {
   submitText?: string
   loadingText?: string
   onFieldChange?: (fieldName: string, value: unknown) => void
+  /** Bouton secondaire (ex. Annuler / Retour) dans le pied du formulaire */
+  onCancel?: () => void
+  cancelText?: string
+  /** Bouton retour étape précédente (ex. formulaire multi-étapes) */
+  onBack?: () => void
+  backText?: string
 }
 
 export interface DynamicFormHandle {
@@ -41,12 +58,13 @@ export const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps>(
       submitText = 'Soumettre',
       loadingText = 'En cours…',
       onFieldChange,
+      onCancel,
+      cancelText = 'Annuler',
+      onBack,
+      backText = 'Précédent',
     },
     ref
   ) => {
-    const { color } = useColor()
-    const { stroke } = CHART_COLORS[color]
-
     const form = useForm({
       resolver: zodResolver(schema) as any,
       defaultValues: defaultValues as any,
@@ -61,7 +79,12 @@ export const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps>(
       watch,
       trigger,
       setValue,
+      reset
     } = form
+
+    useEffect(() => {
+  reset(defaultValues);
+}, [defaultValues]);
 
     useImperativeHandle(ref, () => ({
       setValue: (name: string, value: any) =>
@@ -117,17 +140,11 @@ export const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps>(
     return (
       <div
         className={cn(
-          'relative overflow-hidden rounded-xl border bg-card shadow-sm',
+          'overflow-hidden rounded-xl border border-border/60 bg-card shadow-sm',
           'transition-shadow duration-300 hover:shadow-md'
         )}
       >
-        {/* ── Barre d'accentuation colorée en haut ── */}
-        <div
-          className='h-[3px] w-full'
-          style={{
-            background: `linear-gradient(to right, ${stroke}, ${stroke}55, transparent)`,
-          }}
-        />
+        <div className='h-px w-full bg-gradient-to-r from-transparent via-border to-transparent' />
 
         {/* ── Corps du formulaire ── */}
         <Form {...form}>
@@ -158,9 +175,10 @@ export const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps>(
               </div>
             </div>
 
-            {/* ── Pied du formulaire ── */}
-            <div className='border-t bg-muted/30'>
-              <div className='flex items-center justify-between gap-4 px-6 py-3'>
+            <div className='mx-6 h-px bg-border/50' />
+
+            {/* ── Pied du formulaire (aligné StepDynamicForm / PTBA) ── */}
+            <div className='flex items-center justify-between gap-4 px-6 py-4'>
                 {/* Indicateur de statut */}
                 <div className='flex items-center gap-2'>
                   <span className='relative flex h-2 w-2'>
@@ -189,35 +207,56 @@ export const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps>(
                   </Badge>
                 </div>
 
-                {/* Bouton de soumission */}
-                <Button
-                  type='submit'
-                  disabled={isLoading}
-                  size='sm'
-                  className={cn(
-                    'group relative gap-2 px-5 font-medium tracking-wide',
-                    'transition-all duration-200',
-                    'disabled:cursor-not-allowed disabled:opacity-60'
+                <div className='flex items-center gap-2'>
+                  {onBack && (
+                    <Button
+                      type='button'
+                      variant='outline'
+                      size='sm'
+                      onClick={onBack}
+                      className={formSecondaryButtonClassName}
+                    >
+                      <ArrowLeft className='h-3.5 w-3.5' />
+                      <span>{backText}</span>
+                    </Button>
                   )}
-                  style={{
-                    backgroundColor: stroke,
-                    borderColor: stroke,
-                    boxShadow: `0 1px 12px ${stroke}44`,
-                  }}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className='h-3.5 w-3.5 animate-spin' />
-                      <span>{loadingText}</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>{submitText}</span>
-                      <Send className='h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5' />
-                    </>
+
+                  {onCancel && (
+                    <Button
+                      type='button'
+                      variant='outline'
+                      size='sm'
+                      onClick={onCancel}
+                      className={formSecondaryButtonClassName}
+                    >
+                      {cancelText === 'Retour' ? (
+                        <ArrowLeft className='h-3.5 w-3.5' />
+                      ) : (
+                        <X className='h-3.5 w-3.5' />
+                      )}
+                      <span>{cancelText}</span>
+                    </Button>
                   )}
-                </Button>
-              </div>
+
+                  <Button
+                    type='submit'
+                    disabled={isLoading}
+                    size='sm'
+                    className={formPrimaryButtonClassName}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className='h-3.5 w-3.5 animate-spin' />
+                        <span>{loadingText}</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>{submitText}</span>
+                        <ArrowRight className='h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5' />
+                      </>
+                    )}
+                  </Button>
+                </div>
             </div>
           </form>
         </Form>
