@@ -57,7 +57,9 @@ export type GeneralParamsInput = z.infer<typeof GeneralParamsSchema>
 
 
 
-import type { FieldType } from "@/pages/Parametrages/AutresParametrages/global-params/Fields"
+// NOTE: The old app referenced a UI-only FieldType from `pages/Parametrages/...`.
+// In refonte we define a minimal local union to keep this schema self-contained.
+export type FieldType = 'text' | 'email' | 'url' | 'tel' | 'number'
 
 
 

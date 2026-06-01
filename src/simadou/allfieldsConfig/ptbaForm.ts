@@ -4,7 +4,7 @@ import { getCadreAnalytique } from "../allHooks/admin/cadreAnalytiqueHooks";
 import { getCadreStrategiques } from "../allHooks/admin/cadreStrategiqueHooks";
 import { getLocalites } from "../allHooks/admin/localiteHooks";
 import { getPersonnels } from "../allHooks/admin/personnelHooks";
-import { getPlanSites } from "../allHooks/admin/planSiteHooks";
+// import { getPlanSites } from "../allHooks/admin/planSiteHooks";
 import { getTypeActivites } from "../allHooks/admin/typeActivitesHooks";
 import { getUgls } from "../allHooks/admin/uglHooks";
 
@@ -35,7 +35,7 @@ const personnels = await getPersonnels();
 
 const cadre_strategiques = await getCadreStrategiques();
 
-const plan_Sites = await getPlanSites();
+// const plan_Sites = await getPlanSites();
 
 const ugls = await getUgls();
 
@@ -80,10 +80,11 @@ const uglOptions = ugls.map((ugl) => ({
     value: ugl.code_ugl,
     label: ugl.nom_ugl,
 }));
-const planSiteOptions = plan_Sites.map((planSite) => ({
-    value: planSite.code_ds,
-    label: planSite.intutile_ds,
-}));
+// NOTE: kept for potential future select field; currently unused
+// const planSiteOptions = plan_Sites.map((planSite) => ({
+//     value: planSite.code_ds,
+//     label: planSite.intutile_ds,
+// }));
 
 export const getPtbaFormConfig = (): FormConfig => ({
 

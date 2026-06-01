@@ -1,9 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import {
   BadgeCheck,
-  Bell,
-  ChevronsUpDown,
-  CreditCard,
   EllipsisVertical,
   LogOut,
   MessageCircleWarning,

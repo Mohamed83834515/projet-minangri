@@ -1,6 +1,5 @@
 import { DynamicForm } from '@/Global/Forms/DynamicForm'
 import { getPhoneFormConfig } from '@/simadou/allfieldsConfig/personalPhone'
-import { getPersonnelFormConfig } from '@/simadou/allfieldsConfig/personnelForm'
 import { UpdateTelephoneInput, UpdateTelephoneSchema } from '@/simadou/schemas/personnelSchema'
 
 

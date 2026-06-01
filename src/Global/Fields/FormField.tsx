@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import 'react-phone-number-input/style.css'
 import PhoneInput from 'react-phone-number-input'
 import { Controller, type Control, type FieldErrors, type UseFormTrigger } from 'react-hook-form'
@@ -15,6 +15,8 @@ import {
   Trash2,
   ChevronsUpDown,
   FileText,
+  Calendar,
+  Clock,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -26,7 +28,9 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
+import { Switch } from '@/components/ui/switch'
 import { MultiSelect } from '@/components/ui/multi-select'
 import {
   Popover,
@@ -37,7 +41,11 @@ import { Textarea } from '@/components/ui/textarea'
 import { DateRangeField } from '../DateRange/DateRangeField'
 import type { FieldConfig } from '../types/formConfig'
 import PasswordChecker from '@/simadou/allfonctionalities/settings/profile/PasswordChecker'
-import { toast } from 'sonner'
+// import { toast } from 'sonner'
+
+/** Calendrier natif invisible à droite ; icône Lucide visible au même endroit. */
+const dateInputPickerClasses =
+  'pr-10 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:end-0 [&::-webkit-calendar-picker-indicator]:top-0 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:w-10 [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0'
 
 export interface RichSelectOption {
   value: string | number
@@ -236,7 +244,7 @@ export const FormField = ({
               <div className='space-y-2'>
                 <div
                   className={cn(
-                    'relative rounded-lg border-2 border-dashed p-6 transition-colors',
+                    'relative rounded-lg border-2 border-dashed p-4 transition-colors',
                     controllerField.value instanceof File
                       ? 'border-solid'
                       : 'cursor-pointer hover:border-primary/50',
@@ -453,12 +461,14 @@ export const FormField = ({
                       </div>
                     ) : (
                       <div
-                        className='cursor-pointer'
+                        className='flex w-full cursor-pointer flex-col items-center text-center'
                         onClick={() =>
                           document.getElementById(field.name)?.click()
                         }
                       >
-                        {getFileIcon()}
+                        <div className='flex items-center justify-center'>
+                          {getFileIcon()}
+                        </div>
                         <div className='mt-2'>
                           <p className='text-sm font-medium text-gray-600'>
                             Cliquez pour choisir{' '}
@@ -627,7 +637,11 @@ export const FormField = ({
                                   'bg-green-50 hover:bg-green-100 dark:bg-green-950/40 dark:hover:bg-green-950/60'
                                 )}
                                 onSelect={() => {
-                               controllerField.onChange(option.value.toString())
+                                  const nextValue =
+                                    typeof option.value === 'number'
+                                      ? option.value
+                                      : option.value.toString()
+                                  controllerField.onChange(nextValue)
                                   setComboboxOpen(false)
                                   setTouched(true)
 
@@ -876,6 +890,9 @@ export const FormField = ({
               rows={field.rows || 4}
               onBlur={handleBlur}
               className={cn(
+                field.className?.includes('resize-y') &&
+                  'field-sizing-fixed min-h-[4.5rem] max-h-[min(24vh,9.5rem)] resize-y overflow-y-auto',
+                field.className,
                 isValid && 'border-green-500 focus:ring-green-500',
                 isInvalid && 'border-red-500 focus:ring-red-500'
               )}
@@ -1188,6 +1205,67 @@ export const FormField = ({
           </div>
         )
 
+      // ========== CHECKBOX / SWITCH ==========
+      case 'checkbox':
+      case 'switch': {
+        const isSwitch = field.type === 'switch'
+        const useCard = field.className?.includes('field-card')
+
+        return (
+          <Controller
+            name={field.name}
+            control={control}
+            render={({ field: { value, onChange } }) => (
+              <div
+                className={cn(
+                  'flex items-center justify-between gap-4',
+                  useCard &&
+                    'rounded-lg border border-border/60 bg-muted/20 px-4 py-3',
+                  field.className
+                )}
+              >
+                <div className='min-w-0 space-y-0.5'>
+                  <span className='text-sm font-medium leading-none'>
+                    {field.label}
+                    {field.required && (
+                      <span className='text-destructive'> *</span>
+                    )}
+                  </span>
+                  {field.helperText && (
+                    <p className='text-xs text-muted-foreground'>
+                      {field.helperText}
+                    </p>
+                  )}
+                </div>
+                {isSwitch ? (
+                  <Switch
+                    checked={!!value}
+                    onCheckedChange={(checked) => {
+                      onChange(checked)
+                      setTouched(true)
+                      if (trigger) void trigger(field.name)
+                    }}
+                    onBlur={handleBlur}
+                    aria-invalid={isInvalid}
+                  />
+                ) : (
+                  <Checkbox
+                    checked={!!value}
+                    onCheckedChange={(checked) => {
+                      onChange(checked === true)
+                      setTouched(true)
+                      if (trigger) void trigger(field.name)
+                    }}
+                    onBlur={handleBlur}
+                    aria-invalid={isInvalid}
+                  />
+                )}
+              </div>
+            )}
+          />
+        )
+      }
+
    // ========== TEL ==========
 case 'tel':
   return (
@@ -1232,6 +1310,33 @@ case 'tel':
       )}
     />
   )
+      // ========== DATE / HEURE ==========
+      case 'date':
+      case 'datetime-local':
+      case 'month':
+      case 'week':
+      case 'time': {
+        const PickerIcon = field.type === 'time' ? Clock : Calendar
+        return (
+          <div className='relative'>
+            <Input
+              type={field.type}
+              placeholder={field.placeholder}
+              {...register(field.name)}
+              onBlur={handleBlur}
+              className={cn(
+                dateInputPickerClasses,
+                isInvalid && 'border-red-500 focus:ring-red-500'
+              )}
+            />
+            <PickerIcon
+              className='pointer-events-none absolute end-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground'
+              aria-hidden
+            />
+          </div>
+        )
+      }
+
       // ========== DEFAULT ==========
       default:
         return (
@@ -1241,7 +1346,10 @@ case 'tel':
               placeholder={field.placeholder}
               maxLength={field.maxLength}
               minLength={field.minLength}
-              {...register(field.name)}
+              {...register(
+                field.name,
+                field.type === 'number' ? { valueAsNumber: true } : undefined
+              )}
               onBlur={handleBlur}
               className={cn(
                 'pr-10',
@@ -1264,20 +1372,26 @@ case 'tel':
     }
   }
 
+  const isInlineBooleanField =
+    field.type === 'checkbox' || field.type === 'switch'
+
   return (
     <div className='min-w-0'>
-      {field.type !== 'daterange' && (
+      {field.type !== 'daterange' && !isInlineBooleanField && (
         <label className='mb-2 block text-sm font-medium'>
           {field.label}
           {field.required && <span className='text-red-500'> *</span>}
         </label>
       )}
       {renderInput()}
-      {field.type !== 'daterange' && field.helperText && !error && (
-        <p className='mt-1 text-xs text-gray-500'>{field.helperText}</p>
-      )}
+      {field.type !== 'daterange' &&
+        !isInlineBooleanField &&
+        field.helperText &&
+        !error && (
+          <p className='mt-1 text-xs text-muted-foreground'>{field.helperText}</p>
+        )}
       {field.type !== 'daterange' && error && (
-        <p className='mt-1 text-sm text-red-500'>{error.message as string}</p>
+        <p className='mt-1 text-sm text-destructive'>{error.message as string}</p>
       )}
     </div>
   )

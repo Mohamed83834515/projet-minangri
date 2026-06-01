@@ -1,7 +1,6 @@
 import { useMemo } from 'react'
 import { toast } from 'sonner'
 import { DynamicForm } from '@/Global/Forms/DynamicForm'
-import { getSuiviTacheActiviteFormConfigForTache } from '@/simadou/allfieldsConfig/suiviTacheActiviteForm'
 
 import type {Ptba, TacheActivitePtba } from '@/simadou/allTypes'
 import { TacheActivitePtbaFormData, tacheActivitePtbaSchema } from '@/simadou/schemas/tacheActivitePtbaSchemas'
