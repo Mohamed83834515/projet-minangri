@@ -6,6 +6,7 @@ import { getSuiviTacheActiviteFormConfigForTache } from '@/simadou/allfieldsConf
 import type {Ptba, TacheActivitePtba } from '@/simadou/allTypes'
 import { TacheActivitePtbaFormData, tacheActivitePtbaSchema } from '@/simadou/schemas/tacheActivitePtbaSchemas'
 import { useCreateTacheActivite, useUpdateTacheActivite } from '@/simadou/allHooks/admin/tacheActiviteHooks'
+import { getTacheActivitePtbaFormConfig } from '@/simadou/allfieldsConfig/tacheActivitePtbaForm'
 
 interface TacheActivitePtbaFormProps {
   tache?: TacheActivitePtba;
@@ -21,7 +22,7 @@ export default function TacheActiviteForm({
   onSuccess,
 }: TacheActivitePtbaFormProps) {
   const isEditing = !!tache
-  const formConfig = useMemo(() => getSuiviTacheActiviteFormConfigForTache(), [])
+  const formConfig = useMemo(() => getTacheActivitePtbaFormConfig(), [])
   const idActivite = activite.id_ptba
   const defaultValues = useMemo(
     (): TacheActivitePtbaFormData => ({

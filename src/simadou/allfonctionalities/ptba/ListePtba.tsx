@@ -11,7 +11,7 @@ import { useGetVersions } from '@/simadou/allHooks/admin/versionHooks'
 import SelectInput from 'react-select'
 import AddPtba from './AddPtba'
 import ActiviteTabbedDialog from './ActiviteTabbedDialog'
-import TacheActiviteManager from './panification-tache/PlanificationTacheActiviteManager'
+import TacheActiviteManager from './tache-activite/TacheActiviteManager'
 const route = getRouteApi('/_authenticated/programmation/ptba/')
 
 function ListePtbas() {

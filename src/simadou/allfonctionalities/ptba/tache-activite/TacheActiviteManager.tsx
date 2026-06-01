@@ -10,8 +10,8 @@ import {
   useActiviteTabbedSubView,
 } from '../ActiviteTabbedDialogContext'
 import { useGetTachesByActivite } from '@/simadou/allHooks/admin/tacheActiviteHooks'
-import TacheActiviteForm from './PlanificationTacheActiviteForm'
-import TacheActiviteList from './PlanificationTacheActiviteList'
+import TacheActiviteForm from './TacheActiviteForm'
+import TacheActiviteList from './TacheActiviteList'
 
 type TacheActivitePtbaManagerProps = {
   activite: Ptba
@@ -97,9 +97,6 @@ export default function TacheActiviteManager({
             <div>
               <span className='font-medium'>Activité :</span>{' '}
               {activite.code_activite_ptba} — {activite.intitule_activite_ptba}
-            </div>
-            <div className='text-xs text-muted-foreground'>
-              {suivis.length} observation(s) globale(s)
             </div>
           </div>
         </div>

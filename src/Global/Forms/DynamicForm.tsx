@@ -16,8 +16,11 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Form } from '@/components/ui/form'
 import { FormField } from '../Fields/FormField'
-import type { FormConfig } from '../allTypes/formConfig'
-import { CHART_COLORS, useColor } from '@/stores/others/color-store'
+import type { FormConfig } from '../types/formConfig'
+import {
+  formPrimaryButtonClassName,
+  formSecondaryButtonClassName,
+} from './form-footer-styles'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
