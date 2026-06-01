@@ -94,9 +94,7 @@ const suiviTacheActiviteService = {
       method: "GET",
       params: { id_activite: idActivite },
     });
-    return normalizeList(response)
-      .map(mapSuiviTacheActiviteFromApi)
-      .filter((s) => resolveIdActivitePtba(s.id_activite_ptba) === idActivite);
+    return normalizeList(response).map(mapSuiviTacheActiviteFromApi);
   },
 
   async create(

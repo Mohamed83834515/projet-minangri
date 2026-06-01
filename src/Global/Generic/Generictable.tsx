@@ -51,7 +51,7 @@ type GenericTableProps<TData> = {
   search: Record<string, unknown>
   navigate: NavigateFn
 
-  searchKey: string
+  searchKey?: string
   searchPlaceholder?: string
 
   urlFilterConfig?: ColumnFilterConfig[]
@@ -64,6 +64,8 @@ type GenericTableProps<TData> = {
   emptyMessage?: string
 
   showViewOptions?: boolean
+  showSearch?: boolean
+  showPagination?: boolean
   toolbarEndSlot?: React.ReactNode
 
   /** Clic sur la ligne (hors cellules qui stoppent la propagation). */
@@ -90,6 +92,8 @@ export function GenericTable<TData>({
   defaultPageSize = 10,
   emptyMessage = 'No results.',
   showViewOptions = true,
+  showSearch = true,
+  showPagination = true,
   toolbarEndSlot,
   onRowClick,
   initialState,
@@ -158,6 +162,7 @@ export function GenericTable<TData>({
         searchKey={searchKey}
         filters={facetedFilters}
         showViewOptions={showViewOptions}
+        showSearch={showSearch}
         toolbarEndSlot={toolbarEndSlot}
       />
 
@@ -224,7 +229,7 @@ export function GenericTable<TData>({
         </Table>
       </div>
 
-      <DataTablePagination table={table} className='mt-auto' />
+      {showPagination && <DataTablePagination table={table} className='mt-auto' />}
 
       {bulkActionsSlot?.(table)}
     </div>

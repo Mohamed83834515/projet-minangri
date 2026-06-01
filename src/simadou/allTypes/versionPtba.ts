@@ -6,7 +6,7 @@ export interface VersionPtba extends Record<string, unknown> {
   version_ptba?: string; // Version du PTBA (string: 30)
   date_validation: string; // Date de validation (requis)
   observation?: string; // Observations
-  documentUrl?: string; // URL du document ($uri format)
+  documentUrl?: File; // URL du document ($uri format)
   statut_version?: number; // Statut de la version (0: En construction, 1: Validée, 2: Archivée)
   date_enregistrement: string; // Date d'enregistrement (requis)
   etat?: string; // État de la version

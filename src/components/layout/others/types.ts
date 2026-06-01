@@ -1,9 +1,10 @@
 import { type LinkProps } from '@tanstack/react-router'
 
 type User = {
-  name: string
-  email: string
-  avatar: string
+  name: string 
+  email: string 
+  id: string 
+  statut : number
 }
 
 type Team = {

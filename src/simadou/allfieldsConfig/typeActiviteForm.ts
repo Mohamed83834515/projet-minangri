@@ -10,7 +10,7 @@ export const getTypeActiviteFormConfig = (): FormConfig => ({
             type: "text",
             placeholder: "Ex: TYP001, ACT01...",
             required: true,
-            gridCols: 1,
+            gridCols: 2,
         },
         // texte - Intitulé type
         {
@@ -29,7 +29,7 @@ export const getTypeActiviteFormConfig = (): FormConfig => ({
             placeholder: "Description détaillée du type d'activité...",
             rows: 4,
             required: true,
-            gridCols: 2,
+            gridCols: 1,
         },
     ]
 

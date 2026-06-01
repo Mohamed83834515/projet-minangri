@@ -3,31 +3,12 @@ import type { FormConfig } from "../../Global/types/formConfig";
 export const getIndicateurTacheFormConfig = (): FormConfig => ({
 
     fields: [
-        // select - Tâche
-        {
-            name: "tache",
-            label: "Tâche",
-            type: "select",
-            placeholder: "Sélectionner une tâche",
-            required: true,
-            options: [], // À remplir dynamiquement depuis l'API
-            gridCols: 1,
-        },
         // texte - Intitulé indicateur tâche
         {
             name: "intitule_indicateur_tache",
             label: "Intitulé indicateur tâche",
             type: "text",
             placeholder: "Intitulé de l'indicateur",
-            required: true,
-            gridCols: 2,
-        },
-        // texte - Responsable indicateur tâche
-        {
-            name: "Responsable_ind_tache",
-            label: "Responsable indicateur tâche",
-            type: "text",
-            placeholder: "Nom du responsable",
             required: true,
             gridCols: 1,
         },
@@ -38,7 +19,7 @@ export const getIndicateurTacheFormConfig = (): FormConfig => ({
             type: "text",
             placeholder: "Ex: Kg, %, Nbre, FCFA...",
             required: true,
-            gridCols: 1,
+            gridCols: 2,
         },
         // texte - Code indicateur PTBA
         {
@@ -47,7 +28,7 @@ export const getIndicateurTacheFormConfig = (): FormConfig => ({
             type: "text",
             placeholder: "Ex: IND001, PTBA01...",
             required: true,
-            gridCols: 1,
+            gridCols: 2,
         },
         // select - Indicateur CMR
         {
@@ -57,17 +38,43 @@ export const getIndicateurTacheFormConfig = (): FormConfig => ({
             placeholder: "Sélectionner un indicateur CMR",
             required: true,
             options: [], // À remplir dynamiquement depuis l'API
-            gridCols: 1,
+            gridCols: 2,
         },
-        // select - Activité PTBA
+        // Trimestre 1
         {
-            name: "id_activite",
-            label: "Activité PTBA",
-            type: "select",
-            placeholder: "Sélectionner une activité PTBA",
+            name: "trimestre1",
+            label: "Trimestre 1",
+            type: "text",
+            placeholder: "Ex: 100, 75%, 2000...",
             required: true,
-            options: [], // À remplir dynamiquement depuis l'API
-            gridCols: 1,
+            gridCols: 2,
+        },
+        // Trimestre 2
+        {
+            name: "trimestre2",
+            label: "Trimestre 2",
+            type: "text",
+            placeholder: "Ex: 100, 75%, 2000...",
+            required: true,
+            gridCols: 2,
+        },
+        // Trimestre 3
+        {
+            name: "trimestre3",
+            label: "Trimestre 3",
+            type: "text",
+            placeholder: "Ex: 100, 75%, 2000...",
+            required: true,
+            gridCols: 2,
+        },
+        // Trimestre 4
+        {
+            name: "trimestre4",
+            label: "Trimestre 4",
+            type: "text",
+            placeholder: "Ex: 100, 75%, 2000...",
+            required: true,
+            gridCols: 2,
         },
     ]
 

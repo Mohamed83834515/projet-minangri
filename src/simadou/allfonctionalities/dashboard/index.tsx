@@ -15,9 +15,13 @@ import { RecentSales } from './components/recent-sales'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { CHART_COLORS, useColor } from '@/stores/others/color-store'
 
+
 export function Dashboard() {
   const { color } = useColor()
   const { stroke } = CHART_COLORS[color]
+
+
+  
 
   return (
     <>

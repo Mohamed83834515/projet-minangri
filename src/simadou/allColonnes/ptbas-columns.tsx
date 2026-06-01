@@ -1,10 +1,11 @@
 import { ColumnDef, type Row } from '@tanstack/react-table'
 import { GenericRowActions } from '@/Global/Tableaux/GenericRowActions'
 import { buildColumns, type OptionItem } from '@/Global/Tableaux/column-builder'
-import { UserPen, Trash2, CheckCircle, MinusCircle } from 'lucide-react'
+import { UserPen, Trash2, CheckCircle, MinusCircle, ClipboardList } from 'lucide-react'
 import { Ptba } from '../allTypes'
 import { getMoisOptions } from '../schemas/ptbaSchemas'
 import { DataTableColumnHeader } from '@/components/data-table/column-header'
+import { Button } from '@/components/ui/button'
 
 type PtbasDialogType = 'edit' | 'delete'
 
@@ -83,7 +84,8 @@ export const parseChronogramme = (value: unknown): string[] => {
 
 export const buildPtbasColumns = (
     setOpen: (dialog: PtbasDialogType | null) => void,
-    setCurrentRow: React.Dispatch<React.SetStateAction<Ptba | null>>
+    setCurrentRow: React.Dispatch<React.SetStateAction<Ptba | null>>,
+    onOpenPlanification: (activite: Ptba) => void
 ) => {
     const baseColumns = buildColumns<Ptba>([
         { type: "text", key: "code_activite_ptba", title: "Code", sticky: true },
@@ -144,9 +146,44 @@ export const buildPtbasColumns = (
         enableHiding: false,
     }
 
+    const planificationColumn: ColumnDef<Ptba> = {
+        id: 'planification`',
+        header: ({ column }) => (
+            <DataTableColumnHeader
+                column={column}
+                title='Planification'
+                className='w-full text-center'
+            />
+        ),
+        cell: ({ row }) => {
+            const activite = row.original
+            return (
+                <Button
+                    type='button'
+                    variant='ghost'
+                    size='icon'
+                    className='mx-auto flex h-8 w-8 shrink-0 text-primary'
+                    onClick={() => onOpenPlanification(activite)}
+                    aria-label='Ouvrir le suivi des tâches et indicateurs'
+                    title='Suivi des tâches et indicateurs'
+                >
+                    <ClipboardList className='h-5 w-5' /> Planifier
+                </Button>
+            )
+        },
+        meta: {
+            thClassName: 'text-center w-[72px]',
+            className: 'text-center align-middle',
+        },
+        size: 72,
+        enableSorting: false,
+        enableHiding: false,
+    }
+
     return [
         ...baseColumns,
         ...chronogrammeColumns,
+        planificationColumn,
         coutColumns,
         actionsColumn,
     ]

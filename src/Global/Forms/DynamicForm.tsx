@@ -79,7 +79,12 @@ export const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps>(
       watch,
       trigger,
       setValue,
+      reset
     } = form
+
+    useEffect(() => {
+  reset(defaultValues);
+}, [defaultValues]);
 
     useImperativeHandle(ref, () => ({
       setValue: (name: string, value: any) =>

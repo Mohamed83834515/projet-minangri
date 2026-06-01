@@ -46,7 +46,7 @@ export function buildSuiviPtbaColumns(
     header: ({ column }) => (
       <DataTableColumnHeader
         column={column}
-        title='Suivi'
+        title='Suivis'
         className='w-full text-center'
       />
     ),
@@ -62,7 +62,7 @@ export function buildSuiviPtbaColumns(
           aria-label='Ouvrir le suivi des tâches et indicateurs'
           title='Suivi des tâches et indicateurs'
         >
-          <ClipboardList className='h-5 w-5' />
+          <ClipboardList className='h-5 w-5' /> Suivre
         </Button>
       )
     },

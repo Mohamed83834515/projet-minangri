@@ -9,13 +9,14 @@ import {
 } from '@tanstack/react-query'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { toast } from 'sonner'
-import { useAuthStore } from '@/stores/auth-store'
 import { handleServerError } from '@/lib/handle-server-error'
 // Generated Routes
 import { routeTree } from './routeTree.gen'
 import { DirectionProvider } from './stores/others/direction-provider'
 // Styles
 import './styles/index.css'
+import { AuthProvider } from './simadou/allContext/authProvider'
+import { useAuthStore } from './stores/auth-store'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -62,7 +63,7 @@ const queryClient = new QueryClient({
       if (error instanceof AxiosError) {
         if (error.response?.status === 401) {
           toast.error('Session expired!')
-          useAuthStore.getState().auth.reset()
+          useAuthStore.getState().logout()
           const redirect = `${router.history.location.href}`
           router.navigate({ to: '/sign-in', search: { redirect } })
         }
@@ -100,12 +101,14 @@ const rootElement = document.getElementById('root')!
 if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement)
   root.render(
-    <StrictMode>
-      <QueryClientProvider client={queryClient}>
+     <StrictMode>
+    <QueryClientProvider client={queryClient}>  
+      <AuthProvider>                           
         <DirectionProvider>
           <RouterProvider router={router} />
         </DirectionProvider>
-      </QueryClientProvider>
-    </StrictMode>
+      </AuthProvider>
+    </QueryClientProvider>
+  </StrictMode>
   )
 }

@@ -32,8 +32,7 @@ export const versionPtbaSchema = z.object({
     .max(500, "L'observation ne peut pas dépasser 500 caractères")
     .optional(),
   documentUrl: z
-    .string()
-    .max(255, "Le nom du document ne peut pas dépasser 255 caractères")
+    .file()
     .optional(),
   statut_version: z
     .number()

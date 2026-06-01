@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { Localite } from '@/types'
+import { isValidPhoneNumber } from 'react-phone-number-input'
 
 // Schéma pour la création de personnel (PersonnelRequest)
 export const personnelCreateSchema = z.object({
@@ -66,12 +66,16 @@ export type PersonnelFormData = PersonnelCreateData
 
 
 
+
+
 // Update
 export const UpdateTelephoneSchema = z.object({
-  contact_perso: z
-    .string()
-    .min(8, 'Numéro invalide')
-    .max(20, 'Numéro invalide'),
+ contact_perso: z
+  .string()
+  .min(1, 'Le numéro est requis')
+  .refine(isValidPhoneNumber, {
+    message: 'Numéro invalide',
+  })
 })
 
 export const UpdateTitleSchema = z.object({

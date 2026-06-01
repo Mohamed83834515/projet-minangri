@@ -246,6 +246,14 @@ export const INDICATEUR_TACHE = {
   id_activite: null,
 };
 
+// =========Change password======
+
+export const CHANGE_PASSWORD = {
+  oldPassword : "",
+  newPassword : "",
+  confirmNewPassword : ""
+}
+
 // =========NBC==================
 export const NBC = {
   code_number_nbc: "",

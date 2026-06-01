@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { getRouteApi } from '@tanstack/react-router'
 import { GenericDialogs } from '@/Global/Generic/Genericdialogs'
 import { GenericTable } from '@/Global/Generic/Generictable'
@@ -10,6 +10,9 @@ import { buildPtbasColumns } from '@/simadou/allColonnes/ptbas-columns'
 import { useDeletePtba, useGetPtbas } from '@/simadou/allHooks/admin/ptbaHooks'
 import { usePtbaVersionSelection } from '@/simadou/allHooks/admin/versionHooks'
 import AddPtba from './AddPtba'
+import ActiviteTabbedDialog from './ActiviteTabbedDialog'
+import TacheActiviteManager from './tache-activite/TacheActiviteManager'
+import IndicateurTacheManager from './indicateur-tache/IndicateurTacheManager'
 
 const route = getRouteApi('/_authenticated/programmation/ptba/')
 
@@ -17,6 +20,9 @@ function ListePtbas() {
   const codeProgramme = useActiveProgrammeCode()
   const { selectedVersionId, setSelectedVersionId, versionOptions } =
     usePtbaVersionSelection(codeProgramme)
+
+  const [planifierActivite, setPlanifierActivite] = useState<Ptba | null>(null)
+  const [showPlanificationModal, setShowPlanificationModal] = useState(false)
 
   const search = route.useSearch()
   const navigate = route.useNavigate()
@@ -31,12 +37,17 @@ function ListePtbas() {
     )
   }, [ptbas, selectedVersionId])
 
+  const onOpenPlanification = useCallback((activite: Ptba) => {
+    setPlanifierActivite(activite)
+    setShowPlanificationModal(true)
+  }, [])
+
   const [open, setOpen] = useDialogState<'add' | 'edit' | 'delete'>(null)
   const [currentRow, setCurrentRow] = useState<Ptba | null>(null)
 
   const columns = useMemo(
-    () => buildPtbasColumns(setOpen, setCurrentRow),
-    [setOpen, setCurrentRow]
+    () => buildPtbasColumns(setOpen, setCurrentRow, onOpenPlanification),
+    [setOpen, setCurrentRow, onOpenPlanification]
   )
 
   return (
@@ -65,6 +76,7 @@ function ListePtbas() {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } as any,
         ]}
+        showViewOptions={false}
         initialState={{
           columnVisibility: {
             version_ptba: false,
@@ -72,6 +84,35 @@ function ListePtbas() {
         }}
       />
 
+      <ActiviteTabbedDialog
+        activite={planifierActivite}
+        open={showPlanificationModal}
+        onOpenChange={(open) => {
+          setShowPlanificationModal(open)
+          if (!open) setPlanifierActivite(null)
+        }}
+        defaultTab='taches'
+        tabs={
+          planifierActivite
+            ? [
+                {
+                  value: 'taches',
+                  label: 'Planification des tâches',
+                  content: (
+                    <TacheActiviteManager activite={planifierActivite} />
+                  ),
+                },
+                {
+                  value: 'indicateurs',
+                  label: 'Planification des indicateurs',
+                  content: (
+                    <IndicateurTacheManager activite={planifierActivite} />
+                  ),
+                },
+              ]
+            : []
+        }
+      />
       <GenericDialogs<Ptba, 'add' | 'edit' | 'delete'>
         open={open}
         setOpen={setOpen}
