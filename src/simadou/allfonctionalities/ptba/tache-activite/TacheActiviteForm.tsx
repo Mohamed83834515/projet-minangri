@@ -1,7 +1,6 @@
 import { useMemo } from 'react'
 import { toast } from 'sonner'
 import { DynamicForm } from '@/Global/Forms/DynamicForm'
-
 import type {Ptba, TacheActivitePtba } from '@/simadou/allTypes'
 import { TacheActivitePtbaFormData, tacheActivitePtbaSchema } from '@/simadou/schemas/tacheActivitePtbaSchemas'
 import { useCreateTacheActivite, useUpdateTacheActivite } from '@/simadou/allHooks/admin/tacheActiviteHooks'
@@ -31,10 +30,8 @@ export default function TacheActiviteForm({
       date_debut_gt: tache?.date_debut_gt || "",
       date_fin_gt: tache?.date_fin_gt || "",
       n_lot_gt: tache?.n_lot_gt || 1,
-      valider_gt: tache?.valider_gt || "En attente",
       observation_gt: tache?.observation_gt || "",
-      livrable_gt: tache?.livrable_gt || "",
-      id_personnel_gt: 10,
+      id_personnel_gt: 16,
       responsable_gt:
         typeof tache?.responsable_gt === "object"
           ? tache.responsable_gt.n_personnel || 0

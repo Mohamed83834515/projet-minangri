@@ -37,11 +37,6 @@ export function DataTableToolbar<TData>({
 
   return (
     <div className='flex items-center justify-between'>
-      <div>
-        {toolbarEndSlot ??
-          (showViewOptions ? <DataTableViewOptions table={table} /> : null)
-        }
-      </div>
       <div className="flex items-center gap-x-2">
         {showSearch && (
           searchKey && table.getColumn(searchKey) ? (
@@ -89,6 +84,12 @@ export function DataTableToolbar<TData>({
             <Cross2Icon className='ms-2 h-4 w-4' />
           </Button>
         )}
+      </div>
+
+      <div>
+        {toolbarEndSlot ??
+          (showViewOptions ? <DataTableViewOptions table={table} /> : null)
+        }
       </div>
     </div>
   )

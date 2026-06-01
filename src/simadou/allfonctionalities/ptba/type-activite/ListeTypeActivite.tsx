@@ -6,8 +6,8 @@ import { GenericTable } from "@/Global/Generic/Generictable";
 import { GenericDialogs } from "@/Global/Generic/Genericdialogs";
 import { GenericDeleteDialog } from "@/Global/Tableaux/GenericDeleteDialog";
 import { TypeActivite } from "@/simadou/allTypes/entities";
-import { Button } from "@/components/ui/button";
 import { useEmbeddedTableState } from "@/hooks/use-embedded-table-state";
+import { DataTableToolbarOutlineButton } from "@/components/data-table/toolbar-outline-button";
 
 export default function ListeTypeActivite({
   onAdd,
@@ -41,13 +41,7 @@ export default function ListeTypeActivite({
 
   return (
     <>
-      <div className="space-y-4">
-        <div className="flex justify-end">
-          <Button onClick={onAdd} variant="outline">
-            Ajouter un type
-          </Button>
-        </div>
-
+      
         <GenericTable
           data={data}
           columns={columns}
@@ -56,8 +50,15 @@ export default function ListeTypeActivite({
           showPagination={false}
           navigate={navigate}
           showViewOptions={false}
+          toolbarEndSlot={
+            <DataTableToolbarOutlineButton
+              className='ms-auto'
+              onClick={onAdd}
+            >
+              Ajouter
+            </DataTableToolbarOutlineButton>
+          }
         />
-      </div>
 
       <GenericDialogs
         open={open}

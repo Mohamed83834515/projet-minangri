@@ -172,7 +172,7 @@ export function SignUp() {
 
           {/* Footer */}
           <p className='relative px-10 pb-6 text-xs' style={{ color: 'rgba(255,255,255,.18)' }}>
-            © {new Date().getFullYear()} GTFOD. Tous droits réservés.
+            © {new Date().getFullYear()} SIMANDOU. Tous droits réservés.
           </p>
         </div>
 
@@ -182,7 +182,7 @@ export function SignUp() {
           {/* Logo mobile */}
           <div className='mb-10 flex items-center gap-3 lg:hidden'>
             <Logo className='size-10 rounded-lg' />
-            <span className='text-lg font-semibold tracking-tight'>GTFOD</span>
+            <span className='text-lg font-semibold tracking-tight'>SIMANDOU</span>
           </div>
 
           <div className='w-full max-w-sm space-y-8'>

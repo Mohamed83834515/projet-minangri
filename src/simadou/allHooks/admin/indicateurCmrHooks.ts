@@ -45,6 +45,8 @@ export function useGetIndicateurCmr(id: number | null | undefined) {
   })
 }
 
+export const getIndicateurCmrs = async () => indicateurCmrService.getAll()
+
 export function useCreateIndicateurCmr() {
   const queryClient = useQueryClient()
   return useMutation({

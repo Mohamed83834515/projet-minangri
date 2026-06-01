@@ -139,7 +139,9 @@ export function buildTachePtbaColumns(
             const tache = row.original
             return (
                 <span className='whitespace-nowrap text-muted-foreground'>
-                    {typeof tache.responsable_gt === 'string' ? tache.responsable_gt : 'Non défini'}
+                    {typeof tache.responsable_gt === 'object' ? 
+                    `${tache.responsable_gt?.prenom_perso} ${tache.responsable_gt?.nom_perso}`
+                     : 'Non défini'}
                 </span>
             )
         },

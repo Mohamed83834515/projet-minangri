@@ -27,7 +27,7 @@ export const getTacheActivitePtbaFormConfig = (): FormConfig => ({
         {
             name: "proportion_gt",
             label: "Proportion",
-            type: "text",
+            type: "number",
             placeholder: "Ex: 25%, 50%, 100%",
             required: true,
             maxLength: 10,

@@ -1,9 +1,9 @@
 import { Link } from '@tanstack/react-router'
 import { AuthLayout } from '../auth-layout'
-import { ForgotPasswordForm } from './components/forgot-password-form'
+import { ResetPasswordForm } from './components/reset-password-form'
 import { Logo } from '@/assets/logo'
 
-export function ForgotPassword() {
+export function ResetPassword() {
   return (
     <AuthLayout>
       <div className='flex min-h-screen w-screen'>
@@ -218,12 +218,12 @@ export function ForgotPassword() {
             {/* En-tête */}
             <div className='space-y-1'>
               <h1 className='text-2xl font-bold tracking-tight text-zinc-900'>
-                Mot de passe oublié
+               Réinitialisation de Mot de passe
               </h1>
             </div>
 
             {/* Formulaire */}
-            <ForgotPasswordForm />
+            <ResetPasswordForm />
 
             {/* Séparateur + liens */}
             <div className='space-y-4'>

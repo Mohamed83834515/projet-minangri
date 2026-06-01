@@ -120,7 +120,8 @@ export interface FieldConfig {
   dependsOn?: string;
   showWhen?: ((value: any) => boolean) | Record<string, any>;
   hidden?: boolean;
-  gridCols?: 1 | 2 | 3;
+  colSpan?: 'full' | 'half' | 'third' | 'quarter' | 1 | 2 | 3 | 4  
+  gridCols?: 1 | 2 | 3 | 4 
   useCombobox?: boolean;
   startName?: string;
   endName?: string;

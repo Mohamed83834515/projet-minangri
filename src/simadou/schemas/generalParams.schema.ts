@@ -1,3 +1,4 @@
+import { FieldType } from "@/Global/types/formConfig"
 import { z } from "zod"
 
 export const GeneralParamsSchema = z.object({
@@ -54,12 +55,6 @@ export const GeneralParamsSchema = z.object({
 
 export type GeneralParamsInput = z.infer<typeof GeneralParamsSchema>
 
-
-
-
-// NOTE: The old app referenced a UI-only FieldType from `pages/Parametrages/...`.
-// In refonte we define a minimal local union to keep this schema self-contained.
-export type FieldType = 'text' | 'email' | 'url' | 'tel' | 'number'
 
 
 

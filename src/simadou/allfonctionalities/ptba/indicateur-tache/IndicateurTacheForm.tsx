@@ -29,19 +29,18 @@ export default function IndicateurTacheForm({
     (): IndicateurTacheFormData => ({
       intitule_indicateur_tache: indicateur?.intitule_indicateur_tache || '',
       code_indicateur_ptba: indicateur?.code_indicateur_ptba || '',
-      unite_ind_tache: indicateur?.unite_ind_tache || '',
+      unite_ind_tache: indicateur?.unite_ind_tache || 0,
       indicateur_cmr: indicateur?.indicateur_cmr || 0,
-      trimestre1: indicateur?.trimestre1 || '',
-      trimestre2: indicateur?.trimestre2 || '',
-      trimestre3: indicateur?.trimestre3 || '',
-      trimestre4: indicateur?.trimestre4 || '',
+      trimestre_1: indicateur?.trimestre_1 || '',
+      trimestre_2: indicateur?.trimestre_2 || '',
+      trimestre_3: indicateur?.trimestre_3 || '',
+      trimestre_4: indicateur?.trimestre_4 || '',
       id_activite: indicateur?.id_activite || Number(idActivite),
     }),
     [indicateur, idActivite]
   )
   const createMutation = useCreateIndicateurTache(idActivite)
   const updateMutation = useUpdateIndicateurTache(idActivite)
-
   const onSubmit = (data: IndicateurTache) => {
     if (isEditing && indicateur?.id_indicateur_tache) {
       updateMutation.mutate(

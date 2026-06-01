@@ -7,29 +7,25 @@ export const indicateurTacheSchema = z.object({
     .min(1, "L'intitulé de l'indicateur est requis")
     .max(200, "L'intitulé ne peut pas dépasser 200 caractères"),
 
-  trimestre1: z
+  trimestre_1: z
     .string()
-    .min(1, "Le trimestre 1 est requis")
-    .max(100, "Le trimestre 1 ne peut pas dépasser 100 caractères"),
+    .optional(),
 
-  trimestre2: z
+  trimestre_2: z
     .string()
-    .min(1, "Le trimestre 2 est requis")
-    .max(100, "Le trimestre 2 ne peut pas dépasser 100 caractères"),
+    .optional(),
 
-  trimestre3: z
+  trimestre_3: z
     .string()
-    .min(1, "Le trimestre 3 est requis")
-    .max(100, "Le trimestre 3 ne peut pas dépasser 100 caractères"),
+    .optional(),
 
-  trimestre4: z
+  trimestre_4: z
     .string()
-    .min(1, "Le trimestre 4 est requis")
-    .max(100, "Le trimestre 4 ne peut pas dépasser 100 caractères"),
+    .optional(),
 
   unite_ind_tache: z
-    .string()
-    .min(1, "L'unité de mesure est requise")
+    .number()
+    .int("L'unité de mesure doit être un entier")
     .max(50, "L'unité ne peut pas dépasser 50 caractères"),
 
   code_indicateur_ptba: z

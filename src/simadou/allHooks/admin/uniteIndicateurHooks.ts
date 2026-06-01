@@ -12,3 +12,4 @@ export function useGetUnitesIndicateur() {
   })
 }
 
+export const getUniteIndicateurs = async () => uniteIndicateurService.getAll()

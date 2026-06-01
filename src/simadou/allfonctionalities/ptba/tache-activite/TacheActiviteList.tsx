@@ -7,7 +7,7 @@ import useDialogState from '@/hooks/use-dialog-state'
 import { useDeleteTachePtba } from '@/simadou/allHooks/admin/tacheActiviteHooks'
 import { toast } from 'sonner'
 import { GenericDeleteDialog } from '@/Global/Tableaux/GenericDeleteDialog'
-import { Button } from '@/components/ui/button'
+import { DataTableToolbarOutlineButton } from '@/components/data-table/toolbar-outline-button'
 
 type SuiviTacheActiviteListProps = {
   taches: TacheActivitePtba[]
@@ -45,14 +45,14 @@ export default function TacheActiviteList({
   return (
     <>
       <div className="space-y-4">
-        <div className="flex justify-end">
+        {/* <div className="flex justify-end">
           <Button
             onClick={onAdd}
             variant="outline"
           >
             Ajouter une tache
           </Button>
-        </div>
+        </div> */}
 
         <GenericTable<TachePtbaTableRow>
           data={taches}
@@ -68,6 +68,14 @@ export default function TacheActiviteList({
               type: 'string',
             },
           ]}
+          toolbarEndSlot={
+            <DataTableToolbarOutlineButton
+              className='ms-auto'
+              onClick={onAdd}
+            >
+              Ajouter
+            </DataTableToolbarOutlineButton>
+          }
           defaultPageSize={10}
           showViewOptions={false}
           showPagination={false}

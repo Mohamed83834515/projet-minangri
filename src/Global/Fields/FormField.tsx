@@ -41,7 +41,6 @@ import { Textarea } from '@/components/ui/textarea'
 import { DateRangeField } from '../DateRange/DateRangeField'
 import type { FieldConfig } from '../types/formConfig'
 import PasswordChecker from '@/simadou/allfonctionalities/settings/profile/PasswordChecker'
-// import { toast } from 'sonner'
 
 /** Calendrier natif invisible à droite ; icône Lucide visible au même endroit. */
 const dateInputPickerClasses =
@@ -78,11 +77,11 @@ export const FormField = ({
   const [filePreview, setFilePreview] = useState<string | null>(null)
   const [comboboxOpen, setComboboxOpen] = useState(false)
   const [tagInput, setTagInput] = useState('')
-   const newPassword = watch("newPassword")
+  const newPassword = watch("newPassword")
 
   const error = errors[field.name]
   const fieldValue = watch(field.name)
- 
+
   const hasValue =
     fieldValue !== undefined && fieldValue !== '' && fieldValue !== null
   const isValid = !error && hasValue && touched
@@ -563,7 +562,7 @@ export const FormField = ({
               const options = (field.options || []) as RichSelectOption[]
               const selectedOption = options.find(
                 (opt) =>
-                  opt.value.toString() === controllerField.value?.toString()
+                  opt.value === controllerField.value
               )
               return (
                 <div className='relative min-w-0'>
@@ -637,11 +636,7 @@ export const FormField = ({
                                   'bg-green-50 hover:bg-green-100 dark:bg-green-950/40 dark:hover:bg-green-950/60'
                                 )}
                                 onSelect={() => {
-                                  const nextValue =
-                                    typeof option.value === 'number'
-                                      ? option.value
-                                      : option.value.toString()
-                                  controllerField.onChange(nextValue)
+                                  controllerField.onChange(option.value)
                                   setComboboxOpen(false)
                                   setTouched(true)
 
@@ -665,8 +660,8 @@ export const FormField = ({
                                 <Check
                                   className={cn(
                                     'ml-2 h-4 w-4 shrink-0',
-                                    controllerField.value?.toString() ===
-                                      option.value.toString()
+                                    controllerField.value ===
+                                      option.value
                                       ? 'text-green-600 opacity-100'
                                       : 'opacity-0'
                                   )}
@@ -1037,47 +1032,47 @@ export const FormField = ({
           return (
             <div>
 
-                 <div className='relative'>
-              <Input
-                type={showPassword ? 'text' : 'password'}
-                placeholder={field.placeholder}
-                {...register(field.name)}
-                onBlur={handleBlur}
-                className={cn(
-                  'pr-20',
-                  isValid && 'border-green-500 focus:ring-green-500',
-                  isInvalid && 'border-red-500 focus:ring-red-500'
+              <div className='relative'>
+                <Input
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder={field.placeholder}
+                  {...register(field.name)}
+                  onBlur={handleBlur}
+                  className={cn(
+                    'pr-20',
+                    isValid && 'border-green-500 focus:ring-green-500',
+                    isInvalid && 'border-red-500 focus:ring-red-500'
+                  )}
+                />
+                {isValid && (
+                  <div className='pointer-events-none absolute top-1/2 right-12 -translate-y-1/2'>
+                    <Check className='h-5 w-5 text-green-500' />
+                  </div>
                 )}
-              />
-              {isValid && (
-                <div className='pointer-events-none absolute top-1/2 right-12 -translate-y-1/2'>
-                  <Check className='h-5 w-5 text-green-500' />
-                </div>
-              )}
-              {isInvalid && (
-                <div className='pointer-events-none absolute top-1/2 right-12 -translate-y-1/2'>
-                  <X className='h-5 w-5 text-red-500' />
-                </div>
-              )}
-              <button
-                type='button'
-                onClick={() => setShowPassword(!showPassword)}
-                className='absolute top-1/2 right-3 -translate-y-1/2 text-gray-500 transition-colors hover:text-gray-700'
-              >
-                {showPassword ? (
-                  <EyeOff className='h-5 w-5' />
-                ) : (
-                  <Eye className='h-5 w-5' />
+                {isInvalid && (
+                  <div className='pointer-events-none absolute top-1/2 right-12 -translate-y-1/2'>
+                    <X className='h-5 w-5 text-red-500' />
+                  </div>
                 )}
-              </button>
+                <button
+                  type='button'
+                  onClick={() => setShowPassword(!showPassword)}
+                  className='absolute top-1/2 right-3 -translate-y-1/2 text-gray-500 transition-colors hover:text-gray-700'
+                >
+                  {showPassword ? (
+                    <EyeOff className='h-5 w-5' />
+                  ) : (
+                    <Eye className='h-5 w-5' />
+                  )}
+                </button>
+              </div>
+
+              {field.showPasswordChecker && (
+                <PasswordChecker password={newPassword} />
+              )}
+
             </div>
 
-            {field.showPasswordChecker && (
-              <PasswordChecker  password={newPassword}/>
-            )}
-
-            </div>
-         
           )
         }
         return (
@@ -1266,50 +1261,49 @@ export const FormField = ({
         )
       }
 
-   // ========== TEL ==========
-case 'tel':
-  return (
-    <Controller
-      name={field.name}
-      control={control}
-      render={({ field: { onChange, value } }) => (
-        <div className='relative'>
-          <PhoneInput
-            international
-            countryCallingCodeEditable={false}
-            defaultCountry={'GN'}
-            value={value || undefined}
-            onChange={(phoneValue:any) => {
-              onChange(phoneValue ?? '')
-              setTouched(true)
-              if (trigger) trigger(field.name)
-            }}
-            onBlur={handleBlur}
-            className={cn(
-              // base — matches your other inputs
-              'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background',
-              'placeholder:text-muted-foreground',
-              'focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2',
-              isValid && 'border-green-500 focus-within:ring-green-500',
-              isInvalid && 'border-red-500 focus-within:ring-red-500',
-              // right padding for the status icon
-              'pr-10'
+      // ========== TEL ==========
+      case 'tel':
+        return (
+          <Controller
+            name={field.name}
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <div className='relative'>
+                <PhoneInput
+                  international
+                  countryCallingCodeEditable={false}
+                  defaultCountry={'GN'}
+                  value={value || undefined}
+                  onChange={(phoneValue: any) => {
+                    onChange(phoneValue ?? '')
+                    setTouched(true)
+                    if (trigger) trigger(field.name)
+                  }}
+                  onBlur={handleBlur}
+                  className={cn(
+                    'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background',
+                    'placeholder:text-muted-foreground',
+                    'focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2',
+                    isValid && 'border-green-500 focus-within:ring-green-500',
+                    isInvalid && 'border-red-500 focus-within:ring-red-500',
+                    'pr-10'
+                  )}
+                />
+                {isValid && (
+                  <div className='pointer-events-none absolute top-1/2 right-3 -translate-y-1/2'>
+                    <Check className='h-5 w-5 text-green-500' />
+                  </div>
+                )}
+                {isInvalid && (
+                  <div className='pointer-events-none absolute top-1/2 right-3 -translate-y-1/2'>
+                    <X className='h-5 w-5 text-red-500' />
+                  </div>
+                )}
+              </div>
             )}
           />
-          {isValid && (
-            <div className='pointer-events-none absolute top-1/2 right-3 -translate-y-1/2'>
-              <Check className='h-5 w-5 text-green-500' />
-            </div>
-          )}
-          {isInvalid && (
-            <div className='pointer-events-none absolute top-1/2 right-3 -translate-y-1/2'>
-              <X className='h-5 w-5 text-red-500' />
-            </div>
-          )}
-        </div>
-      )}
-    />
-  )
+        )
+
       // ========== DATE / HEURE ==========
       case 'date':
       case 'datetime-local':
@@ -1337,6 +1331,42 @@ case 'tel':
         )
       }
 
+      // ========== NUMBER ==========
+      case 'number':
+        return (
+          <div className='relative'>
+            <Input
+              type='number'
+              inputMode='numeric'
+              placeholder={field.placeholder}
+              {...register(field.name, {
+                setValueAs: (value: any) => {
+                  if (value === '' || value === null || value === undefined) {
+                    return undefined
+                  }
+                  const num = Number(value)
+                  return isNaN(num) ? undefined : num
+                },
+              })}
+              onBlur={handleBlur}
+              className={cn(
+                'pr-10',
+                isValid && 'border-green-500 focus:ring-green-500',
+                isInvalid && 'border-red-500 focus:ring-red-500'
+              )}
+            />
+            {isValid && (
+              <div className='pointer-events-none absolute top-1/2 right-3 -translate-y-1/2'>
+                <Check className='h-5 w-5 text-green-500' />
+              </div>
+            )}
+            {isInvalid && (
+              <div className='pointer-events-none absolute top-1/2 right-3 -translate-y-1/2'>
+                <X className='h-5 w-5 text-red-500' />
+              </div>
+            )}
+          </div>
+        )
       // ========== DEFAULT ==========
       default:
         return (
@@ -1346,10 +1376,7 @@ case 'tel':
               placeholder={field.placeholder}
               maxLength={field.maxLength}
               minLength={field.minLength}
-              {...register(
-                field.name,
-                field.type === 'number' ? { valueAsNumber: true } : undefined
-              )}
+              {...register(field.name)}
               onBlur={handleBlur}
               className={cn(
                 'pr-10',
