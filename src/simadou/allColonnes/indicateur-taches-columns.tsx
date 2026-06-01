@@ -90,68 +90,65 @@ export function buildIndicateurTacheColumns(
     }
 
     const trimestre1: ColumnDef<IndicateurTache> = {
-        id: 'trimestre1',
+        id: 'trimestre_1',
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title='Trimestre 1' />
         ),
         cell: ({ row }) => {
-            const raw = row.original.trimestre1
+            const raw = row.original.trimestre_1
             if (!raw) {
                 return <span className='text-muted-foreground'>—</span>
             }
-            const label = raw.endsWith('%') ? raw : `${raw}%`
-            return <span className='font-semibold tabular-nums'>{label}</span>
+            return <span className='font-semibold tabular-nums'>{raw}</span>
         },
         meta: { thClassName: 'text-center', className: 'text-center' },
         enableSorting: false,
         enableHiding: false,
     }
     const trimestre2: ColumnDef<IndicateurTache> = {
-        id: 'trimestre2',
+        id: 'trimestre_2',
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title='Trimestre 2' />
         ),
         cell: ({ row }) => {
-            const raw = row.original.trimestre2
+            const raw = row.original.trimestre_2
             if (!raw) {
                 return <span className='text-muted-foreground'>—</span>
             }
-            const label = raw.endsWith('%') ? raw : `${raw}%`
-            return <span className='font-semibold tabular-nums'>{label}</span>
+            return <span className='font-semibold tabular-nums'>{raw}</span>
         },
         meta: { thClassName: 'text-center', className: 'text-center' },
         enableSorting: false,
         enableHiding: false,
     }
     const trimestre3: ColumnDef<IndicateurTache> = {
-        id: 'trimestre3',
+        id: 'trimestre_3',
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title='Trimestre 3' />
         ),
         cell: ({ row }) => {
-            const raw = row.original.trimestre3
+            const raw = row.original.trimestre_3
             if (!raw) {
                 return <span className='text-muted-foreground'>—</span>
             }
-            const label = raw.endsWith('%') ? raw : `${raw}%`
-            return <span className='font-semibold tabular-nums'>{label}</span>
+            
+            return <span className='font-semibold tabular-nums'>{raw}</span>
         },
         meta: { thClassName: 'text-center', className: 'text-center' },
         enableSorting: false,
         enableHiding: false,
     }
     const trimestre4: ColumnDef<IndicateurTache> = {
-        id: 'trimestre4',
+        id: 'trimestre_4',
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title='Trimestre 4' />
         ),
         cell: ({ row }) => {
-            const raw = row.original.trimestre4
+            const raw = row.original.trimestre_4
             if (!raw) {
                 return <span className='text-muted-foreground'>—</span>
             }
-            const label = raw.endsWith('%') ? raw : `${raw}%`
-            return <span className='font-semibold tabular-nums'>{label}</span>
+            return <span className='font-semibold tabular-nums'>{raw}</span>
         },
         meta: { thClassName: 'text-center', className: 'text-center' },
         enableSorting: false,

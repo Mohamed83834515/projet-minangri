@@ -26,19 +26,18 @@ jobs:
 
       - name: Build
         run: npm run build
-      #   env:
-      #     VITE_API_URL: ${{ secrets.VITE_API_URL }}
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
 
-      # - name: Deploy to VPS
-      #   uses: appleboy/scp-action@v0.1.7
-      #   with:
-      #     host: ${{ secrets.VPS_IP }}
-      #     username: ${{ secrets.VPS_USER }}
-      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
-      #     source: "dist/**"
-      #     target: "/var/www/nom_du_domain/www"
-      #     strip_components: 1
-      #     rm: true
+      - name: Deploy to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_IP }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "dist/**"
+          target: "/var/www/ruche-sectoriel.net/admin"
+          strip_components: 1
 
 
 

@@ -9,6 +9,7 @@ import { GenericDeleteDialog } from '@/Global/Tableaux/GenericDeleteDialog'
 import { Button } from '@/components/ui/button'
 import { IndicateurTache } from '@/simadou/allTypes/indicateurTache'
 import { buildIndicateurTacheColumns } from '@/simadou/allColonnes/indicateur-taches-columns'
+import { DataTableToolbarOutlineButton } from '@/components/data-table/toolbar-outline-button'
 
 type IndicateurTacheListProps = {
   indicateurs: IndicateurTache[]
@@ -68,6 +69,14 @@ export default function IndicateurTacheList({
               type: 'string',
             },
           ]}
+          toolbarEndSlot={
+            <DataTableToolbarOutlineButton
+              className='ms-auto'
+              onClick={onAdd}
+            >
+              Ajouter
+            </DataTableToolbarOutlineButton>
+          }
           defaultPageSize={10}
           showViewOptions={false}
           showPagination={false}

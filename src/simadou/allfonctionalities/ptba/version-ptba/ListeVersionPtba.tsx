@@ -12,6 +12,7 @@ import { useGetVersions, useDeleteVersion, useValiderVersion, useArchiverVersion
 import { buildVersionPtbaColumns } from "@/simadou/allColonnes/versions-columns"
 import { GenericTable } from "@/Global/Generic/Generictable"
 import { VersionPtba } from "@/simadou/allTypes"
+import { DataTableToolbarOutlineButton } from "@/components/data-table/toolbar-outline-button"
 
 type Props = {
     onAdd: () => void
@@ -75,27 +76,24 @@ export default function ListeVersionPtba({
 
     return (
         <>
-            <div className="space-y-4">
-                <div className="flex justify-end">
-                    <Button
+
+            <GenericTable
+                data={data}
+                columns={columns}
+                search={search}
+                showSearch={false}
+                navigate={navigate}
+                showPagination={false}
+                showViewOptions={false}
+                toolbarEndSlot={
+                    <DataTableToolbarOutlineButton
+                        className='ms-auto'
                         onClick={onAdd}
-                        variant="outline"
                     >
-                        Ajouter une version
-                    </Button>
-                </div>
-
-                <GenericTable
-                    data={data}
-                    columns={columns}
-                    search={search}
-                    showSearch={false}
-                    navigate={navigate}
-                    showPagination={false}
-                    showViewOptions={false}
-                />
-            </div>
-
+                        Ajouter
+                    </DataTableToolbarOutlineButton>
+                }
+            />
             <GenericDialogs
                 open={open}
                 setOpen={setOpen}

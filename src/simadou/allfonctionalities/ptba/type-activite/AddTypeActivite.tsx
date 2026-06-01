@@ -6,7 +6,7 @@ import { TypeActivite } from "@/simadou/allTypes/entities"
 import { typeActiviteSchema } from "@/simadou/schemas/ptbaSchemas"
 
 type Props = {
-  currentRow?: TypeActivite |null
+  currentRow?: TypeActivite | null
   onBack: () => void
   onSuccess: () => void
   onCancel: () => void
@@ -35,29 +35,16 @@ export default function AddTypeActivite({
   }
 
   return (
-    <div className="space-y-4">
-
-      {/* HEADER ACTIONS */}
-      <div className="flex items-center justify-between">
-        <Button variant="outline" onClick={onBack}>
-          ← Retour
-        </Button>
-
-        <Button variant="ghost" onClick={onCancel}>
-          Annuler
-        </Button>
-      </div>
-
-      {/* FORM */}
-      <DynamicForm
-        config={formConfig}
-        schema={typeActiviteSchema}
-        defaultValues={defaultValues}
-        onSubmit={handleSubmit}
-        isLoading={mutation.isPending}
-        submitText={isEdit ? "Modifier" : "Ajouter"}
-        loadingText="Enregistrement..."
-      />
-    </div>
+    <DynamicForm
+      config={formConfig}
+      schema={typeActiviteSchema}
+      defaultValues={defaultValues}
+      onSubmit={handleSubmit}
+      isLoading={mutation.isPending}
+      submitText={isEdit ? "Modifier" : "Ajouter"}
+      loadingText="Enregistrement..."
+      onCancel={onBack}
+      cancelText='Retour'
+    />
   )
 }

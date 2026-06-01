@@ -78,48 +78,33 @@ export default function AddVersionPtba({
     }
 
     return (
-        <div className="space-y-4">
-            <div className="flex items-center justify-between">
-                <Button
-                    variant="outline"
-                    onClick={onBack}
-                >
-                    ← Retour
-                </Button>
-
-                <Button
-                    variant="ghost"
-                    onClick={onCancel}
-                >
-                    Annuler
-                </Button>
-            </div>
-
-            <DynamicForm
-                config={formConfig}
-                schema={versionPtbaSchema}
-                defaultValues={defaultValues}
-                onSubmit={handleSubmit}
-                isLoading={mutation.isPending}
-                submitText={
-                    isEdit
-                        ? "Modifier"
-                        : "Ajouter"
-                }
-                loadingText="Enregistrement..."
-                onFieldChange={(
-                    fieldName,
-                    value
-                ) => {
-                    if (
-                        fieldName === "documentUrl"
-                    ) {
-                        if (value instanceof File) {
-                            setSelectedFile(value)
-                        }
+        <DynamicForm
+            config={formConfig}
+            schema={versionPtbaSchema}
+            defaultValues={defaultValues}
+            onSubmit={handleSubmit}
+            isLoading={mutation.isPending}
+            submitText={
+                isEdit
+                    ? "Modifier"
+                    : "Ajouter"
+            }
+            loadingText="Enregistrement..."
+            onFieldChange={(
+                fieldName,
+                value
+            ) => {
+                if (
+                    fieldName === "documentUrl"
+                ) {
+                    if (value instanceof File) {
+                        setSelectedFile(value)
                     }
-                }}
-            />
-        </div>
+                }
+            }}
+
+            onCancel={onBack}
+            cancelText='Retour'
+        />
     )
 }
