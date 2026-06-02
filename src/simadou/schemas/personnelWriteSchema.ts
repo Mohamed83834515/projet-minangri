@@ -35,7 +35,8 @@ export const personnelWriteSchema = z.object({
   contact_perso: z
     .string()
     .min(1, 'Le contact est requis')
-    .refine((v) => isValidPhoneNumber(v), { message: 'Numéro invalide' }),
+    .max(15, 'Le contact doit comporter au maximum 15 caractères'),
+    // .refine((v) => isValidPhoneNumber(v), { message: 'Numéro invalide' }),
   structure_perso: requiredPositiveInt('La structure est requise'),
   fonction_perso: requiredPositiveInt('La fonction est requise'),
   service_perso: optionalPositiveInt(),

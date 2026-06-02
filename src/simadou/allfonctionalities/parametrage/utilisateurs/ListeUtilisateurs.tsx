@@ -125,6 +125,7 @@ export default function ListeUtilisateurs() {
             type: 'string',
           },
         ]}
+        showViewOptions={false}
         emptyMessage='Aucun utilisateur.'
       />
 
