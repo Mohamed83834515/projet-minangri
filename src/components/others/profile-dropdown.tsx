@@ -42,10 +42,10 @@ export function ProfileDropdown() {
             <DropdownMenuItem asChild>
               <Link to='/settings'>
                 Profile
-                <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+                <DropdownMenuShortcut></DropdownMenuShortcut>
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
+            {/* <DropdownMenuItem asChild>
               <Link to='/settings'>
                 Billing
                 <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
@@ -57,13 +57,12 @@ export function ProfileDropdown() {
                 <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem>New Team</DropdownMenuItem>
+            <DropdownMenuItem>New Team</DropdownMenuItem> */}
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem variant='destructive' onClick={() => setOpen(true)}>
-            Sign out
+            Deconnexion
             <DropdownMenuShortcut className='text-current'>
-              ⇧⌘Q
             </DropdownMenuShortcut>
           </DropdownMenuItem>
         </DropdownMenuContent>
