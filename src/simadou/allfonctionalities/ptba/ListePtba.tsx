@@ -9,7 +9,6 @@ import { Ptba } from '@/simadou/allTypes'
 import { buildPtbasColumns } from '@/simadou/allColonnes/ptbas-columns'
 import { useDeletePtba, useGetPtbas } from '@/simadou/allHooks/admin/ptbaHooks'
 import { usePtbaVersionSelection } from '@/simadou/allHooks/admin/versionHooks'
-import { PtbaVersionSelect } from './PtbaVersionSelect'
 import AddPtba from './AddPtba'
 import ActiviteTabbedDialog from './ActiviteTabbedDialog'
 import TacheActiviteManager from './tache-activite/TacheActiviteManager'
@@ -19,7 +18,7 @@ const route = getRouteApi('/_authenticated/programmation/ptba/')
 
 function ListePtbas() {
   const codeProgramme = useActiveProgrammeCode()
-  const { selectedVersionId, handleChangeVersion, versionOptions } =
+  const { selectedVersionId, setSelectedVersionId, versionOptions } =
     usePtbaVersionSelection(codeProgramme)
 
   const [planifierActivite, setPlanifierActivite] = useState<Ptba | null>(null)
@@ -67,13 +66,16 @@ function ListePtbas() {
             type: 'string',
           },
         ]}
-        toolbarEndSlot={
-          <PtbaVersionSelect
-            options={versionOptions}
-            value={selectedVersionId}
-            onChange={handleChangeVersion}
-          />
-        }
+        facetedFilters={[
+          {
+            columnId: 'version_ptba',
+            title: 'Version PTBA',
+            options: versionOptions,
+            onValueChange: (value: string | undefined) =>
+              setSelectedVersionId(value || null),
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          } as any,
+        ]}
         showViewOptions={false}
         initialState={{
           columnVisibility: {

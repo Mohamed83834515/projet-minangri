@@ -135,8 +135,6 @@ export function versionBelongsToProgramme(
   return false
 }
 
-const SELECTED_VERSION_STORAGE_KEY = 'selectedVersionId'
-
 /** Version PTBA + filtre programme pour les listes PTBA / suivi PTBA. */
 export function usePtbaVersionSelection(codeProgramme: string | undefined) {
   const { data: versions = [] } = useGetVersions()
@@ -168,40 +166,17 @@ export function usePtbaVersionSelection(codeProgramme: string | undefined) {
       return
     }
 
-    const stored = localStorage.getItem(SELECTED_VERSION_STORAGE_KEY)
-    if (
-      stored &&
-      versionsForProgramme.some(
-        (v) => v.id_version_ptba.toString() === stored
-      )
-    ) {
-      setSelectedVersionId(stored)
-      return
-    }
-
     const currentYear = new Date().getFullYear()
     const preferred =
       versionsForProgramme.find((v) => v.annee_ptba === currentYear) ??
       versionsForProgramme[0]
 
-    const preferredId = preferred.id_version_ptba.toString()
-    setSelectedVersionId(preferredId)
-    localStorage.setItem(SELECTED_VERSION_STORAGE_KEY, preferredId)
+    setSelectedVersionId(preferred.id_version_ptba.toString())
   }, [codeProgramme, versionsForProgramme])
-
-  const handleChangeVersion = (versionId: string | null) => {
-    setSelectedVersionId(versionId)
-    if (versionId) {
-      localStorage.setItem(SELECTED_VERSION_STORAGE_KEY, versionId)
-    } else {
-      localStorage.removeItem(SELECTED_VERSION_STORAGE_KEY)
-    }
-  }
 
   return {
     selectedVersionId,
-    setSelectedVersionId: handleChangeVersion,
-    handleChangeVersion,
+    setSelectedVersionId,
     versionOptions,
     versionsForProgramme,
   }
