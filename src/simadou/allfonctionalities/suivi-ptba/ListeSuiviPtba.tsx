@@ -13,6 +13,7 @@ import { buildSuiviPtbaColumns } from '@/simadou/allColonnes/suivi-ptba-columns'
 import { useActiveProgrammeCode } from '@/hooks/use-active-programme'
 import { useGetPtbas } from '@/simadou/allHooks/admin/ptbaHooks'
 import { usePtbaVersionSelection } from '@/simadou/allHooks/admin/versionHooks'
+import { PtbaVersionSelect } from '@/simadou/allfonctionalities/ptba/PtbaVersionSelect'
 import { useSuiviPtbaActivitesProgress } from '@/simadou/allHooks/admin/suiviPtbaHooks'
 import ActiviteTabbedDialog from './ActiviteTabbedDialog'
 import ObservationPtbaManager from './observations/ObservationPtbaManager'
@@ -27,7 +28,7 @@ export default function ListeSuiviPtba() {
   const search = route.useSearch()
   const navigate = route.useNavigate()
 
-  const { selectedVersionId, setSelectedVersionId, versionOptions } =
+  const { selectedVersionId, handleChangeVersion, versionOptions } =
     usePtbaVersionSelection(codeProgramme)
   const [suiviActivite, setSuiviActivite] = useState<Ptba | null>(null)
   const [showSuiviModal, setShowSuiviModal] = useState(false)
@@ -97,16 +98,14 @@ export default function ListeSuiviPtba() {
             type: 'string',
           },
         ]}
-        facetedFilters={[
-          {
-            columnId: 'version_ptba',
-            title: 'Version PTBA',
-            options: versionOptions,
-            onValueChange: (value: string | undefined) =>
-              setSelectedVersionId(value || null),
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          } as any,
-        ]}
+        toolbarEndSlot={
+          <PtbaVersionSelect
+            options={versionOptions}
+            value={selectedVersionId}
+            onChange={handleChangeVersion}
+          />
+        }
+        showViewOptions={false}
         initialState={{
           columnVisibility: {
             version_ptba: false,
