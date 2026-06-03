@@ -151,16 +151,6 @@ export const sidebarData: SidebarData = {
               url: '/programme/indicateurs-cmr',
               icon: TrendingUp,
             },
-            {
-              title: 'Cadre stratégique',
-              url: '/programme/cadre-strategique',
-              icon: Target,
-            },
-            {
-              title: 'Indicateurs stratégiques',
-              url: '/programme/indicateurs-performance',
-              icon: LineChart,
-            },
           ],
         },
 
