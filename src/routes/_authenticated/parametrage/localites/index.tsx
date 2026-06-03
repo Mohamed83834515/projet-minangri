@@ -5,6 +5,7 @@ import { PageRouteLayout } from '@/Global/HookRoute/genericRoute'
 import ListeLocalite from '@/simadou/allfonctionalities/parametrage/localite/ListeLocalite'
 import NiveauLocaliteDialog from '@/simadou/allfonctionalities/parametrage/localite/niveau/NiveauDialog'
 import AddLocalite from '@/simadou/allfonctionalities/parametrage/localite/AddLocalite'
+import { LocaliteProvider } from '@/simadou/allContext/niveauLocalite'
 
 export const Route = createFileRoute('/_authenticated/parametrage/localites/')({
   component: RouteComponent,
@@ -13,6 +14,7 @@ export const Route = createFileRoute('/_authenticated/parametrage/localites/')({
 
 function RouteComponent() {
   return (
+    <LocaliteProvider>
     <PageRouteLayout
       title="Localités"
       boutonAddTitle="Ajouter une localité"
@@ -27,5 +29,6 @@ function RouteComponent() {
         },
       ]}
     />
+    </LocaliteProvider>
   )
 }
