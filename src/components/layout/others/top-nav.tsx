@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { Link, useLocation }                         from '@tanstack/react-router'
-import { ChevronDown, Search, X }                    from 'lucide-react'
+import { Search, X }                                 from 'lucide-react'
 import { cn }                                        from '@/lib/utils'
 import {
   DropdownMenu,
@@ -277,7 +277,8 @@ export function AppTopbar({user} :UserProps) {
   const href      = useLocation({ select: (l) => l.href })
   const firstTeam = sidebarData.teams[0]
 
-  // ── Couleurs dynamiques — Header Color uniquement ──
+  const subNavMode = useLayout((s) => s.subNavMode)
+
   const headerColor = useColorStore((s) => s.headerColor)
   const { bg: headerBg, text: headerText } = HEADER_COLORS[headerColor]
   const headerBg2 = darken(headerBg, 0.82)
@@ -345,6 +346,10 @@ export function AppTopbar({user} :UserProps) {
 
   const fadeBgLeft  = `linear-gradient(to right, ${headerBg2} 20%, transparent)`
   const fadeBgRight = `linear-gradient(to left,  ${headerBg2} 20%, transparent)`
+
+  const handleGroupToggle = (item: NavCollapsible) => {
+    setManualGroup((prev) => (prev?.title === item.title ? null : item))
+  }
 
   return (
     <>
