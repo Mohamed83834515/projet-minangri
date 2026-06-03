@@ -12,6 +12,8 @@ import {
   User,
   SlidersHorizontal,
   Handshake,
+  Briefcase,
+  MapPin,
 } from 'lucide-react'
 import { type SidebarData } from '../../components/layout/others/types'
 
@@ -55,11 +57,11 @@ export const sidebarData: SidebarData = {
           title: 'Paramétrage',
           icon: Settings,
           items: [
-            // {
-            //   title: 'Localités',
-            //   url: '/parametrage/localites',
-            //   icon: MapPin,
-            // },
+            {
+              title: 'Localités',
+              url: '/parametrage/localites',
+              icon: MapPin,
+            },
             {
               title: 'Unités de gestion',
               url: '/parametrage/unites-de-gestion',
@@ -75,21 +77,22 @@ export const sidebarData: SidebarData = {
               url: '/parametrage/utilisateurs',
               icon: UserCog,
             },
-            // {
-            //   title: 'Fonctions',
-            //   url: '/parametrage/fonctions',
-            //   icon: Briefcase,
-            // },
+            {
+              title: 'Fonctions',
+              url: '/parametrage/fonctions',
+              icon: Briefcase
+              ,
+            },
             {
               title: 'Partenaire Financier',
               url: '/parametrage/partenaire-financier',
               icon: Handshake,
             },
-            // {
-            //   title: 'Zone de Collecte',
-            //   url: '/parametrage/zone-de-collecte',
-            //   icon: Map,
-            // },
+            {
+              title: 'Zone de Collecte',
+              url: '/parametrage/zone-de-collecte',
+              icon: MapPin,
+            },
             // {
             //   title: 'Conventions',
             //   url: '/parametrage/conventions',

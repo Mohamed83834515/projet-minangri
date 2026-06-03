@@ -19,14 +19,15 @@ export const getZoneCollecteFormConfig = (): FormConfig => ({
             type: "text",
             placeholder: "Nom de la zone de collecte",
             required: true,
-            gridCols: 2,
+            gridCols: 1,
         },
         // texte - Type zone
         {
             name: "type_zone",
             label: "Type zone",
-            type: "text",
+            type: "select",
             placeholder: "Ex: Urbain, Rural, Périurbain...",
+            options: [], // Les options seront chargées dynamiquement
             required: true,
             gridCols: 1,
         },
