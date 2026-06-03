@@ -8,6 +8,10 @@ import {
   FolderOpen,
   CalendarDays,
   Eye,
+  LayoutGrid,
+  User,
+  SlidersHorizontal,
+  Handshake,
 } from 'lucide-react'
 import { type SidebarData } from '../../components/layout/others/types'
 
@@ -56,16 +60,16 @@ export const sidebarData: SidebarData = {
             //   url: '/parametrage/localites',
             //   icon: MapPin,
             // },
-            // {
-            //   title: 'Unités de gestion',
-            //   url: '/parametrage/unites-de-gestion',
-            //   icon: LayoutGrid,
-            // },
-            // {
-            //   title: 'Acteurs',
-            //   url: '/parametrage/acteurs',
-            //   icon: User,
-            // },
+            {
+              title: 'Unités de gestion',
+              url: '/parametrage/unites-de-gestion',
+              icon: LayoutGrid,
+            },
+            {
+              title: 'Acteurs',
+              url: '/parametrage/acteurs',
+              icon: User,
+            },
             {
               title: 'Utilisateurs',
               url: '/parametrage/utilisateurs',
@@ -76,11 +80,11 @@ export const sidebarData: SidebarData = {
             //   url: '/parametrage/fonctions',
             //   icon: Briefcase,
             // },
-            // {
-            //   title: 'Partenaire Financier',
-            //   url: '/parametrage/partenaire-financier',
-            //   icon: Handshake,
-            // },
+            {
+              title: 'Partenaire Financier',
+              url: '/parametrage/partenaire-financier',
+              icon: Handshake,
+            },
             // {
             //   title: 'Zone de Collecte',
             //   url: '/parametrage/zone-de-collecte',
@@ -101,11 +105,11 @@ export const sidebarData: SidebarData = {
               url: '/parametrage/dictionnaire-indicateurs',
               icon: BookOpen,
             },
-            // {
-            //   title: 'Autres paramétrages',
-            //   url: '/parametrage/autres',
-            //   icon: SlidersHorizontal,
-            // },
+            {
+              title: 'Autres paramétrages',
+              url: '/parametrage/autres',
+              icon: SlidersHorizontal,
+            },
           ],
         },
 

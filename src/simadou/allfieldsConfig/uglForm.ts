@@ -10,15 +10,6 @@ export const getUGLFormConfig = (): FormConfig => ({
             type: "text",
             placeholder: "Ex: UGL001, UGL01...",
             required: true,
-            gridCols: 1,
-        },
-        // texte - Nom UGL
-        {
-            name: "nom_ugl",
-            label: "Nom UGL",
-            type: "text",
-            placeholder: "Nom complet de l'UGL",
-            required: true,
             gridCols: 2,
         },
         // texte - Abrégé UGL
@@ -27,6 +18,15 @@ export const getUGLFormConfig = (): FormConfig => ({
             label: "Abrégé UGL",
             type: "text",
             placeholder: "Ex: UGL, UGL-NORD...",
+            required: true,
+            gridCols: 2,
+        },
+        // texte - Nom UGL
+        {
+            name: "nom_ugl",
+            label: "Nom UGL",
+            type: "textarea",
+            placeholder: "Nom complet de l'UGL",
             required: true,
             gridCols: 1,
         },
@@ -47,16 +47,15 @@ export const getUGLFormConfig = (): FormConfig => ({
             placeholder: "Sélectionner une localité",
             required: true,
             options: [], // À remplir dynamiquement depuis l'API
-            gridCols: 1,
+            gridCols: 2,
         },
         // select multiple - Régions concernées
         {
             name: "region_concerne_ugl",
             label: "Régions concernées",
-            type: "select",
+            type: "multiselect",
             placeholder: "Sélectionner une ou plusieurs régions",
             required: true,
-            multiple: true,
             options: [], // À remplir dynamiquement depuis l'API
             gridCols: 2,
         },

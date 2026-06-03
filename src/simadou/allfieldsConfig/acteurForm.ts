@@ -10,7 +10,7 @@ export const getActeurFormConfig = (): FormConfig => ({
             type: "text",
             placeholder: "Ex: ACT001, ART01...",
             required: true,
-            gridCols: 1,
+            gridCols: 2,
         },
         // texte - Nom acteur
         {
@@ -19,7 +19,7 @@ export const getActeurFormConfig = (): FormConfig => ({
             type: "text",
             placeholder: "Nom complet de l'acteur",
             required: true,
-            gridCols: 1,
+            gridCols: 2,
         },
         // textarea - Description acteur
         {
@@ -27,9 +27,8 @@ export const getActeurFormConfig = (): FormConfig => ({
             label: "Description",
             type: "textarea",
             placeholder: "Description détaillée de l'acteur...",
-            rows: 4,
             required: false,
-            gridCols: 2,
+            gridCols: 1,
         },
         // texte - Personne responsable
         {
@@ -47,7 +46,7 @@ export const getActeurFormConfig = (): FormConfig => ({
             type: "text",
             placeholder: "Téléphone, WhatsApp...",
             required: true,
-            gridCols: 1,
+            gridCols: 2,
         },
         // email - Adresse email
         {
@@ -56,7 +55,7 @@ export const getActeurFormConfig = (): FormConfig => ({
             type: "email",
             placeholder: "exemple@domaine.com",
             required: true,
-            gridCols: 1,
+            gridCols: 2,
         },
         // select - Catégorie acteur (relation)
         {

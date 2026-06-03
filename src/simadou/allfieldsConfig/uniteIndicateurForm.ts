@@ -20,7 +20,7 @@ export const getUniteIndicateurFormConfig = (): FormConfig => ({
             placeholder: "Définition de l'unité de mesure...",
             rows: 3,
             required: true,
-            gridCols: 2,
+            gridCols: 1,
         },
     ]
 
