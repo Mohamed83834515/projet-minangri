@@ -110,9 +110,9 @@ export default function ListeCadreAnalytique() {
   const sortedNiveaux = useMemo(
     () =>
       sortNiveauxCadreAnalytique(
-        filterNiveauxByProgramme(niveaux, codeProgramme, programmeId)
+        filterNiveauxByProgramme(niveaux, codeProgramme)
       ),
-    [niveaux, codeProgramme, programmeId]
+    [niveaux, codeProgramme]
   )
 
   const hasNiveaux = sortedNiveaux.length > 0
