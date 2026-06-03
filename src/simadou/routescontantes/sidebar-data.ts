@@ -14,6 +14,9 @@ import {
   Handshake,
   Briefcase,
   MapPin,
+  FileStack,
+  BarChart2,
+  TrendingUp,
 } from 'lucide-react'
 import { type SidebarData } from '../../components/layout/others/types'
 
@@ -117,42 +120,27 @@ export const sidebarData: SidebarData = {
         },
 
         // ── Politique ─────────────────────────────────────────
-        // {
-        //   title: 'Politique',
-        //   icon: FileStack,
-        //   items: [
-        //     {
-        //       title: 'Liste des politiques et stratégies',
-        //       url: '/programme/liste',
-        //       icon: FileStack,
-        //     },
-        //     {
-        //       title: 'Cadre analytique',
-        //       url: '/programme/cadre-analytique',
-        //       icon: BarChart2,
-        //     },
-        //     {
-        //       title: 'Cadre stratégique',
-        //       url: '/programme/cadre-strategique',
-        //       icon: Target,
-        //     },
-        //     {
-        //       title: 'Indicateurs strategique',
-        //       url: '/programme/indicateurs-strategique',
-        //       icon: TrendingUp,
-        //     },
-        //     {
-        //       title: 'Indicateurs du CMR',
-        //       url: '/programme/indicateurs-cmr',
-        //       icon: TrendingUp,
-        //     },
-        //     {
-        //       title: 'pages de test',
-        //       url: '/programme/pagesTest',
-        //       icon: TrendingUp,
-        //     },
-        //   ],
-        // },
+        {
+          title: 'Politique',
+          icon: FileStack,
+          items: [
+            {
+              title: 'Liste des politiques et stratégies',
+              url: '/programme/liste',
+              icon: FileStack,
+            },
+            {
+              title: 'Cadre analytique',
+              url: '/programme/cadre-analytique',
+              icon: BarChart2,
+            },
+            {
+              title: 'Indicateurs du CMR',
+              url: '/programme/indicateurs-cmr',
+              icon: TrendingUp,
+            },
+          ],
+        },
 
         // ── Programmation ─────────────────────────────────────
         {

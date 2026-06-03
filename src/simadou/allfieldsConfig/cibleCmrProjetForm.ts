@@ -33,12 +33,14 @@ export const getCibleCmrProjetFormConfigForDialog = ({
   uglOptions,
   isLoadingIndicateurs,
   isLoadingUgls,
+  showProjetField = false,
 }: {
   anneeOptions: SelectOption[];
   indicateurOptions: SelectOption[];
   uglOptions: SelectOption[];
   isLoadingIndicateurs?: boolean;
   isLoadingUgls?: boolean;
+  showProjetField?: boolean;
 }): FormConfig => ({
   fields: [
     {
@@ -80,5 +82,17 @@ export const getCibleCmrProjetFormConfigForDialog = ({
       isLoading: isLoadingUgls,
       gridCols: 1,
     },
+    ...(showProjetField
+      ? [
+          {
+            name: "code_projet",
+            label: "Code du projet concerné",
+            type: "text" as const,
+            placeholder: "Entrez le code du projet (optionnel)",
+            required: false,
+            gridCols: 2 as const,
+          },
+        ]
+      : []),
   ],
 });
