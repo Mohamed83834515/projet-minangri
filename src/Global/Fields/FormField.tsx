@@ -55,6 +55,12 @@ export interface RichSelectOption {
   suffix?: string
 }
 
+function selectValuesMatch(a: unknown, b: unknown): boolean {
+  if (a == null && b == null) return true
+  if (a == null || b == null) return false
+  return String(a) === String(b)
+}
+
 interface FormFieldProps {
   field: FieldConfig & { options?: RichSelectOption[] }
   register: any
@@ -560,10 +566,10 @@ export const FormField = ({
             control={control}
             render={({ field: controllerField }) => {
               const options = (field.options || []) as RichSelectOption[]
-              const selectedOption = options.find(
-                (opt) =>
-                  opt.value === controllerField.value
+              const selectedOption = options.find((opt) =>
+                selectValuesMatch(opt.value, controllerField.value)
               )
+              const canClear = !field.required
               return (
                 <div className='relative min-w-0'>
                   <Popover open={comboboxOpen} onOpenChange={setComboboxOpen} modal={false}>
@@ -578,7 +584,7 @@ export const FormField = ({
                         }
                         className={cn(
                           'h-auto min-h-9 w-full min-w-0 justify-between gap-2 overflow-hidden font-normal whitespace-normal',
-                          !controllerField.value && 'text-muted-foreground',
+                          !selectedOption && 'text-muted-foreground',
                           isValid && 'border-green-500 focus:ring-green-500',
                           isInvalid && 'border-red-500 focus:ring-red-500'
                         )}
@@ -625,6 +631,28 @@ export const FormField = ({
                         <CommandList>
                           <CommandEmpty>Aucun résultat trouvé.</CommandEmpty>
                           <CommandGroup>
+                            {canClear ? (
+                              <CommandItem
+                                value='__none__'
+                                className='cursor-pointer text-muted-foreground italic'
+                                onSelect={() => {
+                                  controllerField.onChange(null)
+                                  setComboboxOpen(false)
+                                  setTouched(true)
+                                  if (trigger) trigger(field.name)
+                                }}
+                              >
+                                Aucun
+                                <Check
+                                  className={cn(
+                                    'ml-2 h-4 w-4 shrink-0',
+                                    controllerField.value == null
+                                      ? 'opacity-100'
+                                      : 'opacity-0'
+                                  )}
+                                />
+                              </CommandItem>
+                            ) : null}
                             {options.map((option) => (
                               <CommandItem
                                 key={option.value}
@@ -660,8 +688,10 @@ export const FormField = ({
                                 <Check
                                   className={cn(
                                     'ml-2 h-4 w-4 shrink-0',
-                                    controllerField.value ===
+                                    selectValuesMatch(
+                                      controllerField.value,
                                       option.value
+                                    )
                                       ? 'text-green-600 opacity-100'
                                       : 'opacity-0'
                                   )}

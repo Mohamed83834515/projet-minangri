@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input'
 import { SearchIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { GenericTable } from '@/Global/Generic/Generictable'
-import { GenericDialogs } from '@/Global/Generic/Genericdialogs'
 import { useEmbeddedTableState } from '@/hooks/use-embedded-table-state'
 import useDialogState from '@/hooks/use-dialog-state'
 import { useGetLocalitesByNiveau } from '@/simadou/allHooks/admin/localiteHooks'
@@ -17,7 +16,7 @@ import { useGetNiveauxLocalite } from '@/simadou/allHooks/admin/niveauLocaliteHo
     const [activeNiveau, setActiveNiveau] = useState<string>('0')
     const [searchTerm, setSearchTerm] = useState('')
     const { search, navigate } = useEmbeddedTableState()
-    const [open, setOpen] = useDialogState<'add'>(null)
+    const [, setOpen] = useDialogState<'add'>(null)
 
     const currentNiveauId = parseInt(activeNiveau)
     const { data: niveauData, refetch } = useGetLocalitesByNiveau(currentNiveauId)
@@ -48,10 +47,6 @@ import { useGetNiveauxLocalite } from '@/simadou/allHooks/admin/niveauLocaliteHo
     const handleAdd = () => {
         console.log('handleAdd called', currentNiveauId) // Debug
         setOpen('add')
-    }
-    const handleSuccess = () => {
-        refetch()
-        setOpen(null)
     }
 
     // Si aucun niveau n'existe

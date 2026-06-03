@@ -89,6 +89,13 @@ export function useGetCiblesCmrProjet(codeProjet: string | undefined) {
   })
 }
 
+export function useGetAllCiblesCmrProjet() {
+  return useQuery({
+    queryKey: cibleCmrProjetQueryKeys.all,
+    queryFn: () => cibleCmrProjetService.getAll(),
+  })
+}
+
 export function useCreateCibleCmrProjet(codeProjet: string | undefined) {
   const queryClient = useQueryClient()
   return useMutation({

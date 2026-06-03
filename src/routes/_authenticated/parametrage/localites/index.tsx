@@ -4,7 +4,6 @@ import { MapPin, Layers3 } from 'lucide-react'
 import { PageRouteLayout } from '@/Global/HookRoute/genericRoute'
 import ListeLocalite from '@/simadou/allfonctionalities/parametrage/localite/ListeLocalite'
 import NiveauLocaliteDialog from '@/simadou/allfonctionalities/parametrage/localite/niveau/NiveauDialog'
-import { useState } from 'react'
 import AddLocalite from '@/simadou/allfonctionalities/parametrage/localite/AddLocalite'
 
 export const Route = createFileRoute('/_authenticated/parametrage/localites/')({
@@ -13,7 +12,6 @@ export const Route = createFileRoute('/_authenticated/parametrage/localites/')({
 
 
 function RouteComponent() {
-  const [refreshKey, setRefreshKey] = useState(0)
   return (
     <PageRouteLayout
       title="Localités"

@@ -35,7 +35,10 @@ function signatairesOptions(acteurs: Acteur[]): SelectOption[] {
 
 function zoneOptions(localites: Localite[]): SelectOption[] {
   return localites
-    .filter((z) => z.niveau_loca?.nombre_nlc === 1)
+    .filter((z) => {
+      const niveau = z.niveau_loca
+      return typeof niveau === 'object' && niveau?.nombre_nlc === 1
+    })
     .map((z) => ({ value: z.id_loca, label: z.intitule_loca }))
 }
 
