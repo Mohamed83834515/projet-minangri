@@ -1,6 +1,3 @@
-import { useState } from "react"
-
-
 import { DynamicForm } from "@/Global/Forms/DynamicForm"
 
 import { getVersionPtbaFormConfig } from "@/simadou/allfieldsConfig/versionPtbaForm"

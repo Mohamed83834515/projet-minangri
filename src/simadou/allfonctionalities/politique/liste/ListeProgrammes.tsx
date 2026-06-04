@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
 import { getRouteApi } from '@tanstack/react-router'
+import { toast } from 'sonner'
 import {
   Dialog,
   DialogContent,
@@ -144,7 +145,16 @@ export default function ListeProgrammes() {
           currentRow={rowToDelete}
           entityName='ce programme'
           getEntityLabel={(row) => row.nom_programme}
-          onDelete={(row) => deleteMutation.mutate(row.id_programme)}
+          onDelete={(row) =>
+            deleteMutation.mutate(row.id_programme, {
+              onSuccess: () => {
+                toast.success('Programme supprimé avec succès')
+                setRowToDelete(null)
+              },
+              onError: () =>
+                toast.error('Erreur lors de la suppression du programme'),
+            })
+          }
         />
       ) : null}
     </>

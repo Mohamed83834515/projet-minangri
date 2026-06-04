@@ -200,13 +200,15 @@ export const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps>(
             {/* ── Pied du formulaire (aligné StepDynamicForm / PTBA) ── */}
             <div
               className={cn(
-                'flex items-center gap-4',
-                embedded ? 'justify-end pt-3' : 'justify-between px-6 py-4'
+                'flex flex-wrap items-center gap-2',
+                embedded
+                  ? 'justify-end pt-3'
+                  : 'justify-between gap-x-4 px-6 py-4'
               )}
             >
                 {/* Indicateur de statut (masqué en modal embarqué sauf erreurs) */}
                 {(!embedded || hasErrors) && (
-                <div className='flex items-center gap-2'>
+                <div className='flex min-w-0 shrink items-center gap-2'>
                   <span className='relative flex h-2 w-2'>
                     {(isDirty || hasErrors) && (
                       <span
@@ -234,7 +236,7 @@ export const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps>(
                 </div>
                 )}
 
-                <div className='flex items-center gap-2'>
+                <div className='flex shrink-0 items-center gap-2'>
                   {onBack && (
                     <Button
                       type='button'

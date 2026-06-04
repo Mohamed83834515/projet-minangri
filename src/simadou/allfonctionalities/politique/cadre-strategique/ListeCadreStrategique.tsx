@@ -19,13 +19,13 @@ import {
   useActiveProgramme,
   useActiveProgrammeId,
 } from '@/hooks/use-active-programme'
-import type { CadreAnalytique } from '@/simadou/allTypes/cadreAnalytique'
-import { buildCadreAnalytiqueColumns } from '@/simadou/allColonnes/cadre-analytique-columns'
+import type { CadreStrategique } from '@/simadou/allTypes/cadreStrategique'
+import { buildCadreStrategiqueColumns } from '@/simadou/allColonnes/cadre-strategique-columns'
 import {
-  useDeleteCadreAnalytique,
-  useGetCadresAnalytique,
-  useGetNiveauxCadreAnalytique,
-} from '@/simadou/allHooks/admin/cadreAnalytiqueHooks'
+  useDeleteCadreStrategique,
+  useGetCadresStrategique,
+  useGetNiveauxCadreStrategique,
+} from '@/simadou/allHooks/admin/cadreStrategiqueHooks'
 import { useGetActeurs } from '@/simadou/allHooks/admin/acteurHooks'
 import {
   NiveauTabTrigger,
@@ -33,14 +33,14 @@ import {
 } from '@/simadou/allfonctionalities/projets/detail/NiveauTabs'
 import {
   filterNiveauxByProgramme,
-  getNiveauCadreAnalytiqueLibelle,
-  resolveNiveauCaNumber,
-  sortNiveauxCadreAnalytique,
-} from '@/simadou/lib/cadreAnalytiqueUtils'
-import CadreAnalytiqueFormPanel from './CadreAnalytiqueFormPanel'
-import NiveauCadreAnalytiqueDialog from './NiveauCadreAnalytiqueDialog'
+  getNiveauCadreStrategiqueLibelle,
+  resolveNiveauCsNumber,
+  sortNiveauxCadreStrategique,
+} from '@/simadou/lib/cadreStrategiqueUtils'
+import CadreStrategiqueFormPanel from './CadreStrategiqueFormPanel'
+import NiveauCadreStrategiqueDialog from './NiveauCadreStrategiqueDialog'
 
-function CadreAnalytiqueNiveauTable({
+function CadreStrategiqueNiveauTable({
   niveauCodeNumber,
   cadres,
   acteurs,
@@ -50,17 +50,17 @@ function CadreAnalytiqueNiveauTable({
   onDeleteRequest,
 }: {
   niveauCodeNumber: number
-  cadres: CadreAnalytique[]
+  cadres: CadreStrategique[]
   acteurs: { id_acteur: number; nom_acteur: string; code_acteur: string }[]
   searchTerm: string
   tableKey: string
-  onEdit: (row: CadreAnalytique) => void
-  onDeleteRequest: (row: CadreAnalytique) => void
+  onEdit: (row: CadreStrategique) => void
+  onDeleteRequest: (row: CadreStrategique) => void
 }) {
   const { search, navigate } = useEmbeddedTableState()
 
   const columns = useMemo(
-    () => buildCadreAnalytiqueColumns({ cadres, acteurs, onEdit, onDeleteRequest }),
+    () => buildCadreStrategiqueColumns({ cadres, acteurs, onEdit, onDeleteRequest }),
     [cadres, acteurs, onEdit, onDeleteRequest]
   )
 
@@ -68,21 +68,21 @@ function CadreAnalytiqueNiveauTable({
     const normalizedSearch = searchTerm.trim().toLowerCase()
 
     return cadres.filter((cadre) => {
-      if (resolveNiveauCaNumber(cadre.niveau_ca) !== niveauCodeNumber) {
+      if (resolveNiveauCsNumber(cadre.niveau_cs) !== niveauCodeNumber) {
         return false
       }
 
       if (!normalizedSearch) return true
 
       return (
-        cadre.intutile_ca.toLowerCase().includes(normalizedSearch) ||
-        cadre.code_ca.toLowerCase().includes(normalizedSearch)
+        cadre.intutile_cs.toLowerCase().includes(normalizedSearch) ||
+        cadre.code_cs.toLowerCase().includes(normalizedSearch)
       )
     })
   }, [cadres, niveauCodeNumber, searchTerm])
 
   return (
-    <GenericTable<CadreAnalytique>
+    <GenericTable<CadreStrategique>
       key={tableKey}
       data={rows}
       columns={columns}
@@ -96,20 +96,20 @@ function CadreAnalytiqueNiveauTable({
   )
 }
 
-export default function ListeCadreAnalytique() {
+export default function ListeCadreStrategique() {
   const activeProgramme = useActiveProgramme()
   const programmeId = useActiveProgrammeId()
   const codeProgramme = activeProgramme?.code_programme
 
   const { data: niveaux = [], isLoading: isLoadingNiveaux } =
-    useGetNiveauxCadreAnalytique()
-  const { data: cadres = [], dataUpdatedAt } = useGetCadresAnalytique(programmeId)
+    useGetNiveauxCadreStrategique()
+  const { data: cadres = [], dataUpdatedAt } = useGetCadresStrategique(programmeId)
   const { data: acteurs = [] } = useGetActeurs()
-  const deleteMutation = useDeleteCadreAnalytique(programmeId)
+  const deleteMutation = useDeleteCadreStrategique(programmeId)
 
   const sortedNiveaux = useMemo(
     () =>
-      sortNiveauxCadreAnalytique(
+      sortNiveauxCadreStrategique(
         filterNiveauxByProgramme(niveaux, codeProgramme, programmeId)
       ),
     [niveaux, codeProgramme, programmeId]
@@ -121,22 +121,22 @@ export default function ListeCadreAnalytique() {
   const [searchTerm, setSearchTerm] = useState('')
   const [showForm, setShowForm] = useState(false)
   const [showNiveauxDialog, setShowNiveauxDialog] = useState(false)
-  const [selectedCadre, setSelectedCadre] = useState<CadreAnalytique | null>(null)
+  const [selectedCadre, setSelectedCadre] = useState<CadreStrategique | null>(null)
   const [deleteOpen, setDeleteOpen] = useDialogState<'delete'>(null)
-  const [cadreToDelete, setCadreToDelete] = useState<CadreAnalytique | null>(null)
+  const [cadreToDelete, setCadreToDelete] = useState<CadreStrategique | null>(null)
 
   useEffect(() => {
     if (sortedNiveaux.length > 0 && activeNiveauCode === '') {
-      setActiveNiveauCode(String(sortedNiveaux[0].code_number_nca))
+      setActiveNiveauCode(String(sortedNiveaux[0].code_number_nsc))
     }
   }, [sortedNiveaux, activeNiveauCode])
 
   const currentNiveauCode = Number(
-    activeNiveauCode || sortedNiveaux[0]?.code_number_nca || 0
+    activeNiveauCode || sortedNiveaux[0]?.code_number_nsc || 0
   )
 
   const currentNiveauLibelle = useMemo(() => {
-    const libelle = getNiveauCadreAnalytiqueLibelle(
+    const libelle = getNiveauCadreStrategiqueLibelle(
       niveaux,
       currentNiveauCode,
       codeProgramme
@@ -147,7 +147,7 @@ export default function ListeCadreAnalytique() {
   const countByNiveau = useMemo(() => {
     const counts = new Map<number, number>()
     for (const c of cadres) {
-      const n = resolveNiveauCaNumber(c.niveau_ca)
+      const n = resolveNiveauCsNumber(c.niveau_cs)
       if (n == null) continue
       counts.set(n, (counts.get(n) ?? 0) + 1)
     }
@@ -159,13 +159,13 @@ export default function ListeCadreAnalytique() {
     setSearchTerm('')
   }, [])
 
-  const handleEdit = useCallback((cadre: CadreAnalytique) => {
+  const handleEdit = useCallback((cadre: CadreStrategique) => {
     setSelectedCadre(cadre)
     setShowForm(true)
   }, [])
 
   const handleDeleteRequest = useCallback(
-    (cadre: CadreAnalytique) => {
+    (cadre: CadreStrategique) => {
       setCadreToDelete(cadre)
       setDeleteOpen('delete')
     },
@@ -179,7 +179,7 @@ export default function ListeCadreAnalytique() {
 
   const handleAddForm = () => {
     if (!hasNiveaux) {
-      toast.info('Configurez d’abord les niveaux du cadre analytique.')
+      toast.info('Configurez d’abord les niveaux du cadre stratégique.')
       setShowNiveauxDialog(true)
       return
     }
@@ -191,7 +191,7 @@ export default function ListeCadreAnalytique() {
     return (
       <Card className='border-dashed p-6 text-center'>
         <p className='text-sm text-muted-foreground'>
-          Sélectionnez un programme dans l&apos;en-tête pour gérer le cadre analytique.
+          Sélectionnez un programme dans l&apos;en-tête pour gérer le cadre stratégique.
         </p>
       </Card>
     )
@@ -212,7 +212,7 @@ export default function ListeCadreAnalytique() {
           <Settings className='mx-auto mb-4 h-10 w-10 text-muted-foreground' />
           <h3 className='mb-2 text-lg font-semibold'>Configuration requise</h3>
           <p className='mb-4 text-sm text-muted-foreground'>
-            Veuillez d&apos;abord configurer les niveaux du cadre analytique avant
+            Veuillez d&apos;abord configurer les niveaux du cadre stratégique avant
             de pouvoir ajouter des cadres.
           </p>
           <Button type='button' onClick={() => setShowNiveauxDialog(true)}>
@@ -221,7 +221,7 @@ export default function ListeCadreAnalytique() {
           </Button>
         </Card>
 
-        <NiveauCadreAnalytiqueDialog
+        <NiveauCadreStrategiqueDialog
           open={showNiveauxDialog}
           onOpenChange={setShowNiveauxDialog}
         />
@@ -241,11 +241,11 @@ export default function ListeCadreAnalytique() {
             <NiveauTabsList>
               {sortedNiveaux.map((n) => (
                 <NiveauTabTrigger
-                  key={n.id_nca}
-                  value={String(n.code_number_nca)}
-                  count={countByNiveau.get(Number(n.code_number_nca)) ?? 0}
+                  key={n.id_nsc}
+                  value={String(n.code_number_nsc)}
+                  count={countByNiveau.get(Number(n.code_number_nsc)) ?? 0}
                 >
-                  {n.libelle_nca}
+                  {n.libelle_nsc}
                 </NiveauTabTrigger>
               ))}
             </NiveauTabsList>
@@ -270,17 +270,17 @@ export default function ListeCadreAnalytique() {
 
         {sortedNiveaux.map((n) => (
           <TabsContent
-            key={n.id_nca}
-            value={String(n.code_number_nca)}
+            key={n.id_nsc}
+            value={String(n.code_number_nsc)}
             className='mt-3'
           >
-            {Number(n.code_number_nca) === currentNiveauCode && (
-              <CadreAnalytiqueNiveauTable
-                niveauCodeNumber={Number(n.code_number_nca)}
+            {Number(n.code_number_nsc) === currentNiveauCode && (
+              <CadreStrategiqueNiveauTable
+                niveauCodeNumber={Number(n.code_number_nsc)}
                 cadres={cadres}
                 acteurs={acteurs}
                 searchTerm={searchTerm}
-                tableKey={`cadres-ca-${n.id_nca}-${dataUpdatedAt}-${cadres.length}-${searchTerm}`}
+                tableKey={`cadres-cs-${n.id_nsc}-${dataUpdatedAt}-${cadres.length}-${searchTerm}`}
                 onEdit={handleEdit}
                 onDeleteRequest={handleDeleteRequest}
               />
@@ -290,21 +290,21 @@ export default function ListeCadreAnalytique() {
       </Tabs>
 
       {cadreToDelete && (
-        <GenericDeleteDialog<CadreAnalytique>
+        <GenericDeleteDialog<CadreStrategique>
           open={deleteOpen === 'delete'}
           onOpenChange={(isOpen) => setDeleteOpen(isOpen ? 'delete' : null)}
           currentRow={cadreToDelete}
-          entityName='le cadre analytique'
-          getEntityLabel={(row) => row.intutile_ca}
+          entityName='le cadre stratégique'
+          getEntityLabel={(row) => row.intutile_cs}
           onDelete={(row) =>
-            deleteMutation.mutate(row.id_ca, {
+            deleteMutation.mutate(row.id_cs, {
               onSuccess: () => {
-                toast.success('Cadre analytique supprimé avec succès')
+                toast.success('Cadre stratégique supprimé avec succès')
                 setCadreToDelete(null)
                 setDeleteOpen(null)
               },
               onError: () =>
-                toast.error('Erreur lors de la suppression du cadre analytique'),
+                toast.error('Erreur lors de la suppression du cadre stratégique'),
             })
           }
         />
@@ -320,7 +320,7 @@ export default function ListeCadreAnalytique() {
             </DialogTitle>
           </DialogHeader>
           <div className='px-6 py-4'>
-            <CadreAnalytiqueFormPanel
+            <CadreStrategiqueFormPanel
               programmeId={programmeId}
               codeProgramme={codeProgramme}
               niveauCodeNumber={currentNiveauCode}
@@ -334,7 +334,7 @@ export default function ListeCadreAnalytique() {
         </DialogContent>
       </Dialog>
 
-      <NiveauCadreAnalytiqueDialog
+      <NiveauCadreStrategiqueDialog
         open={showNiveauxDialog}
         onOpenChange={setShowNiveauxDialog}
       />
