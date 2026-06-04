@@ -90,14 +90,13 @@ export const buildPtbasColumns = (
     const baseColumns = buildColumns<Ptba>([
         { type: "text", key: "code_activite_ptba", title: "Code", sticky: true },
         { type: "text", key: "intitule_activite_ptba", title: "Activité" },
-        { type: "text", key: "responsable_ptba", title: "Responsable" },
     ])
 
     const actionsColumn: ColumnDef<Ptba> = {
-        id: "actions",
-        accessorKey: 'id_ptba',
+        id: "responsable_ptba",
+        accessorKey: 'responsable_ptba',
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='Actions' />
+            <DataTableColumnHeader column={column} title='Responsable' />
         ),
         cell: (props) => (
             <PtbasRowActions
@@ -109,13 +108,44 @@ export const buildPtbasColumns = (
         enableSorting: false,
         enableHiding: false,
     }
+    const responsableColumn: ColumnDef<Ptba> = {
+        id: "actions",
+        accessorKey: 'id_ptba',
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title='Actions' />
+        ),
+        cell: ({ row }) => {
+            const responsable = row.original.responsable_ptba;
+
+            let nomComplet = "-";
+            if (responsable && typeof responsable === "object") {
+                const prenom = responsable.prenom_perso || "";
+                const nom = responsable.nom_perso || "";
+                nomComplet = `${prenom} ${nom}`.trim() || "-";
+            }
+
+            return (
+                <div className='flex justify-center'>
+                    {nomComplet !== "-" ? (
+                        <span className='inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-950/30 dark:text-blue-400'>
+                            {nomComplet}
+                        </span>
+                    ) : (
+                        <span className='text-sm text-muted-foreground'>-</span>
+                    )}
+                </div>
+            )
+        },
+        enableSorting: false,
+        enableHiding: false,
+    }
 
     const chronogrammeColumns: ColumnDef<Ptba>[] = getMoisOptions().map((mois) => ({
         id: `chronogramme_${mois.value}`,
         header: ({ column }) => (
             <DataTableColumnHeader
                 column={column}
-                title={mois.label}
+                title={mois.value}
                 className="text-center"
             />
         ),
@@ -139,7 +169,12 @@ export const buildPtbasColumns = (
             <DataTableColumnHeader column={column} title='Coût' />
         ),
         cell: () => (
-            <span className='tabular-nums'>300 000</span>
+            <div className='flex justify-center'>
+                <span className='inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold tabular-nums text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400'>
+                    <span className='mr-1 text-emerald-500'>💰</span>
+                    300 000
+                </span>
+            </div>
         ),
         meta: { thClassName: 'text-center', className: 'text-center' },
         enableSorting: false,
@@ -147,7 +182,7 @@ export const buildPtbasColumns = (
     }
 
     const planificationColumn: ColumnDef<Ptba> = {
-        id: 'planification`',
+        id: 'planification',
         header: ({ column }) => (
             <DataTableColumnHeader
                 column={column}
@@ -158,30 +193,34 @@ export const buildPtbasColumns = (
         cell: ({ row }) => {
             const activite = row.original
             return (
-                <Button
-                    type='button'
-                    variant='ghost'
-                    size='icon'
-                    className='mx-auto flex h-8 w-8 shrink-0 text-primary'
-                    onClick={() => onOpenPlanification(activite)}
-                    aria-label='Ouvrir le suivi des tâches et indicateurs'
-                    title='Suivi des tâches et indicateurs'
-                >
-                    <ClipboardList className='h-5 w-5' /> Planifier
-                </Button>
+                <div className='flex justify-center'>
+                    <Button
+                        type='button'
+                        variant='outline'
+                        size='sm'
+                        className='gap-2 border-blue-200 bg-blue-50 text-blue-700 transition-all duration-200 hover:bg-blue-100 hover:text-blue-800 dark:border-blue-800 dark:bg-blue-950/30 dark:text-blue-400 dark:hover:bg-blue-950/50'
+                        onClick={() => onOpenPlanification(activite)}
+                        aria-label='Ouvrir le suivi des tâches et indicateurs'
+                        title='Suivi des tâches et indicateurs'
+                    >
+                        <ClipboardList className='h-4 w-4' />
+                        <span className='text-xs font-medium'>Planifier</span>
+                    </Button>
+                </div>
             )
         },
         meta: {
-            thClassName: 'text-center w-[72px]',
+            thClassName: 'text-center w-[100px]',
             className: 'text-center align-middle',
         },
-        size: 72,
+        size: 100,
         enableSorting: false,
         enableHiding: false,
     }
 
     return [
         ...baseColumns,
+        responsableColumn,
         ...chronogrammeColumns,
         planificationColumn,
         coutColumns,

@@ -10,6 +10,7 @@ import { DIALOG_SIZES } from '@/Global/Forms/dialog'
 import type { Ptba } from '@/simadou/allTypes'
 import { activiteModalTitle } from './activite-modal-utils'
 import { ActiviteTabbedDialogProvider } from './ActiviteTabbedDialogContext'
+import { CHART_COLORS, useColor } from '@/stores/others/color-store'
 
 export type ActiviteTabConfig = {
   value: string
@@ -34,6 +35,9 @@ export default function ActiviteTabbedDialog({
   defaultTab,
   title,
 }: ActiviteTabbedDialogProps) {
+
+  const { color } = useColor()
+  const { stroke } = CHART_COLORS[color]
   const [subViewActive, setSubViewActive] = useState(false)
   const initialTab = defaultTab ?? tabs[0]?.value ?? ''
 
@@ -59,7 +63,14 @@ export default function ActiviteTabbedDialog({
             <Tabs
               key={activite.id_ptba}
               defaultValue={initialTab}
-              className='w-full'
+              orientation='vertical'
+              className='space-y-4'
+              style={
+                {
+                  '--tab-active-bg': stroke,
+                  '--tab-active-color': '#ffffff',
+                } as React.CSSProperties
+              }
             >
               {!subViewActive && (
                 <TabsList className='flex h-auto w-full flex-wrap gap-1'>

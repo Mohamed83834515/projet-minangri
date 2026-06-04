@@ -39,9 +39,10 @@ const cadre_strategiques = await getCadreStrategiques();
 const ugls = await getUgls();
 
 // Transformer les données en options pour le select
-const typeActivitesOptions = typeActivitesData?.map((item: any) => ({
+const typeActivitesOptions = typeActivitesData?.map((item: any) => (
+    {
     label: item.intutile_type,
-    value: String(item.code_type) 
+    value: String(item.code_type)
 })) || [];
 
 const cadre_analytiquesOptions = cadre_analytiques
@@ -52,12 +53,16 @@ const cadre_analytiquesOptions = cadre_analytiques
     })) || [];
 
 const localiteOptions = localites
-    .filter((localite) => localite.id_loca !== undefined)
+    .filter((localite) => {
+        if (typeof localite.niveau_loca === 'object' && localite.niveau_loca !== null) {
+            return localite.niveau_loca.nombre_nlc === 1;
+        }
+        return localite.niveau_loca === 1;
+    })
     .map((localite) => ({
         value: localite.id_loca as number,
         label: localite.intitule_loca,
     }));
-
 const acteurOptions = acteurs
     .filter((acteur) => acteur.id_acteur !== undefined)
     .map((acteur) => ({
@@ -92,16 +97,14 @@ export const getPtbaFormConfig = (): FormConfig => ({
         {
             step: 1,
             title: "Identité",
-            description: "Informations & chronogramme",
         },
         {
             step: 2,
             title: "Coordonnées",
-            description: "Localisation & gestion",
         }
     ],
     fields: [
-        
+
         // texte - Code activité PTBA
         {
             name: "code_activite_ptba",
@@ -112,7 +115,7 @@ export const getPtbaFormConfig = (): FormConfig => ({
             gridCols: 2,
             formStep: 1,
         },
-       
+
         // select - Type activité
         {
             name: "type_activite",
@@ -135,7 +138,7 @@ export const getPtbaFormConfig = (): FormConfig => ({
             gridCols: 1,
             formStep: 1,
         },
-         // select - Cadre analytique (optionnel)
+        // select - Cadre analytique (optionnel)
         {
             name: "cadre_analytique",
             label: "Cadre analytique",
@@ -174,7 +177,7 @@ export const getPtbaFormConfig = (): FormConfig => ({
         // select - Code CRP (optionnel)
         {
             name: "code_crp",
-            label: "Code CRP",
+            label: "Cadre strategique",
             type: "select",
             placeholder: "Sélectionner un cadre stratégique (optionnel)",
             required: false,

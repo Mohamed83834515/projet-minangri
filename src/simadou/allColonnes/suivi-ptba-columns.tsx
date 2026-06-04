@@ -41,40 +41,6 @@ export function buildSuiviPtbaColumns(
     { type: 'plain', key: 'version_ptba', title: 'Version PTBA' },
   ])
 
-  const suiviColumn: ColumnDef<Ptba> = {
-    id: 'suivi',
-    header: ({ column }) => (
-      <DataTableColumnHeader
-        column={column}
-        title='Suivis'
-        className='w-full text-center'
-      />
-    ),
-    cell: ({ row }) => {
-      const activite = row.original
-      return (
-        <Button
-          type='button'
-          variant='ghost'
-          size='icon'
-          className='mx-auto flex h-8 w-8 shrink-0 text-primary'
-          onClick={() => onOpenSuivi(activite)}
-          aria-label='Ouvrir le suivi des tâches et indicateurs'
-          title='Suivi des tâches et indicateurs'
-        >
-          <ClipboardList className='h-5 w-5' /> Suivre
-        </Button>
-      )
-    },
-    meta: {
-      thClassName: 'text-center w-[72px]',
-      className: 'text-center align-middle',
-    },
-    size: 72,
-    enableSorting: false,
-    enableHiding: false,
-  }
-
   const avancementColumn: ColumnDef<Ptba> = {
     id: 'avancement_taches',
     header: ({ column }) => (
@@ -97,9 +63,47 @@ export function buildSuiviPtbaColumns(
         />
       )
     },
+    maxSize:150,
     enableSorting: false,
     enableHiding: false,
   }
+  const suiviColumn: ColumnDef<Ptba> = {
+    id: 'suivi',
+    header: ({ column }) => (
+      <DataTableColumnHeader
+        column={column}
+        title='Suivis des resultats'
+        className='w-full text-center'
+      />
+    ),
+    cell: ({ row }) => {
+      const activite = row.original
+      return (
+        <div className='flex justify-center'>
+          <Button
+            type='button'
+            variant='outline'
+            size='sm'
+            className='gap-2 border-yellow-200 bg-yellow-50 text-yellow-700 transition-all duration-200 hover:bg-yellow-100 hover:text-yellow-800 dark:border-yellow-800 dark:bg-yellow-950/30 dark:text-yellow-400 dark:hover:bg-yellow-950/50'
+            onClick={() => onOpenSuivi(activite)}
+            aria-label='Ouvrir le suivi des tâches et indicateurs'
+            title='Suivi des tâches et indicateurs'
+          >
+            <ClipboardList className='h-4 w-4' />
+            <span className='text-xs font-medium'>Suivre</span>
+          </Button>
+        </div>
+      )
+    },
+    meta: {
+      thClassName: 'text-center w-[100px]',
+      className: 'text-center align-middle',
+    },
+    size: 100,
+    enableSorting: false,
+    enableHiding: false,
+  }
+
 
   const observationsColumn: ColumnDef<Ptba> = {
     id: 'observations',
@@ -120,5 +124,5 @@ export function buildSuiviPtbaColumns(
     enableHiding: false,
   }
 
-  return [...baseColumns, suiviColumn, avancementColumn, observationsColumn]
+  return [...baseColumns, avancementColumn, suiviColumn,  observationsColumn]
 }
