@@ -1,4 +1,4 @@
-import {useCallback, useMemo, useState } from 'react'
+import {useCallback, useState } from 'react'
 import {
   CircleCheck,
   RotateCcw,
@@ -12,10 +12,6 @@ import {
 // import { IconThemeDark } from '@/assets/custom/icon-theme-dark'
 // import { IconThemeLight } from '@/assets/custom/icon-theme-light'
 import {
-  CHART_COLORS,
-  type ChartColorKey,
-  HEADER_COLORS,
-  type HeaderColorKey,
   useColor,
 } from '@/stores/others/color-store'
 import { useDirection } from '@/stores/others/direction-store'
