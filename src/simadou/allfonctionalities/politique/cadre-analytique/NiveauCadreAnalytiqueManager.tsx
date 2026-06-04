@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { Plus, Save, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -11,14 +12,19 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { useActiveProgrammeCode } from '@/hooks/use-active-programme'
+import {
+  useActiveProgrammeCode,
+  useActiveProgrammeId,
+} from '@/hooks/use-active-programme'
 import type { NiveauCadreAnalytique } from '@/simadou/allTypes/cadreAnalytique'
 import {
+  niveauCadreAnalytiqueQueryKeys,
   useCreateNiveauCadreAnalytique,
   useDeleteNiveauCadreAnalytique,
   useGetNiveauxCadreAnalytique,
   useUpdateNiveauCadreAnalytique,
 } from '@/simadou/allHooks/admin/cadreAnalytiqueHooks'
+import { niveauCadreAnalytiqueService } from '@/simadou/allSercices/niveauCadreAnalytiqueService'
 import {
   filterNiveauxByProgramme,
   sortNiveauxCadreAnalytique,
@@ -44,32 +50,55 @@ function createEmptyRow(): NiveauRow {
   return { libelle: '', codeLength: 2, isNew: true }
 }
 
+function rowsFromNiveaux(niveaux: NiveauCadreAnalytique[]): NiveauRow[] {
+  return niveaux.length > 0 ? niveaux.map(toRow) : [createEmptyRow()]
+}
+
 export default function NiveauCadreAnalytiqueManager() {
+  const queryClient = useQueryClient()
   const codeProgramme = useActiveProgrammeCode()
+  const programmeId = useActiveProgrammeId()
   const { data: niveaux = [], isLoading } = useGetNiveauxCadreAnalytique()
   const createMutation = useCreateNiveauCadreAnalytique()
   const updateMutation = useUpdateNiveauCadreAnalytique()
   const deleteMutation = useDeleteNiveauCadreAnalytique()
 
   const niveauxProgramme = useMemo(
-    () => sortNiveauxCadreAnalytique(filterNiveauxByProgramme(niveaux, codeProgramme)),
-    [niveaux, codeProgramme]
+    () =>
+      sortNiveauxCadreAnalytique(
+        filterNiveauxByProgramme(niveaux, codeProgramme, programmeId)
+      ),
+    [niveaux, codeProgramme, programmeId]
   )
 
-  const [rows, setRows] = useState<NiveauRow[]>([])
-  const [initialized, setInitialized] = useState(false)
+  const [rows, setRows] = useState<NiveauRow[]>([createEmptyRow()])
+  const [isDirty, setIsDirty] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const skipSyncRef = useRef(false)
+
+  const syncRowsFromQuery = useCallback(() => {
+    setRows(rowsFromNiveaux(niveauxProgramme))
+    setIsDirty(false)
+  }, [niveauxProgramme])
 
   useEffect(() => {
-    if (initialized || isLoading) return
-    if (niveauxProgramme.length === 0) {
-      setRows([createEmptyRow()])
-    } else {
-      setRows(niveauxProgramme.map(toRow))
+    setIsDirty(false)
+    skipSyncRef.current = false
+  }, [codeProgramme])
+
+  useEffect(() => {
+    if (isLoading || isDirty) return
+    if (skipSyncRef.current) {
+      skipSyncRef.current = false
+      return
     }
-    setInitialized(true)
-  }, [initialized, isLoading, niveauxProgramme])
+    syncRowsFromQuery()
+  }, [isLoading, isDirty, syncRowsFromQuery])
+
+  const markDirty = () => setIsDirty(true)
 
   const onAddRow = () => {
+    markDirty()
     setRows((prev) => [...prev, createEmptyRow()])
   }
 
@@ -85,6 +114,7 @@ export default function NiveauCadreAnalytiqueManager() {
       return
     }
 
+    setIsSaving(true)
     try {
       let order = 0
       for (const row of rows) {
@@ -104,10 +134,21 @@ export default function NiveauCadreAnalytiqueManager() {
         }
       }
 
+      const fresh = await queryClient.fetchQuery({
+        queryKey: niveauCadreAnalytiqueQueryKeys.all,
+        queryFn: () => niveauCadreAnalytiqueService.getAll(),
+      })
+      const synced = sortNiveauxCadreAnalytique(
+        filterNiveauxByProgramme(fresh, codeProgramme, programmeId)
+      )
+      skipSyncRef.current = true
+      setRows(rowsFromNiveaux(synced))
+      setIsDirty(false)
       toast.success('Niveaux sauvegardés avec succès')
-      setInitialized(false)
     } catch {
       toast.error('Erreur lors de la sauvegarde')
+    } finally {
+      setIsSaving(false)
     }
   }
 
@@ -119,14 +160,24 @@ export default function NiveauCadreAnalytiqueManager() {
       if (!window.confirm('Supprimer ce niveau ?')) return
       try {
         await deleteMutation.mutateAsync(row.id)
+        const fresh = await queryClient.fetchQuery({
+          queryKey: niveauCadreAnalytiqueQueryKeys.all,
+          queryFn: () => niveauCadreAnalytiqueService.getAll(),
+        })
+        const synced = sortNiveauxCadreAnalytique(
+          filterNiveauxByProgramme(fresh, codeProgramme, programmeId)
+        )
+        skipSyncRef.current = true
+        setRows(rowsFromNiveaux(synced))
+        setIsDirty(false)
         toast.success('Niveau supprimé')
-        setInitialized(false)
       } catch {
         toast.error('Erreur lors de la suppression')
       }
       return
     }
 
+    markDirty()
     setRows((prev) => prev.filter((_, i) => i !== index))
   }
 
@@ -138,7 +189,7 @@ export default function NiveauCadreAnalytiqueManager() {
     )
   }
 
-  if (isLoading && !initialized) {
+  if (isLoading && !isDirty && rows.every((r) => r.isNew && !r.libelle)) {
     return <div className='py-6 text-sm text-muted-foreground'>Chargement…</div>
   }
 
@@ -149,13 +200,17 @@ export default function NiveauCadreAnalytiqueManager() {
           Définissez les niveaux du cadre analytique pour le programme actif.
         </p>
         <div className='flex flex-col gap-2 sm:flex-row'>
-          <Button type='button' variant='outline' onClick={onAddRow}>
+          <Button type='button' variant='outline' onClick={onAddRow} disabled={isSaving}>
             <Plus className='h-4 w-4' />
             Ajouter un niveau
           </Button>
-          <Button type='button' onClick={onSave}>
+          <Button
+            type='button'
+            onClick={onSave}
+            disabled={isSaving || rows.every((r) => !r.libelle.trim())}
+          >
             <Save className='h-4 w-4' />
-            Sauvegarder
+            {isSaving ? 'Sauvegarde…' : 'Sauvegarder'}
           </Button>
         </div>
       </div>
@@ -176,13 +231,15 @@ export default function NiveauCadreAnalytiqueManager() {
                   <Input
                     value={row.libelle}
                     placeholder='Ex: Objectif analytique'
-                    onChange={(e) =>
+                    disabled={isSaving}
+                    onChange={(e) => {
+                      markDirty()
                       setRows((p) =>
                         p.map((r, i) =>
                           i === index ? { ...r, libelle: e.target.value } : r
                         )
                       )
-                    }
+                    }}
                   />
                 </TableCell>
                 <TableCell>
@@ -191,7 +248,9 @@ export default function NiveauCadreAnalytiqueManager() {
                     min={1}
                     max={10}
                     value={row.codeLength}
-                    onChange={(e) =>
+                    disabled={isSaving}
+                    onChange={(e) => {
+                      markDirty()
                       setRows((p) =>
                         p.map((r, i) =>
                           i === index
@@ -199,7 +258,7 @@ export default function NiveauCadreAnalytiqueManager() {
                             : r
                         )
                       )
-                    }
+                    }}
                   />
                 </TableCell>
                 <TableCell className='text-end'>
@@ -207,7 +266,7 @@ export default function NiveauCadreAnalytiqueManager() {
                     type='button'
                     variant='ghost'
                     size='icon'
-                    disabled={index !== rows.length - 1}
+                    disabled={isSaving || index !== rows.length - 1}
                     onClick={() => onRemoveRow(index)}
                     title={
                       index === rows.length - 1
