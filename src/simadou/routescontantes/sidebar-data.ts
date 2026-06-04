@@ -17,6 +17,8 @@ import {
   FileStack,
   BarChart2,
   TrendingUp,
+  Target,
+  LineChart,
 } from 'lucide-react'
 import { type SidebarData } from '../../components/layout/others/types'
 
@@ -138,6 +140,16 @@ export const sidebarData: SidebarData = {
               title: 'Indicateurs du CMR',
               url: '/programme/indicateurs-cmr',
               icon: TrendingUp,
+            },
+            {
+              title: 'Cadre stratégique',
+              url: '/programme/cadre-strategique',
+              icon: Target,
+            },
+            {
+              title: 'Indicateurs stratégiques',
+              url: '/programme/indicateurs-performance',
+              icon: LineChart,
             },
           ],
         },

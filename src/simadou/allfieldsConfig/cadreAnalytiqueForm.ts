@@ -27,7 +27,17 @@ export function getCadreAnalytiqueFormConfigForDialog({
         placeholder: `Code de ${codeLength} caractères`,
         required: true,
         maxLength: codeLength,
-        gridCols: 1,
+        gridCols: 2,
+      },
+      {
+        name: 'partenaire_ca',
+        label: 'Partenaire',
+        type: 'select',
+        placeholder: '-- Choisir un partenaire --',
+        required: false,
+        options: acteurOptions,
+        isLoading: isLoadingActeurs,
+        gridCols: 2,
       },
       {
         name: 'intutile_ca',
@@ -35,6 +45,14 @@ export function getCadreAnalytiqueFormConfigForDialog({
         type: 'text',
         placeholder: "Entrez l'intitulé",
         required: true,
+        gridCols: 2,
+      },
+      {
+        name: 'abgrege_ca',
+        label: 'Abrégé',
+        type: 'text',
+        placeholder: "Entrez l'abrégé",
+        required: false,
         gridCols: 2,
       },
       {
@@ -46,14 +64,6 @@ export function getCadreAnalytiqueFormConfigForDialog({
         min: 0,
         step: 0.01,
         gridCols: 1,
-      },
-      {
-        name: 'abgrege_ca',
-        label: 'Abrégé',
-        type: 'text',
-        placeholder: "Entrez l'abrégé",
-        required: false,
-        gridCols: 2,
       },
       ...(showParent
         ? [
@@ -72,16 +82,6 @@ export function getCadreAnalytiqueFormConfigForDialog({
             },
           ]
         : []),
-      {
-        name: 'partenaire_ca',
-        label: 'Partenaire',
-        type: 'select',
-        placeholder: '-- Choisir un partenaire --',
-        required: false,
-        options: acteurOptions,
-        isLoading: isLoadingActeurs,
-        gridCols: 2,
-      },
     ],
   }
 }

@@ -1,12 +1,5 @@
 import type { FormConfig, SelectOption } from "../../Global/types/formConfig";
-
-const PERIODICITE_OPTIONS: SelectOption[] = [
-  { value: "Mensuel", label: "Mensuel" },
-  { value: "Trimestriel", label: "Trimestriel" },
-  { value: "Semestriel", label: "Semestriel" },
-  { value: "Annuel", label: "Annuel" },
-  { value: "Ponctuel", label: "Ponctuel" },
-];
+import { PERIODICITE_OPTIONS } from "./periodiciteOptions";
 
 export const getIndicateurCadreResultatFormConfigForDialog = ({
   cadreOptions,
