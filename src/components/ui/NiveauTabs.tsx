@@ -1,6 +1,4 @@
 import { TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { cn } from '@/lib/utils'
-
 interface NiveauTabTriggerProps {
   value: string
   count?: number
