@@ -98,11 +98,11 @@ export const sidebarData: SidebarData = {
             //   url: '/parametrage/conventions',
             //   icon: FileText,
             // },
-            // {
-            //   title: 'Plans de Site',
-            //   url: '/parametrage/plans-de-site',
-            //   icon: ClipboardList,
-            // },
+            {
+              title: 'Plans de Site',
+              url: '/parametrage/plans-de-site',
+              icon: ClipboardList,
+            },
             {
               title: 'Dictionnaire des indicateurs',
               url: '/parametrage/dictionnaire-indicateurs',
