@@ -596,7 +596,7 @@ export const FormField = ({
                               className={cn(
                                 'truncate',
                                 selectedOption.isInscrit &&
-                                  'font-medium text-green-700 dark:text-green-400'
+                                'font-medium text-green-700 dark:text-green-400'
                               )}
                             >
                               {selectedOption.label}
@@ -749,8 +749,8 @@ export const FormField = ({
                             'h-auto min-h-9 w-full min-w-0 justify-between gap-2 overflow-hidden font-normal whitespace-normal',
                             !controllerField.value && 'text-muted-foreground',
                             isValid &&
-                              !isOtherSelected &&
-                              'border-green-500 focus:ring-green-500',
+                            !isOtherSelected &&
+                            'border-green-500 focus:ring-green-500',
                             isInvalid && 'border-red-500 focus:ring-red-500'
                           )}
                           onClick={() => setTouched(true)}
@@ -916,7 +916,7 @@ export const FormField = ({
               onBlur={handleBlur}
               className={cn(
                 field.className?.includes('resize-y') &&
-                  'field-sizing-fixed min-h-[4.5rem] max-h-[min(24vh,9.5rem)] resize-y overflow-y-auto',
+                'field-sizing-fixed min-h-[4.5rem] max-h-[min(24vh,9.5rem)] resize-y overflow-y-auto',
                 field.className,
                 isValid && 'border-green-500 focus:ring-green-500',
                 isInvalid && 'border-red-500 focus:ring-red-500'
@@ -1036,14 +1036,13 @@ export const FormField = ({
                       )
                     })}
                   </div>
-
-                  {/* APERÇU */}
+                  {/* 
                   {selectedMois.length > 0 && (
                     <div className="rounded-lg bg-gray-50 p-3 text-sm text-gray-700">
                       <strong>Mois sélectionnés :</strong>{" "}
                       {selectedMois.join(", ")}
                     </div>
-                  )}
+                  )} */}
 
                   {/* ERROR */}
                   {error && (
@@ -1159,6 +1158,7 @@ export const FormField = ({
                       <Input
                         value={tagInput}
                         placeholder={field.placeholder}
+                        disabled={field.disabled}
                         onChange={(e) => setTagInput(e.target.value)}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') {
@@ -1245,7 +1245,7 @@ export const FormField = ({
                 className={cn(
                   'flex items-center justify-between gap-4',
                   useCard &&
-                    'rounded-lg border border-border/60 bg-muted/20 px-4 py-3',
+                  'rounded-lg border border-border/60 bg-muted/20 px-4 py-3',
                   field.className
                 )}
               >

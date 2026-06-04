@@ -1,6 +1,7 @@
 import { Acteur } from "./acteur";
 import { CadreAnalytique } from "./cadreAnalytique";
 import { Localite } from "./localite";
+import { Personnel } from "./personnel";
 import { PlanSite } from "./planSite";
 
 export interface Ptba extends Record<string, unknown> {
@@ -14,7 +15,7 @@ export interface Ptba extends Record<string, unknown> {
   statut_activite: string; // max 100 chars
   code_crp?: string; // Code du Cadre stratégique concerné, relation vers CadreStrategique
   cadre_analytique?: string | CadreAnalytique; // Code du Cadre analytique concerné, relation vers CadreAnalytique via code_ca
-  responsable_ptba?: number; // Code du PlanSite responsable
+  responsable_ptba?: Personnel |  number; // Code du PlanSite responsable
   direction_ptba?: string; // Code du PlanSite direction, relation vers PlanSite via code_ds
   code_programme?: string;
   version_ptba: number; // Relation vers VersionPtba

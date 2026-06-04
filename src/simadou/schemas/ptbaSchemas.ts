@@ -12,8 +12,7 @@ export const typeActiviteSchema = z.object({
     .max(200, "L'intitulé ne peut pas dépasser 200 caractères"),
   description: z
     .string()
-    .min(1, "La description est requise")
-    .max(500, "La description ne peut pas dépasser 500 caractères"),
+   .optional(),
 });
 
 // Schéma pour VersionPtba
@@ -31,9 +30,11 @@ export const versionPtbaSchema = z.object({
     .string()
     .max(500, "L'observation ne peut pas dépasser 500 caractères")
     .optional(),
-  documentUrl: z
-    .file()
-    .optional(),
+  documentUrl: z.union([
+    z.instanceof(File),
+    z.string().
+      optional(),
+  ]),
   statut_version: z
     .number()
     .int("Le statut doit être un entier")
@@ -77,7 +78,7 @@ export const chronogrammeSchema = z
       message:
         "Le chronogramme contient des mois invalides",
     }
-    
+
   );
 // Schéma pour Ptba
 export const ptbaSchema = z.object({
@@ -125,7 +126,7 @@ export const ptbaSchema = z.object({
     .max(50, "Le code programme ne peut pas dépasser 50 caractères")
     .optional(),
   version_ptba: z
-  .number("La version PTBA est requise"),
+    .number("La version PTBA est requise"),
   type_activite: z
     .string()
     .min(1, "Le type d'activité doit être sélectionné"),

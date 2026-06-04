@@ -6,7 +6,7 @@ import useDialogState from '@/hooks/use-dialog-state'
 import { useDeleteSuiviIndicateur } from '@/simadou/allHooks/admin/indicateurTacheHooks'
 import { toast } from 'sonner'
 import { GenericDeleteDialog } from '@/Global/Tableaux/GenericDeleteDialog'
-import { Button } from '@/components/ui/button'
+// import { Button } from '@/components/ui/button'
 import { IndicateurTache } from '@/simadou/allTypes/indicateurTache'
 import { buildIndicateurTacheColumns } from '@/simadou/allColonnes/indicateur-taches-columns'
 import { DataTableToolbarOutlineButton } from '@/components/data-table/toolbar-outline-button'
@@ -49,11 +49,11 @@ export default function IndicateurTacheList({
   return (
     <>
       <div className="space-y-4">
-        <div className="flex justify-end">
+        {/* <div className="flex justify-end">
           <Button onClick={onAdd} variant="outline">
             Ajouter un indicateur
           </Button>
-        </div>
+        </div> */}
 
         <GenericTable<IndicateurTache>
           data={indicateurs}
