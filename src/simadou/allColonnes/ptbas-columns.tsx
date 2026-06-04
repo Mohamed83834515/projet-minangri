@@ -93,10 +93,10 @@ export const buildPtbasColumns = (
     ])
 
     const actionsColumn: ColumnDef<Ptba> = {
-        id: "actions",
-        accessorKey: 'id_ptba',
+        id: "responsable_ptba",
+        accessorKey: 'responsable_ptba',
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='Actions' />
+            <DataTableColumnHeader column={column} title='Responsable' />
         ),
         cell: (props) => (
             <PtbasRowActions
