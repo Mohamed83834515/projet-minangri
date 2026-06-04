@@ -10,7 +10,7 @@ export const getZoneCollecteFormConfig = (): FormConfig => ({
             type: "text",
             placeholder: "Ex: ZC001, ZONE01...",
             required: true,
-            gridCols: 1,
+            gridCols: 2,
         },
         // texte - Nom zone
         {
@@ -19,6 +19,16 @@ export const getZoneCollecteFormConfig = (): FormConfig => ({
             type: "text",
             placeholder: "Nom de la zone de collecte",
             required: true,
+            gridCols: 2,
+        },
+        {
+            name: "shape_file",
+            label: "Shape file",
+            type: "file",
+            accept: 'application/pdf,image/*,.doc,.docx',
+            maxSize: 10,
+            helperText: "Formats acceptés: PDF, DOC, DOCX (max 10MB)",
+            required: false,
             gridCols: 1,
         },
         // texte - Type zone
