@@ -764,6 +764,10 @@ import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { Link, useLocation } from '@tanstack/react-router'
 import { Search, X } from 'lucide-react'
 import { cn, getDisplayNameInitials } from '@/lib/utils'
+import pontLogo from '@/assets/images/pont.png'
+import logo1 from '@/assets/images/logo1.png'
+import logo3 from '@/assets/images/logo3.png'
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -1217,7 +1221,7 @@ export function AppTopbar({ user }: UserProps) {
             >
               {!logoFailed ? (
                 <img
-                  src="/src/assets/images/pont.png"
+                  src={pontLogo}
                   alt={firstTeam.name}
                   style={{ height: 40, width: 40, objectFit: 'contain', borderRadius: 6 }}
                   onError={() => setLogoFailed(true)}
@@ -1254,7 +1258,7 @@ export function AppTopbar({ user }: UserProps) {
               }}
             >
               <img
-                src="/src/assets/images/logo1.png"
+                src={logo1}
                 alt="Logo partenaire"
                 style={{ height: 40, width: 40, objectFit: 'contain', borderRadius: 6 }}
               />
@@ -1272,7 +1276,7 @@ export function AppTopbar({ user }: UserProps) {
               }}
             >
               <img
-                src="/src/assets/images/logo3.png"
+                src={logo3}
                 alt="Logo partenaire"
                 style={{ height: 40, width: 40, objectFit: 'contain', borderRadius: 6 }}
               />
