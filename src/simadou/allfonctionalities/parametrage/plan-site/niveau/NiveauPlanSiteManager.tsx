@@ -1,6 +1,6 @@
 // simadou/allfonctionalities/parametrage/plan-site/NiveauPlanSiteManager.tsx
 import { useEffect, useMemo, useState } from 'react'
-import { Plus, Save, Trash2 } from 'lucide-react'
+import { Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
