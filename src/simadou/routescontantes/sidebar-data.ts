@@ -32,7 +32,7 @@ export const sidebarData: SidebarData = {
     name: "Simadou",
     email: "hello@gmail.com",
     id: "zofmov",
-    statut : 1
+    statut: 1
   },
   teams: [
     {
@@ -154,32 +154,7 @@ export const sidebarData: SidebarData = {
               title: 'Indicateurs du CMR',
               url: '/programme/indicateurs-cmr',
               icon: TrendingUp,
-            },
-            {
-              title: 'Cadre stratégique',
-              url: '/programme/cadre-strategique',
-              icon: Target,
-            },
-            {
-              title: 'Indicateurs stratégiques',
-              url: '/programme/indicateurs-performance',
-              icon: LineChart,
-            },
-            {
-              title: 'Indicateurs du CMR',
-              url: '/programme/indicateurs-cmr',
-              icon: TrendingUp,
-            },
-            {
-              title: 'Cadre stratégique',
-              url: '/programme/cadre-strategique',
-              icon: Target,
-            },
-            {
-              title: 'Indicateurs stratégiques',
-              url: '/programme/indicateurs-performance',
-              icon: LineChart,
-            },
+            }
           ],
         },
 
