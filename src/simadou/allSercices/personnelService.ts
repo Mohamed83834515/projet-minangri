@@ -3,7 +3,9 @@ import { apiClient } from "@/axios/api";
 import type { Personnel } from "../allTypes";
 import { PersonnelFormData } from "../allTypes/entities";
 
-
+interface UpdateProfilePictureResponse {
+  profilePicture: string  
+}
 const BASE_URL = "/personnels/";
 
 export const personnelService = {
@@ -124,4 +126,27 @@ export const personnelService = {
       throw error;
     }
   },
+
+  async updateProfilePicture(n_personnel : number, file : File) : Promise<UpdateProfilePictureResponse>{
+    try {
+      const formData = new FormData()
+  formData.append('personnel_profile_picture', file)
+     const res = await apiClient.request<UpdateProfilePictureResponse>(
+    `/personnels/${n_personnel}/profile-picture/`, {
+      data : formData,
+      headers : { 'Content-Type': 'multipart/form-data' },
+      method : 'PATCH'
+    })
+    return  res
+    } catch (error) {
+      toast.error("Erreur lors de la désactivation du personnel");
+      throw error;
+    }
+  }
+
+
+
 };
+
+
+

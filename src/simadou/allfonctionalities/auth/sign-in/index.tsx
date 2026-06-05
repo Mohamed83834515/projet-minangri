@@ -1,7 +1,9 @@
-import { useSearch } from '@tanstack/react-router'
+import { Link, useSearch } from '@tanstack/react-router'
 import { AuthLayout } from '../auth-layout'
 import { UserAuthForm } from './components/user-auth-form'
 import { Logo } from '@/assets/logo'
+
+import { ArrowRight, KeyRound } from 'lucide-react'
 
 export function SignIn() {
   const { redirect } = useSearch({ from: '/(auth)/sign-in' })
@@ -55,11 +57,11 @@ export function SignIn() {
 
               {/* Tour gauche */}
               <rect x="68" y="148" width="52" height="182" rx="4" fill="rgba(29,78,216,.25)" stroke="rgba(99,149,255,.18)" strokeWidth="1" />
-              {[148,168,188,208,228,248,268,288].map((y, i) => (
+              {[148, 168, 188, 208, 228, 248, 268, 288].map((y, i) => (
                 <g key={y}>
-                  <rect x="76" y={y+4} width="10" height="13" rx="2" fill={`rgba(99,149,255,${.2 + (i%3)*.15})`} />
-                  <rect x="92" y={y+4} width="10" height="13" rx="2" fill={`rgba(99,149,255,${.35 + (i%2)*.2})`} />
-                  <rect x="108" y={y+4} width="4" height="13" rx="2" fill={`rgba(99,149,255,${.15 + (i%4)*.1})`} />
+                  <rect x="76" y={y + 4} width="10" height="13" rx="2" fill={`rgba(99,149,255,${.2 + (i % 3) * .15})`} />
+                  <rect x="92" y={y + 4} width="10" height="13" rx="2" fill={`rgba(99,149,255,${.35 + (i % 2) * .2})`} />
+                  <rect x="108" y={y + 4} width="4" height="13" rx="2" fill={`rgba(99,149,255,${.15 + (i % 4) * .1})`} />
                 </g>
               ))}
               <line x1="94" y1="148" x2="94" y2="126" stroke="rgba(99,149,255,.38)" strokeWidth="1.5" />
@@ -69,11 +71,11 @@ export function SignIn() {
 
               {/* Tour droite */}
               <rect x="296" y="124" width="56" height="206" rx="4" fill="rgba(29,78,216,.2)" stroke="rgba(99,149,255,.14)" strokeWidth="1" />
-              {[124,144,164,184,204,224,244,264,284].map((y, i) => (
+              {[124, 144, 164, 184, 204, 224, 244, 264, 284].map((y, i) => (
                 <g key={y}>
-                  <rect x="304" y={y+5} width="10" height="13" rx="2" fill={`rgba(99,149,255,${.25+(i%3)*.15})`} />
-                  <rect x="320" y={y+5} width="10" height="13" rx="2" fill={`rgba(99,149,255,${.15+(i%2)*.25})`} />
-                  <rect x="336" y={y+5} width="8" height="13" rx="2" fill={`rgba(99,149,255,${.3+(i%4)*.1})`} />
+                  <rect x="304" y={y + 5} width="10" height="13" rx="2" fill={`rgba(99,149,255,${.25 + (i % 3) * .15})`} />
+                  <rect x="320" y={y + 5} width="10" height="13" rx="2" fill={`rgba(99,149,255,${.15 + (i % 2) * .25})`} />
+                  <rect x="336" y={y + 5} width="8" height="13" rx="2" fill={`rgba(99,149,255,${.3 + (i % 4) * .1})`} />
                 </g>
               ))}
               <line x1="324" y1="124" x2="324" y2="98" stroke="rgba(99,149,255,.32)" strokeWidth="1.5" />
@@ -83,12 +85,12 @@ export function SignIn() {
 
               {/* Tour centrale — flagship */}
               <rect x="160" y="62" width="100" height="268" rx="6" fill="rgba(37,99,235,.18)" stroke="rgba(100,160,255,.22)" strokeWidth="1.5" />
-              {[66,88,110,132,154,176,198,220,242,264,286].map((y, i) => (
+              {[66, 88, 110, 132, 154, 176, 198, 220, 242, 264, 286].map((y, i) => (
                 <g key={y}>
-                  <rect x="168" y={y} width="13" height="16" rx="2" fill={`rgba(99,149,255,${.2+(i%3)*.18})`} />
-                  <rect x="187" y={y} width="13" height="16" rx="2" fill={`rgba(99,149,255,${.35+(i%2)*.2})`} />
-                  <rect x="206" y={y} width="13" height="16" rx="2" fill={`rgba(99,149,255,${.15+(i%4)*.12})`} />
-                  <rect x="225" y={y} width="9" height="16" rx="2" fill={`rgba(99,149,255,${.28+(i%3)*.14})`} />
+                  <rect x="168" y={y} width="13" height="16" rx="2" fill={`rgba(99,149,255,${.2 + (i % 3) * .18})`} />
+                  <rect x="187" y={y} width="13" height="16" rx="2" fill={`rgba(99,149,255,${.35 + (i % 2) * .2})`} />
+                  <rect x="206" y={y} width="13" height="16" rx="2" fill={`rgba(99,149,255,${.15 + (i % 4) * .12})`} />
+                  <rect x="225" y={y} width="9" height="16" rx="2" fill={`rgba(99,149,255,${.28 + (i % 3) * .14})`} />
                 </g>
               ))}
               {/* Flèche / spire */}
@@ -103,7 +105,7 @@ export function SignIn() {
                 stroke="rgba(34,197,94,.7)" strokeWidth="2.5" fill="none" strokeLinecap="round" />
               <path d="M 50 300 Q 115 272 158 244 Q 200 216 245 184 Q 288 152 370 118 L 370 330 L 50 330 Z"
                 fill="rgba(34,197,94,.055)" />
-              {[[158,244],[245,184],[330,136]].map(([cx,cy],i) => (
+              {[[158, 244], [245, 184], [330, 136]].map(([cx, cy], i) => (
                 <circle key={i} cx={cx} cy={cy} r="4.5" fill="rgba(34,197,94,.9)" stroke="rgba(34,197,94,.25)" strokeWidth="7" />
               ))}
 
@@ -122,15 +124,15 @@ export function SignIn() {
               <text x="185" y="30" fill="rgba(255,255,255,.92)" fontSize="11" fontWeight="600" fontFamily="system-ui,sans-serif">Simadou 2040 🌍</text>
 
               {/* Étoiles scintillantes */}
-              {[[40,44],[378,72],[28,252],[390,240],[55,170],[390,170]].map(([x,y],i)=>(
+              {[[40, 44], [378, 72], [28, 252], [390, 240], [55, 170], [390, 170]].map(([x, y], i) => (
                 <circle key={i} cx={x} cy={y} r="1.5" fill="rgba(255,255,255,.4)">
-                  <animate attributeName="opacity" values=".4;1;.4" dur={`${2+i*.45}s`} repeatCount="indefinite"/>
+                  <animate attributeName="opacity" values=".4;1;.4" dur={`${2 + i * .45}s`} repeatCount="indefinite" />
                 </circle>
               ))}
 
               {/* Lignes de connexion entre tours */}
-              <line x1="120" y1="220" x2="160" y2="220" stroke="rgba(99,149,255,.15)" strokeWidth=".75" strokeDasharray="4 4"/>
-              <line x1="260" y1="220" x2="296" y2="220" stroke="rgba(99,149,255,.15)" strokeWidth=".75" strokeDasharray="4 4"/>
+              <line x1="120" y1="220" x2="160" y2="220" stroke="rgba(99,149,255,.15)" strokeWidth=".75" strokeDasharray="4 4" />
+              <line x1="260" y1="220" x2="296" y2="220" stroke="rgba(99,149,255,.15)" strokeWidth=".75" strokeDasharray="4 4" />
             </svg>
           </div>
 
@@ -179,10 +181,39 @@ export function SignIn() {
           <div className='w-full max-w-sm space-y-8'>
 
             {/* En-tête */}
-            <div className='space-y-1'>
-              <h1 className='text-2xl font-bold tracking-tight text-zinc-900'>
-                Connectez-vous à votre compte
-              </h1>
+            <div className="space-y-5">
+              <div className="space-y-1">
+
+                <h1 className="text-2xl font-medium tracking-tight">
+                  Connectez-vous à votre compte
+                </h1>
+              </div>
+
+              <div className="flex gap-3 rounded-xl border border-amber-200 bg-amber-50 p-3.5
+                      dark:border-amber-800 dark:bg-amber-950">
+                <KeyRound
+                  className="mt-0.5 size-4 shrink-0 text-amber-600 dark:text-amber-400"
+                  aria-hidden
+                />
+                <div className="space-y-1.5">
+                  <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                    Première connexion ?
+                  </p>
+                  <p className="text-sm leading-relaxed text-amber-700 dark:text-amber-300">
+                    Définissez en deux clicks votre mot de passe afin de continuer .
+                  </p>
+                  <Link
+                    to="/forgot-password"
+                    search={{ mode: 'setup' }}
+                    className="inline-flex items-center gap-1 text-sm font-medium
+                       text-amber-800 underline underline-offset-4
+                       hover:no-underline dark:text-amber-200"
+                  >
+                    Définir mon mot de passe
+                    <ArrowRight className="size-3" aria-hidden />
+                  </Link>
+                </div>
+              </div>
             </div>
 
             {/* Formulaire — logique inchangée */}

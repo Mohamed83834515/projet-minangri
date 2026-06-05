@@ -43,6 +43,8 @@ interface DynamicFormProps {
   embedded?: boolean
   /** Largeur max. du formulaire embarqué (ex. modales suivi PTBA) */
   className?: string
+  hideFormFooter?: boolean
+  formId?: string
 }
 
 export interface DynamicFormHandle {
@@ -68,6 +70,8 @@ export const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps>(
       backText = 'Précédent',
       embedded = false,
       className,
+      hideFormFooter,
+      formId
     },
     ref
   ) => {
@@ -89,8 +93,8 @@ export const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps>(
     } = form
 
     useEffect(() => {
-  reset(defaultValues);
-}, [defaultValues]);
+      reset(defaultValues);
+    }, [defaultValues]);
 
     useImperativeHandle(ref, () => ({
       setValue: (name: string, value: any) =>
@@ -124,24 +128,24 @@ export const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps>(
 
     const status = hasErrors
       ? {
-          icon: <AlertCircle className='h-3.5 w-3.5' />,
-          label: `${errorCount} erreur${errorCount > 1 ? 's' : ''} à corriger`,
-          variant: 'destructive' as const,
-          dot: 'bg-destructive',
-        }
+        icon: <AlertCircle className='h-3.5 w-3.5' />,
+        label: `${errorCount} erreur${errorCount > 1 ? 's' : ''} à corriger`,
+        variant: 'destructive' as const,
+        dot: 'bg-destructive',
+      }
       : isDirty
         ? {
-            icon: <PenLine className='h-3.5 w-3.5' />,
-            label: 'Modifications en attente',
-            variant: 'secondary' as const,
-            dot: 'bg-amber-400',
-          }
+          icon: <PenLine className='h-3.5 w-3.5' />,
+          label: 'Modifications en attente',
+          variant: 'secondary' as const,
+          dot: 'bg-amber-400',
+        }
         : {
-            icon: <CheckCircle2 className='h-3.5 w-3.5' />,
-            label: 'Formulaire prêt',
-            variant: 'outline' as const,
-            dot: 'bg-emerald-400',
-          }
+          icon: <CheckCircle2 className='h-3.5 w-3.5' />,
+          label: 'Formulaire prêt',
+          variant: 'outline' as const,
+          dot: 'bg-emerald-400',
+        }
 
     return (
       <div
@@ -158,7 +162,7 @@ export const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps>(
 
         {/* ── Corps du formulaire ── */}
         <Form {...form}>
-          <form onSubmit={handleSubmit(onSubmit as any)}>
+          <form onSubmit={handleSubmit(onSubmit as any)} id={formId}  >
             <div className={cn(embedded ? 'px-0 pt-0 pb-1' : 'p-6')}>
               <div
                 className={cn(
@@ -197,43 +201,43 @@ export const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps>(
               )}
             />
 
-            {/* ── Pied du formulaire (aligné StepDynamicForm / PTBA) ── */}
-            <div
-              className={cn(
-                'flex flex-wrap items-center gap-2',
-                embedded
-                  ? 'justify-end pt-3'
-                  : 'justify-between gap-x-4 px-6 py-4'
-              )}
-            >
+            {/* ── Pied du formulaire (aligné StepDynamicForm / PTBA) ── Cacher si hideFormFooter */}
+            {!hideFormFooter && (
+              <div
+                className={cn(
+                  'flex items-center gap-4',
+                  embedded ? 'justify-end pt-3' : 'justify-between px-6 py-4',
+
+                )}
+              >
                 {/* Indicateur de statut (masqué en modal embarqué sauf erreurs) */}
                 {(!embedded || hasErrors) && (
-                <div className='flex min-w-0 shrink items-center gap-2'>
-                  <span className='relative flex h-2 w-2'>
-                    {(isDirty || hasErrors) && (
+                  <div className='flex min-w-0 shrink items-center gap-2'>
+                    <span className='relative flex h-2 w-2'>
+                      {(isDirty || hasErrors) && (
+                        <span
+                          className={cn(
+                            'absolute inline-flex h-full w-full animate-ping rounded-full opacity-60',
+                            status.dot
+                          )}
+                        />
+                      )}
                       <span
                         className={cn(
-                          'absolute inline-flex h-full w-full animate-ping rounded-full opacity-60',
+                          'relative inline-flex h-2 w-2 rounded-full',
                           status.dot
                         )}
                       />
-                    )}
-                    <span
-                      className={cn(
-                        'relative inline-flex h-2 w-2 rounded-full',
-                        status.dot
-                      )}
-                    />
-                  </span>
+                    </span>
 
-                  <Badge
-                    variant={status.variant}
-                    className='gap-1.5 rounded-md px-2 py-0.5 text-[11px] font-medium'
-                  >
-                    {status.icon}
-                    {status.label}
-                  </Badge>
-                </div>
+                    <Badge
+                      variant={status.variant}
+                      className='gap-1.5 rounded-md px-2 py-0.5 text-[11px] font-medium'
+                    >
+                      {status.icon}
+                      {status.label}
+                    </Badge>
+                  </div>
                 )}
 
                 <div className='flex shrink-0 items-center gap-2'>
@@ -286,7 +290,8 @@ export const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps>(
                     )}
                   </Button>
                 </div>
-            </div>
+              </div>
+            )}
           </form>
         </Form>
       </div>

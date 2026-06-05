@@ -45,7 +45,7 @@ export function useUpdatePersonnel(id: number | undefined) {
    onMutate: async (incoming) => {
   await queryClient.cancelQueries({ queryKey: personnelKeys.me() })
   const previous = queryClient.getQueryData<Personnel>(personnelKeys.me())
-  console.log("previous",queryClient.getQueryData<Personnel>(personnelKeys.all()))
+  
 
   queryClient.setQueryData<Personnel>(personnelKeys.me(), old => {
     if (!old) return old
@@ -156,6 +156,20 @@ export function usePlanSites() {
   return useQuery({
     queryKey: personnelKeys.planSites(),
     queryFn: planSiteService.getAll,
+  })
+}
+
+
+
+
+export const useUpdateProfilePicture = (n_personel: number) => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (file: File) => personnelService.updateProfilePicture(n_personel, file),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['me'] })
+    },
   })
 }
 
