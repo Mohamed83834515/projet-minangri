@@ -15,4 +15,8 @@ export const Route = createFileRoute('/_authenticated/parametrage/localites/')({
 //       listComponent={ListeLocalite}
 //     />
 //   )
+<<<<<<< HEAD
 // }
+=======
+// }
+>>>>>>> origin/master
