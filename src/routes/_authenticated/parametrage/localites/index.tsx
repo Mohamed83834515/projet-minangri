@@ -5,18 +5,3 @@ import ListeLocalite from '@/simadou/allfonctionalities/parametrage/localite/Lis
 export const Route = createFileRoute('/_authenticated/parametrage/localites/')({
   component: ListeLocalite,
 })
-
-// function RouteComponent() {
-//   return (
-//     <PageRouteLayout
-//       title="Localités"
-//       icon={MapPin}
-//       showAddButton={false}
-//       listComponent={ListeLocalite}
-//     />
-//   )
-<<<<<<< HEAD
-// }
-=======
-// }
->>>>>>> origin/master
