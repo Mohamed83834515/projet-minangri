@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { Link, useLocation }                         from '@tanstack/react-router'
 import { ChevronDown, Search, X }                    from 'lucide-react'
-import { cn }                                        from '@/lib/utils'
+import { cn, getDisplayNameInitials }                                        from '@/lib/utils'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +17,10 @@ import { type NavCollapsible, type NavItem, type NavLink } from './types'
 import { CHART_COLORS, HEADER_COLORS, useColorStore } from '@/stores/others/color-store'
 import { sidebarData }                               from '../../../simadou/routescontantes/sidebar-data'
 import { ProgrammeSwitcher }                           from './programme-switcher'
+import { SignOutDialog } from '@/components/others/sign-out-dialog'
+import useDialogState from '@/hooks/use-dialog-state'
+import { Button } from '@/components/ui/button'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 const t = (key: string) => key
 
@@ -204,11 +208,22 @@ function MobileSearchModal({
   )
 }
 
+type UserProps = {
+  user: {
+    nom_perso?: string
+  prenom_perso?: string
+  email?: string
+   personnel_profile_picture : string | null
+     id_personnel_perso?: string;
+      statut?: number;
+  }
+}
+
 // ─── AppTopbar ────────────────────────────────────────────────────────────────
-export function AppTopbar() {
+export function AppTopbar({user} :UserProps) {
   const href      = useLocation({ select: (l) => l.href })
   const firstTeam = sidebarData.teams[0]
-
+   const [open, setOpen] = useDialogState()
   // ── Couleurs dynamiques — Header Color uniquement ──
   const headerColor = useColorStore((s) => s.headerColor)
   const { bg: headerBg, text: headerText } = HEADER_COLORS[headerColor]
@@ -246,6 +261,7 @@ export function AppTopbar() {
 
   const fadeBgLeft  = `linear-gradient(to right, ${headerBg2} 20%, transparent)`
   const fadeBgRight = `linear-gradient(to left,  ${headerBg2} 20%, transparent)`
+  const userInitials = getDisplayNameInitials(user.nom_perso ?? '')
 
   return (
     <>
@@ -343,7 +359,21 @@ export function AppTopbar() {
             <ProgrammeSwitcher onHeader />
             <ThemeSwitch />
             <ConfigDrawer />
-            <ProfileDropdown />
+            {user && (
+              <ProfileDropdown
+            user={user}
+            side={ "bottom" }
+            onLogout={() => setOpen(true)}
+            trigger={
+              <Button>
+                 <Avatar className='h-8 w-8'>
+                  <AvatarImage src={user.personnel_profile_picture ?? ''} alt='profile' />
+                  <AvatarFallback>{userInitials}</AvatarFallback>
+                </Avatar>
+              </Button>
+            }
+          />
+            )}
           </div>
         </div>
 
@@ -402,6 +432,7 @@ export function AppTopbar() {
         </div>
 
       </header>
+       <SignOutDialog open={!!open} onOpenChange={setOpen} />
     </>
   )
 }
