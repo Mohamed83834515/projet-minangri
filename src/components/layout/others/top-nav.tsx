@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { Link, useLocation }                         from '@tanstack/react-router'
-import { Search, X }                                 from 'lucide-react'
-import { cn }                                        from '@/lib/utils'
+import { ChevronDown, Search, X }                    from 'lucide-react'
+import { cn, getDisplayNameInitials }                                        from '@/lib/utils'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -279,6 +279,8 @@ export function AppTopbar({user} :UserProps) {
 
   const subNavMode = useLayout((s) => s.subNavMode)
 
+   const [open, setOpen] = useDialogState()
+  // ── Couleurs dynamiques — Header Color uniquement ──
   const headerColor = useColorStore((s) => s.headerColor)
   const { bg: headerBg, text: headerText } = HEADER_COLORS[headerColor]
   const headerBg2 = darken(headerBg, 0.82)
@@ -346,6 +348,7 @@ export function AppTopbar({user} :UserProps) {
 
   const fadeBgLeft  = `linear-gradient(to right, ${headerBg2} 20%, transparent)`
   const fadeBgRight = `linear-gradient(to left,  ${headerBg2} 20%, transparent)`
+  const userInitials = getDisplayNameInitials(user.nom_perso ?? '')
 
   const handleGroupToggle = (item: NavCollapsible) => {
     setManualGroup((prev) => (prev?.title === item.title ? null : item))
