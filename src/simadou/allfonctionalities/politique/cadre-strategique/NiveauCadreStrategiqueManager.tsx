@@ -5,6 +5,13 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
   Table,
   TableBody,
   TableCell,
@@ -16,56 +23,59 @@ import {
   useActiveProgrammeCode,
   useActiveProgrammeId,
 } from '@/hooks/use-active-programme'
-import type { NiveauCadreAnalytique } from '@/simadou/allTypes/cadreAnalytique'
+import type { NiveauCadreStrategique } from '@/simadou/allTypes/niveauCadreStrategique'
 import {
-  niveauCadreAnalytiqueQueryKeys,
-  useCreateNiveauCadreAnalytique,
-  useDeleteNiveauCadreAnalytique,
-  useGetNiveauxCadreAnalytique,
-  useUpdateNiveauCadreAnalytique,
-} from '@/simadou/allHooks/admin/cadreAnalytiqueHooks'
-import { niveauCadreAnalytiqueService } from '@/simadou/allSercices/niveauCadreAnalytiqueService'
+  niveauCadreStrategiqueQueryKeys,
+  useCreateNiveauCadreStrategique,
+  useDeleteNiveauCadreStrategique,
+  useGetNiveauxCadreStrategique,
+  useUpdateNiveauCadreStrategique,
+} from '@/simadou/allHooks/admin/cadreStrategiqueHooks'
+import { niveauCadreStrategiqueService } from '@/simadou/allSercices/niveauCadreStrategiqueService'
+import { typeNiveauOptions } from '@/simadou/schemas/niveauCadreStrategiqueSchema'
 import {
   filterNiveauxByProgramme,
-  sortNiveauxCadreAnalytique,
-} from '@/simadou/lib/cadreAnalytiqueUtils'
+  sortNiveauxCadreStrategique,
+} from '@/simadou/lib/cadreStrategiqueUtils'
 
 type NiveauRow = {
   id?: number
   libelle: string
   codeLength: number
+  typeNiveau: number
   isNew: boolean
 }
 
-function toRow(n: NiveauCadreAnalytique): NiveauRow {
+function toRow(n: NiveauCadreStrategique): NiveauRow {
   return {
-    id: n.id_nca,
-    libelle: n.libelle_nca,
-    codeLength: Number(n.nombre_nca) || 2,
+    id: n.id_nsc,
+    libelle: n.libelle_nsc,
+    codeLength: Number(n.nombre_nsc) || 2,
+    typeNiveau: Number(n.type_niveau) || 1,
     isNew: false,
   }
 }
 
 function createEmptyRow(): NiveauRow {
-  return { libelle: '', codeLength: 2, isNew: true }
+  return { libelle: '', codeLength: 2, typeNiveau: 1, isNew: true }
 }
 
-function rowsFromNiveaux(niveaux: NiveauCadreAnalytique[]): NiveauRow[] {
+function rowsFromNiveaux(niveaux: NiveauCadreStrategique[]): NiveauRow[] {
   return niveaux.length > 0 ? niveaux.map(toRow) : [createEmptyRow()]
 }
 
-export default function NiveauCadreAnalytiqueManager() {
+export default function NiveauCadreStrategiqueManager() {
   const queryClient = useQueryClient()
   const codeProgramme = useActiveProgrammeCode()
   const programmeId = useActiveProgrammeId()
-  const { data: niveaux = [], isLoading } = useGetNiveauxCadreAnalytique()
-  const createMutation = useCreateNiveauCadreAnalytique()
-  const updateMutation = useUpdateNiveauCadreAnalytique()
-  const deleteMutation = useDeleteNiveauCadreAnalytique()
+  const { data: niveaux = [], isLoading } = useGetNiveauxCadreStrategique()
+  const createMutation = useCreateNiveauCadreStrategique()
+  const updateMutation = useUpdateNiveauCadreStrategique()
+  const deleteMutation = useDeleteNiveauCadreStrategique()
 
   const niveauxProgramme = useMemo(
     () =>
-      sortNiveauxCadreAnalytique(
+      sortNiveauxCadreStrategique(
         filterNiveauxByProgramme(niveaux, codeProgramme, programmeId)
       ),
     [niveaux, codeProgramme, programmeId]
@@ -121,9 +131,10 @@ export default function NiveauCadreAnalytiqueManager() {
         if (!row.libelle.trim()) continue
         order += 1
         const data = {
-          libelle_nca: row.libelle.trim(),
-          code_number_nca: order,
-          nombre_nca: Number(row.codeLength) || 2,
+          libelle_nsc: row.libelle.trim(),
+          code_number_nsc: order,
+          nombre_nsc: Number(row.codeLength) || 2,
+          type_niveau: Number(row.typeNiveau) || 1,
           programme: codeProgramme,
         }
 
@@ -135,10 +146,10 @@ export default function NiveauCadreAnalytiqueManager() {
       }
 
       const fresh = await queryClient.fetchQuery({
-        queryKey: niveauCadreAnalytiqueQueryKeys.all,
-        queryFn: () => niveauCadreAnalytiqueService.getAll(),
+        queryKey: niveauCadreStrategiqueQueryKeys.all,
+        queryFn: () => niveauCadreStrategiqueService.getAll(),
       })
-      const synced = sortNiveauxCadreAnalytique(
+      const synced = sortNiveauxCadreStrategique(
         filterNiveauxByProgramme(fresh, codeProgramme, programmeId)
       )
       skipSyncRef.current = true
@@ -161,10 +172,10 @@ export default function NiveauCadreAnalytiqueManager() {
       try {
         await deleteMutation.mutateAsync(row.id)
         const fresh = await queryClient.fetchQuery({
-          queryKey: niveauCadreAnalytiqueQueryKeys.all,
-          queryFn: () => niveauCadreAnalytiqueService.getAll(),
+          queryKey: niveauCadreStrategiqueQueryKeys.all,
+          queryFn: () => niveauCadreStrategiqueService.getAll(),
         })
-        const synced = sortNiveauxCadreAnalytique(
+        const synced = sortNiveauxCadreStrategique(
           filterNiveauxByProgramme(fresh, codeProgramme, programmeId)
         )
         skipSyncRef.current = true
@@ -197,7 +208,7 @@ export default function NiveauCadreAnalytiqueManager() {
     <div className='space-y-4'>
       <div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
         <p className='text-sm text-muted-foreground'>
-          Définissez les niveaux du cadre analytique pour le programme actif.
+          Définissez les niveaux du cadre stratégique pour le programme actif.
         </p>
         <div className='flex flex-col gap-2 sm:flex-row'>
           <Button type='button' variant='outline' onClick={onAddRow} disabled={isSaving}>
@@ -221,6 +232,7 @@ export default function NiveauCadreAnalytiqueManager() {
             <TableRow>
               <TableHead>Libellé du niveau</TableHead>
               <TableHead className='w-36'>Taille du code</TableHead>
+              <TableHead className='w-40'>Type de niveau</TableHead>
               <TableHead className='w-20 text-end'>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -230,7 +242,7 @@ export default function NiveauCadreAnalytiqueManager() {
                 <TableCell>
                   <Input
                     value={row.libelle}
-                    placeholder='Ex: Objectif analytique'
+                    placeholder='Ex: Objectif stratégique'
                     disabled={isSaving}
                     onChange={(e) => {
                       markDirty()
@@ -260,6 +272,31 @@ export default function NiveauCadreAnalytiqueManager() {
                       )
                     }}
                   />
+                </TableCell>
+                <TableCell>
+                  <Select
+                    value={String(row.typeNiveau)}
+                    disabled={isSaving}
+                    onValueChange={(v) => {
+                      markDirty()
+                      setRows((p) =>
+                        p.map((r, i) =>
+                          i === index ? { ...r, typeNiveau: Number(v) } : r
+                        )
+                      )
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {typeNiveauOptions.map((opt) => (
+                        <SelectItem key={opt.value} value={String(opt.value)}>
+                          {opt.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </TableCell>
                 <TableCell className='text-end'>
                   <Button

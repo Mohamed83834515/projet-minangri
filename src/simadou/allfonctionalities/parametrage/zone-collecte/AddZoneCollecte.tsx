@@ -48,6 +48,7 @@ export default function AddZoneCollecte({
         return {
             code_zone: currentRow?.code_zone || '',
             nom_zone: currentRow?.nom_zone || '',
+            shape_file: currentRow?.shape_file || '',
             type_zone: typeof typeZone === 'object' && typeZone !== null
                 ? (typeZone as any).id_type_zone
                 : typeZone || null,
@@ -59,7 +60,11 @@ export default function AddZoneCollecte({
     })
 
     const handleSubmit = (data: ZoneCollecte) => {
-        mutation.mutate(data)
+        console.log(data)
+        mutation.mutate({
+            data,
+            file: data.shape_file || undefined
+        })
     }
 
     return (

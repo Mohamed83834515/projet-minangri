@@ -97,20 +97,10 @@ export const cadreStrategiqueService = {
 
   // Create new cadre strategique
   create: async (data: CadreStrategiqueFormData): Promise<CadreStrategique> => {
-    try {
-      const response = await apiClient.request<CadreStrategique>(
-        "/cadre_strategique/",
-        {
-          method: "POST",
-          data,
-        },
-      );
-      toast.success("Cadre stratégique créé avec succès");
-      return response;
-    } catch (error) {
-      toast.error("Erreur lors de la création du cadre stratégique");
-      throw error;
-    }
+    return await apiClient.request<CadreStrategique>("/cadre_strategique/", {
+      method: "POST",
+      data,
+    });
   },
 
   // Update cadre strategique
@@ -118,50 +108,30 @@ export const cadreStrategiqueService = {
     id: number,
     data: Partial<CadreStrategiqueFormData>,
   ): Promise<CadreStrategique> => {
-    try {
-      const response = await apiClient.request<CadreStrategique>(
-        `/cadre_strategique/${id}/`,
-        {
-          method: "PUT",
-          data,
-        },
-      );
-      toast.success("Cadre stratégique mis à jour avec succès");
-      return response;
-    } catch (error) {
-      toast.error("Erreur lors de la mise à jour du cadre stratégique");
-      throw error;
-    }
+    return await apiClient.request<CadreStrategique>(
+      `/cadre_strategique/${id}/`,
+      {
+        method: "PUT",
+        data,
+      },
+    );
   },
 
   // Delete cadre strategique
   delete: async (id: number): Promise<void> => {
-    try {
-      await apiClient.request(`/cadre_strategique/${id}/`, {
-        method: "DELETE",
-      });
-      toast.success("Cadre stratégique supprimé avec succès");
-    } catch (error) {
-      toast.error("Erreur lors de la suppression du cadre stratégique");
-      throw error;
-    }
+    await apiClient.request(`/cadre_strategique/${id}/`, {
+      method: "DELETE",
+    });
   },
 
   // Toggle status
   toggleStatus: async (id: number): Promise<CadreStrategique> => {
-    try {
-      const response = await apiClient.request<CadreStrategique>(
-        `/cadre_strategique/${id}/toggle_status/`,
-        {
-          method: "PATCH",
-        },
-      );
-      toast.success("Statut du cadre stratégique mis à jour avec succès");
-      return response;
-    } catch (error) {
-      toast.error("Erreur lors de la mise à jour du statut");
-      throw error;
-    }
+    return await apiClient.request<CadreStrategique>(
+      `/cadre_strategique/${id}/toggle_status/`,
+      {
+        method: "PATCH",
+      },
+    );
   },
 
   // Get children of a cadre

@@ -63,16 +63,9 @@ export const programmeService = {
 
   // Supprimer un programme
   async delete(id: number): Promise<void> {
-    try {
-      await apiClient.request(`${endpoint}${id}/`, {
-        method: "DELETE",
-      });
-      toast.success("Programme supprimé avec succès");
-    } catch (error) {
-      console.error(`Erreur lors de la suppression du programme ${id}:`, error);
-      toast.error("Erreur lors de la suppression du programme");
-      throw error;
-    }
+    await apiClient.request(`${endpoint}${id}/`, {
+      method: "DELETE",
+    });
   },
 
   // Options pour react-select
