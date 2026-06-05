@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Plus, Settings } from 'lucide-react'
 import { toast } from 'sonner'
@@ -14,35 +13,6 @@ import {
 import { Tabs, TabsContent } from '@/components/ui/tabs'
 import { NiveauTabTrigger, NiveauTabsList } from '../../../../components/ui/NiveauTabs'
 import { useGetAllLocalites, useDeleteLocalite } from '@/simadou/allHooks/admin/localiteHooks'
-=======
-// simadou/allfonctionalities/parametrage/localite/ListeLocalite.tsx
-<<<<<<< HEAD
-import { useMemo, useState, useEffect } from 'react'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Input } from '@/components/ui/input'
-import { SearchIcon } from 'lucide-react'
-import { GenericTable } from '@/Global/Generic/Generictable'
-import { useEmbeddedTableState } from '@/hooks/use-embedded-table-state'
-import { useGetAllLocalites } from '@/simadou/allHooks/admin/localiteHooks'
-import { buildLocaliteColumns } from '@/simadou/allColonnes/localite-columns'
->>>>>>> 69c4d62 (oklm)
-=======
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Plus, Settings } from 'lucide-react'
-import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog'
-import { Tabs, TabsContent } from '@/components/ui/tabs'
-import { NiveauTabTrigger, NiveauTabsList } from '../../../../components/ui/NiveauTabs'
-import { useGetAllLocalites, useDeleteLocalite } from '@/simadou/allHooks/admin/localiteHooks'
->>>>>>> b979759 (Integration plan site et localites)
 import { useGetNiveauxLocalite } from '@/simadou/allHooks/admin/niveauLocaliteHooks'
 import AddLocalite from './AddLocalite'
 import { GenericDeleteDialog } from '@/Global/Tableaux/GenericDeleteDialog'

@@ -48,6 +48,14 @@ export function getCadreAnalytiqueFormConfigForDialog({
         gridCols: 2,
       },
       {
+        name: 'abgrege_ca',
+        label: 'Abrégé',
+        type: 'text',
+        placeholder: "Entrez l'abrégé",
+        required: false,
+        gridCols: 2,
+      },
+      {
         name: 'cout_axe',
         label: 'Coût axe',
         type: 'number',
@@ -56,14 +64,6 @@ export function getCadreAnalytiqueFormConfigForDialog({
         min: 0,
         step: 0.01,
         gridCols: 1,
-      },
-      {
-        name: 'abgrege_ca',
-        label: 'Abrégé',
-        type: 'text',
-        placeholder: "Entrez l'abrégé",
-        required: false,
-        gridCols: 2,
       },
       ...(showParent
         ? [
@@ -82,16 +82,6 @@ export function getCadreAnalytiqueFormConfigForDialog({
             },
           ]
         : []),
-      {
-        name: 'partenaire_ca',
-        label: 'Partenaire',
-        type: 'select',
-        placeholder: '-- Choisir un partenaire --',
-        required: false,
-        options: acteurOptions,
-        isLoading: isLoadingActeurs,
-        gridCols: 2,
-      },
     ],
   }
 }

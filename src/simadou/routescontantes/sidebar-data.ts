@@ -154,7 +154,7 @@ export const sidebarData: SidebarData = {
               title: 'Indicateurs du CMR',
               url: '/programme/indicateurs-cmr',
               icon: TrendingUp,
-            }
+            },
           ],
         },
 
