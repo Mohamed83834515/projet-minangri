@@ -173,31 +173,31 @@ export const sidebarData: SidebarData = {
               url: '/programmation/ptba',
               icon: ClipboardList,
             },
-            {
-              title: 'Indicateurs activités PTBA',
-              url: '/programmation/indicateurs-activites-ptba',
-              icon: Activity,
-            },
+            // {
+            //   title: 'Indicateurs activités PTBA',
+            //   url: '/programmation/indicateurs-activites-ptba',
+            //   icon: Activity,
+            // },
             {
               title: 'Suivi du PTBA',
               url: '/programmation/suivi-ptba',
               icon: Eye,
             },
-            {
-              title: 'Indicateurs de performance',
-              url: '/programmation/indicateurs-performance',
-              icon: Gauge,
-            },
-            {
-              title: 'Activités projet',
-              url: '/programmation/activites-projet',
-              icon: ListTodo,
-            },
-            {
-              title: 'Activités programme',
-              url: '/programmation/activites-programme',
-              icon: Layers,
-            },
+            // {
+            //   title: 'Indicateurs de performance',
+            //   url: '/programmation/indicateurs-performance',
+            //   icon: Gauge,
+            // },
+            // {
+            //   title: 'Activités projet',
+            //   url: '/programmation/activites-projet',
+            //   icon: ListTodo,
+            // },
+            // {
+            //   title: 'Activités programme',
+            //   url: '/programmation/activites-programme',
+            //   icon: Layers,
+            // },
           ],
         },
       ],

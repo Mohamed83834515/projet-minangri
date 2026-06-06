@@ -42,7 +42,7 @@ export const getIndicateurCmrFormConfigForDialog = ({
     {
       name: "intitule_ref_ind",
       label: "Intitulé de l'indicateur",
-      type: "text",
+      type: "textarea",
       placeholder: "Intitulé complet de l'indicateur de référence",
       required: true,
       maxLength: 200,
@@ -55,7 +55,7 @@ export const getIndicateurCmrFormConfigForDialog = ({
       placeholder: "Résultat attendu du cadre de mesure de résultats",
       required: true,
       maxLength: 200,
-      gridCols: 1,
+      gridCols: 2,
     },
     {
       name: "reference_cmr",
@@ -64,7 +64,7 @@ export const getIndicateurCmrFormConfigForDialog = ({
       placeholder: "Référence du cadre de mesure de résultats",
       required: true,
       maxLength: 200,
-      gridCols: 1,
+      gridCols: 2,
     },
     {
       name: "unite_cmr",
@@ -101,7 +101,7 @@ export const getIndicateurCmrFormConfigForDialog = ({
       placeholder: "Responsable de la collecte des données",
       required: true,
       maxLength: 100,
-      gridCols: 1,
+      gridCols: 2
     },
   ],
 });
