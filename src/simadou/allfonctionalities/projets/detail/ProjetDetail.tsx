@@ -5,12 +5,8 @@ import {
   Calendar,
   Clock,
   DollarSign,
-  Layout,
   Loader2,
-  MapPin,
   TrendingUp,
-  User,
-  Users,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Main } from '@/components/layout/others/main'
@@ -40,21 +36,6 @@ const route = getRouteApi('/_authenticated/programmation/projets/$id')
 /** Indicateurs démo (branche amadou) — API à brancher. */
 const DEMO_EXECUTION = 67
 const DEMO_DECAISSEMENT = 54
-
-function ActeurList({ items, emptyLabel }: { items: string[]; emptyLabel: string }) {
-  if (items.length === 0) {
-    return <p className='text-xs text-muted-foreground'>{emptyLabel}</p>
-  }
-  return (
-    <ul className='space-y-1'>
-      {items.map((name) => (
-        <li key={name} className='text-xs font-medium leading-snug'>
-          {name}
-        </li>
-      ))}
-    </ul>
-  )
-}
 
 export default function ProjetDetail() {
   const { id } = route.useParams()
@@ -114,16 +95,6 @@ export default function ProjetDetail() {
       </div>
     )
   }
-
-  const structures =
-    projet.structure_projet?.map((a) => a.nom_acteur).filter(Boolean) ?? []
-  const signataires =
-    projet.signataires_projet?.map((a) => a.nom_acteur).filter(Boolean) ?? []
-  const partenairesExec =
-    projet.partenaires_execution_projet?.map((a) => a.nom_acteur).filter(Boolean) ??
-    []
-  const zones =
-    projet.zone_projet?.map((z) => z.intitule_loca).filter(Boolean) ?? []
 
   const duree = computeDureeConsommee(projet)
 

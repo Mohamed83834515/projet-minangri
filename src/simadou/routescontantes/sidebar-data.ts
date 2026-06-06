@@ -19,13 +19,8 @@ import {
   Target,
   LineChart,
   TrendingUp,
-  Gauge,
-  ListTodo,
-  Layers,
 } from 'lucide-react'
 import { type SidebarData } from '../../components/layout/others/types'
-import { Activity } from 'react'
-
 
 export const sidebarData: SidebarData = {
   user: {
