@@ -78,6 +78,7 @@ export default function ListeDictionnaireIndicateurs() {
         columns={columns}
         search={search}
         navigate={navigate}
+        showViewOptions={false}
         searchKey='intitule_ref_ind'
         searchPlaceholder='Rechercher un indicateur…'
         urlFilterConfig={[
