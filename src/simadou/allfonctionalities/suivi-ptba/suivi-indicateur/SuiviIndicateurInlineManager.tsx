@@ -256,7 +256,7 @@ export default function SuiviIndicateurInlineManager({
               <TableHead className='w-40'>Date suivi</TableHead>
               <TableHead className='w-32'>Valeur</TableHead>
               <TableHead className='w-16 text-end'>Actions</TableHead>
-            </TableRow>
+            </TableRow> 
           </TableHeader>
           <TableBody>
             {rows.map((row, index) => (
