@@ -1018,15 +1018,15 @@ function MobileSearchModal({
           border: '1px solid rgba(255,255,255,.2)',
           borderRadius: 10, padding: '8px 14px',
         }}>
-          <Search size={16} aria-hidden style={{ color: headerText, opacity:.7, flexShrink:0 }} />
+          <Search size={16} aria-hidden style={{ color: '#fff', opacity:.8, flexShrink:0 }} />
           <input
             ref={inputRef}
             type="search"
             placeholder={t("Rechercher dans l'application…")}
-            style={{ flex:1, background:'transparent', border:'none', outline:'none', color: headerText, fontSize:14 }}
+            style={{ flex:1, background:'transparent', border:'none', outline:'none', color: '#fff', fontSize:14 }}
           />
           <button onClick={onClose} className="_tb-ibtn" aria-label={t('Fermer')} style={{ width:24, height:24 }}>
-            <X size={14} style={{ color: headerText, opacity:.75 }} />
+            <X size={14} style={{ color: '#fff', opacity:.75 }} />
           </button>
         </div>
       </div>
@@ -1192,9 +1192,9 @@ export function AppTopbar({ user }: UserProps) {
               <div aria-hidden style={{
                 height:          48,
                 width:           44,
-                borderRadius:    8,
-                backgroundColor: 'rgba(255,255,255,.12)',
-                border:          '1px solid rgba(255,255,255,.25)',
+                borderRadius:    6,
+                backgroundColor: 'rgba(206,17,38,.12)',
+                border:          '1px solid rgba(206,17,38,.3)',
                 display:         'flex',
                 flexDirection:   'column',
                 alignItems:      'center',
@@ -1202,7 +1202,7 @@ export function AppTopbar({ user }: UserProps) {
                 fontSize:        11,
                 fontFamily:      "'Cinzel', serif",
                 fontWeight:      900,
-                color:           '#FCD116',
+                color:           '#CE1126',
                 letterSpacing:   '1px',
                 lineHeight:      1.1,
               }}>
@@ -1216,7 +1216,7 @@ export function AppTopbar({ user }: UserProps) {
             width:           1,
             height:          28,
             flexShrink:      0,
-            backgroundColor: 'rgba(255,255,255,.2)',
+            backgroundColor: 'rgba(255,255,255,.3)',
           }} />
 
           {/* Nom de l'app */}
@@ -1227,16 +1227,18 @@ export function AppTopbar({ user }: UserProps) {
               fontWeight: 900,
               letterSpacing: '.06em',
               color:         '#FCD116',
+              textShadow:    '0 1px 4px rgba(0,0,0,0.5)',
             }}>
               {firstTeam.name ?? 'SIMABOU'}
             </span>
             <span style={{
               fontSize:      9,
-              fontWeight:    500,
+              fontWeight:    600,
               letterSpacing: '.2em',
               textTransform: 'uppercase',
-              opacity:       0.55,
-              color:         headerText,
+              opacity:       0.9,
+              color:         '#FCD116',
+              textShadow:    '0 1px 3px rgba(0,0,0,0.4)',
             }}>
               2040
             </span>
@@ -1291,7 +1293,7 @@ export function AppTopbar({ user }: UserProps) {
           className="_tb-row2"
           style={{
             position:        'relative',
-            borderTop:       '1px solid rgba(255,255,255,.10)',
+            borderTop:       '1px solid rgba(255,255,255,.15)',
             backgroundColor: headerBg2,
             transition: 'background-color .35s ease',
           }}
@@ -1344,7 +1346,7 @@ export function AppTopbar({ user }: UserProps) {
           <div
             className="_tb-subnav"
             style={{
-              borderTop:       '1px solid rgba(255,255,255,.08)',
+              borderTop:       '1px solid rgba(255,255,255,.10)',
               backgroundColor: headerBg3,
               transition: 'background-color .35s ease',
             }}
@@ -1370,10 +1372,11 @@ export function AppTopbar({ user }: UserProps) {
                     className="_tb-sublink"
                     aria-current={isActive ? 'page' : undefined}
                     style={{
-                      color:           isActive ? '#fff' : `color-mix(in srgb, ${headerText} 65%, transparent)`,
-                      backgroundColor: isActive ? 'rgba(255,255,255,.20)' : 'transparent',
+                      color:           isActive ? '#fff' : 'rgba(255,255,255,0.78)',
+                      backgroundColor: isActive ? 'rgba(255,255,255,.22)' : 'transparent',
                       fontWeight:      isActive ? 700 : 400,
                       boxShadow:       isActive ? 'inset 0 -2px 0 rgba(255,255,255,.6)' : 'none',
+                      textShadow:      '0 1px 3px rgba(0,0,0,0.35)',
                       animation:       `_tb-fade 0.18s ${0.02 + idx * 0.03}s both`,
                     }}
                   >
@@ -1422,10 +1425,11 @@ function TopNavLink({
       className="_tb-link"
       aria-current={isActive ? 'page' : undefined}
       style={{
-        color:           isActive ? headerText : `color-mix(in srgb, ${headerText} 62%, transparent)`,
-        backgroundColor: isActive ? 'rgba(255,255,255,.18)' : 'transparent',
-        fontWeight:      isActive ? 700 : 400,
+        color:           isActive ? '#fff' : 'rgba(255,255,255,0.82)',
+        backgroundColor: isActive ? 'rgba(255,255,255,.20)' : 'transparent',
+        fontWeight:      isActive ? 700 : 500,
         boxShadow:       isActive ? 'inset 0 -2px 0 rgba(255,255,255,.65)' : 'none',
+        textShadow:      '0 1px 3px rgba(0,0,0,0.4)',
         animation:       `_tb-fade 0.25s ${animDelay}s both`,
       }}
     >
@@ -1459,10 +1463,11 @@ function TopNavCollapsible({
   const isOpen = activeGroupTitle === item.title
 
   const activeStyle = {
-    color:           isRouteActive || isOpen ? headerText : `color-mix(in srgb, ${headerText} 62%, transparent)`,
-    backgroundColor: isRouteActive || isOpen ? 'rgba(255,255,255,.18)' : 'transparent',
-    fontWeight:      (isRouteActive || isOpen ? 700 : 400) as number,
+    color:           isRouteActive || isOpen ? '#fff' : 'rgba(255,255,255,0.82)',
+    backgroundColor: isRouteActive || isOpen ? 'rgba(255,255,255,.20)' : 'transparent',
+    fontWeight:      (isRouteActive || isOpen ? 700 : 500) as number,
     boxShadow:       isRouteActive || isOpen ? 'inset 0 -2px 0 rgba(255,255,255,.65)' : 'none',
+    textShadow:      '0 1px 3px rgba(0,0,0,0.4)',
     animation:       `_tb-fade 0.25s ${animDelay}s both`,
   }
 
