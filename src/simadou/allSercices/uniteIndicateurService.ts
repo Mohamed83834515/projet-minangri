@@ -3,7 +3,7 @@ import { apiClient } from '@/axios/api'
 import type { UniteIndicateur } from '../allTypes'
 import { UniteIndicateurFormData } from '../allTypes/entities'
 
-const BASE_URL = '/unite_indicateur/'
+const BASE_URL = '/unite-indicateurs/'
 
 export const uniteIndicateurService = {
   async getAll(): Promise<UniteIndicateur[]> {
