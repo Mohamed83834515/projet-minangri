@@ -1333,7 +1333,7 @@ export function AppTopbar({ user }: UserProps) {
 
           {/* ── Logo 1 & Logo 2 ── */}
           <img src="/src/assets/images/logo1.png" alt="Logo 1" style={{ height: 40, width: 'auto', objectFit: 'contain', flexShrink: 0 }} />
-          <img src="/src/assets/images/logo2.png" alt="Logo 2" style={{ height: 40, width: 'auto', objectFit: 'contain', flexShrink: 0 }} />
+          <img src="/src/assets/images/logo3.png" alt="Logo 2" style={{ height: 40, width: 'auto', objectFit: 'contain', flexShrink: 0 }} />
 
 >>>>>>> 9fb2626 (feat: add logo1 and logo2 images to top navigation bar)
           {/* Spacer */}
