@@ -17,7 +17,7 @@ import { toast } from 'sonner'
 import { StepDynamicForm } from '@/Global/Forms/StepDynamicForm'
 
 interface OpenPropsProjet {
-  currentRow: any | null
+  currentRow?: any | null
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
