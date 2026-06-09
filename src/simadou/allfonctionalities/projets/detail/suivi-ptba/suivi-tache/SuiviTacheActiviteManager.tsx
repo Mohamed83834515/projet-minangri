@@ -8,10 +8,10 @@ import {
   tauxAvancementGlobalTaches,
 } from '@/simadou/allTypes/suiviTacheActivite'
 import {
-  suiviPtbaQueryKeys,
-  useGetSuiviTachesByActivite,
-  useGetTachesByActivite,
-} from '@/simadou/allHooks/admin/suiviPtbaHooks'
+  suiviPtbaProjetQueryKeys,
+  useGetSuiviTachesProjetByActivite,
+} from '@/simadou/allHooks/admin/suiviPtbaProjetHooks'
+import { useGetTachesByActiviteProjet } from '@/simadou/allHooks/admin/tacheActiviteProjetHooks'
 import SuiviTacheActiviteForm from './SuiviTacheActiviteForm'
 import SuiviTacheActiviteList from './SuiviTacheActiviteList'
 import { ActiviteTabbedSubViewHeader, useActiviteTabbedSubView } from '@/simadou/allfonctionalities/suivi-ptba/ActiviteTabbedDialogContext'
@@ -37,10 +37,9 @@ export default function SuiviTacheActiviteProjetManager({
   useActiviteTabbedSubView(showForm)
 
   const { data: suivis = [], isLoading: suivisLoading } =
-    useGetSuiviTachesByActivite(activite.id_ptba)
-  const { data: taches = [], isLoading: tachesLoading } = useGetTachesByActivite(
-    activite.id_ptba
-  )
+    useGetSuiviTachesProjetByActivite(activite.id_ptba)
+  const { data: taches = [], isLoading: tachesLoading } =
+    useGetTachesByActiviteProjet(activite.id_ptba)
 
   const filteredTaches = useMemo(
     () => taches.filter((t) => tacheBelongsToActivite(t, activite)),
@@ -73,9 +72,8 @@ export default function SuiviTacheActiviteProjetManager({
   const handleSuccess = () => {
     handleCloseForm()
     queryClient.invalidateQueries({
-      queryKey: suiviPtbaQueryKeys.suiviTache(activite.id_ptba),
+      queryKey: suiviPtbaProjetQueryKeys.suiviTache(activite.id_ptba),
     })
-    queryClient.invalidateQueries({ queryKey: suiviPtbaQueryKeys.tachesAll })
   }
 
   const isLoading = suivisLoading || tachesLoading

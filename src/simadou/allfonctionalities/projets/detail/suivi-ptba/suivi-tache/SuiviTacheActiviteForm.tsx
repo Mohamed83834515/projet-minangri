@@ -2,16 +2,16 @@ import { useMemo } from 'react'
 import { toast } from 'sonner'
 import { DynamicForm } from '@/Global/Forms/DynamicForm'
 import { getApiErrorMessage } from '@/lib/api-error-message'
-import { getSuiviTacheActiviteFormConfigForTache } from '@/simadou/allfieldsConfig/suiviTacheActiviteForm'
+import { getSuiviTacheActiviteProjetFormConfig } from '@/simadou/allfieldsConfig/suiviTacheActiviteProjetForm'
 import {
-  suiviTacheActiviteSchema,
-  type SuiviTacheActiviteFormData,
-} from '@/simadou/schemas/suiviTacheActiviteSchemas'
+  suiviTacheActiviteProjetSchema,
+  type SuiviTacheActiviteProjetFormData,
+} from '@/simadou/schemas/suiviTacheActiviteProjetSchemas'
 import type { SuiviTacheActivite, TacheActivitePtba } from '@/simadou/allTypes'
 import {
-  useCreateSuiviTache,
-  useUpdateSuiviTache,
-} from '@/simadou/allHooks/admin/suiviPtbaHooks'
+  useCreateSuiviTacheProjet,
+  useUpdateSuiviTacheProjet,
+} from '@/simadou/allHooks/admin/suiviPtbaProjetHooks'
 
 type SuiviTacheActiviteFormProps = {
   tache: TacheActivitePtba
@@ -29,24 +29,22 @@ export default function SuiviTacheActiviteProjetForm({
   onSuccess,
 }: SuiviTacheActiviteFormProps) {
   const isEditing = !!suivi
-  const formConfig = useMemo(() => getSuiviTacheActiviteFormConfigForTache(), [])
+  const formConfig = useMemo(() => getSuiviTacheActiviteProjetFormConfig(), [])
 
   const defaultValues = useMemo(
-    (): SuiviTacheActiviteFormData => ({
-      id_groupe_tache: tache.id_groupe_tache,
+    (): SuiviTacheActiviteProjetFormData => ({
       date_reele: suivi?.date_reele?.slice(0, 10) || '',
       observation_suivi: suivi?.observation_suivi || '',
-      livrable_fichier: [],
       proportion_realisee: suivi?.proportion_realisee ?? 0,
       valide: suivi?.valide ?? false,
     }),
-    [suivi, tache.id_groupe_tache]
+    [suivi]
   )
 
-  const createMutation = useCreateSuiviTache(idActivite)
-  const updateMutation = useUpdateSuiviTache(idActivite)
+  const createMutation = useCreateSuiviTacheProjet(idActivite)
+  const updateMutation = useUpdateSuiviTacheProjet(idActivite)
 
-  const onSubmit = (data: SuiviTacheActiviteFormData) => {
+  const onSubmit = (data: SuiviTacheActiviteProjetFormData) => {
     const payload = {
       ...data,
       id_activite_ptba: idActivite,
@@ -87,7 +85,7 @@ export default function SuiviTacheActiviteProjetForm({
       className='w-full'
       embedded
       config={formConfig}
-      schema={suiviTacheActiviteSchema}
+      schema={suiviTacheActiviteProjetSchema}
       defaultValues={defaultValues}
       onSubmit={onSubmit}
       submitText={isEditing ? 'Mettre à jour' : 'Enregistrer'}

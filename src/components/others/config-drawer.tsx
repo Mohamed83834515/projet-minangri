@@ -1,4 +1,4 @@
-import {useCallback, useMemo, useState } from 'react'
+import { useCallback, useState } from 'react'
 import {
   CircleCheck,
   RotateCcw,
@@ -12,10 +12,6 @@ import {
 // import { IconThemeDark } from '@/assets/custom/icon-theme-dark'
 // import { IconThemeLight } from '@/assets/custom/icon-theme-light'
 import {
-  CHART_COLORS,
-  type ChartColorKey,
-  HEADER_COLORS,
-  type HeaderColorKey,
   useColor,
 } from '@/stores/others/color-store'
 import { useDirection } from '@/stores/others/direction-store'
@@ -308,19 +304,19 @@ function NavModeConfig() {
     icon: React.ElementType
     description: string
   }[] = [
-    {
-      value: 'sidebar',
-      label: 'Sidebar',
-      icon: PanelLeft,
-      description: 'Navigation latérale',
-    },
-    {
-      value: 'topbar',
-      label: 'Topbar',
-      icon: PanelTop,
-      description: 'Navigation horizontale',
-    },
-  ]
+      {
+        value: 'sidebar',
+        label: 'Sidebar',
+        icon: PanelLeft,
+        description: 'Navigation latérale',
+      },
+      {
+        value: 'topbar',
+        label: 'Topbar',
+        icon: PanelTop,
+        description: 'Navigation horizontale',
+      },
+    ]
 
   const subNavOptions: {
     value: SubNavMode
@@ -328,19 +324,19 @@ function NavModeConfig() {
     icon: React.ElementType
     description: string
   }[] = [
-    {
-      value: 'horizontal',
-      label: 'Horizontal',
-      icon: Rows3,
-      description: 'Sous-menu en ligne',
-    },
-    {
-      value: 'dropdown',
-      label: 'Dropdown',
-      icon: ChevronDown,
-      description: 'Menu déroulant',
-    },
-  ]
+      {
+        value: 'horizontal',
+        label: 'Horizontal',
+        icon: Rows3,
+        description: 'Sous-menu en ligne',
+      },
+      {
+        value: 'dropdown',
+        label: 'Dropdown',
+        icon: ChevronDown,
+        description: 'Menu déroulant',
+      },
+    ]
 
   return (
     <div className='space-y-4'>
