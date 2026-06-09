@@ -5,6 +5,7 @@ import suiviAvancementContratService from '@/simadou/allSercices/suiviAvancement
 import sourceVerificationSuiviAvancementContratService from '@/simadou/allSercices/sourceVerificationSuiviAvancementContratService'
 import observationPtbaService from '@/simadou/allSercices/observationPtbaService'
 import suiviIndicateurActiviteService from '@/simadou/allSercices/suiviIndicateurActiviteService'
+import suiviDecaissementPtbaService from '@/simadou/allSercices/suiviDecaissementPtbaService'
 export { useGetLocalites } from './sharedHooks'
 export { useGetIndicateursByActivite } from './indicateurTacheHooks'
 import type { SuiviTacheActivite, TacheActivitePtba } from '@/simadou/allTypes'
@@ -13,6 +14,8 @@ import { tauxAvancementGlobalTaches } from '@/simadou/allTypes/suiviTacheActivit
 import type { SuiviIndicateurActiviteFormData } from '@/simadou/schemas/suiviIndicateurSchemas'
 import type { SuiviTacheActiviteFormData } from '@/simadou/schemas/suiviTacheActiviteSchemas'
 import type { ObservationPtbaFormData } from '@/simadou/schemas/observationPtbaSchemas'
+import type { SuiviDecaissementPtbaFormData } from '@/simadou/schemas/suiviDecaissementPtbaSchemas'
+import type { SuiviDecaissementPtba } from '@/simadou/allTypes/decaissementPtba'
 import type {
   SuiviAvancementContratPayload,
   SuiviAvancementWithSourcesInput,
@@ -36,6 +39,8 @@ export const suiviPtbaQueryKeys = {
   suivisIndicateurs: ['suivis-indicateurs-all'] as const,
   suivisIndicateur: (codeIndicateur: string) =>
     ['suivis-indicateurs', codeIndicateur] as const,
+  suiviDecaissement: (idActivite: number) =>
+    ['suivi-ptba', 'suivi-decaissement', idActivite] as const,
   localites: ['localites'] as const,
 }
 
@@ -155,6 +160,13 @@ export const useGetSuivisIndicateurByIndicateur = (
     queryFn: () =>
       suiviIndicateurActiviteService.getByIndicateur(codeIndicateur),
     enabled: enabled && !!codeIndicateur,
+  })
+
+export const useGetSuiviDecaissementByActivite = (idActivite: number) =>
+  useQuery({
+    queryKey: suiviPtbaQueryKeys.suiviDecaissement(idActivite),
+    queryFn: () => suiviDecaissementPtbaService.getByActivite(idActivite),
+    enabled: Number.isFinite(idActivite),
   })
 
 export const useCreateSuiviTache = (idActivite: number) => {
@@ -336,6 +348,67 @@ export const useDeleteObservationPtba = (codeActivite: string) => {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: suiviPtbaQueryKeys.observations(codeActivite),
+      })
+    },
+  })
+}
+
+export const useCreateSuiviDecaissement = (
+  idActivite: number,
+  codeProgramme: string
+) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: SuiviDecaissementPtbaFormData) =>
+      suiviDecaissementPtbaService.create(idActivite, data, codeProgramme),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: suiviPtbaQueryKeys.suiviDecaissement(idActivite),
+      })
+    },
+  })
+}
+
+export const useUpdateSuiviDecaissement = (
+  idActivite: number,
+  codeProgramme: string
+) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({
+      id,
+      data,
+      existing,
+    }: {
+      id: number
+      data: SuiviDecaissementPtbaFormData
+      existing?: Pick<
+        SuiviDecaissementPtba,
+        'periode_suivi_dec' | 'taux_dollars_jour' | 'programme'
+      >
+    }) =>
+      suiviDecaissementPtbaService.update(
+        id,
+        idActivite,
+        data,
+        codeProgramme,
+        existing
+      ),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: suiviPtbaQueryKeys.suiviDecaissement(idActivite),
+      })
+    },
+  })
+}
+
+export const useDeleteSuiviDecaissement = (idActivite: number) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: number) => suiviDecaissementPtbaService.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: suiviPtbaQueryKeys.suiviDecaissement(idActivite),
       })
     },
   })

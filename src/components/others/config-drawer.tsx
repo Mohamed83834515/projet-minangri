@@ -304,19 +304,19 @@ function NavModeConfig() {
     icon: React.ElementType
     description: string
   }[] = [
-    {
-      value: 'sidebar',
-      label: 'Sidebar',
-      icon: PanelLeft,
-      description: 'Navigation latérale',
-    },
-    {
-      value: 'topbar',
-      label: 'Topbar',
-      icon: PanelTop,
-      description: 'Navigation horizontale',
-    },
-  ]
+      {
+        value: 'sidebar',
+        label: 'Sidebar',
+        icon: PanelLeft,
+        description: 'Navigation latérale',
+      },
+      {
+        value: 'topbar',
+        label: 'Topbar',
+        icon: PanelTop,
+        description: 'Navigation horizontale',
+      },
+    ]
 
   const subNavOptions: {
     value: SubNavMode
@@ -324,19 +324,19 @@ function NavModeConfig() {
     icon: React.ElementType
     description: string
   }[] = [
-    {
-      value: 'horizontal',
-      label: 'Horizontal',
-      icon: Rows3,
-      description: 'Sous-menu en ligne',
-    },
-    {
-      value: 'dropdown',
-      label: 'Dropdown',
-      icon: ChevronDown,
-      description: 'Menu déroulant',
-    },
-  ]
+      {
+        value: 'horizontal',
+        label: 'Horizontal',
+        icon: Rows3,
+        description: 'Sous-menu en ligne',
+      },
+      {
+        value: 'dropdown',
+        label: 'Dropdown',
+        icon: ChevronDown,
+        description: 'Menu déroulant',
+      },
+    ]
 
   return (
     <div className='space-y-4'>

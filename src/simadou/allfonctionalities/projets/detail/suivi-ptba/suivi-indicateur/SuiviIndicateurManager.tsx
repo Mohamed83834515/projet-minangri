@@ -3,8 +3,10 @@ import { Loader2 } from 'lucide-react'
 import type { Ptba } from '@/simadou/allTypes'
 import { IndicateurTache } from '@/simadou/allTypes/indicateurTache'
 import { getValeurCibleIndicateur } from '@/simadou/allColonnes/suivi-indicateur-columns'
-import { useGetIndicateursByActivite } from '@/simadou/allHooks/admin/indicateurTacheHooks'
-import { useGetAllSuivisIndicateurs } from '@/simadou/allHooks/admin/suiviPtbaHooks'
+import {
+  useGetAllSuivisIndicateursProjet,
+  useGetIndicateursProjetByActivite,
+} from '@/simadou/allHooks/admin/suiviPtbaProjetHooks'
 import SuiviIndicateurActiviteTable from './SuiviIndicateurActiviteTable'
 import SuiviIndicateurInlineManager from './SuiviIndicateurInlineManager'
 import { ActiviteTabbedSubViewHeader, useActiviteTabbedSubView } from '@/simadou/allfonctionalities/suivi-ptba/ActiviteTabbedDialogContext'
@@ -23,10 +25,9 @@ export default function SuiviIndicateurProjetManager({
   const showForm = selectedIndicateur != null
   useActiviteTabbedSubView(showForm, 'formWide')
 
-  const { data: indicateurs = [], isLoading } = useGetIndicateursByActivite(
-    activite.id_ptba
-  )
-  const { data: suivis = [] } = useGetAllSuivisIndicateurs(
+  const { data: indicateurs = [], isLoading } =
+    useGetIndicateursProjetByActivite(activite.id_ptba)
+  const { data: suivis = [] } = useGetAllSuivisIndicateursProjet(
     Number.isFinite(activite.id_ptba)
   )
 
@@ -58,7 +59,7 @@ export default function SuiviIndicateurProjetManager({
           }
         >
           <SuiviIndicateurInlineManager
-            key={selectedIndicateur.code_indicateur_ptba}
+            key={selectedIndicateur.id_indicateur_tache}
             activite={activite}
             indicateur={selectedIndicateur}
             onClose={handleCloseForm}
