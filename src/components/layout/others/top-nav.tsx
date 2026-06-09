@@ -1206,107 +1206,114 @@ export function AppTopbar({ user }: UserProps) {
             style={{ color: headerText, flexShrink: 0 }}
           />
 
-          {/* LOGO — fond blanc pour lisibilité */}
-          <div
-            className="_tb-brand _tb-logo-wrap"
-            style={{
-              flexShrink:      0,
-              lineHeight:      0,
-              backgroundColor: '#FFFFFF',
-              borderRadius:    8,
-              padding:         4,
-              boxShadow:       '0 2px 8px rgba(0,0,0,0.25)',
-            }}
-          >
-            {!logoFailed ? (
-              <img
-                src="/src/assets/images/pont.png"
-                alt={firstTeam.name}
-                className="_tb-logo"
-                onError={() => setLogoFailed(true)}
-              />
-            ) : (
-              <div aria-hidden style={{
-                height:          48,
-                width:           44,
-                borderRadius:    6,
-                backgroundColor: 'rgba(206,17,38,.12)',
-                border:          '1px solid rgba(206,17,38,.3)',
-                display:         'flex',
-                flexDirection:   'column',
-                alignItems:      'center',
-                justifyContent:  'center',
-                fontSize:        11,
-                fontFamily:      "'Cinzel', serif",
-                fontWeight:      900,
-                color:           '#CE1126',
-                letterSpacing:   '1px',
-                lineHeight:      1.1,
-              }}>
-                {firstTeam.name?.slice(0, 2).toUpperCase() ?? 'AP'}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              {/* Logo principal */}
+              <div
+                style={{
+                  flexShrink: 0,
+                  lineHeight: 0,
+                  borderRadius: 10,
+                  padding: 4,
+                  background: '#fff',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+                }}
+              >
+                {!logoFailed ? (
+                  <img
+                    src="/src/assets/images/pont.png"
+                    alt={firstTeam.name}
+                    style={{ height: 40, width: 40, objectFit: 'contain', borderRadius: 6 }}
+                    onError={() => setLogoFailed(true)}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      height: 40,
+                      width: 40,
+                      borderRadius: 6,
+                      background: 'rgba(206,17,38,.1)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontWeight: 'bold',
+                      fontSize: 12,
+                      color: '#CE1126',
+                    }}
+                  >
+                    {firstTeam.name?.slice(0, 2).toUpperCase() ?? 'AP'}
+                  </div>
+                )}
               </div>
-            )}
+
+              {/* Logo partenaire 1 */}
+              <div
+                style={{
+                  flexShrink: 0,
+                  lineHeight: 0,
+                  borderRadius: 10,
+                  padding: 4,
+                  background: '#fff',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+                }}
+              >
+                <img
+                  src="/src/assets/images/logo1.png"
+                  alt="Logo partenaire"
+                  style={{ height: 40, width: 40, objectFit: 'contain', borderRadius: 6 }}
+                />
+              </div>
+
+              {/* Logo partenaire 2 */}
+              <div
+                style={{
+                  flexShrink: 0,
+                  lineHeight: 0,
+                  borderRadius: 10,
+                  padding: 4,
+                  background: '#fff',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+                }}
+              >
+                <img
+                  src="/src/assets/images/logo3.png"
+                  alt="Logo partenaire"
+                  style={{ height: 40, width: 40, objectFit: 'contain', borderRadius: 6 }}
+                />
+              </div>
+            </div>
           </div>
 
-          {/* Séparateur */}
-          <div aria-hidden style={{
-            width:           1,
-            height:          28,
-            flexShrink:      0,
-            backgroundColor: 'rgba(255,255,255,.3)',
-          }} />
-
-          {/* Nom de l'app */}
-          <div className="_tb-brand" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', lineHeight: 1.2, flexShrink: 0 }}>
-            <span style={{
-              fontFamily: "'Cinzel', serif",
-              fontSize: 13,
-              fontWeight: 900,
-              letterSpacing: '.06em',
-              color:         '#FCD116',
-              textShadow:    '0 1px 4px rgba(0,0,0,0.5)',
-            }}>
-              {firstTeam.name ?? 'SIMABOU'}
-            </span>
-            <span style={{
-              fontSize:      9,
-              fontWeight:    600,
-              letterSpacing: '.2em',
-              textTransform: 'uppercase',
-              opacity:       0.9,
-              color:         '#FCD116',
-              textShadow:    '0 1px 3px rgba(0,0,0,0.4)',
-            }}>
-              2040
-            </span>
-          </div>
-
-          {/* ══ TITRE CENTRÉ ══ */}
-          <div className="_tb-center-title _tb-brand">
-            <div className="_tb-center-divider" />
-            <span className="_tb-center-main">Suivi &amp; Évaluation</span>
-            <span className="_tb-center-sub">République de Guinée</span>
-            <div className="_tb-center-divider" />
-          </div>
-
-          {/* ── Logo 1 & Logo 2 ── */}
-          <img src="/src/assets/images/logo1.png" alt="Logo 1" style={{ height: 40, width: 'auto', objectFit: 'contain', flexShrink: 0 }} />
-          <img src="/src/assets/images/logo3.png" alt="Logo 2" style={{ height: 40, width: 'auto', objectFit: 'contain', flexShrink: 0 }} />
-
-          {/* Spacer */}
-          <div style={{ flex: 1 }} />
-
-          {/* Contrôles droite */}
-          <div className="_tb-ctrl" style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-            <button
-              onClick={() => setMobileSearchOpen(true)}
-              className="_tb-ibtn md:hidden"
-              aria-label={t('Rechercher')}
-              style={{ color: headerText }}
+          {/* Centre : Titre */}
+          <div style={{ textAlign: 'center' }}>
+            <div
+              style={{
+                fontWeight: 800,
+                fontSize: 18,
+                letterSpacing: '2px',
+                textTransform: 'uppercase',
+                background: 'linear-gradient(135deg, #fff 0%, #FCD116 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                textShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              }}
             >
-              <Search size={17} aria-hidden />
-            </button>
-            <div className="hidden md:flex me-1">
+              SISE CEP Agriculture PS2040
+            </div>
+            <div
+              style={{
+                height: 2,
+                width: 60,
+                margin: '6px auto 0',
+                background: 'linear-gradient(90deg, transparent, #FCD116, #CE1126, #009460, transparent)',
+                borderRadius: 2,
+              }}
+            />
+          </div>
+
+          {/* Droite : Logos partenaires + Actions */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div className="hidden md:block">
               <SearchDesktop />
             </div>
             <ProgrammeSwitcher onHeader />
@@ -1334,10 +1341,8 @@ export function AppTopbar({ user }: UserProps) {
         <div
           className="_tb-row2"
           style={{
-            position:        'relative',
-            borderTop:       '1px solid rgba(255,255,255,.15)',
-            backgroundColor: headerBg2,
-            transition: 'background-color .35s ease',
+            borderTop: '1px solid rgba(255,255,255,.1)',
+            background: headerBg2,
           }}
         >
           <div aria-hidden style={{
