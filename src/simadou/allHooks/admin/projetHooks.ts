@@ -1,7 +1,5 @@
-import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
-import { AxiosError } from 'axios'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useActiveProgrammeId } from '@/hooks/use-active-programme'
-import type { Projet } from '@/simadou/allTypes/projet'
 import { projetBelongsToProgramme } from '@/simadou/allTypes/projet'
 import { projetService } from '@/simadou/allSercices/projetService'
 import type { ProjectCreateSubmitData } from '@/simadou/schemas/projetSchema'
@@ -102,16 +100,10 @@ export function useGetAllProjets() {
 }
 
 export function useGetProjet(id: number | string | undefined) {
-  const idProgramme = useActiveProgrammeId()
-  const queryClient = useQueryClient()
-
   return useQuery({
-    queryKey: [...projetQueryKeys.all, 'detail', id, idProgramme] as const,
-    queryFn: () => resolveProjetByRouteId(id!, idProgramme),
-    initialData: () => findProjetInCache(queryClient, idProgramme, id!),
-    staleTime: 30_000,
+    queryKey: [...projetQueryKeys.all, 'detail', id] as const,
+    queryFn: () => projetService.getById(id!),
     enabled: id != null && String(id).length > 0,
-    meta: { suppressGlobalErrorToast: true },
   })
 }
 
