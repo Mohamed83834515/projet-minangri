@@ -7,7 +7,7 @@ import useDialogState from '@/hooks/use-dialog-state'
 import { useEmbeddedTableState } from '@/hooks/use-embedded-table-state'
 import type { SuiviAvancementContrat } from '@/simadou/allTypes'
 import { buildSuiviAvancementContratColumns } from '@/simadou/allColonnes/suivi-avancement-contrat-columns'
-import { useDeleteSuiviAvancement } from '@/simadou/allHooks/admin/suiviPtbaHooks'
+import { useDeleteSuiviAvancementProjet } from '@/simadou/allHooks/admin/suiviPtbaProjetHooks'
 
 type SuiviAvancementContratListProps = {
   suivis: SuiviAvancementContrat[]
@@ -38,7 +38,7 @@ export default function SuiviAvancementContratProjetList({
   const [currentRow, setCurrentRow] =
     useState<SuiviAvancementContrat | null>(null)
 
-  const deleteMutation = useDeleteSuiviAvancement(idActivite)
+  const deleteMutation = useDeleteSuiviAvancementProjet(idActivite)
 
   const columns = useMemo(
     () => buildSuiviAvancementContratColumns(onEdit, setOpen, setCurrentRow),

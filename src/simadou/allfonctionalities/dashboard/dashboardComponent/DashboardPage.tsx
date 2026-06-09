@@ -17,7 +17,6 @@ import { useQuery } from "@tanstack/react-query";
 // import ptbaService from "@/simadou/allSercices/ptbaService";
 // import versionPtbaService from "@/simadou/allSercices/versionPtbaService";
 // import { planSiteService } from "@/simadou/allSercices/planSiteService";
-// import { decaissementPtbaService } from "@/simadou/allSercices/decaissementPtbaService";
 
 // ─── DONNÉES FICTIVES ────────────────────────────────────────────────────────────
 
@@ -187,11 +186,6 @@ const DashboardPage: React.FC = () => {
     // const { data: plansSites = [], isLoading: loadingPlansSites } = useQuery<PlanSite[]>({
     //     queryKey: ["plans-sites-dashboard"],
     //     queryFn: planSiteService.getAll,
-    // });
-
-    // const { data: decaissements = [], isLoading: loadingDecaissements } = useQuery({
-    //     queryKey: ["decaissementsPtba"],
-    //     queryFn: () => decaissementPtbaService.getAll(),
     // });
 
     // ── DONNÉES FICTIVES (remplacement temporaire) ──

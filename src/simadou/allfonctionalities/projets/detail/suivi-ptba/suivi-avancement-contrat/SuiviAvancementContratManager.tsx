@@ -3,9 +3,9 @@ import { useQueryClient } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
 import type { Ptba, SuiviAvancementContrat } from '@/simadou/allTypes'
 import {
-  suiviPtbaQueryKeys,
-  useGetSuiviAvancementByActivite,
-} from '@/simadou/allHooks/admin/suiviPtbaHooks'
+  suiviPtbaProjetQueryKeys,
+  useGetSuiviAvancementProjetByActivite,
+} from '@/simadou/allHooks/admin/suiviPtbaProjetHooks'
 import SuiviAvancementContratForm from './SuiviAvancementContratForm'
 import SuiviAvancementContratList from './SuiviAvancementContratList'
 import { ActiviteTabbedSubViewHeader, useActiviteTabbedSubView } from '@/simadou/allfonctionalities/suivi-ptba/ActiviteTabbedDialogContext'
@@ -24,9 +24,8 @@ export default function SuiviAvancementContratProjetManager({
 
   useActiviteTabbedSubView(showForm)
 
-  const { data: suivis = [], isLoading } = useGetSuiviAvancementByActivite(
-    activite.id_ptba
-  )
+  const { data: suivis = [], isLoading } =
+    useGetSuiviAvancementProjetByActivite(activite.id_ptba)
 
   const handleAdd = () => {
     setEditing(undefined)
@@ -47,7 +46,7 @@ export default function SuiviAvancementContratProjetManager({
     setShowForm(false)
     setEditing(undefined)
     queryClient.invalidateQueries({
-      queryKey: suiviPtbaQueryKeys.suiviAvancement(activite.id_ptba),
+      queryKey: suiviPtbaProjetQueryKeys.suiviAvancement(activite.id_ptba),
     })
   }
 

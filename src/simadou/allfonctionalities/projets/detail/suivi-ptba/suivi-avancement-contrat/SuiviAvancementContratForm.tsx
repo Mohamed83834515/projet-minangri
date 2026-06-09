@@ -15,11 +15,11 @@ import {
 } from '@/simadou/allTypes/suiviAvancementContrat'
 import { useMe } from '@/simadou/allHooks/auth/authHooks'
 import {
-  useCreateSuiviAvancementWithSources,
-  useGetSuiviAvancementSources,
-  useUpdateSuiviAvancementWithSources,
-  type SuiviAvancementWithSourcesInput,
-} from '@/simadou/allHooks/admin/suiviPtbaHooks'
+  useCreateSuiviAvancementProjetWithSources,
+  useGetSuiviAvancementProjetSources,
+  useUpdateSuiviAvancementProjetWithSources,
+} from '@/simadou/allHooks/admin/suiviPtbaProjetHooks'
+import type { SuiviAvancementWithSourcesInput } from '@/simadou/allSercices/suiviAvancementContratService'
 import {
   buildSuiviAvancementDefaultValues,
   pickExistingDocumentSources,
@@ -84,7 +84,7 @@ export default function SuiviAvancementContratProjetForm({
   const modifierPar = me?.email?.trim() || 'Utilisateur'
 
   const { data: sources = [], isLoading: sourcesLoading } =
-    useGetSuiviAvancementSources(suivi?.id_suivi)
+    useGetSuiviAvancementProjetSources(suivi?.id_suivi)
 
   const documentUrls = useMemo(
     () =>
@@ -104,8 +104,8 @@ export default function SuiviAvancementContratProjetForm({
     [suivi, documentUrls]
   )
 
-  const createMutation = useCreateSuiviAvancementWithSources(idActivite)
-  const updateMutation = useUpdateSuiviAvancementWithSources(idActivite)
+  const createMutation = useCreateSuiviAvancementProjetWithSources(idActivite)
+  const updateMutation = useUpdateSuiviAvancementProjetWithSources(idActivite)
 
   const onSubmit = (data: SuiviAvancementContratSuiviPtbaFormData) => {
     const idPersonnel =

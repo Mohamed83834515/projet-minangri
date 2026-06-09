@@ -10,6 +10,14 @@ export type SuiviIndicateurTableRow = IndicateurTache
 export type SuiviIndicateurColumnHandlers = {
   onSuivre: (indicateur: IndicateurTache) => void
   suivisByIndicateur: Map<string, SuiviIndicateurActivite[]>
+  resolveIndicateurKey?: (indicateur: IndicateurTache) => string
+}
+
+function getIndicateurKey(
+  indicateur: IndicateurTache,
+  resolveIndicateurKey?: (indicateur: IndicateurTache) => string
+): string {
+  return resolveIndicateurKey?.(indicateur) ?? resolveIndicateurCode(indicateur)
 }
 
 const colWide = 'max-w-[240px] whitespace-normal'
@@ -46,15 +54,19 @@ export function getValeurCibleIndicateur(
 
 export function countSuivisForIndicateur(
   suivisByIndicateur: Map<string, SuiviIndicateurActivite[]>,
-  indicateur: IndicateurTache
+  indicateur: IndicateurTache,
+  resolveIndicateurKey?: (indicateur: IndicateurTache) => string
 ): number {
-  return suivisByIndicateur.get(resolveIndicateurCode(indicateur))?.length ?? 0
+  return (
+    suivisByIndicateur.get(getIndicateurKey(indicateur, resolveIndicateurKey))
+      ?.length ?? 0
+  )
 }
 
 export function buildSuiviIndicateurColumns(
   handlers: SuiviIndicateurColumnHandlers
 ): ColumnDef<SuiviIndicateurTableRow>[] {
-  const { onSuivre, suivisByIndicateur } = handlers
+  const { onSuivre, suivisByIndicateur, resolveIndicateurKey } = handlers
 
   return [
     {
@@ -125,7 +137,11 @@ export function buildSuiviIndicateurColumns(
       ),
       cell: ({ row }) => {
         const indicateur = row.original
-        const count = countSuivisForIndicateur(suivisByIndicateur, indicateur)
+        const count = countSuivisForIndicateur(
+          suivisByIndicateur,
+          indicateur,
+          resolveIndicateurKey
+        )
         return (
           <Button
             variant='outline'

@@ -12,12 +12,12 @@ import type { Projet } from '@/simadou/allTypes'
 import type { PtbaProjet } from '@/simadou/allTypes/ptbaProjet'
 import { buildSuiviPtbaColumns } from '@/simadou/allColonnes/suivi-ptba-columns'
 import { useGetPtbasProjet } from '@/simadou/allHooks/admin/ptbaProjetHooks'
-import { useSuiviPtbaActivitesProgress } from '@/simadou/allHooks/admin/suiviPtbaHooks'
+import { useSuiviPtbaProjetActivitesProgress } from '@/simadou/allHooks/admin/suiviPtbaProjetHooks'
 import ActiviteTabbedDialog from '@/simadou/allfonctionalities/suivi-ptba/ActiviteTabbedDialog'
-import ObservationPtbaManager from '@/simadou/allfonctionalities/suivi-ptba/observations/ObservationPtbaManager'
 import SuiviTacheActiviteProjetManager from './suivi-tache/SuiviTacheActiviteManager'
 import SuiviIndicateurProjetManager from './suivi-indicateur/SuiviIndicateurManager'
 import SuiviAvancementContratProjetManager from './suivi-avancement-contrat/SuiviAvancementContratManager'
+import SuiviDecaissementPtbaProjetManager from './suivi-decaissement/SuiviDecaissementPtbaProjetManager'
 
 type ProjetSuiviPtbaPanelProps = {
   projet: Projet
@@ -46,7 +46,7 @@ export default function ProjetSuiviPtbaPanel({ projet }: ProjetSuiviPtbaPanelPro
     tachesByActivite,
     avancementByActivite,
     isLoading: progressLoading,
-  } = useSuiviPtbaActivitesProgress(activiteIds)
+  } = useSuiviPtbaProjetActivitesProgress(activiteIds)
 
   const columns = useMemo(
     () =>
@@ -116,6 +116,13 @@ export default function ProjetSuiviPtbaPanel({ projet }: ProjetSuiviPtbaPanelPro
                   ),
                 },
                 {
+                  value: 'decaissement',
+                  label: 'Suivi décaissement',
+                  content: (
+                    <SuiviDecaissementPtbaProjetManager activite={suiviActivite} />
+                  ),
+                },
+                {
                   value: 'avancement-contrat',
                   label: "Observation globale sur l'activité",
                   content: (
@@ -134,12 +141,17 @@ export default function ProjetSuiviPtbaPanel({ projet }: ProjetSuiviPtbaPanelPro
           if (!open) setObservationActivite(null)
         }}
       >
-        <DialogContent className={DIALOG_SIZES.lg} aria-describedby={undefined}>
+        <DialogContent
+          className={`${DIALOG_SIZES.lg} flex max-h-[90vh] flex-col overflow-hidden`}
+          aria-describedby={undefined}
+        >
           <DialogHeader>
             <DialogTitle>Observations</DialogTitle>
           </DialogHeader>
           {observationActivite && (
-            <ObservationPtbaManager activite={observationActivite} />
+            <div className='min-h-0 flex-1 overflow-hidden'>
+              <SuiviAvancementContratProjetManager activite={observationActivite} />
+            </div>
           )}
         </DialogContent>
       </Dialog>

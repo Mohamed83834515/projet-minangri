@@ -20,6 +20,7 @@ import ObservationPtbaManager from './observations/ObservationPtbaManager'
 import SuiviAvancementContratManager from './suivi-avancement-contrat/SuiviAvancementContratManager'
 import SuiviIndicateurManager from './suivi-indicateur/SuiviIndicateurManager'
 import SuiviTacheActiviteManager from './suivi-tache/SuiviTacheActiviteManager'
+import SuiviDecaissementPtbaManager from './suivi-decaissement/SuiviDecaissementPtbaManager'
 
 const route = getRouteApi('/_authenticated/programmation/suivi-ptba/')
 
@@ -136,6 +137,13 @@ export default function ListeSuiviPtba() {
                   label: 'Suivi des indicateurs',
                   content: (
                     <SuiviIndicateurManager activite={suiviActivite} />
+                  ),
+                },
+                {
+                  value: 'decaissement',
+                  label: 'Suivi décaissement',
+                  content: (
+                    <SuiviDecaissementPtbaManager activite={suiviActivite} />
                   ),
                 },
                 {

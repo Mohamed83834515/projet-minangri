@@ -3,6 +3,7 @@ import { GenericTable } from '@/Global/Generic/Generictable'
 import { useEmbeddedTableState } from '@/hooks/use-embedded-table-state'
 import type { IndicateurTache } from '@/simadou/allTypes/indicateurTache'
 import type { SuiviIndicateurActivite } from '@/simadou/allTypes/suiviIndicateurActivite'
+import type { SuiviIndicateurTacheProjet } from '@/simadou/allTypes/suiviIndicateurTacheProjet'
 import {
   buildSuiviIndicateurColumns,
   type SuiviIndicateurTableRow,
@@ -10,37 +11,19 @@ import {
 
 type SuiviIndicateurActiviteTableProps = {
   indicateurs: IndicateurTache[]
-  suivis: SuiviIndicateurActivite[]
+  suivis: SuiviIndicateurTacheProjet[]
   onSuivre: (indicateur: IndicateurTache) => void
 }
 
-function resolveSuiviIndicateurCode(suivi: SuiviIndicateurActivite): string | null {
-  if (typeof suivi.indicateur_activite === 'string') {
-    return suivi.indicateur_activite
-  }
-  if (
-    typeof suivi.indicateur_activite === 'object' &&
-    suivi.indicateur_activite
-  ) {
-    const obj = suivi.indicateur_activite as Record<string, unknown>
-    if (typeof obj.code_indicateur_activite === 'string') {
-      return obj.code_indicateur_activite
-    }
-    if (typeof obj.code_indicateur_ptba === 'string') {
-      return obj.code_indicateur_ptba
-    }
-  }
-  return null
-}
-
-function groupSuivisByIndicateur(suivis: SuiviIndicateurActivite[]) {
+function groupSuivisByIndicateur(suivis: SuiviIndicateurTacheProjet[]) {
   const map = new Map<string, SuiviIndicateurActivite[]>()
   for (const suivi of suivis) {
-    const code = resolveSuiviIndicateurCode(suivi)
-    if (!code) continue
-    const list = map.get(code) ?? []
-    list.push(suivi)
-    map.set(code, list)
+    const id = suivi.indicateur_sit
+    if (id == null || !Number.isFinite(id)) continue
+    const key = String(id)
+    const list = map.get(key) ?? []
+    list.push({ id_suivi_indicateur: suivi.id_suivi_sit } as SuiviIndicateurActivite)
+    map.set(key, list)
   }
   return map
 }
@@ -58,7 +41,13 @@ export default function SuiviIndicateurActiviteProjetTable({
   )
 
   const columns = useMemo(
-    () => buildSuiviIndicateurColumns({ onSuivre, suivisByIndicateur }),
+    () =>
+      buildSuiviIndicateurColumns({
+        onSuivre,
+        suivisByIndicateur,
+        resolveIndicateurKey: (indicateur) =>
+          String(indicateur.id_indicateur_tache),
+      }),
     [onSuivre, suivisByIndicateur]
   )
 
@@ -79,7 +68,7 @@ export default function SuiviIndicateurActiviteProjetTable({
       ]}
       defaultPageSize={10}
       showViewOptions={false}
-      emptyMessage='Aucun indicateur pour cette activité. Créez des indicateurs depuis la planification PTBA.'
+      emptyMessage='Aucun indicateur pour cette activité.'
     />
   )
 }
