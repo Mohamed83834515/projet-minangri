@@ -3,7 +3,7 @@ import { buildColumns } from '@/Global/Tableaux/column-builder'
 import { buildEditDeleteActionsColumn } from '@/Global/Tableaux/buildEditDeleteActionsColumn'
 import type { ActiviteProjet, NiveauActiviteProjet } from '@/simadou/allTypes'
 import { Button } from '@/components/ui/button'
-import { DollarSign, List } from 'lucide-react'
+import {  List } from 'lucide-react'
 import { DataTableColumnHeader } from '@/components/data-table'
 
 export function buildActiviteProjetColumns({
