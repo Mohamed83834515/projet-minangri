@@ -12,6 +12,7 @@ export interface Projet {
   date_demarrage_projet: string;
   partenaire_projet: Acteur | null;
   programme_projet?: Programme | number;
+  mps?: boolean;
   structure_projet: number;
   signataires_projet: Acteur[];
   partenaires_execution_projet: Acteur[];

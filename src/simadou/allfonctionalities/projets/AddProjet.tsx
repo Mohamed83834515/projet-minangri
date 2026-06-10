@@ -63,6 +63,7 @@ export default function AddProjet({ open, onOpenChange, currentRow }: OpenPropsP
     date_signature_projet: currentRow?.date_signature_projet ?? '',
     date_demarrage_projet: currentRow?.date_demarrage_projet ?? '',
     duree_projet: currentRow?.duree_projet ?? 0,
+    mps: currentRow?.mps ?? false,
 
     structure_projet: extractId(currentRow?.structure_projet?.[0] ?? 0),
     signataires_projet: extractIds(currentRow?.signataires_projet),
