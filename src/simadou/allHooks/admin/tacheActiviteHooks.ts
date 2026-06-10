@@ -1,5 +1,5 @@
 import tacheActivitePtbaService from "@/simadou/allSercices/tacheActivitePtbaService";
-import { TacheActivitePtbaFormData } from "@/simadou/schemas/tacheActivitePtbaSchemas";
+import type { TacheActivitePtbaApiPayload } from "@/simadou/lib/tacheActivitePtbaUtils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const BASE_URL = "/tache_activite_ptba/"
@@ -29,7 +29,7 @@ export const useCreateTacheActivite = (idActivite: number) => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (
-      data: TacheActivitePtbaFormData
+      data: TacheActivitePtbaApiPayload
     ) => tacheActivitePtbaService.create(BASE_URL, data),
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -48,7 +48,7 @@ export const useUpdateTacheActivite = (idActivite: number) => {
       data,
     }: {
       id: number
-      data: TacheActivitePtbaFormData 
+      data: TacheActivitePtbaApiPayload
     }) => tacheActivitePtbaService.update(BASE_URL, id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({

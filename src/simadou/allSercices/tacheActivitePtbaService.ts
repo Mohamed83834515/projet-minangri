@@ -1,6 +1,9 @@
 import { apiClient } from "@/axios/api";
-import { TacheActivitePtbaFormData } from "../schemas/tacheActivitePtbaSchemas";
-import type { TacheActivitePtba } from "../allTypes";
+import type { TacheActivitePtba } from "../allTypes/tacheActivitePtba";
+import {
+  filterTachesByActivite,
+  type TacheActivitePtbaApiPayload,
+} from "../lib/tacheActivitePtbaUtils";
 
 class TacheActivitePtbaService {
   async getAll(url:string): Promise<TacheActivitePtba[]> {
@@ -11,10 +14,8 @@ class TacheActivitePtbaService {
   }
 
   async getByActivite(url:string,idActivite: number): Promise<TacheActivitePtba[]> {
-    const response = await apiClient.request<TacheActivitePtba[]>(
-      `${url}?id_activite=${idActivite}`,
-    );
-    return response;
+    const response = await apiClient.request<TacheActivitePtba[]>(url);
+    return filterTachesByActivite(response, idActivite);
   }
 
   async getById(url:string, id: number): Promise<TacheActivitePtba> {
@@ -24,7 +25,7 @@ class TacheActivitePtbaService {
     return response;
   }
 
-  async create(url:string, data: TacheActivitePtbaFormData): Promise<TacheActivitePtba> {
+  async create(url:string, data: TacheActivitePtbaApiPayload): Promise<TacheActivitePtba> {
     const response = await apiClient.request<TacheActivitePtba>(
       url,
       {
@@ -38,7 +39,7 @@ class TacheActivitePtbaService {
   async update(
     url:string,
     id: number,
-    data: Partial<TacheActivitePtbaFormData>,
+    data: Partial<TacheActivitePtbaApiPayload>,
   ): Promise<TacheActivitePtba> {
     const response = await apiClient.request<TacheActivitePtba>(
       `${url}${id}/`,

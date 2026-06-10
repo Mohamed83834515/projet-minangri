@@ -10,6 +10,11 @@ export function getTacheActivitePtbaFormConfigForDialog({
   return {
   fields: [
     {
+      name: 'id_activite',
+      label: 'Activité',
+      type: 'hidden',
+    },
+    {
       name: 'code_tache_gt',
       label: 'Code tâche',
       type: 'text',

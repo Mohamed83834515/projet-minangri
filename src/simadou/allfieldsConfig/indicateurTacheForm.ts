@@ -14,6 +14,11 @@ export function getIndicateurTacheFormConfigForDialog({
   return {
   fields: [
     {
+      name: 'id_activite',
+      label: 'Activité',
+      type: 'hidden',
+    },
+    {
       name: 'intitule_indicateur_tache',
       label: 'Intitulé indicateur tâche',
       type: 'textarea',

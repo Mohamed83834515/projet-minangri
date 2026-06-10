@@ -119,14 +119,20 @@ export default function ProjetSuiviPtbaPanel({ projet }: ProjetSuiviPtbaPanelPro
                   value: 'decaissement',
                   label: 'Suivi décaissement',
                   content: (
-                    <SuiviDecaissementPtbaProjetManager activite={suiviActivite} />
+                    <SuiviDecaissementPtbaProjetManager
+                      key={suiviActivite.id_ptba}
+                      activite={suiviActivite}
+                    />
                   ),
                 },
                 {
                   value: 'avancement-contrat',
                   label: "Observation globale sur l'activité",
                   content: (
-                    <SuiviAvancementContratProjetManager activite={suiviActivite} />
+                    <SuiviAvancementContratProjetManager
+                      key={suiviActivite.id_ptba}
+                      activite={suiviActivite}
+                    />
                   ),
                 },
               ]
@@ -150,7 +156,10 @@ export default function ProjetSuiviPtbaPanel({ projet }: ProjetSuiviPtbaPanelPro
           </DialogHeader>
           {observationActivite && (
             <div className='min-h-0 flex-1 overflow-hidden'>
-              <SuiviAvancementContratProjetManager activite={observationActivite} />
+              <SuiviAvancementContratProjetManager
+                key={observationActivite.id_ptba}
+                activite={observationActivite}
+              />
             </div>
           )}
         </DialogContent>

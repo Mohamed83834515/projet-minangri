@@ -6,8 +6,7 @@ import { ActiviteTabbedSubViewHeader, useActiviteTabbedSubView } from '@/simadou
 import ActiviteTabbedFormPanel from '@/simadou/allfonctionalities/suivi-ptba/ActiviteTabbedFormPanel'
 import TacheActiviteProjetForm from './TacheActiviteForm'
 import TacheActiviteProjetList from './TacheActiviteList'
-import { useGetTachesByActiviteProjet } from '@/simadou/allHooks/admin/tacheActiviteProjetHooks'
-import { suiviPtbaQueryKeys } from '@/simadou/allHooks/admin/tacheActiviteHooks'
+import { useGetTachesByActiviteProjet, suiviPtbaQueryKeys } from '@/simadou/allHooks/admin/tacheActiviteProjetHooks'
 
 type TacheActivitePtbaManagerProps = {
   activite: Ptba

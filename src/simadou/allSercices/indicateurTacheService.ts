@@ -3,8 +3,7 @@ import type {
   IndicateurTache,
   IndicateurTacheRequest,
 } from "../allTypes/indicateurTache";
-
-// const BASE_URL = "/indicateurs-taches/";
+import { filterIndicateursByActivite } from "../lib/indicateurTacheUtils";
 
 class IndicateurTacheService {
   async getAll(url: string): Promise<IndicateurTache[]> {
@@ -15,10 +14,8 @@ class IndicateurTacheService {
   }
 
   async getByActivite(url: string, idActivite: number): Promise<IndicateurTache[]> {
-    const response = await apiClient.request<IndicateurTache[]>(
-      `${url}?id_activite=${idActivite}`
-    );
-    return response;
+    const response = await apiClient.request<IndicateurTache[]>(url);
+    return filterIndicateursByActivite(response, idActivite);
   }
 
   async getByTache(url: string, idTache: number): Promise<IndicateurTache[]> {

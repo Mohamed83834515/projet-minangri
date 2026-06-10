@@ -14,6 +14,13 @@ import { useGetIndicateursCmr } from '@/simadou/allHooks/admin/indicateurCmrHook
 import { useGetUnitesIndicateur } from '@/simadou/allHooks/admin/uniteIndicateurHooks'
 import type { Ptba } from '@/simadou/allTypes'
 import { IndicateurTache } from '@/simadou/allTypes/indicateurTache'
+import {
+  buildIndicateurCmrSelectOptions,
+  buildIndicateurTachePayload,
+  buildUniteIndicateurSelectOptions,
+  resolveIndicateurCmrFormValue,
+  resolveUniteIndicateurFormValue,
+} from '@/simadou/lib/indicateurTacheUtils'
 
 interface IndicateurTacheFormProps {
   indicateur?: IndicateurTache
@@ -36,14 +43,8 @@ export default function IndicateurTacheForm({
   const formConfig = useMemo(
     () =>
       getIndicateurTacheFormConfigForDialog({
-        indicateurCmrOptions: indicateursCmr.map((i) => ({
-          value: i.id_ref_ind_cmr,
-          label: i.intitule_ref_ind ?? i.code_ref_ind,
-        })),
-        uniteIndicateurOptions: unites.map((u) => ({
-          value: u.id_unite,
-          label: u.definition_ui ?? u.unite_ui ?? String(u.id_unite),
-        })),
+        indicateurCmrOptions: buildIndicateurCmrSelectOptions(indicateursCmr),
+        uniteIndicateurOptions: buildUniteIndicateurSelectOptions(unites),
         isLoadingIndicateurCmrs,
         isLoadingUnites,
       }),
@@ -55,8 +56,12 @@ export default function IndicateurTacheForm({
     (): IndicateurTacheFormData => ({
       intitule_indicateur_tache: indicateur?.intitule_indicateur_tache || '',
       code_indicateur_ptba: indicateur?.code_indicateur_ptba || '',
-      unite_ind_tache: indicateur?.unite_ind_tache || 0,
-      indicateur_cmr: indicateur?.indicateur_cmr || 0,
+      unite_ind_tache:
+        resolveUniteIndicateurFormValue(indicateur?.unite_ind_tache) ??
+        (undefined as unknown as number),
+      indicateur_cmr:
+        resolveIndicateurCmrFormValue(indicateur?.indicateur_cmr) ??
+        (undefined as unknown as number),
       trimestre_1: indicateur?.trimestre_1 || '',
       trimestre_2: indicateur?.trimestre_2 || '',
       trimestre_3: indicateur?.trimestre_3 || '',
@@ -69,10 +74,12 @@ export default function IndicateurTacheForm({
   const createMutation = useCreateIndicateurTache(idActivite)
   const updateMutation = useUpdateIndicateurTache(idActivite)
 
-  const onSubmit = (data: IndicateurTache) => {
+  const onSubmit = (data: IndicateurTacheFormData) => {
+    const payload = buildIndicateurTachePayload(data, Number(idActivite))
+
     if (isEditing && indicateur?.id_indicateur_tache) {
       updateMutation.mutate(
-        { id: indicateur.id_indicateur_tache, data },
+        { id: indicateur.id_indicateur_tache, data: payload },
         {
           onSuccess: () => {
             toast.success('Indicateur mis à jour avec succès')
@@ -82,7 +89,7 @@ export default function IndicateurTacheForm({
         }
       )
     } else {
-      createMutation.mutate(data, {
+      createMutation.mutate(payload, {
         onSuccess: () => {
           toast.success('Indicateur créé avec succès')
           onSuccess()

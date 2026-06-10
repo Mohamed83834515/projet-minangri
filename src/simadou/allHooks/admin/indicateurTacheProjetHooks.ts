@@ -1,12 +1,12 @@
 import indicateurTacheService from "@/simadou/allSercices/indicateurTacheService";
-import { IndicateurTache } from "@/simadou/allTypes/indicateurTache";
+import type { IndicateurTacheRequest } from "@/simadou/allTypes/indicateurTache";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const BASE_URL = "/indicateurs-taches-projets/"
 
 export const suiviPtbaQueryKeys = {
     indicateurs: (id_ptba: number) =>
-        ['indicateurs-tache', id_ptba] as const,
+        ['indicateurs-tache-projet', id_ptba] as const,
     localites: ['localites'] as const,
 }
 
@@ -20,7 +20,7 @@ export const useGetIndicateursProjetByActivite = (id_ptba: number) =>
 export const useCreateIndicateurTacheProjet = (id_ptba: number) => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data: IndicateurTache) =>
+    mutationFn: (data: IndicateurTacheRequest) =>
       indicateurTacheService.create(BASE_URL, data),
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -38,7 +38,7 @@ export const useUpdateIndicateurTacheProjet = (id_ptba: number) => {
       data,
     }: {
       id: number
-      data: IndicateurTache
+      data: Partial<IndicateurTacheRequest>
     }) => indicateurTacheService.update(BASE_URL, id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({

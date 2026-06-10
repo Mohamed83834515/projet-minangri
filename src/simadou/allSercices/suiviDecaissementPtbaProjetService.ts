@@ -1,6 +1,7 @@
 import { apiClient } from '@/axios/api'
 import type { SuiviDecaissementPtbaProjet } from '../allTypes/suiviDecaissementPtbaProjet'
 import type { SuiviDecaissementPtbaProjetFormData } from '../schemas/suiviDecaissementPtbaProjetSchemas'
+import { resolveRelationId } from '../lib/resolveApiRelation'
 import { normalizeApiList } from './apiListUtils'
 
 const ENDPOINT = '/suivi-decaissement-ptba-projets/'
@@ -14,6 +15,10 @@ function toDateInput(value: unknown): string {
 
 function todayIsoDate(): string {
   return new Date().toISOString().split('T')[0]
+}
+
+function resolveActivitePtbaProjetId(value: unknown): number | null {
+  return resolveRelationId(value, 'id_ptba')
 }
 
 function mapSuiviDecaissementPtbaProjetFromApi(
@@ -30,11 +35,15 @@ function mapSuiviDecaissementPtbaProjetFromApi(
     observation: String(raw.observation ?? ''),
     date_enregistrement: toDateInput(raw.date_enregistrement) || null,
     date_modification: toDateInput(raw.date_modification) || null,
-    activite_ptba_projet:
-      raw.activite_ptba_projet != null
-        ? Number(raw.activite_ptba_projet)
-        : null,
+    activite_ptba_projet: resolveActivitePtbaProjetId(raw.activite_ptba_projet),
   }
+}
+
+function filterSuivisDecaissementProjetByActivite(
+  items: SuiviDecaissementPtbaProjet[],
+  idActivite: number
+): SuiviDecaissementPtbaProjet[] {
+  return items.filter((item) => item.activite_ptba_projet === idActivite)
 }
 
 function toApiPayload(
@@ -63,11 +72,11 @@ const suiviDecaissementPtbaProjetService = {
   ): Promise<SuiviDecaissementPtbaProjet[]> {
     const response = await apiClient.request<unknown>(ENDPOINT, {
       method: 'GET',
-      params: { activite_ptba_projet: idActivite },
     })
-    return normalizeApiList<Record<string, unknown>>(response).map(
+    const items = normalizeApiList<Record<string, unknown>>(response).map(
       mapSuiviDecaissementPtbaProjetFromApi
     )
+    return filterSuivisDecaissementProjetByActivite(items, idActivite)
   },
 
   async create(

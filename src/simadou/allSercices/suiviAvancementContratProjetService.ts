@@ -1,5 +1,6 @@
 import { apiClient } from '@/axios/api'
 import type { SuiviAvancementContrat } from '../allTypes'
+import { filterSuivisAvancementByActivite } from '../allTypes/suiviAvancementContrat'
 import type {
   SourceVerificationInput,
   SuiviAvancementContratPayload,
@@ -89,10 +90,9 @@ function toMultipartBody(
 
 const suiviAvancementContratProjetService = {
   async getByActivite(idActivite: number): Promise<SuiviAvancementContrat[]> {
-    const response = await apiClient.request<SuiviAvancementContrat[]>(
-      `${ENDPOINT}?activite_ptba=${idActivite}`
-    )
-    return Array.isArray(response) ? response : []
+    const response = await apiClient.request<SuiviAvancementContrat[]>(ENDPOINT)
+    const items = Array.isArray(response) ? response : []
+    return filterSuivisAvancementByActivite(items, idActivite)
   },
 
   async createWithSources(
