@@ -150,7 +150,10 @@ export default function ListeSuiviPtba() {
                   value: 'avancement-contrat',
                   label: "Observation globale sur l'activité",
                   content: (
-                    <SuiviAvancementContratManager activite={suiviActivite} />
+                    <SuiviAvancementContratManager
+                      key={suiviActivite.id_ptba}
+                      activite={suiviActivite}
+                    />
                   ),
                 },
               ]
@@ -170,7 +173,10 @@ export default function ListeSuiviPtba() {
             <DialogTitle>Observations</DialogTitle>
           </DialogHeader>
           {observationActivite && (
-            <ObservationPtbaManager activite={observationActivite} />
+            <ObservationPtbaManager
+              key={observationActivite.id_ptba}
+              activite={observationActivite}
+            />
           )}
         </DialogContent>
       </Dialog>

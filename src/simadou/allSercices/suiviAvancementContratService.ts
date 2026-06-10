@@ -3,7 +3,10 @@ import type {
   ETAT_SUIVI_VALUES,
   STATUT_ACTIVITE_VALUES,
 } from "../schemas/suiviAvancementContratSchemas";
-import { SuiviAvancementContrat } from "../allTypes";
+import {
+  filterSuivisAvancementByActivite,
+  SuiviAvancementContrat,
+} from "../allTypes";
 
 const ENDPOINT = "/suivi-avancement-contrat/";
 const WITH_SOURCES_ENDPOINT = "/suivi-avancement-contrat/with-sources/";
@@ -120,10 +123,9 @@ function toMultipartBody(
 
 const suiviAvancementContratService = {
   async getByActivite(idActivite: number): Promise<SuiviAvancementContrat[]> {
-    const response = await apiClient.request<SuiviAvancementContrat[]>(
-      `${ENDPOINT}?activite_ptba=${idActivite}`,
-    );
-    return Array.isArray(response) ? response : [];
+    const response = await apiClient.request<SuiviAvancementContrat[]>(ENDPOINT);
+    const items = Array.isArray(response) ? response : [];
+    return filterSuivisAvancementByActivite(items, idActivite);
   },
 
   async createWithSources(

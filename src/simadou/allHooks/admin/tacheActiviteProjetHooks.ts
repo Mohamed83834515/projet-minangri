@@ -1,13 +1,13 @@
 import tacheActivitePtbaService from "@/simadou/allSercices/tacheActivitePtbaService";
-import { TacheActivitePtbaFormData } from "@/simadou/schemas/tacheActivitePtbaSchemas";
+import type { TacheActivitePtbaApiPayload } from "@/simadou/lib/tacheActivitePtbaUtils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const BASE_URL = "/tache-activite-ptba-projets/"
 
 export const suiviPtbaQueryKeys = {
-    tachesAll: ['taches-activite-all'] as const,
+    tachesAll: ['taches-activite-projet-all'] as const,
     tachesActivite: (idActivite: number) =>
-        ['taches-activite', idActivite] as const,
+        ['taches-activite-projet', idActivite] as const,
 }
 
 export const useGetAllTachesActiviteProjet = (enabled = true) =>
@@ -29,7 +29,7 @@ export const useCreateTacheActiviteProjet = (idActivite: number) => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (
-      data: TacheActivitePtbaFormData
+      data: TacheActivitePtbaApiPayload
     ) => tacheActivitePtbaService.create(BASE_URL, data),
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -48,7 +48,7 @@ export const useUpdateTacheActiviteProjet = (idActivite: number) => {
       data,
     }: {
       id: number
-      data: TacheActivitePtbaFormData 
+      data: TacheActivitePtbaApiPayload
     }) => tacheActivitePtbaService.update(BASE_URL, id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({

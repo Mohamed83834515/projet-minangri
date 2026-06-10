@@ -44,6 +44,46 @@ export function resolveActeurLabel(value: unknown): string | null {
   return null
 }
 
+export function resolvePersonnelLabel(
+  value: unknown,
+  personnelsById?: Map<number, { prenom_perso?: string; nom_perso?: string }>
+): string | null {
+  if (isEmptyRelationValue(value)) return null
+
+  if (typeof value === 'object' && value !== null) {
+    const personnel = value as {
+      prenom_perso?: string
+      nom_perso?: string
+      n_personnel?: number
+    }
+    const embeddedName =
+      `${personnel.prenom_perso ?? ''} ${personnel.nom_perso ?? ''}`.trim()
+    if (embeddedName) return embeddedName
+
+    const id = resolveRelationId(value, 'n_personnel')
+    if (id != null && personnelsById) {
+      const found = personnelsById.get(id)
+      if (found) {
+        const name =
+          `${found.prenom_perso ?? ''} ${found.nom_perso ?? ''}`.trim()
+        if (name) return name
+      }
+    }
+    return id != null ? String(id) : null
+  }
+
+  const id = resolveRelationId(value, 'n_personnel')
+  if (id == null) return null
+  if (personnelsById) {
+    const found = personnelsById.get(id)
+    if (found) {
+      const name = `${found.prenom_perso ?? ''} ${found.nom_perso ?? ''}`.trim()
+      if (name) return name
+    }
+  }
+  return String(id)
+}
+
 export function parseOptionalNumber(value: unknown): number | null {
   if (typeof value === 'number') return Number.isFinite(value) ? value : null
   if (typeof value === 'string' && value !== '') {
