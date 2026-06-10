@@ -42,10 +42,10 @@ export function getCadreAnalytiqueFormConfigForDialog({
       {
         name: 'intutile_ca',
         label: 'Intitulé',
-        type: 'text',
+        type: 'textarea',
         placeholder: "Entrez l'intitulé",
         required: true,
-        gridCols: 2,
+        gridCols: 1,
       },
       {
         name: 'abgrege_ca',
@@ -63,7 +63,7 @@ export function getCadreAnalytiqueFormConfigForDialog({
         required: true,
         min: 0,
         step: 0.01,
-        gridCols: 1,
+        gridCols: 2,
       },
       ...(showParent
         ? [

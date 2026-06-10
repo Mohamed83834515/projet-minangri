@@ -8,18 +8,8 @@ import type { NiveauCadreStrategique } from '@/simadou/allTypes/niveauCadreStrat
 import {
   buildChildCountByParentCsId,
   getNextNiveauCadreStrategique,
-  resolveParentCsId,
   resolvePartenaireCsIds,
 } from '@/simadou/lib/cadreStrategiqueUtils'
-
-function resolveParentCadre(
-  row: CadreStrategique,
-  cadres: CadreStrategique[]
-): CadreStrategique | null {
-  const parentId = resolveParentCsId(row.parent_cs)
-  if (parentId == null) return null
-  return cadres.find((c) => c.id_cs === parentId) ?? null
-}
 
 export function buildCadreStrategiqueColumns({
   cadres,
@@ -110,28 +100,6 @@ export function buildCadreStrategiqueColumns({
           ) : null}
         </div>
       ),
-      enableHiding: false,
-    },
-    {
-      id: 'parent_cs',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Parent' />
-      ),
-      cell: ({ row }) => {
-        const parent = resolveParentCadre(row.original, cadres)
-        if (!parent) {
-          return (
-            <span className='text-sm italic text-muted-foreground'>Racine</span>
-          )
-        }
-        return (
-          <div>
-            <LongText className='max-w-xs font-medium'>{parent.intutile_cs}</LongText>
-            <div className='text-xs text-muted-foreground'>{parent.code_cs}</div>
-          </div>
-        )
-      },
-      enableSorting: false,
       enableHiding: false,
     },
     {

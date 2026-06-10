@@ -32,7 +32,7 @@ import {
   buildCibleCmrGridState,
   buildCiblePayloadFromGridCell,
   filterCiblesForIndicateurCmrId,
-  getLocalitesNiveau2,
+  getLocalitesNiveau1,
   getProgrammeYearRange,
   parseGridCellValue,
   type CibleCmrGridCell,
@@ -42,7 +42,7 @@ import { resolveFixedCodeIndicateurCrpFromCmr } from '@/simadou/allfonctionaliti
 const DEFAULT_PAGE_SIZE = 5
 /** Above this count, year columns use min-widths and the grid scrolls horizontally */
 const YEAR_SCROLL_THRESHOLD = 10
-const ZONE_COLUMN_MIN_PX = 148
+const ZONE_COLUMN_MIN_PX = 100
 const YEAR_COLUMN_MIN_PX = 58
 
 type Props = {
@@ -69,7 +69,7 @@ export default function CibleCmrGridPanel({ indicateur, onClose }: Props) {
   )
 
   const zones = useMemo(
-    () => getLocalitesNiveau2(localites, niveaux),
+    () => getLocalitesNiveau1(localites, niveaux),
     [localites, niveaux]
   )
 

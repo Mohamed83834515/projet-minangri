@@ -10,7 +10,6 @@ import type {
 import {
   buildChildCountByParentCaId,
   getNextNiveauCadreAnalytique,
-  resolveParentCaId,
   resolvePartenaireCaIds,
 } from '@/simadou/lib/cadreAnalytiqueUtils'
 
@@ -22,14 +21,6 @@ function formatCoutAxe(value: number | undefined): string {
   }).format(value ?? 0)
 }
 
-function resolveParentCadre(
-  row: CadreAnalytique,
-  cadres: CadreAnalytique[]
-): CadreAnalytique | null {
-  const parentId = resolveParentCaId(row.parent_ca)
-  if (parentId == null) return null
-  return cadres.find((c) => c.id_ca === parentId) ?? null
-}
 
 export function buildCadreAnalytiqueColumns({
   cadres,
@@ -132,28 +123,7 @@ export function buildCadreAnalytiqueColumns({
       ),
       enableHiding: false,
     },
-    {
-      id: 'parent_ca',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Parent' />
-      ),
-      cell: ({ row }) => {
-        const parent = resolveParentCadre(row.original, cadres)
-        if (!parent) {
-          return (
-            <span className='text-sm italic text-muted-foreground'>Racine</span>
-          )
-        }
-        return (
-          <div>
-            <LongText className='max-w-xs font-medium'>{parent.intutile_ca}</LongText>
-            <div className='text-xs text-muted-foreground'>{parent.code_ca}</div>
-          </div>
-        )
-      },
-      enableSorting: false,
-      enableHiding: false,
-    },
+    
     {
       id: 'partenaire_ca',
       header: ({ column }) => (

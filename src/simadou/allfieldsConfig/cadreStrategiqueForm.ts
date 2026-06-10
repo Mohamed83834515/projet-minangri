@@ -41,10 +41,10 @@ export function getCadreStrategiqueFormConfigForDialog({
       {
         name: 'intutile_cs',
         label: 'Intitulé',
-        type: 'text',
+        type: 'textarea',
         placeholder: "Entrez l'intitulé",
         required: true,
-        gridCols: 2,
+        gridCols: 1,
       },
       {
         name: 'abgrege_cs',

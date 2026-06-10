@@ -48,11 +48,11 @@ export function resolveLocaliteNiveauNombre(
   return null
 }
 
-export function getLocalitesNiveau2(
+export function getLocalitesNiveau1(
   localites: Localite[],
   niveaux: NiveauLocalite[] = []
 ): Localite[] {
-  const niveauConfig = niveaux.find((n) => Number(n.nombre_nlc) === 2)
+  const niveauConfig = niveaux.find((n) => Number(n.nombre_nlc) === 1)
 
   return localites
     .filter((localite) => {

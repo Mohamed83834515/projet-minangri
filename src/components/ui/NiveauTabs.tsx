@@ -26,7 +26,7 @@ export function NiveauTabTrigger({ value, count, children }: NiveauTabTriggerPro
       {children}
       {count !== undefined && count > 0 && (
         <span className='ml-2 rounded-full bg-muted px-1.5 py-0.5 text-xs text-black'>
-          {count}
+          ({count})
         </span>
       )}
     </TabsTrigger>
