@@ -48,6 +48,8 @@ function darken(hex: string, factor = 0.85): string {
 
 // ─── CSS injecté dynamiquement ────────────────────────────────────────────────
 const TOPBAR_CSS = `
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Lato:wght@400;600;700;900&display=swap');
+
   @keyframes _tb-down {
     from { opacity:0; transform:translateY(-8px); }
     to   { opacity:1; transform:translateY(0); }
@@ -64,8 +66,14 @@ const TOPBAR_CSS = `
     from { opacity:0; transform:translateY(-6px); max-height:0; }
     to   { opacity:1; transform:translateY(0);   max-height:56px; }
   }
+  @keyframes _tb-shine {
+    0%   { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+
   ._tb-row1  { animation: _tb-down 0.32s cubic-bezier(.16,1,.3,1) both; }
   ._tb-row2  { animation: _tb-down 0.32s .07s cubic-bezier(.16,1,.3,1) both; }
+  ._tb-brand { animation: _tb-fade 0.38s .12s both; }
 
   ._tb-ctrl > *              { animation: _tb-fade 0.28s both; }
   ._tb-ctrl > *:nth-child(1) { animation-delay:.12s; }
@@ -115,6 +123,98 @@ const TOPBAR_CSS = `
     animation: _tb-subnav-in 0.22s cubic-bezier(.16,1,.3,1) both;
     overflow: hidden;
   }
+
+  ._tb-logo {
+    height: 48px;
+    width: auto;
+    max-width: 140px;
+    object-fit: contain;
+    display: block;
+    border-radius: 4px;
+    transition: opacity .2s ease, transform .2s ease;
+  }
+  ._tb-logo-wrap:hover ._tb-logo { opacity:.85; transform:scale(1.04); }
+
+  /* ── Centre redesigné ── */
+  ._tb-center-title {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+    gap: 3px;
+  }
+
+  ._tb-center-eyebrow {
+    font-family: 'Lato', sans-serif;
+    font-size: 8.5px;
+    font-weight: 700;
+    letter-spacing: .32em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.85);
+    text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+  }
+
+  ._tb-center-main {
+    font-family: 'Cinzel', serif;
+    font-size: 17px;
+    font-weight: 900;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: #fff;
+    line-height: 1.15;
+    white-space: nowrap;
+    /* Shine sweep sur blanc pur */
+    background: linear-gradient(
+      105deg,
+      #ffffff 0%,
+      rgba(255,255,255,0.7) 35%,
+      #ffffff 50%,
+      rgba(255,255,255,0.7) 65%,
+      #ffffff 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: _tb-shine 6s linear infinite;
+    text-shadow: none;
+    padding: 0 2px;
+  }
+
+  ._tb-center-rule {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+  }
+  ._tb-center-rule-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,.5), transparent);
+    min-width: 32px;
+  }
+  ._tb-center-rule-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.7);
+    opacity: .8;
+    flex-shrink: 0;
+  }
+
+  ._tb-center-sub {
+    font-family: 'Lato', sans-serif;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: .26em;
+    color: rgba(255,255,255,.65);
+    line-height: 1;
+    text-transform: uppercase;
+  }
 `
 
 function CSSInjector() {
@@ -152,6 +252,7 @@ function MobileSearchModal({
   open: boolean
   onClose: () => void
   headerBg: string
+  headerText: string
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -227,7 +328,6 @@ export function AppTopbar({ user }: UserProps) {
   const [open, setOpen] = useDialogState()
   const headerColor = useColorStore((s) => s.headerColor)
   const { bg: headerBg } = HEADER_COLORS[headerColor]
-  // Toujours blanc pour le texte → lisibilité maximale
   const headerText = '#FFFFFF'
   const headerBg2 = darken(headerBg, 0.82)
   const headerBg3 = darken(headerBg, 0.70)
@@ -308,6 +408,7 @@ export function AppTopbar({ user }: UserProps) {
         open={mobileSearchOpen}
         onClose={() => setMobileSearchOpen(false)}
         headerBg={headerBg}
+        headerText={headerText}
       />
 
       <header
@@ -341,126 +442,109 @@ export function AppTopbar({ user }: UserProps) {
             style={{ color: headerText, flexShrink: 0 }}
           />
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              {/* Logo principal */}
-              <div
-                style={{
-                  flexShrink: 0,
-                  lineHeight: 0,
-                  borderRadius: 10,
-                  padding: 4,
-                  background: '#fff',
-                  boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
-                }}
-              >
-                {!logoFailed ? (
-                  <img
-                    src="/src/assets/images/pont.png"
-                    alt={firstTeam.name}
-                    style={{ height: 40, width: 40, objectFit: 'contain', borderRadius: 6 }}
-                    onError={() => setLogoFailed(true)}
-                  />
-                ) : (
-                  <div
-                    style={{
-                      height: 40,
-                      width: 40,
-                      borderRadius: 6,
-                      background: 'rgba(206,17,38,.1)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontWeight: 'bold',
-                      fontSize: 12,
-                      color: '#CE1126',
-                    }}
-                  >
-                    {firstTeam.name?.slice(0, 2).toUpperCase() ?? 'AP'}
-                  </div>
-                )}
+          {/* LOGO — fond blanc pour lisibilité */}
+          <div
+            className="_tb-brand _tb-logo-wrap"
+            style={{
+              flexShrink:      0,
+              lineHeight:      0,
+              backgroundColor: '#FFFFFF',
+              borderRadius:    8,
+              padding:         4,
+              boxShadow:       '0 2px 8px rgba(0,0,0,0.25)',
+            }}
+          >
+            {!logoFailed ? (
+              <img
+                src="/src/assets/images/pont.png"
+                alt={firstTeam.name}
+                className="_tb-logo"
+                onError={() => setLogoFailed(true)}
+              />
+            ) : (
+              <div aria-hidden style={{
+                height:          48,
+                width:           44,
+                borderRadius:    6,
+                backgroundColor: 'rgba(206,17,38,.12)',
+                border:          '1px solid rgba(206,17,38,.3)',
+                display:         'flex',
+                flexDirection:   'column',
+                alignItems:      'center',
+                justifyContent:  'center',
+                fontSize:        11,
+                fontFamily:      "'Cinzel', serif",
+                fontWeight:      900,
+                color:           '#CE1126',
+                letterSpacing:   '1px',
+                lineHeight:      1.1,
+              }}>
+                {firstTeam.name?.slice(0, 2).toUpperCase() ?? 'AP'}
               </div>
-
-              {/* Logo partenaire 1 */}
-              <div
-                style={{
-                  flexShrink: 0,
-                  lineHeight: 0,
-                  borderRadius: 10,
-                  padding: 4,
-                  background: '#fff',
-                  boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
-                }}
-              >
-                <img
-                  src="/src/assets/images/logo1.png"
-                  alt="Logo partenaire"
-                  style={{ height: 40, width: 40, objectFit: 'contain', borderRadius: 6 }}
-                />
-              </div>
-
-              {/* Logo partenaire 2 */}
-              <div
-                style={{
-                  flexShrink: 0,
-                  lineHeight: 0,
-                  borderRadius: 10,
-                  padding: 4,
-                  background: '#fff',
-                  boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
-                }}
-              >
-                <img
-                  src="/src/assets/images/logo3.png"
-                  alt="Logo partenaire"
-                  style={{ height: 40, width: 40, objectFit: 'contain', borderRadius: 6 }}
-                />
-              </div>
-            </div>
+            )}
           </div>
 
-          {/* Centre : Titre */}
-          <div style={{ textAlign: 'center' }}>
-            <div
-              style={{
-                fontWeight: 800,
-                fontSize: 18,
-                letterSpacing: '2px',
-                textTransform: 'uppercase',
-                background: 'linear-gradient(135deg, #fff 0%, #FCD116 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-                textShadow: '0 2px 4px rgba(0,0,0,0.1)',
-              }}
+          {/* Séparateur */}
+          <div aria-hidden style={{
+            width:           1,
+            height:          28,
+            flexShrink:      0,
+            backgroundColor: 'rgba(255,255,255,.3)',
+          }} />
+
+          {/* Nom de l'app */}
+          <div className="_tb-brand" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', lineHeight: 1.2, flexShrink: 0 }}>
+            <span style={{
+              fontFamily: "'Cinzel', serif",
+              fontSize: 13,
+              fontWeight: 900,
+              letterSpacing: '.06em',
+              color:         '#FCD116',
+              textShadow:    '0 1px 4px rgba(0,0,0,0.5)',
+            }}>
+              {firstTeam.name ?? 'SIMABOU'}
+            </span>
+            <span style={{
+              fontSize:      9,
+              fontWeight:    600,
+              letterSpacing: '.2em',
+              textTransform: 'uppercase',
+              opacity:       0.9,
+              color:         '#FCD116',
+              textShadow:    '0 1px 3px rgba(0,0,0,0.4)',
+            }}>
+              2040
+            </span>
+          </div>
+
+          {/* ══ TITRE CENTRÉ ══ */}
+          <div className="_tb-center-title _tb-brand">
+            <div className="_tb-center-divider" />
+            <span className="_tb-center-main">Suivi &amp; Évaluation</span>
+            <span className="_tb-center-sub">République de Guinée</span>
+            <div className="_tb-center-divider" />
+          </div>
+
+          {/* ── Logo 1 & Logo 2 ── */}
+          <img src="/src/assets/images/logo1.png" alt="Logo 1" style={{ height: 40, width: 'auto', objectFit: 'contain', flexShrink: 0 }} />
+          <img src="/src/assets/images/logo3.png" alt="Logo 2" style={{ height: 40, width: 'auto', objectFit: 'contain', flexShrink: 0 }} />
+
+          {/* Spacer */}
+          <div style={{ flex: 1 }} />
+
+          {/* Contrôles droite */}
+          <div className="_tb-ctrl" style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+            <button
+              onClick={() => setMobileSearchOpen(true)}
+              className="_tb-ibtn md:hidden"
+              aria-label={t('Rechercher')}
+              style={{ color: headerText }}
             >
-              SISE CEP Agriculture PS2040
-            </div>
-            <div
-              style={{
-                height: 2,
-                width: 60,
-                margin: '6px auto 0',
-                background: 'linear-gradient(90deg, transparent, #FCD116, #CE1126, #009460, transparent)',
-                borderRadius: 2,
-              }}
-            />
-          </div>
-
-          {/* Droite : Logos partenaires + Actions */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div className="hidden md:block">
+              <Search size={17} aria-hidden />
+            </button>
+            <div className="hidden md:flex me-1">
               <SearchDesktop />
             </div>
-            <div
-              aria-hidden
-              style={{
-                width: 1,
-                height: 28,
-                flexShrink: 0,
-                backgroundColor: 'rgba(255,255,255,.22)',
-                marginInline: 4,
-              }}
-            />
             <ProgrammeSwitcher onHeader />
             <ThemeSwitch />
             <ConfigDrawer />
@@ -486,8 +570,10 @@ export function AppTopbar({ user }: UserProps) {
         <div
           className="_tb-row2"
           style={{
-            borderTop: '1px solid rgba(255,255,255,.1)',
-            background: headerBg2,
+            position:        'relative',
+            borderTop:       '1px solid rgba(255,255,255,.15)',
+            backgroundColor: headerBg2,
+            transition: 'background-color .35s ease',
           }}
         >
           <div aria-hidden style={{
