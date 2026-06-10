@@ -14,9 +14,13 @@ const FONCTION_AGREGAT_OPTIONS: SelectOption[] = [
 export const getIndicateurCmrFormConfigForDialog = ({
   uniteOptions,
   isLoadingUnites,
+  indicateurStrategiqueOptions,
+  isLoadingIndicateursStrategiques,
 }: {
   uniteOptions: SelectOption[];
   isLoadingUnites?: boolean;
+  indicateurStrategiqueOptions?: SelectOption[];
+  isLoadingIndicateursStrategiques?: boolean;
 }): FormConfig => ({
   fields: [
     {
@@ -51,10 +55,14 @@ export const getIndicateurCmrFormConfigForDialog = ({
     {
       name: "resultat_cmr",
       label: "Résultat CMR",
-      type: "text",
-      placeholder: "Résultat attendu du cadre de mesure de résultats",
+      type: indicateurStrategiqueOptions ? "select" : "text",
+      placeholder: indicateurStrategiqueOptions
+        ? "Sélectionner un indicateur stratégique…"
+        : "Résultat attendu du cadre de mesure de résultats",
       required: true,
-      maxLength: 200,
+      maxLength: indicateurStrategiqueOptions ? undefined : 200,
+      options: indicateurStrategiqueOptions ?? [],
+      isLoading: isLoadingIndicateursStrategiques,
       gridCols: 2,
     },
     {
