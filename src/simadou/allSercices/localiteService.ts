@@ -12,11 +12,22 @@ export const localiteService = {
   },
 
   async getByParent(parentId: number | null): Promise<Localite[]> {
+    const allLocalites = await this.getAll()
+    
     if (parentId === null) {
-      const all = await this.getAll()
-      return all.filter((loc) => loc.parent_loca === null)
+      // Retourner les localités sans parent (niveau 1)
+      return allLocalites.filter((loc) => loc.parent_loca === null)
     }
-    return await apiClient.request<Localite[]>(`/localiteByParent/${parentId}/`)
+    
+    // Filtrer les localités dont l'id du parent correspond
+    return allLocalites.filter((loc) => {
+      if (!loc.niveau_loca) return false
+      if (loc.niveau_loca && typeof loc.niveau_loca === 'number') {
+        return loc.niveau_loca === parentId
+      }
+      // Si parent_loca est un objet
+      return (loc.niveau_loca as any).nombre_nlc === parentId
+    })
   },
 
   // ✅ Correction: Filtrer les localités par niveau côté frontend

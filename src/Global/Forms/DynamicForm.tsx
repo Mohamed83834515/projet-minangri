@@ -212,7 +212,7 @@ export const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps>(
             >
                 {/* Indicateur de statut (masqué en modal embarqué sauf erreurs) */}
                 {(!embedded || hasErrors) && (
-                <div className='flex items-center gap-2'>
+                <div className='flex min-w-0 shrink items-center gap-2'>
                   <span className='relative flex h-2 w-2'>
                     {(isDirty || hasErrors) && (
                       <span
@@ -240,7 +240,7 @@ export const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps>(
                 </div>
                 )}
 
-                <div className='flex items-center gap-2'>
+                <div className='flex shrink-0 items-center gap-2'>
                   {onBack && (
                     <Button
                       type='button'

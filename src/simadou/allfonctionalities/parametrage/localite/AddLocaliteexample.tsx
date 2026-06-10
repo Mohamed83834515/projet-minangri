@@ -1,7 +1,7 @@
 // simadou/allfonctionalities/parametrage/localite/AddLocalite.tsx
 import { useMemo } from 'react'
 import { DynamicForm } from '@/Global/Forms/DynamicForm'
-import { localiteSchema, LocaliteFormData } from '@/simadou/schemas/localiteSchema'
+import { localiteSchema } from '@/simadou/schemas/localiteSchema'
 import { useSaveLocalite, useGetLocalitesByParent } from '@/simadou/allHooks/admin/localiteHooks'
 import { getLocaliteFormConfig } from '@/simadou/allfieldsConfig/localiteForm'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'

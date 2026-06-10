@@ -3,7 +3,6 @@ import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowRight, Clock, Inbox, Loader2, MailCheck, RefreshCw } from 'lucide-react'
-import {  cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -21,14 +20,11 @@ import { useState } from 'react'
 
 const formSchema = z.object({
   email: z.email({
-    error: (iss) => (iss.input === '' ? 'Veuillez entrer votre email' : undefined),
+    error: (iss) => (iss.input === '' ? 'Veuillez entrer votre email' : "Entrez une adresse email valide"),
   }),
 })
 
-export function ForgotPasswordForm({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLFormElement>) {
+export function ForgotPasswordForm({mode } : {mode : "reset" | "setup"}) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: { email: '' },
@@ -46,7 +42,7 @@ const [submittedEmail, setSubmittedEmail] = useState('')
 
 function onSubmit(data: z.infer<typeof formSchema>) {
   resetPassword(
-    { data },
+    { data, mode },
     {
       onSuccess: () => {
         setSubmittedEmail(data.email)
@@ -58,7 +54,7 @@ function onSubmit(data: z.infer<typeof formSchema>) {
 
 const handleResend = () => {
   resetPassword(
-    { data: { email: submittedEmail } },
+    { data: { email: submittedEmail }, mode },
     {
       onSuccess: () => {
         // stays on success screen, no flash
@@ -72,7 +68,7 @@ const handleResend = () => {
     <>
  {
   isSubmitted ? (
-      <div className={cn('flex flex-col items-center gap-5 text-center', className)}>
+      <div className={"flex flex-col items-center gap-5 text-center"}>
 
     <div className="flex size-13 items-center justify-center rounded-full
                     border border-emerald-200 bg-emerald-50
@@ -113,7 +109,8 @@ const handleResend = () => {
     </div>
 
     {/* Resend */}
-    <div className="w-full space-y-3 border-t border-zinc-100 pt-4 dark:border-zinc-800">
+  
+     <div className="w-full space-y-3 border-t border-zinc-100 pt-4 dark:border-zinc-800">
       <p className="text-xs text-zinc-400">Vous n'avez rien reçu ?</p>
      <Button
       className="w-full text-sm"
@@ -127,6 +124,7 @@ const handleResend = () => {
      {isPending ? "Renvoie du lien .." : "Renvoyer le lien" }
     </Button>
     </div>
+  
 
   </div>
   ) 
@@ -134,8 +132,8 @@ const handleResend = () => {
        <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className={cn('grid gap-2', className)}
-        {...props}
+        className={'grid gap-2'}
+      
       >
         <FormField
           control={form.control}

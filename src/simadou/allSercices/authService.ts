@@ -48,14 +48,21 @@ export const authService = {
     return response;
   },
 
-  async reset_link(credentials: ResetLinkCredentials): Promise<LoginResponse> {
-    const response = await apiClient.request<LoginResponse>("/password/reset/", {
+async reset_link(
+  credentials: ResetLinkCredentials,
+  mode: "reset" | "setup"
+): Promise<LoginResponse> {
+  const response = await apiClient.request<LoginResponse>(
+    mode === 'setup' ? "/password/set/resend/" : "/password/reset/",
+    {
       method: "POST",
       data: credentials,
-    });
+    
+    }
+  );
 
-    return response;
-  },
+  return response;
+},
 
   async reset_password(credentials: ResetPasswordCredentials): Promise<LoginResponse> {
     const response = await apiClient.request<LoginResponse>("/password/set/", {

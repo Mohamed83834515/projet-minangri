@@ -1,10 +1,11 @@
 import { useMemo } from 'react'
 import { toast } from 'sonner'
 import { DynamicForm } from '@/Global/Forms/DynamicForm'
-import type {Ptba, TacheActivitePtba } from '@/simadou/allTypes'
+import type { Ptba, TacheActivitePtba } from '@/simadou/allTypes'
 import { TacheActivitePtbaFormData, tacheActivitePtbaSchema } from '@/simadou/schemas/tacheActivitePtbaSchemas'
 import { useCreateTacheActivite, useUpdateTacheActivite } from '@/simadou/allHooks/admin/tacheActiviteHooks'
 import { getTacheActivitePtbaFormConfig } from '@/simadou/allfieldsConfig/tacheActivitePtbaForm'
+import { useMe } from '@/simadou/allHooks/auth/authHooks'
 
 interface TacheActivitePtbaFormProps {
   tache?: TacheActivitePtba;
@@ -20,6 +21,7 @@ export default function TacheActiviteForm({
   onSuccess,
 }: TacheActivitePtbaFormProps) {
   const isEditing = !!tache
+  const { data: user } = useMe()
   const formConfig = useMemo(() => getTacheActivitePtbaFormConfig(), [])
   const idActivite = activite.id_ptba
   const defaultValues = useMemo(
@@ -31,15 +33,16 @@ export default function TacheActiviteForm({
       date_fin_gt: tache?.date_fin_gt || "",
       n_lot_gt: tache?.n_lot_gt || 1,
       observation_gt: tache?.observation_gt || "",
-      id_personnel_gt: 16,
+      id_personnel_gt: user?.n_personnel,
       responsable_gt:
-        typeof tache?.responsable_gt === "object"
+        (typeof tache?.responsable_gt === "object") && (tache.responsable_gt !== null)
           ? tache.responsable_gt.n_personnel || 0
           : tache?.responsable_gt || 0,
       id_activite: idActivite,
     }),
     [tache]
   )
+
 
   const createMutation = useCreateTacheActivite(idActivite)
   const updateMutation = useUpdateTacheActivite(idActivite)

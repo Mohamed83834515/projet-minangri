@@ -55,6 +55,12 @@ export interface RichSelectOption {
   suffix?: string
 }
 
+function selectValuesMatch(a: unknown, b: unknown): boolean {
+  if (a == null && b == null) return true
+  if (a == null || b == null) return false
+  return String(a) === String(b)
+}
+
 interface FormFieldProps {
   field: FieldConfig & { options?: RichSelectOption[] }
   register: any
@@ -560,10 +566,10 @@ export const FormField = ({
             control={control}
             render={({ field: controllerField }) => {
               const options = (field.options || []) as RichSelectOption[]
-              const selectedOption = options.find(
-                (opt) =>
-                  opt.value === controllerField.value
+              const selectedOption = options.find((opt) =>
+                selectValuesMatch(opt.value, controllerField.value)
               )
+              const canClear = !field.required
               return (
                 <div className='relative min-w-0'>
                   <Popover open={comboboxOpen} onOpenChange={setComboboxOpen} modal={false}>
@@ -578,7 +584,7 @@ export const FormField = ({
                         }
                         className={cn(
                           'h-auto min-h-9 w-full min-w-0 justify-between gap-2 overflow-hidden font-normal whitespace-normal',
-                          !controllerField.value && 'text-muted-foreground',
+                          !selectedOption && 'text-muted-foreground',
                           isValid && 'border-green-500 focus:ring-green-500',
                           isInvalid && 'border-red-500 focus:ring-red-500'
                         )}
@@ -590,7 +596,7 @@ export const FormField = ({
                               className={cn(
                                 'truncate',
                                 selectedOption.isInscrit &&
-                                  'font-medium text-green-700 dark:text-green-400'
+                                'font-medium text-green-700 dark:text-green-400'
                               )}
                             >
                               {selectedOption.label}
@@ -625,6 +631,28 @@ export const FormField = ({
                         <CommandList>
                           <CommandEmpty>Aucun résultat trouvé.</CommandEmpty>
                           <CommandGroup>
+                            {canClear ? (
+                              <CommandItem
+                                value='__none__'
+                                className='cursor-pointer text-muted-foreground italic'
+                                onSelect={() => {
+                                  controllerField.onChange(null)
+                                  setComboboxOpen(false)
+                                  setTouched(true)
+                                  if (trigger) trigger(field.name)
+                                }}
+                              >
+                                Aucun
+                                <Check
+                                  className={cn(
+                                    'ml-2 h-4 w-4 shrink-0',
+                                    controllerField.value == null
+                                      ? 'opacity-100'
+                                      : 'opacity-0'
+                                  )}
+                                />
+                              </CommandItem>
+                            ) : null}
                             {options.map((option) => (
                               <CommandItem
                                 key={option.value}
@@ -660,8 +688,10 @@ export const FormField = ({
                                 <Check
                                   className={cn(
                                     'ml-2 h-4 w-4 shrink-0',
-                                    controllerField.value ===
+                                    selectValuesMatch(
+                                      controllerField.value,
                                       option.value
+                                    )
                                       ? 'text-green-600 opacity-100'
                                       : 'opacity-0'
                                   )}
@@ -719,8 +749,8 @@ export const FormField = ({
                             'h-auto min-h-9 w-full min-w-0 justify-between gap-2 overflow-hidden font-normal whitespace-normal',
                             !controllerField.value && 'text-muted-foreground',
                             isValid &&
-                              !isOtherSelected &&
-                              'border-green-500 focus:ring-green-500',
+                            !isOtherSelected &&
+                            'border-green-500 focus:ring-green-500',
                             isInvalid && 'border-red-500 focus:ring-red-500'
                           )}
                           onClick={() => setTouched(true)}
@@ -886,7 +916,7 @@ export const FormField = ({
               onBlur={handleBlur}
               className={cn(
                 field.className?.includes('resize-y') &&
-                  'field-sizing-fixed min-h-[4.5rem] max-h-[min(24vh,9.5rem)] resize-y overflow-y-auto',
+                'field-sizing-fixed min-h-[4.5rem] max-h-[min(24vh,9.5rem)] resize-y overflow-y-auto',
                 field.className,
                 isValid && 'border-green-500 focus:ring-green-500',
                 isInvalid && 'border-red-500 focus:ring-red-500'
@@ -1006,14 +1036,13 @@ export const FormField = ({
                       )
                     })}
                   </div>
-
-                  {/* APERÇU */}
+                  {/* 
                   {selectedMois.length > 0 && (
                     <div className="rounded-lg bg-gray-50 p-3 text-sm text-gray-700">
                       <strong>Mois sélectionnés :</strong>{" "}
                       {selectedMois.join(", ")}
                     </div>
-                  )}
+                  )} */}
 
                   {/* ERROR */}
                   {error && (
@@ -1129,6 +1158,7 @@ export const FormField = ({
                       <Input
                         value={tagInput}
                         placeholder={field.placeholder}
+                        disabled={field.disabled}
                         onChange={(e) => setTagInput(e.target.value)}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') {
@@ -1215,7 +1245,7 @@ export const FormField = ({
                 className={cn(
                   'flex items-center justify-between gap-4',
                   useCard &&
-                    'rounded-lg border border-border/60 bg-muted/20 px-4 py-3',
+                  'rounded-lg border border-border/60 bg-muted/20 px-4 py-3',
                   field.className
                 )}
               >

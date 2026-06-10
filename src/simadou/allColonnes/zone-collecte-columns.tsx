@@ -1,9 +1,17 @@
 // simadou/allColonnes/zoneCollecte-columns.tsx
 import { GenericRowActions } from "@/Global/Tableaux/GenericRowActions"
+<<<<<<< HEAD
 import { UserPen, Trash2 } from "lucide-react"
 import { ZoneCollecte } from "../allTypes"
 import { DataTableColumnHeader } from "@/components/data-table/column-header"
 import { ColumnDef } from "@tanstack/react-table"
+=======
+import { UserPen, Trash2, Download } from "lucide-react"
+import { ZoneCollecte } from "../allTypes"
+import { DataTableColumnHeader } from "@/components/data-table/column-header"
+import { ColumnDef } from "@tanstack/react-table"
+import { Button } from "@/components/ui/button"
+>>>>>>> develop
 
 type ZoneCollecteDialogType = 'add' | 'edit' | 'delete'
 
@@ -43,6 +51,47 @@ export const buildZoneCollecteColumns = (
             ),
         },
         {
+<<<<<<< HEAD
+=======
+            id: 'shape_file',
+            accessorKey: 'shape_file',
+            header: ({ column }) => (
+                <DataTableColumnHeader column={column} title='Shape File' />
+            ),
+            cell: ({ row }) => {
+                const fileUrl = row.original.shape_file as any;
+                const fileName = row.original.nom_zone || 'shape_file';
+
+                if (!fileUrl) {
+                    return <span className='text-muted-foreground'>-</span>;
+                }
+
+                const handleDownload = () => {
+                    const link = document.createElement('a');
+                    link.href = fileUrl;
+                    link.download = `${fileName}.zip`;
+                    link.target = '_blank';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                };
+
+                return (
+                    <Button
+                        type='button'
+                        variant='ghost'
+                        size='sm'
+                        className='gap-2 text-blue-600 hover:text-blue-800'
+                        onClick={handleDownload}
+                    >
+                        <Download className='h-4 w-4' />
+                        Télécharger
+                    </Button>
+                );
+            },
+        },
+        {
+>>>>>>> develop
             id: 'actions',
             header: ({ column }) => (
                 <DataTableColumnHeader column={column} title='Actions' />

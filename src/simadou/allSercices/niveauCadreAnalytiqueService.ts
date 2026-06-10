@@ -6,6 +6,7 @@ export interface NiveauCadreAnalytiqueFormData {
   nombre_nca: number;
   libelle_nca: string;
   code_number_nca: number;
+  programme?: string;
 }
 
 export const niveauCadreAnalytiqueService = {
@@ -39,20 +40,13 @@ export const niveauCadreAnalytiqueService = {
   async create(
     data: NiveauCadreAnalytiqueFormData,
   ): Promise<NiveauCadreAnalytique> {
-    try {
-      const response = await apiClient.request<NiveauCadreAnalytique>(
-        "/niveau_cadre_analytique/",
-        {
-          method: "POST",
-          data,
-        },
-      );
-      toast.success("Niveau créé avec succès");
-      return response;
-    } catch (error) {
-      toast.error("Erreur lors de la création du niveau");
-      throw error;
-    }
+    return await apiClient.request<NiveauCadreAnalytique>(
+      "/niveau_cadre_analytique/",
+      {
+        method: "POST",
+        data,
+      },
+    );
   },
 
   // Mettre à jour un niveau
@@ -60,33 +54,20 @@ export const niveauCadreAnalytiqueService = {
     id_nca: number,
     data: NiveauCadreAnalytiqueFormData,
   ): Promise<NiveauCadreAnalytique> {
-    try {
-      const response = await apiClient.request<NiveauCadreAnalytique>(
-        `/niveau_cadre_analytique/${id_nca}/`,
-        {
-          method: "PUT",
-          data,
-        },
-      );
-      toast.success("Niveau mis à jour avec succès");
-      return response;
-    } catch (error) {
-      toast.error("Erreur lors de la mise à jour du niveau");
-      throw error;
-    }
+    return await apiClient.request<NiveauCadreAnalytique>(
+      `/niveau_cadre_analytique/${id_nca}/`,
+      {
+        method: "PUT",
+        data,
+      },
+    );
   },
 
   // Supprimer un niveau
   async delete(id_nca: number): Promise<void> {
-    try {
-      await apiClient.request<void>(`/niveau_cadre_analytique/${id_nca}/`, {
-        method: "DELETE",
-      });
-      toast.success("Niveau supprimé avec succès");
-    } catch (error) {
-      toast.error("Erreur lors de la suppression du niveau");
-      throw error;
-    }
+    await apiClient.request<void>(`/niveau_cadre_analytique/${id_nca}/`, {
+      method: "DELETE",
+    });
   },
 
   // Rechercher des niveaux
