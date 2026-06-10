@@ -41,9 +41,9 @@ const ugls = await getUgls();
 // Transformer les données en options pour le select
 const typeActivitesOptions = typeActivitesData?.map((item: any) => (
     {
-    label: item.intutile_type,
-    value: String(item.code_type)
-})) || [];
+        label: item.intutile_type,
+        value: String(item.code_type)
+    })) || [];
 
 const cadre_analytiquesOptions = cadre_analytiques
     // .filter((item: any) => item.niveau_cadre === 2) // Filtrer pour n'avoir que les cadres de niveau 2
