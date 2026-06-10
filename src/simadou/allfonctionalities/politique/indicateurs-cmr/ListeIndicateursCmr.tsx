@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Target } from 'lucide-react'
 import { toast } from 'sonner'
-import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { DataTableToolbarOutlineButton } from '@/components/data-table/toolbar-outline-button'
 import {
@@ -70,6 +68,8 @@ export default function ListeIndicateursCmr() {
   const [activeNiveauCode, setActiveNiveauCode] = useState('')
   const [modal, setModal] = useState<ModalState | null>(null)
   const [ciblesOpen, setCiblesOpen] = useState(false)
+  const [indicateurForCibles, setIndicateurForCibles] =
+    useState<IndicateurCmr | null>(null)
   const [selectedIndicateurId, setSelectedIndicateurId] = useState<number | null>(
     null
   )
@@ -121,14 +121,25 @@ export default function ListeIndicateursCmr() {
     [setDeleteOpen]
   )
 
+  const handleOpenCibles = useCallback((row: IndicateurCmr) => {
+    setIndicateurForCibles(row)
+    setCiblesOpen(true)
+  }, [])
+
+  const handleCloseCibles = useCallback((open: boolean) => {
+    setCiblesOpen(open)
+    if (!open) setIndicateurForCibles(null)
+  }, [])
+
   const columns = useMemo(
     () =>
       buildIndicateurCmrColumns({
         onView: handleView,
         onEdit: handleEdit,
         onDeleteRequest: handleDeleteRequest,
+        onOpenCibles: handleOpenCibles,
       }),
-    [handleView, handleEdit, handleDeleteRequest]
+    [handleView, handleEdit, handleDeleteRequest, handleOpenCibles]
   )
 
   const handleConfirmDelete = (row: IndicateurCmr) => {
@@ -240,21 +251,9 @@ export default function ListeIndicateursCmr() {
         defaultPageSize={10}
         showViewOptions={false}
         toolbarEndSlot={
-          <div className='ms-auto flex flex-col gap-2 sm:flex-row'>
-            <Button
-              type='button'
-              variant='outline'
-              size='sm'
-              className='h-8 border-dashed'
-              onClick={() => setCiblesOpen(true)}
-            >
-              <Target className='h-4 w-4' />
-              Cibles CMR
-            </Button>
-            <DataTableToolbarOutlineButton onClick={handleAddForm}>
-              Nouvel indicateur
-            </DataTableToolbarOutlineButton>
-          </div>
+          <DataTableToolbarOutlineButton onClick={handleAddForm}>
+            Nouvel indicateur
+          </DataTableToolbarOutlineButton>
         }
         emptyMessage='Aucun indicateur CMR.'
       />
@@ -270,7 +269,11 @@ export default function ListeIndicateursCmr() {
         />
       ) : null}
 
-      <CiblesCmrDialog open={ciblesOpen} onOpenChange={setCiblesOpen} />
+      <CiblesCmrDialog
+        open={ciblesOpen}
+        onOpenChange={handleCloseCibles}
+        indicateur={indicateurForCibles}
+      />
 
       <Dialog open={modal === 'indicateur'} onOpenChange={(o) => !o && closeAll()}>
         <DialogContent
