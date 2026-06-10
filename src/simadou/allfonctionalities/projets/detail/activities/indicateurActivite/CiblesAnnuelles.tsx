@@ -49,28 +49,40 @@ export default function CiblesAnnuelles({ onCiblesChange }: CiblesAnnuellesProps
         <div className="space-y-4 mt-6">
             <Label>Cibles annuelles (optionnelles)</Label>
             <div className="rounded-md border">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            {annees.map(annee => <TableHead key={annee} className="text-center">{annee}</TableHead>)}
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        <TableRow>
-                            {annees.map((annee, index) => (
-                                <TableCell key={annee} className="text-center">
-                                    <Input
-                                        type="number"
-                                        placeholder="Valeur"
-                                        className="w-32 text-center"
-                                        value={cibles[index]?.valeur_cible || 0}
-                                        onChange={(e) => handleChange(index, Number(e.target.value))}
-                                    />
-                                </TableCell>
-                            ))}
-                        </TableRow>
-                    </TableBody>
-                </Table>
+                <div className="rounded-md border overflow-hidden">
+                    <Table>
+                        <TableHeader className="bg-muted/50">
+                            <TableRow className="border-b">
+                                {annees.map(annee => (
+                                    <TableHead
+                                        key={annee}
+                                        className=" font-semibold text-foreground border-r last:border-r-0"
+                                    >
+                                        {annee}
+                                    </TableHead>
+                                ))}
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            <TableRow className="hover:bg-muted/20 transition-colors">
+                                {annees.map((annee, index) => (
+                                    <TableCell
+                                        key={annee}
+                                        className="text-center border-r last:border-r-0 p-2"
+                                    >
+                                        <Input
+                                            type="number"
+                                            placeholder="Valeur"
+                                            className="w-28 text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                            value={cibles[index]?.valeur_cible || 0}
+                                            onChange={(e) => handleChange(index, Number(e.target.value))}
+                                        />
+                                    </TableCell>
+                                ))}
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </div>
             </div>
         </div>
     )
