@@ -27,7 +27,7 @@ export default function IndicateurPerformanceActiviteManager({
   const { data, isLoading } = useGetIndicateurPerformanceByActiviteProjet(
     activite.code_activite_projet
   )
-  
+
   const indicateurs = data ?? []
 
   const handleAdd = () => {
@@ -52,7 +52,6 @@ export default function IndicateurPerformanceActiviteManager({
       queryKey: indicateurPerformanceProjetQueryKeys.byActivite(activite.code_activite_projet),
     })
   }
-
   const handleOpenChange = (newOpen: boolean) => {
     if (!newOpen) {
       setShowForm(false)
@@ -60,7 +59,6 @@ export default function IndicateurPerformanceActiviteManager({
     }
     onOpenChange(newOpen)
   }
-
   // Si on est en mode formulaire, on affiche juste le formulaire
   if (showForm) {
     return (
@@ -71,7 +69,7 @@ export default function IndicateurPerformanceActiviteManager({
               {editing ? 'Modifier indicateur de performance' : 'Nouvel indicateur de performance'}
             </DialogTitle>
           </DialogHeader>
-          
+
           <AddIndicateurPerformance
             currentRow={editing}
             activite={activite}
@@ -89,7 +87,7 @@ export default function IndicateurPerformanceActiviteManager({
       <DialogContent className={DIALOG_SIZES.xl}>
         <DialogHeader>
           <DialogTitle>
-            Indicateurs de performance
+            Indicateurs de performance skhfws
           </DialogTitle>
         </DialogHeader>
 

@@ -56,7 +56,7 @@ export default function AddIndicateurPerformance({
             })),
         [unites]
     )
-
+    
     const defaultValues: IndicateurPerformanceFormData = useMemo(
         () => ({
             code_indicateur_performance: currentRow?.code_indicateur_performance ?? '',
@@ -87,7 +87,7 @@ export default function AddIndicateurPerformance({
             if (hasValues) {
                 payload.cibles = cibles.map(cible => ({
                     annee: cible.annee,
-                    valeur_cible: cible.valeur_cible,
+                    valeur_cible_indcateur_performance: cible.valeur_cible,
                 }))
             }
         }
@@ -113,6 +113,14 @@ export default function AddIndicateurPerformance({
         [isEditing, uniteOptions, isLoadingUnites]
     )
 
+    // Extraire les cibles existantes du currentRow
+    const existingCibles = useMemo(() => {
+        if (currentRow?.cibles && Array.isArray(currentRow.cibles)) {
+            return currentRow.cibles
+        }
+        return []
+    }, [currentRow])
+
     return (
         <FormProvider {...form}>
             <DynamicForm
@@ -125,7 +133,7 @@ export default function AddIndicateurPerformance({
                 isLoading={createMutation.isPending || updateMutation.isPending}
                 onCancel={onClose}
                 cancelText='Retour'
-                renderAfter={<CiblesAnnuelles onCiblesChange={setCibles} />}
+                renderAfter={<CiblesAnnuelles onCiblesChange={setCibles} initialCibles={existingCibles} />}
             />
         </FormProvider>
     )
