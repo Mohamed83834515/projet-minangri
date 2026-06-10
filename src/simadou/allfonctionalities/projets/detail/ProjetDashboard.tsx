@@ -1,13 +1,13 @@
 // ProjetDashboard.tsx
 import { useState } from 'react'
 import {
-  Activity, BarChart3, DollarSign, Target, Wallet,
+  Activity, BarChart3, DollarSign, Wallet,
   Calendar, FileText, Gauge, Rocket, Shield, Zap,
   TrendingUp, CheckCircle2, Clock, Circle,
 } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Progress } from '@/components/ui/Progress'
+import { Progress } from '@/components/ui/progress'
 
 interface ProjetDashboardProps { codeProjet: string }
 
