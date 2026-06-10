@@ -34,7 +34,7 @@ export default function AddSuiviIndicateur({
     { value: '2', label: 'Indicateur 2' },
     { value: '3', label: 'Indicateur 3' },
   ]
-
+ 
   const formConfig = useMemo(
     () => getSuiviIndicateurActiviteFormConfigForSuivi({
       localites,
