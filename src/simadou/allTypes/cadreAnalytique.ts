@@ -8,7 +8,7 @@ export interface CadreAnalytique {
   abgrege_ca: string;
   niveau_ca: number | string;
   cout_axe: number;
-  partenaire_ca: number | Acteur | null;
+  partenaire_ca: number[] | Acteur[] | number | Acteur | null;
   parent_ca: number | CadreAnalytique | null;
   programme_ca: number | Programme | null;
 }

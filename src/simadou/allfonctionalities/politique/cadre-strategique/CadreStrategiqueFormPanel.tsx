@@ -133,7 +133,7 @@ export default function CadreStrategiqueFormPanel({
       niveau_cs: niveauCodeNumber,
       programme_cs: programmeId,
       parent_cs: data.parent_cs || null,
-      partenaire_cs: data.partenaire_cs || null,
+      partenaire_cs: data.partenaire_cs ?? [],
     }
 
     const callbacks = {

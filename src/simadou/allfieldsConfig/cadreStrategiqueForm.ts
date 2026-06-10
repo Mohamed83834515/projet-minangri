@@ -30,9 +30,9 @@ export function getCadreStrategiqueFormConfigForDialog({
       },
       {
         name: 'partenaire_cs',
-        label: 'Partenaire',
-        type: 'select',
-        placeholder: '-- Choisir un partenaire --',
+        label: 'Acteur(s)',
+        type: 'multiselect',
+        placeholder: 'Sélectionner un ou plusieurs acteurs',
         required: false,
         options: acteurOptions,
         isLoading: isLoadingActeurs,

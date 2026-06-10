@@ -33,8 +33,15 @@ export function LocaliteNiveauTable({
   const currentNiveau = niveaux.find((n: any) => n.id_nlc === niveauId)
 
   const columns = useMemo(
-    () => buildLocaliteColumns(niveaux, currentNiveau?.nombre_nlc || 0, onEdit, onDeleteRequest),
-    [niveaux, currentNiveau?.nombre_nlc, onEdit, onDeleteRequest]
+    () =>
+      buildLocaliteColumns(
+        niveaux,
+        currentNiveau?.nombre_nlc || 0,
+        localites,
+        onEdit,
+        onDeleteRequest
+      ),
+    [niveaux, currentNiveau?.nombre_nlc, localites, onEdit, onDeleteRequest]
   )
 
   const rows = useMemo(

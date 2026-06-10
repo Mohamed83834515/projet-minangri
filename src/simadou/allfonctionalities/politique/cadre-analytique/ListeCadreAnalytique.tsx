@@ -19,7 +19,10 @@ import {
   useActiveProgramme,
   useActiveProgrammeId,
 } from '@/hooks/use-active-programme'
-import type { CadreAnalytique } from '@/simadou/allTypes/cadreAnalytique'
+import type {
+  CadreAnalytique,
+  NiveauCadreAnalytique,
+} from '@/simadou/allTypes/cadreAnalytique'
 import { buildCadreAnalytiqueColumns } from '@/simadou/allColonnes/cadre-analytique-columns'
 import {
   useDeleteCadreAnalytique,
@@ -43,6 +46,7 @@ import NiveauCadreAnalytiqueDialog from './NiveauCadreAnalytiqueDialog'
 
 function CadreAnalytiqueNiveauTable({
   niveauCodeNumber,
+  niveaux,
   cadres,
   acteurs,
   searchTerm,
@@ -51,6 +55,7 @@ function CadreAnalytiqueNiveauTable({
   onDeleteRequest,
 }: {
   niveauCodeNumber: number
+  niveaux: NiveauCadreAnalytique[]
   cadres: CadreAnalytique[]
   acteurs: { id_acteur: number; nom_acteur: string; code_acteur: string }[]
   searchTerm: string
@@ -61,8 +66,16 @@ function CadreAnalytiqueNiveauTable({
   const { search, navigate } = useEmbeddedTableState()
 
   const columns = useMemo(
-    () => buildCadreAnalytiqueColumns({ cadres, acteurs, onEdit, onDeleteRequest }),
-    [cadres, acteurs, onEdit, onDeleteRequest]
+    () =>
+      buildCadreAnalytiqueColumns({
+        cadres,
+        niveaux,
+        currentNiveauCodeNumber: niveauCodeNumber,
+        acteurs,
+        onEdit,
+        onDeleteRequest,
+      }),
+    [cadres, niveaux, niveauCodeNumber, acteurs, onEdit, onDeleteRequest]
   )
 
   const rows = useMemo(() => {
@@ -281,6 +294,7 @@ export default function ListeCadreAnalytique() {
             {Number(n.code_number_nca) === currentNiveauCode && (
               <CadreAnalytiqueNiveauTable
                 niveauCodeNumber={Number(n.code_number_nca)}
+                niveaux={sortedNiveaux}
                 cadres={cadres}
                 acteurs={acteurs}
                 searchTerm={searchTerm}

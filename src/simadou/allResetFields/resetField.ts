@@ -65,7 +65,7 @@ export const CADRE_ANALYTIQUE = {
   abgrege_ca: "",
   niveau_ca: "",
   cout_axe: "",
-  partenaire_ca: null,
+  partenaire_ca: [],
   parent_ca: null,
   programme_ca: null,
 };
@@ -98,7 +98,7 @@ export const CADRE_STRATEGIQUE = {
   abgrege_cs: "",
   niveau_cs: "",
   etat: null,
-  partenaire_cs: null,
+  partenaire_cs: [],
   parent_cs: null,
   programme_cs: null,
 };

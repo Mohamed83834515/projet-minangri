@@ -4,9 +4,12 @@ import { LongText } from '@/components/others/long-text'
 import { buildEditDeleteActionsColumn } from '@/Global/Tableaux/buildEditDeleteActionsColumn'
 import type { Acteur } from '@/simadou/allTypes/acteur'
 import type { CadreStrategique } from '@/simadou/allTypes/cadreStrategique'
+import type { NiveauCadreStrategique } from '@/simadou/allTypes/niveauCadreStrategique'
 import {
+  buildChildCountByParentCsId,
+  getNextNiveauCadreStrategique,
   resolveParentCsId,
-  resolvePartenaireCsId,
+  resolvePartenaireCsIds,
 } from '@/simadou/lib/cadreStrategiqueUtils'
 
 function resolveParentCadre(
@@ -20,11 +23,15 @@ function resolveParentCadre(
 
 export function buildCadreStrategiqueColumns({
   cadres,
+  niveaux = [],
+  currentNiveauCodeNumber,
   acteurs = [],
   onEdit,
   onDeleteRequest,
 }: {
   cadres: CadreStrategique[]
+  niveaux?: NiveauCadreStrategique[]
+  currentNiveauCodeNumber: number
   acteurs?: Pick<Acteur, 'id_acteur' | 'nom_acteur' | 'code_acteur'>[]
   onEdit: (row: CadreStrategique) => void
   onDeleteRequest: (row: CadreStrategique) => void
@@ -33,6 +40,47 @@ export function buildCadreStrategiqueColumns({
     onEdit,
     onDeleteRequest,
   })
+
+  const nextNiveau = getNextNiveauCadreStrategique(
+    niveaux,
+    currentNiveauCodeNumber
+  )
+  const nextNiveauCodeNumber =
+    nextNiveau != null ? Number(nextNiveau.code_number_nsc) : null
+  const childCountByParentId =
+    nextNiveauCodeNumber != null
+      ? buildChildCountByParentCsId(cadres, nextNiveauCodeNumber)
+      : null
+
+  const childCountColumn: ColumnDef<CadreStrategique>[] =
+    nextNiveau && childCountByParentId
+      ? [
+          {
+            id: `children_${nextNiveau.id_nsc}`,
+            accessorFn: (row) => childCountByParentId.get(row.id_cs) ?? 0,
+            header: ({ column }) => (
+              <DataTableColumnHeader
+                column={column}
+                title={nextNiveau.libelle_nsc}
+                className='w-full justify-center'
+              />
+            ),
+            cell: ({ row }) => (
+              <div className='flex w-full justify-center'>
+                <span className='tabular-nums text-sm'>
+                  {childCountByParentId.get(row.original.id_cs) ?? 0}
+                </span>
+              </div>
+            ),
+            meta: {
+              thClassName: '!text-center max-w-[11rem]',
+              tdClassName: 'text-center max-w-[11rem]',
+            },
+            enableSorting: true,
+            enableHiding: false,
+          },
+        ]
+      : []
 
   return [
     {
@@ -72,7 +120,9 @@ export function buildCadreStrategiqueColumns({
       cell: ({ row }) => {
         const parent = resolveParentCadre(row.original, cadres)
         if (!parent) {
-          return <span className='text-sm italic text-muted-foreground'>Racine</span>
+          return (
+            <span className='text-sm italic text-muted-foreground'>Racine</span>
+          )
         }
         return (
           <div>
@@ -87,32 +137,50 @@ export function buildCadreStrategiqueColumns({
     {
       id: 'partenaire_cs',
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Partenaire' />
+        <DataTableColumnHeader column={column} title='Acteur(s)' />
       ),
       cell: ({ row }) => {
-        const id = resolvePartenaireCsId(row.original.partenaire_cs)
-        const acteur = id == null ? null : acteurs.find((a) => a.id_acteur === id)
-
-        if (!acteur) {
+        const ids = resolvePartenaireCsIds(row.original.partenaire_cs)
+        if (ids.length === 0) {
           return (
-            <span className='text-sm text-muted-foreground'>Non défini</span>
+            <LongText className='max-w-xs text-muted-foreground'>Non défini</LongText>
           )
         }
 
         return (
-          <div>
-            <div className='font-medium'>{acteur.nom_acteur}</div>
-            {acteur.code_acteur ? (
-              <div className='text-xs text-muted-foreground'>
-                {acteur.code_acteur}
-              </div>
-            ) : null}
+          <div className='space-y-1'>
+            {ids.map((id) => {
+              const acteur = acteurs.find((a) => a.id_acteur === id)
+              if (!acteur) {
+                return (
+                  <LongText
+                    key={id}
+                    className='max-w-xs text-muted-foreground'
+                  >
+                    Non défini
+                  </LongText>
+                )
+              }
+              return (
+                <div key={id}>
+                  <LongText className='max-w-xs font-medium'>
+                    {acteur.nom_acteur}
+                  </LongText>
+                  {acteur.code_acteur ? (
+                    <div className='text-xs text-muted-foreground'>
+                      {acteur.code_acteur}
+                    </div>
+                  ) : null}
+                </div>
+              )
+            })}
           </div>
         )
       },
       enableSorting: false,
       enableHiding: false,
     },
+    ...childCountColumn,
     actionsColumn,
   ]
 }
