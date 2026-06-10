@@ -2,9 +2,6 @@ import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { Link, useLocation } from '@tanstack/react-router'
 import { Search, X } from 'lucide-react'
 import { cn, getDisplayNameInitials } from '@/lib/utils'
-import pontLogo from '@/assets/images/pont.png'
-import logo1 from '@/assets/images/logo1.png'
-import logo3 from '@/assets/images/logo3.png'
 
 import {
   DropdownMenu,
@@ -48,6 +45,8 @@ function darken(hex: string, factor = 0.85): string {
 
 // ─── CSS injecté dynamiquement ────────────────────────────────────────────────
 const TOPBAR_CSS = `
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap');
+
   @keyframes _tb-down {
     from { opacity:0; transform:translateY(-8px); }
     to   { opacity:1; transform:translateY(0); }
@@ -64,6 +63,7 @@ const TOPBAR_CSS = `
     from { opacity:0; transform:translateY(-6px); max-height:0; }
     to   { opacity:1; transform:translateY(0);   max-height:56px; }
   }
+
   ._tb-row1  { animation: _tb-down 0.32s cubic-bezier(.16,1,.3,1) both; }
   ._tb-row2  { animation: _tb-down 0.32s .07s cubic-bezier(.16,1,.3,1) both; }
 
@@ -114,6 +114,58 @@ const TOPBAR_CSS = `
   ._tb-subnav {
     animation: _tb-subnav-in 0.22s cubic-bezier(.16,1,.3,1) both;
     overflow: hidden;
+  }
+
+  ._tb-logo {
+    height: 48px;
+    width: auto;
+    max-width: 140px;
+    object-fit: contain;
+    display: block;
+    border-radius: 6px;
+    transition: opacity .2s ease, transform .2s ease;
+  }
+  ._tb-logo-wrap:hover ._tb-logo { opacity:.85; transform:scale(1.04); }
+
+  ._tb-center-title {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+    gap: 2px;
+  }
+  ._tb-center-main {
+    font-family: 'Cinzel', serif;
+    font-size: 20px;
+    font-weight: 900;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: #fff;
+    line-height: 1.1;
+    white-space: nowrap;
+    background: rgba(0, 0, 0, .28);
+    padding: 4px 18px 5px;
+    border-radius: 6px;
+    border-top: 2px solid #FCD116;
+    border-bottom: 2px solid #FCD116;
+  }
+  ._tb-center-divider {
+    width: 100px;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(252,209,22,.75), transparent);
+  }
+  ._tb-center-sub {
+    font-family: 'Lato', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .28em;
+    color: rgba(252,209,22,.85);
+    line-height: 1;
+    text-transform: uppercase;
   }
 `
 
@@ -226,9 +278,7 @@ export function AppTopbar({ user }: UserProps) {
 
   const [open, setOpen] = useDialogState()
   const headerColor = useColorStore((s) => s.headerColor)
-  const { bg: headerBg } = HEADER_COLORS[headerColor]
-  // Toujours blanc pour le texte → lisibilité maximale
-  const headerText = '#FFFFFF'
+  const { bg: headerBg, text: headerText } = HEADER_COLORS[headerColor]
   const headerBg2 = darken(headerBg, 0.82)
   const headerBg3 = darken(headerBg, 0.70)
   const accentRgb = hexToRgb(headerBg)
@@ -341,82 +391,67 @@ export function AppTopbar({ user }: UserProps) {
             style={{ color: headerText, flexShrink: 0 }}
           />
 
-          {/* LOGO — fond blanc pour lisibilité */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            {/* Logo principal */}
-            <div
-              style={{
-                flexShrink: 0,
-                lineHeight: 0,
-                borderRadius: 10,
-                padding: 4,
-                background: '#fff',
-                boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
-              }}
-            >
-              {!logoFailed ? (
-                <img
-                  src={pontLogo}
-                  alt={firstTeam.name}
-                  style={{ height: 40, width: 40, objectFit: 'contain', borderRadius: 6 }}
-                  onError={() => setLogoFailed(true)}
-                />
-              ) : (
-                <div
-                  style={{
-                    height: 40,
-                    width: 40,
-                    borderRadius: 6,
-                    background: 'rgba(206,17,38,.1)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: 'bold',
-                    fontSize: 12,
-                    color: '#CE1126',
-                  }}
-                >
-                  {firstTeam.name?.slice(0, 2).toUpperCase() ?? 'AP'}
-                </div>
-              )}
-            </div>
-
-            {/* Logo partenaire 1 */}
-            <div
-              style={{
-                flexShrink: 0,
-                lineHeight: 0,
-                borderRadius: 10,
-                padding: 4,
-                background: '#fff',
-                boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
-              }}
-            >
+          {/* LOGO */}
+          <div className="_tb-brand _tb-logo-wrap" style={{ flexShrink: 0, lineHeight: 0 }}>
+            {!logoFailed ? (
               <img
-                src={logo1}
-                alt="Logo partenaire"
-                style={{ height: 40, width: 40, objectFit: 'contain', borderRadius: 6 }}
+                src="/src/assets/images/pont.png"
+                alt={firstTeam.name}
+                className="_tb-logo"
+                onError={() => setLogoFailed(true)}
               />
-            </div>
+            ) : (
+              <div aria-hidden style={{
+                height: 48,
+                width: 44,
+                borderRadius: 8,
+                backgroundColor: 'rgba(255,255,255,.12)',
+                border: '1px solid rgba(255,255,255,.25)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 11,
+                fontFamily: "'Cinzel', serif",
+                fontWeight: 900,
+                color: '#FCD116',
+                letterSpacing: '1px',
+                lineHeight: 1.1,
+              }}>
+                {firstTeam.name?.slice(0, 2).toUpperCase() ?? 'AP'}
+              </div>
+            )}
+          </div>
 
-            {/* Logo partenaire 2 */}
-            <div
-              style={{
-                flexShrink: 0,
-                lineHeight: 0,
-                borderRadius: 10,
-                padding: 4,
-                background: '#fff',
-                boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
-              }}
-            >
-              <img
-                src={logo3}
-                alt="Logo partenaire"
-                style={{ height: 40, width: 40, objectFit: 'contain', borderRadius: 6 }}
-              />
-            </div>
+          {/* Séparateur */}
+          <div aria-hidden style={{
+            width: 1,
+            height: 28,
+            flexShrink: 0,
+            backgroundColor: 'rgba(255,255,255,.2)',
+          }} />
 
+          {/* Nom de l'app */}
+          <div className="_tb-brand" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', lineHeight: 1.2, flexShrink: 0 }}>
+            <span style={{
+              fontFamily: "'Cinzel', serif",
+              fontSize: 13,
+              fontWeight: 900,
+              letterSpacing: '.06em',
+              color: '#FCD116',
+            }}>
+              {firstTeam.name ?? 'SIMABOU'}
+            </span>
+            <span style={{
+              fontSize: 9,
+              fontWeight: 500,
+              letterSpacing: '.2em',
+              textTransform: 'uppercase',
+              opacity: 0.55,
+              color: headerText,
+            }}>
+              2040
+            </span>
           </div>
 
           {/* ══ TITRE CENTRÉ — redesigné ══ */}
@@ -446,7 +481,7 @@ export function AppTopbar({ user }: UserProps) {
               }}
             />
           </div>
-          {/* Spacer */}
+
           <div style={{ flex: 1 }} />
 
           {/* Contrôles droite */}
@@ -498,7 +533,7 @@ export function AppTopbar({ user }: UserProps) {
           className="_tb-row2"
           style={{
             position: 'relative',
-            borderTop: '1px solid rgba(255,255,255,.15)',
+            borderTop: '1px solid rgba(255,255,255,.10)',
             backgroundColor: headerBg2,
             transition: 'background-color .35s ease',
           }}

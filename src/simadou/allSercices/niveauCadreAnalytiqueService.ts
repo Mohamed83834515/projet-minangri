@@ -9,13 +9,14 @@ export interface NiveauCadreAnalytiqueFormData {
   programme?: string;
 }
 
+const BASE_URL = "/niveaux-cadre-analytique/"
 export const niveauCadreAnalytiqueService = {
   // Récupérer tous les niveaux
 
   async getAll(): Promise<NiveauCadreAnalytique[]> {
     try {
       return await apiClient.request<NiveauCadreAnalytique[]>(
-        "/niveau_cadre_analytique/",
+        BASE_URL,
       );
     } catch (error) {
       toast.error("Erreur lors de la récupération des niveaux");
@@ -27,7 +28,7 @@ export const niveauCadreAnalytiqueService = {
   async getById(id_nca: number): Promise<NiveauCadreAnalytique> {
     try {
       const response = await apiClient.request<NiveauCadreAnalytique>(
-        `/niveau_cadre_analytique/${id_nca}/`,
+        `${BASE_URL}${id_nca}/`,
       );
       return response;
     } catch (error) {
@@ -41,7 +42,7 @@ export const niveauCadreAnalytiqueService = {
     data: NiveauCadreAnalytiqueFormData,
   ): Promise<NiveauCadreAnalytique> {
     return await apiClient.request<NiveauCadreAnalytique>(
-      "/niveau_cadre_analytique/",
+     BASE_URL,
       {
         method: "POST",
         data,
@@ -55,7 +56,7 @@ export const niveauCadreAnalytiqueService = {
     data: NiveauCadreAnalytiqueFormData,
   ): Promise<NiveauCadreAnalytique> {
     return await apiClient.request<NiveauCadreAnalytique>(
-      `/niveau_cadre_analytique/${id_nca}/`,
+      `${BASE_URL}${id_nca}/`,
       {
         method: "PUT",
         data,
@@ -65,7 +66,7 @@ export const niveauCadreAnalytiqueService = {
 
   // Supprimer un niveau
   async delete(id_nca: number): Promise<void> {
-    await apiClient.request<void>(`/niveau_cadre_analytique/${id_nca}/`, {
+    await apiClient.request<void>(`${BASE_URL}${id_nca}/`, {
       method: "DELETE",
     });
   },
@@ -74,7 +75,7 @@ export const niveauCadreAnalytiqueService = {
   async search(query: string): Promise<NiveauCadreAnalytique[]> {
     try {
       const response = await apiClient.request<NiveauCadreAnalytique[]>(
-        `/niveau_cadre_analytique/search/?q=${encodeURIComponent(query)}`,
+        `${BASE_URL}search/?q=${encodeURIComponent(query)}`,
       );
       return response || [];
     } catch (error) {
@@ -87,7 +88,7 @@ export const niveauCadreAnalytiqueService = {
   async getByType(type_niveau: 1 | 2 | 3): Promise<NiveauCadreAnalytique[]> {
     try {
       const response = await apiClient.request<NiveauCadreAnalytique[]>(
-        `/niveau_cadre_analytique/?type_niveau=${type_niveau}`,
+        `${BASE_URL}?type_niveau=${type_niveau}`,
       );
       return response || [];
     } catch (error) {

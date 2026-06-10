@@ -1,15 +1,16 @@
-import { toast } from 'sonner'
-import { apiClient } from '@/axios/api'
-import type { UniteIndicateur } from '../allTypes'
-import { UniteIndicateurFormData } from '../allTypes/entities'
-
-const BASE_URL = '/unite-indicateurs/'
+import { toast } from "sonner";
+import { apiClient } from "@/axios/api";
+import type { UniteIndicateur } from "../allTypes";
+import { UniteIndicateurFormData } from "../allTypes/entities";
+ 
+const BASE_URL = "/unite-indicateurs/"
 
 export const uniteIndicateurService = {
   async getAll(): Promise<UniteIndicateur[]> {
     try {
-      const response = await apiClient.request<UniteIndicateur[]>(BASE_URL)
-      return Array.isArray(response) ? response : []
+      const response =
+        await apiClient.request<UniteIndicateur[]>(BASE_URL);
+      return Array.isArray(response) ? response : [];
     } catch (error) {
       toast.error("Erreur lors de la récupération des unités d'indicateur")
       throw error
@@ -18,7 +19,9 @@ export const uniteIndicateurService = {
 
   async getById(id: number): Promise<UniteIndicateur> {
     try {
-      return await apiClient.request<UniteIndicateur>(`${BASE_URL}${id}/`)
+      return await apiClient.request<UniteIndicateur>(
+        `${BASE_URL}${id}/`,
+      );
     } catch (error) {
       toast.error("Erreur lors de la récupération de l'unité d'indicateur")
       throw error
@@ -27,12 +30,15 @@ export const uniteIndicateurService = {
 
   async create(data: UniteIndicateurFormData): Promise<UniteIndicateur> {
     try {
-      const response = await apiClient.request<UniteIndicateur>(BASE_URL, {
-        method: 'POST',
-        data,
-      })
-      toast.success("Unité d'indicateur créée avec succès")
-      return response
+      const response = await apiClient.request<UniteIndicateur>(
+       BASE_URL,
+        {
+          method: "POST",
+          data,
+        },
+      );
+      toast.success("Unité d'indicateur créée avec succès");
+      return response;
     } catch (error) {
       toast.error("Erreur lors de la création de l'unité d'indicateur")
       throw error
