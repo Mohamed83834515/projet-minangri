@@ -1,94 +1,73 @@
-import { GeneralParamsInput } from "@/simadou/schemas/generalParams.schema";
+import { InlineField } from "./components/InlineFields"
+import type { Configuration } from "@/simadou/schemas/configurations.schema"
 
-import {
-  SecuriteInput,
-  securiteSchema,
-} from "./schemas/security.schema";
-import { DynamicForm } from "@/Global/Forms/DynamicForm";
-import { useState } from "react";
-import { GENERAL_PARAMS_SECURITE } from "@/simadou/allResetFields/resetField";
-import { getSecuriteFormConfig } from "@/simadou/allfieldsConfig/generalParamsForm";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Loader2, RotateCcw } from "lucide-react";
-
-interface Props {
-  params: GeneralParamsInput;
-  onSave: (data: SecuriteInput) => void;
-  isSaving: boolean;
-}
-  const FORM_ID = "securite-form"
-export function SecuriteSection({
-  params,
-  onSave,
-  isSaving,
-}: Props) {
-   const [resetKey, setResetKey] = useState(0)
-   const  formConfig = getSecuriteFormConfig()
-  const defaultValues: SecuriteInput = {
-    ...GENERAL_PARAMS_SECURITE,
-    maintenanceMode: params.maintenanceMode ?? false,
-    inactivityDelayMinutes:
-      params.inactivityDelayMinutes ?? 30,
-    maxSessions: params.maxSessions ?? 3,
-    loginAttemptsLimit:
-      params.loginAttemptsLimit ?? 5,
-    tpCodeDelayMinutes:
-      params.tpCodeDelayMinutes ?? 10,
-    passwordChangeDelayMonths:
-      params.passwordChangeDelayMonths ?? 3,
-    deleteOrUpdateDelaySeconds:
-      params.deleteOrUpdateDelaySeconds ?? 30,
-  };
-
+export function SecuriteSection({ config }: { config: Configuration }) {
   return (
-     <div className="flex flex-col">
-
-       <div className="h-75 overflow-y-auto px-1">
-          <DynamicForm
-               formId={FORM_ID}
-                 key={resetKey}                              // remounts form on restore
-                 config={formConfig}
-                 schema={securiteSchema}
-                 defaultValues={defaultValues}
-                 onSubmit={onSave}
-                 isLoading={isSaving}
-                 submitText="Enregistrer"
-                 loadingText="Enregistrement..."
-                 onCancel={() => setResetKey(k => k + 1)}   // restore = remount with original defaultValues
-                 cancelText="Restaurer les paramètres"
-                 hideFormFooter
-                 className="bg-muted/50"
-               />
-       </div>
-
-          <div className="flex items-center justify-between border-t border-border bg-muted px-6 py-4">
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="gap-1.5 text-muted-foreground hover:text-foreground font-medium"
-          onClick={() => setResetKey(k => k + 1)}
-        >
-          <RotateCcw className="size-3.5" />
-          Restaurer les paramètres
-        </Button>
-
-        <Button
-          type="submit"
-          form={FORM_ID}        
-          size="sm"
-          disabled={isSaving}
-          className="group cursor-pointer"
-        >
-         
-          Enregistrer
-           {isSaving ? <Loader2 className="size-3.5 animate-spin group-hover:translate-x-1 duration-600 " /> : <ArrowRight />}
-        </Button>
+    <div className="flex flex-col gap-4">
+      <InlineField
+        configId={config.id}
+        field="is_maintenance"
+        value={config.is_maintenance ?? false}
+        label="Mode maintenance"
+        type="switch"
+        helperText="Seul le super admin a accès pendant cette période"
+      />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <InlineField
+          configId={config.id}
+          field="inactivity_minute"
+          value={config.inactivity_minute ?? 30}
+          label="Délai d'inactivité (min)"
+          type="number"
+          min={0}
+          helperText="0 = illimité"
+        />
+        <InlineField
+          configId={config.id}
+          field="max_sessions"
+          value={config.max_sessions ?? 2}
+          label="Sessions simultanées max"
+          type="number"
+          min={0}
+          helperText="0 = illimité"
+        />
+        <InlineField
+          configId={config.id}
+          field="max_login_attempts"
+          value={config.max_login_attempts ?? 3}
+          label="Tentatives de connexion max"
+          type="number"
+          min={0}
+          helperText="0 = illimité"
+        />
+        <InlineField
+          configId={config.id}
+          field="otp_validity_minute"
+          value={config.otp_validity_minute ?? 5}
+          label="Validité code OTP (min)"
+          type="number"
+          min={0}
+          helperText="0 = non exigé"
+        />
+        <InlineField
+          configId={config.id}
+          field="password_expiry_month"
+          value={config.password_expiry_month ?? 6}
+          label="Expiration mot de passe (mois)"
+          type="number"
+          min={0}
+          helperText="0 = non exigé"
+        />
+        <InlineField
+          configId={config.id}
+          field="delay_update_second"
+          value={config.delay_update_second ?? 5}
+          label="Délai avant suppression (sec)"
+          type="number"
+          min={0}
+          helperText="0 = non exigé"
+        />
       </div>
-
-      
-
-     </div>
- 
-  );
+    </div>
+  )
 }

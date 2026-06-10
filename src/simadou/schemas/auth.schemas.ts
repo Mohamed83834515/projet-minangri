@@ -44,11 +44,11 @@ export type LoginInput = z.infer<typeof LoginSchema>
 // Password Reset
 export const ResetPasswordFormSchema = z
   .object({
-    password: PasswordSchema,
+    newPassword: PasswordSchema,
     confirm: z.string(),
   })
   .superRefine((data, ctx) => {
-    if (data.password !== data.confirm) {
+    if (data.newPassword !== data.confirm) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["confirm"],

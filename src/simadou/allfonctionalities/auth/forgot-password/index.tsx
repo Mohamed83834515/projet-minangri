@@ -241,10 +241,11 @@ export function ForgotPassword() {
         </div>
 
             {/* Formulaire */}
-            <ForgotPasswordForm />
+            <ForgotPasswordForm mode={mode  === 'forgot' ? 'reset' : 'setup'} />
 
             {/* Séparateur + liens */}
-            <div className='space-y-4'>
+            {mode ==='forgot' && (
+               <div className='space-y-4'>
               <div className='relative'>
                 <div className='absolute inset-0 flex items-center'>
                   <span className='w-full border-t border-zinc-200' />
@@ -269,15 +270,10 @@ export function ForgotPassword() {
                 </Link> */}
               </div>
             </div>
+            )}
 
-            {/* Note sécurité */}
-            <p className='text-center text-xs text-zinc-400'>
-              Vous n'avez pas reçu l'email ? Vérifiez vos spams ou{' '}
-              <button className='underline underline-offset-2 hover:text-zinc-700'>
-                renvoyez le lien
-              </button>
-              .
-            </p>
+          
+         
           </div>
         </div>
       </div>

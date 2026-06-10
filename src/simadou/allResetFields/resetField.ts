@@ -557,3 +557,15 @@ export const GENERAL_PARAMS_NOTIFICATIONS = {
 export const GENERAL_PARAMS_INTEGRATIONS = {
   parentApiUrl: '',
 }
+
+// =========CONFIGURATION==================
+export const CONFIGURATION = {
+  structure_name:  '',
+  structure_sigle: '',
+}
+
+// Reset and set password
+export  const SET_PASSWORD = {
+  newPassword  : '',
+  confirm : ''
+}

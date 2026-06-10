@@ -1,14 +1,15 @@
+import { ConfigurationSchema } from '@/simadou/schemas/configurations.schema'
 import { z } from 'zod'
-import { getFieldSchema } from '@/simadou/schemas/generalParams.schema'
 
-export const identiteSchema = z.object({
-  appName:          getFieldSchema('text', true),
-  systemSigle:      getFieldSchema('text'),
-  systemTitle:      getFieldSchema('text'),
-  structureSigle:   getFieldSchema('text'),
-  structureName:    getFieldSchema('text'),
-  structureAddress: getFieldSchema('text'),
-  primaryColor:     getFieldSchema('text'),
+
+export const identiteSchema = ConfigurationSchema.pick({
+  system_sigle:      true,
+  system_name:       true,
+  structure_sigle:   true,
+  structure_name:    true,
+  structure_logo:    true,
+  structure_address: true,
 })
+
 
 export type IdentiteInput = z.infer<typeof identiteSchema>
