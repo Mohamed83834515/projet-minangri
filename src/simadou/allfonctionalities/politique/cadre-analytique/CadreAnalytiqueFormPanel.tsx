@@ -132,7 +132,7 @@ export default function CadreAnalytiqueFormPanel({
       niveau_ca: niveauCodeNumber,
       programme_ca: programmeId,
       parent_ca: data.parent_ca || null,
-      partenaire_ca: data.partenaire_ca || null,
+      partenaire_ca: data.partenaire_ca ?? [],
     }
 
     const callbacks = {

@@ -20,6 +20,7 @@ import {
   useActiveProgrammeId,
 } from '@/hooks/use-active-programme'
 import type { CadreStrategique } from '@/simadou/allTypes/cadreStrategique'
+import type { NiveauCadreStrategique } from '@/simadou/allTypes/niveauCadreStrategique'
 import { buildCadreStrategiqueColumns } from '@/simadou/allColonnes/cadre-strategique-columns'
 import {
   useDeleteCadreStrategique,
@@ -43,6 +44,7 @@ import NiveauCadreStrategiqueDialog from './NiveauCadreStrategiqueDialog'
 
 function CadreStrategiqueNiveauTable({
   niveauCodeNumber,
+  niveaux,
   cadres,
   acteurs,
   searchTerm,
@@ -51,6 +53,7 @@ function CadreStrategiqueNiveauTable({
   onDeleteRequest,
 }: {
   niveauCodeNumber: number
+  niveaux: NiveauCadreStrategique[]
   cadres: CadreStrategique[]
   acteurs: { id_acteur: number; nom_acteur: string; code_acteur: string }[]
   searchTerm: string
@@ -61,8 +64,16 @@ function CadreStrategiqueNiveauTable({
   const { search, navigate } = useEmbeddedTableState()
 
   const columns = useMemo(
-    () => buildCadreStrategiqueColumns({ cadres, acteurs, onEdit, onDeleteRequest }),
-    [cadres, acteurs, onEdit, onDeleteRequest]
+    () =>
+      buildCadreStrategiqueColumns({
+        cadres,
+        niveaux,
+        currentNiveauCodeNumber: niveauCodeNumber,
+        acteurs,
+        onEdit,
+        onDeleteRequest,
+      }),
+    [cadres, niveaux, niveauCodeNumber, acteurs, onEdit, onDeleteRequest]
   )
 
   const rows = useMemo(() => {
@@ -281,6 +292,7 @@ export default function ListeCadreStrategique() {
             {Number(n.code_number_nsc) === currentNiveauCode && (
               <CadreStrategiqueNiveauTable
                 niveauCodeNumber={Number(n.code_number_nsc)}
+                niveaux={sortedNiveaux}
                 cadres={cadres}
                 acteurs={acteurs}
                 searchTerm={searchTerm}
