@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { Link, useLocation }                         from '@tanstack/react-router'
-import { ChevronDown, Search, X }                    from 'lucide-react'
+import { Search, X }                                 from 'lucide-react'
 import { cn, getDisplayNameInitials }                                        from '@/lib/utils'
 import {
   DropdownMenu,
@@ -14,7 +14,8 @@ import { Search as SearchDesktop }                   from '@/components/others/s
 import { ThemeSwitch }                               from '@/components/others/theme-switch'
 import { SidebarTrigger }                            from '@/components/ui/sidebar'
 import { type NavCollapsible, type NavItem, type NavLink } from './types'
-import { CHART_COLORS, HEADER_COLORS, useColorStore } from '@/stores/others/color-store'
+import { HEADER_COLORS, useColorStore }              from '@/stores/others/color-store'
+import { useLayout }                                 from '@/stores/others/layout-store'
 import { sidebarData }                               from '../../../simadou/routescontantes/sidebar-data'
 import { ProgrammeSwitcher }                           from './programme-switcher'
 import { SignOutDialog } from '@/components/others/sign-out-dialog'
@@ -43,6 +44,8 @@ function darken(hex: string, factor = 0.85): string {
 
 // ─── CSS injecté dynamiquement ────────────────────────────────────────────────
 const TOPBAR_CSS = `
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap');
+
   @keyframes _tb-down {
     from { opacity:0; transform:translateY(-8px); }
     to   { opacity:1; transform:translateY(0); }
@@ -55,14 +58,14 @@ const TOPBAR_CSS = `
     from { opacity:0; transform:translateY(-100%); }
     to   { opacity:1; transform:translateY(0); }
   }
-  @keyframes _tb-dd-in {
-    from { opacity:0; transform:translateY(-6px) scale(.97); }
-    to   { opacity:1; transform:translateY(0) scale(1); }
+  @keyframes _tb-subnav-in {
+    from { opacity:0; transform:translateY(-6px); max-height:0; }
+    to   { opacity:1; transform:translateY(0);   max-height:56px; }
   }
 
-  ._tb-row1  { animation: _tb-down 0.30s cubic-bezier(.16,1,.3,1) both; }
-  ._tb-row2  { animation: _tb-down 0.30s .06s cubic-bezier(.16,1,.3,1) both; }
-  ._tb-brand { animation: _tb-fade 0.35s .10s both; }
+  ._tb-row1  { animation: _tb-down 0.32s cubic-bezier(.16,1,.3,1) both; }
+  ._tb-row2  { animation: _tb-down 0.32s .07s cubic-bezier(.16,1,.3,1) both; }
+  ._tb-brand { animation: _tb-fade 0.38s .12s both; }
 
   ._tb-ctrl > *              { animation: _tb-fade 0.28s both; }
   ._tb-ctrl > *:nth-child(1) { animation-delay:.12s; }
@@ -82,35 +85,87 @@ const TOPBAR_CSS = `
     background:transparent; color:inherit;
     transition: background .15s ease, transform .1s ease;
   }
-  ._tb-ibtn:hover  { background:rgba(255,255,255,.15); }
+  ._tb-ibtn:hover  { background:rgba(255,255,255,.16); }
   ._tb-ibtn:active { transform:scale(.92); }
   ._tb-ibtn:focus-visible { outline:2px solid rgba(255,255,255,.7); outline-offset:2px; }
 
   ._tb-link {
     display:inline-flex; align-items:center; gap:6px;
-    padding:7px 16px; border-radius:6px;
-    font-size:14px; font-weight:500;
+    padding:6px 15px; border-radius:6px;
+    font-size:13px; font-weight:500;
     white-space:nowrap; text-decoration:none; flex-shrink:0;
     transition: background .15s ease, color .15s ease, transform .1s ease;
-    border:none; cursor:pointer;
+    border:none; cursor:pointer; background:transparent;
   }
-  ._tb-link:hover  { background:rgba(255,255,255,.12); color:#fff; }
+  ._tb-link:hover  { background:rgba(255,255,255,.13); color:#fff; }
   ._tb-link:active { transform:scale(.97); }
   ._tb-link:focus-visible { outline:2px solid rgba(255,255,255,.7); outline-offset:2px; }
 
+  ._tb-sublink {
+    display:inline-flex; align-items:center; gap:5px;
+    padding:5px 14px; border-radius:5px;
+    font-size:13px; font-weight:500;
+    white-space:nowrap; text-decoration:none; flex-shrink:0;
+    transition: background .15s ease, color .15s ease, transform .1s ease;
+  }
+  ._tb-sublink:hover  { background:rgba(255,255,255,.13); }
+  ._tb-sublink:active { transform:scale(.97); }
+
+  ._tb-subnav {
+    animation: _tb-subnav-in 0.22s cubic-bezier(.16,1,.3,1) both;
+    overflow: hidden;
+  }
+
   ._tb-logo {
-    height: 52px;
+    height: 48px;
     width: auto;
-    max-width: 160px;
+    max-width: 140px;
     object-fit: contain;
     display: block;
     border-radius: 6px;
     transition: opacity .2s ease, transform .2s ease;
   }
-  ._tb-logo-wrap:hover ._tb-logo { opacity:.88; transform:scale(1.03); }
+  ._tb-logo-wrap:hover ._tb-logo { opacity:.85; transform:scale(1.04); }
 
-  ._tb-dd-panel {
-    animation: _tb-dd-in 0.18s cubic-bezier(.16,1,.3,1) both;
+  ._tb-center-title {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+    gap: 2px;
+  }
+  ._tb-center-main {
+    font-family: 'Cinzel', serif;
+    font-size: 20px;
+    font-weight: 900;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: #fff;
+    line-height: 1.1;
+    white-space: nowrap;
+    background: rgba(0, 0, 0, .28);
+    padding: 4px 18px 5px;
+    border-radius: 6px;
+    border-top: 2px solid #FCD116;
+    border-bottom: 2px solid #FCD116;
+  }
+  ._tb-center-divider {
+    width: 100px;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(252,209,22,.75), transparent);
+  }
+  ._tb-center-sub {
+    font-family: 'Lato', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .28em;
+    color: rgba(252,209,22,.85);
+    line-height: 1;
+    text-transform: uppercase;
   }
 `
 
@@ -125,15 +180,12 @@ function CSSInjector() {
   return null
 }
 
-// ─── Badge ───────────────────────────────────────────────────────────────────
+// ─── Badge ────────────────────────────────────────────────────────────────────
 function NavBadge({ value }: { value: string }) {
-  const color = useColorStore((s) => s.color)
-  const { stroke } = CHART_COLORS[color]
   return (
     <span style={{
-      backgroundColor: stroke,
-      boxShadow:       `0 0 0 2px ${stroke}33, 0 0 8px ${stroke}55`,
-      color:           '#fff',
+      backgroundColor: '#FCD116',
+      color:           '#1a1200',
       display:         'inline-flex', alignItems:'center', justifyContent:'center',
       minWidth: 18, height: 18, borderRadius: 999,
       padding: '0 5px', fontSize: 10, fontWeight: 700, lineHeight: 1,
@@ -189,7 +241,8 @@ function MobileSearchModal({
       >
         <div style={{
           display:'flex', alignItems:'center', gap:10,
-          backgroundColor:'rgba(255,255,255,.14)',
+          backgroundColor:'rgba(0,0,0,.25)',
+          border:'1px solid rgba(255,255,255,.2)',
           borderRadius:10, padding:'8px 14px',
         }}>
           <Search size={16} aria-hidden style={{ color: headerText, opacity:.7, flexShrink:0 }} />
@@ -225,15 +278,51 @@ export function AppTopbar({user} :UserProps) {
   const firstTeam = sidebarData.teams[0]
    const [open, setOpen] = useDialogState()
   // ── Couleurs dynamiques — Header Color uniquement ──
+
+  const subNavMode = useLayout((s) => s.subNavMode)
+
   const headerColor = useColorStore((s) => s.headerColor)
   const { bg: headerBg, text: headerText } = HEADER_COLORS[headerColor]
-
-  // ROW2 légèrement plus sombre
   const headerBg2 = darken(headerBg, 0.82)
+  const headerBg3 = darken(headerBg, 0.70)
   const accentRgb = hexToRgb(headerBg)
 
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const [logoFailed,       setLogoFailed]       = useState(false)
+
+  const routeGroup = useMemo((): NavCollapsible | null => {
+    const allItems = sidebarData.navGroups.flatMap((g) => g.items)
+    return (
+      (allItems.find(
+        (item) =>
+          item.items &&
+          (item as NavCollapsible).items.some(
+            (sub) => href === sub.url || href.split('?')[0] === sub.url
+          )
+      ) as NavCollapsible | undefined) ?? null
+    )
+  }, [href])
+
+  const [manualGroup, setManualGroup] = useState<NavCollapsible | null>(null)
+  const [lastHref,    setLastHref]    = useState(href)
+
+  if (lastHref !== href) {
+    setLastHref(href)
+    setManualGroup(null)
+  }
+
+  const activeGroup = manualGroup ?? routeGroup
+
+  const headerRef = useRef<HTMLElement>(null)
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (headerRef.current && !headerRef.current.contains(e.target as Node)) {
+        setManualGroup(null)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   const navRef                    = useRef<HTMLDivElement>(null)
   const [leftFade,  setLeftFade]  = useState(false)
@@ -257,11 +346,13 @@ export function AppTopbar({user} :UserProps) {
     }
   }, [checkFades])
 
-  const initials = firstTeam.name?.slice(0, 2).toUpperCase() ?? 'AP'
-
   const fadeBgLeft  = `linear-gradient(to right, ${headerBg2} 20%, transparent)`
   const fadeBgRight = `linear-gradient(to left,  ${headerBg2} 20%, transparent)`
   const userInitials = getDisplayNameInitials(user.nom_perso ?? '')
+
+  const handleGroupToggle = (item: NavCollapsible) => {
+    setManualGroup((prev) => (prev?.title === item.title ? null : item))
+  }
 
   return (
     <>
@@ -273,76 +364,112 @@ export function AppTopbar({user} :UserProps) {
         headerText={headerText}
       />
 
-      <header style={{
-        position:        'sticky',
-        top:             0,
-        zIndex:          50,
-        width:           '100%',
-        backgroundColor: headerBg,
-        color:           headerText,
-        borderBottom:    `1px solid rgba(${accentRgb},.25)`,
-        boxShadow:       '0 2px 16px rgba(0,0,0,.18)',
-        transition:      'background-color .35s ease, border-color .35s ease',
-      }}>
+      <header
+        ref={headerRef}
+        style={{
+          position:        'sticky',
+          top:             0,
+          zIndex:          50,
+          width:           '100%',
+          backgroundColor: headerBg,
+          color:           headerText,
+          borderBottom:    `1px solid rgba(${accentRgb},.2)`,
+          boxShadow:       '0 4px 20px rgba(0,0,0,.3)',
+          transition:      'background-color .35s ease, border-color .35s ease',
+        }}
+      >
 
-        {/* ══ ROW 1 : Logo + contrôles ══ */}
+        {/* ══ ROW 1 : Logo + Titre centré + contrôles ══ */}
         <div className="_tb-row1" style={{
           display:    'flex',
           alignItems: 'center',
-          height:     56,
+          height:     60,
           gap:        8,
-          padding:    '0 12px',
+          padding:    '0 14px',
+          position:   'relative',
         }}>
 
-          {/* SidebarTrigger — mobile seulement */}
           <SidebarTrigger
             className="_tb-ibtn md:hidden"
             aria-label={t('Ouvrir le menu')}
             style={{ color: headerText, flexShrink: 0 }}
           />
 
-          {/* ── LOGO ── */}
+          {/* LOGO */}
           <div className="_tb-brand _tb-logo-wrap" style={{ flexShrink: 0, lineHeight: 0 }}>
             {!logoFailed ? (
               <img
-                src="/src/assets/images/pont.jpeg"
+                src="/src/assets/images/pont.png"
                 alt={firstTeam.name}
                 className="_tb-logo"
                 onError={() => setLogoFailed(true)}
               />
             ) : (
               <div aria-hidden style={{
-                height:          52,
-                width:           120,
+                height:          48,
+                width:           44,
                 borderRadius:    8,
-                backgroundColor: 'rgba(255,255,255,.18)',
+                backgroundColor: 'rgba(255,255,255,.12)',
+                border:          '1px solid rgba(255,255,255,.25)',
                 display:         'flex',
+                flexDirection:   'column',
                 alignItems:      'center',
                 justifyContent:  'center',
-                fontSize:        18,
-                fontWeight:      700,
-                color:           headerText,
+                fontSize:        11,
+                fontFamily:      "'Cinzel', serif",
+                fontWeight:      900,
+                color:           '#FCD116',
                 letterSpacing:   '1px',
+                lineHeight:      1.1,
               }}>
-                {initials}
+                {firstTeam.name?.slice(0, 2).toUpperCase() ?? 'AP'}
               </div>
             )}
           </div>
 
-          {/* Séparateur vertical */}
+          {/* Séparateur */}
           <div aria-hidden style={{
             width:           1,
             height:          28,
             flexShrink:      0,
-            backgroundColor: 'rgba(255,255,255,.18)',
+            backgroundColor: 'rgba(255,255,255,.2)',
           }} />
 
-          {/* Spacer */}
+          {/* Nom de l'app */}
+          <div className="_tb-brand" style={{ display:'flex', flexDirection:'column', justifyContent:'center', lineHeight:1.2, flexShrink:0 }}>
+            <span style={{
+              fontFamily:    "'Cinzel', serif",
+              fontSize:      13,
+              fontWeight:    900,
+              letterSpacing: '.06em',
+              color:         '#FCD116',
+            }}>
+              {firstTeam.name ?? 'SIMABOU'}
+            </span>
+            <span style={{
+              fontSize:      9,
+              fontWeight:    500,
+              letterSpacing: '.2em',
+              textTransform: 'uppercase',
+              opacity:       0.55,
+              color:         headerText,
+            }}>
+              2040
+            </span>
+          </div>
+
+          {/* ══ TITRE CENTRÉ ══ */}
+          <div className="_tb-center-title _tb-brand">
+            <div className="_tb-center-divider" />
+            <span className="_tb-center-main">Suivi &amp; Évaluation</span>
+            <span className="_tb-center-sub">République de Guinée</span>
+            <div className="_tb-center-divider" />
+          </div>
+
           <div style={{ flex: 1 }} />
 
-          {/* ── Contrôles droite ── */}
+          {/* Contrôles droite */}
           <div className="_tb-ctrl" style={{ display:'flex', alignItems:'center', gap:3 }}>
-
             <button
               onClick={() => setMobileSearchOpen(true)}
               className="_tb-ibtn md:hidden"
@@ -351,11 +478,9 @@ export function AppTopbar({user} :UserProps) {
             >
               <Search size={17} aria-hidden />
             </button>
-
             <div className="hidden md:flex me-1">
               <SearchDesktop />
             </div>
-
             <ProgrammeSwitcher onHeader />
             <ThemeSwitch />
             <ConfigDrawer />
@@ -377,7 +502,7 @@ export function AppTopbar({user} :UserProps) {
           </div>
         </div>
 
-        {/* ══ ROW 2 : Navigation ══ */}
+        {/* ══ ROW 2 : Navigation principale ══ */}
         <div
           className="_tb-row2"
           style={{
@@ -387,15 +512,12 @@ export function AppTopbar({user} :UserProps) {
             transition:      'background-color .35s ease',
           }}
         >
-          {/* Fade gauche */}
           <div aria-hidden style={{
             position: 'absolute', left:0, top:0, bottom:0, width:24,
             background: fadeBgLeft,
             zIndex:10, pointerEvents:'none',
             opacity: leftFade ? 1 : 0, transition:'opacity .2s ease',
           }} />
-
-          {/* Fade droite */}
           <div aria-hidden style={{
             position: 'absolute', right:0, top:0, bottom:0, width:24,
             background: fadeBgRight,
@@ -403,7 +525,6 @@ export function AppTopbar({user} :UserProps) {
             opacity: rightFade ? 1 : 0, transition:'opacity .2s ease',
           }} />
 
-          {/* Nav scrollable */}
           <nav
             ref={navRef}
             className="_tb-scroll"
@@ -411,7 +532,7 @@ export function AppTopbar({user} :UserProps) {
             style={{
               display:    'flex',
               alignItems: 'center',
-              height:     48,
+              height:     44,
               gap:        2,
               padding:    '0 10px',
               overflowX:  'auto',
@@ -426,9 +547,67 @@ export function AppTopbar({user} :UserProps) {
                   href={href}
                   animDelay={0.05 + idx * 0.04}
                   headerText={headerText}
+                  activeGroupTitle={activeGroup?.title ?? null}
+                  onGroupToggle={handleGroupToggle}
+                  subNavMode={subNavMode}
                 />
               ))}
           </nav>
+        </div>
+
+        {/* ══ ROW 3 : Sous-navigation horizontale ══ */}
+        {subNavMode === 'horizontal' && activeGroup && activeGroup.items.length > 0 && (
+          <div
+            className="_tb-subnav"
+            style={{
+              borderTop:       '1px solid rgba(255,255,255,.08)',
+              backgroundColor: headerBg3,
+              transition:      'background-color .35s ease',
+            }}
+          >
+            <nav
+              className="_tb-scroll"
+              aria-label={t(`Sous-navigation ${activeGroup.title}`)}
+              style={{
+                display:    'flex',
+                alignItems: 'center',
+                height:     44,
+                gap:        2,
+                padding:    '0 10px',
+                overflowX:  'auto',
+              }}
+            >
+              {activeGroup.items.map((sub, idx) => {
+                const isActive = href === sub.url || href.split('?')[0] === sub.url
+                return (
+                  <Link
+                    key={`${sub.title}-${idx}`}
+                    to={sub.url}
+                    className="_tb-sublink"
+                    aria-current={isActive ? 'page' : undefined}
+                    style={{
+                      color:           isActive ? '#fff' : `color-mix(in srgb, ${headerText} 65%, transparent)`,
+                      backgroundColor: isActive ? 'rgba(255,255,255,.20)' : 'transparent',
+                      fontWeight:      isActive ? 700 : 400,
+                      boxShadow:       isActive ? 'inset 0 -2px 0 rgba(255,255,255,.6)' : 'none',
+                      animation:       `_tb-fade 0.18s ${0.02 + idx * 0.03}s both`,
+                    }}
+                  >
+                    {sub.icon && <sub.icon className="size-3.5" aria-hidden />}
+                    <span>{t(sub.title)}</span>
+                    {sub.badge && <NavBadge value={sub.badge} />}
+                  </Link>
+                )
+              })}
+            </nav>
+          </div>
+        )}
+
+        {/* ══ Bande tricolore Guinée ══ */}
+        <div aria-hidden style={{ display:'flex', height:5 }}>
+          <div style={{ flex:1, backgroundColor:'#CE1126' }} />
+          <div style={{ flex:1, backgroundColor:'#FCD116' }} />
+          <div style={{ flex:1, backgroundColor:'#009460' }} />
         </div>
 
       </header>
@@ -461,8 +640,8 @@ function TopNavLink({
       aria-current={isActive ? 'page' : undefined}
       style={{
         color:           isActive ? headerText : `color-mix(in srgb, ${headerText} 62%, transparent)`,
-        backgroundColor: isActive ? 'rgba(255,255,255,.17)' : 'transparent',
-        fontWeight:      isActive ? 600 : 400,
+        backgroundColor: isActive ? 'rgba(255,255,255,.18)' : 'transparent',
+        fontWeight:      isActive ? 700 : 400,
         boxShadow:       isActive ? 'inset 0 -2px 0 rgba(255,255,255,.65)' : 'none',
         animation:       `_tb-fade 0.25s ${animDelay}s both`,
       }}
@@ -474,68 +653,99 @@ function TopNavLink({
   )
 }
 
-// ─── NavLink collapsible ──────────────────────────────────────────────────────
+// ─── NavItem collapsible ──────────────────────────────────────────────────────
 function TopNavCollapsible({
   item,
   href,
   animDelay,
   headerText,
+  activeGroupTitle,
+  onGroupToggle,
+  subNavMode,
 }: {
   item: NavCollapsible
   href: string
   animDelay: number
   headerText: string
+  activeGroupTitle: string | null
+  onGroupToggle: (item: NavCollapsible) => void
+  subNavMode: 'horizontal' | 'dropdown'
 }) {
-  const isActive = item.items.some(
+  const isRouteActive = item.items.some(
     (sub) => href === sub.url || href.split('?')[0] === sub.url
   )
+  const isOpen = activeGroupTitle === item.title
+
+  const activeStyle = {
+    color:           isRouteActive || isOpen ? headerText : `color-mix(in srgb, ${headerText} 62%, transparent)`,
+    backgroundColor: isRouteActive || isOpen ? 'rgba(255,255,255,.18)' : 'transparent',
+    fontWeight:      (isRouteActive || isOpen ? 700 : 400) as number,
+    boxShadow:       isRouteActive || isOpen ? 'inset 0 -2px 0 rgba(255,255,255,.65)' : 'none',
+    animation:       `_tb-fade 0.25s ${animDelay}s both`,
+  }
+
+  const chevron = (
+    <svg
+      aria-hidden
+      width="10" height="10" viewBox="0 0 10 10"
+      style={{
+        marginLeft: 2, opacity: .5,
+        transition: 'transform .2s ease',
+        transform: isOpen && subNavMode === 'horizontal' ? 'rotate(180deg)' : 'rotate(0deg)',
+      }}
+    >
+      <path d="M1 3l4 4 4-4" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  )
+
+  if (subNavMode === 'dropdown') {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          className="_tb-link"
+          aria-haspopup="true"
+          style={{ ...activeStyle, outline: 'none' }}
+        >
+          {item.icon && <item.icon className="size-3.5" aria-hidden />}
+          <span>{t(item.title)}</span>
+          {item.badge && <NavBadge value={item.badge} />}
+          {chevron}
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent align="start" sideOffset={6} className="min-w-44">
+          {item.items.map((sub, idx) => (
+            <DropdownMenuItem key={`${sub.title}-${idx}`} asChild>
+              <Link
+                to={sub.url}
+                className={cn(
+                  'flex items-center gap-2',
+                  (href === sub.url || href.split('?')[0] === sub.url) && 'bg-secondary',
+                )}
+              >
+                {sub.icon && <sub.icon className="size-4 shrink-0" aria-hidden />}
+                <span className="max-w-52 text-xs text-wrap">{t(sub.title)}</span>
+                {sub.badge && <span className="ms-auto"><NavBadge value={sub.badge} /></span>}
+              </Link>
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    )
+  }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        className="_tb-link"
-        aria-haspopup="true"
-        style={{
-          color:           isActive ? headerText : `color-mix(in srgb, ${headerText} 62%, transparent)`,
-          backgroundColor: isActive ? 'rgba(255,255,255,.17)' : 'transparent',
-          fontWeight:      isActive ? 600 : 400,
-          boxShadow:       isActive ? 'inset 0 -2px 0 rgba(255,255,255,.65)' : 'none',
-          outline: 'none',
-          animation: `_tb-fade 0.25s ${animDelay}s both`,
-        }}
-      >
-        {item.icon && <item.icon className="size-3.5" aria-hidden />}
-        <span>{t(item.title)}</span>
-        {item.badge && <NavBadge value={item.badge} />}
-        <ChevronDown size={12} aria-hidden style={{ marginLeft: 2, opacity: .55 }} />
-      </DropdownMenuTrigger>
-
-      <DropdownMenuContent
-        align="start"
-        sideOffset={6}
-        className="min-w-44 _tb-dd-panel"
-      >
-        {item.items.map((sub, idx) => (
-          <DropdownMenuItem key={`${sub.title}-${idx}`} asChild>
-            <Link
-              to={sub.url}
-              className={cn(
-                'flex items-center gap-2',
-                (href === sub.url || href.split('?')[0] === sub.url) && 'bg-secondary',
-              )}
-            >
-              {sub.icon && <sub.icon className="size-4 shrink-0" aria-hidden />}
-              <span className="max-w-52 text-xs text-wrap">{t(sub.title)}</span>
-              {sub.badge && (
-                <span className="ms-auto">
-                  <NavBadge value={sub.badge} />
-                </span>
-              )}
-            </Link>
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <button
+      className="_tb-link"
+      aria-haspopup="true"
+      aria-expanded={isOpen}
+      onClick={() => onGroupToggle(item)}
+      style={activeStyle}
+    >
+      {item.icon && <item.icon className="size-3.5" aria-hidden />}
+      <span>{t(item.title)}</span>
+      {item.badge && <NavBadge value={item.badge} />}
+      {chevron}
+    </button>
   )
 }
 
@@ -545,13 +755,31 @@ function TopNavItem({
   href,
   animDelay,
   headerText,
+  activeGroupTitle,
+  onGroupToggle,
+  subNavMode,
 }: {
   item: NavItem
   href: string
   animDelay: number
   headerText: string
+  activeGroupTitle: string | null
+  onGroupToggle: (item: NavCollapsible) => void
+  subNavMode: 'horizontal' | 'dropdown'
 }) {
   if (!item.items)
-    return <TopNavLink item={item as NavLink} href={href} animDelay={animDelay} headerText={headerText} />
-  return <TopNavCollapsible item={item as NavCollapsible} href={href} animDelay={animDelay} headerText={headerText} />
+    return (
+      <TopNavLink item={item as NavLink} href={href} animDelay={animDelay} headerText={headerText} />
+    )
+  return (
+    <TopNavCollapsible
+      item={item as NavCollapsible}
+      href={href}
+      animDelay={animDelay}
+      headerText={headerText}
+      activeGroupTitle={activeGroupTitle}
+      onGroupToggle={onGroupToggle}
+      subNavMode={subNavMode}
+    />
+  )
 }
