@@ -38,12 +38,15 @@ const TABS = [
 type TabId = typeof TABS[number]['id']
 
 function SystemPage() {
+   const { headerColor } = useColor()
+   const { data: config, isLoading } = useGeneralParamsQuery()
+  const { mutate: patch, isPending } = useUpdateGeneralParams()
   const [activeTab, setActiveTab] = useState<TabId>('identite')
 
-  const { data: config, isLoading } = useGeneralParamsQuery()
+ 
   
 
-  const { headerColor } = useColor()
+ 
   const { bg } = HEADER_COLORS[headerColor]
 
   if (isLoading) return <SystemPageSkeleton />
@@ -53,7 +56,7 @@ function SystemPage() {
     </div>
   )
 
-  const { mutate: patch, isPending } = useUpdateGeneralParams()
+  
 
 const handleSaveIdentite = (data: IdentiteInput) =>
   patch({

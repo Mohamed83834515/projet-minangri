@@ -15,7 +15,7 @@ export function useGeneralParamsQuery() {
     queryKey: generalParamsKeys.single(),
     queryFn:  async () => {
       const raw = await apiClient.request<GeneralParamsRaw>('/configuration/')
-      console.log('Config raw', raw)
+      
       return GeneralParamsSchema.parse(raw)
     },
     staleTime: 1000 * 60 * 10,
