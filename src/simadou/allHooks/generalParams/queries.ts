@@ -14,9 +14,5 @@ export const generalParamsKeys = {
 
 
 export function useGeneralParamsQuery() {
-  return useQuery({
-    queryKey: generalParamsKeys.single(),
-    queryFn:  () => apiClient.request<GeneralParams>('/params'),
-    staleTime: 1000 * 60 * 10, 
-  })
+  return 0
 }
