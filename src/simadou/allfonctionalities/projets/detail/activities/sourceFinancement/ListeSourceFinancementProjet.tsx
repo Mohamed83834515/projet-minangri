@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import { GenericDeleteDialog } from '@/Global/Tableaux/GenericDeleteDialog'
 import { DataTableToolbarOutlineButton } from '@/components/data-table/toolbar-outline-button'
 import { buildSourceFinancementProjetColumns } from '@/simadou/allColonnes/sourceFinancementProjetColumns'
+import { useGeneralParamsQuery } from '@/simadou/allHooks/generalParams/queries'
 
 type ListeSourceFinancementProps = {
   sources: SourFinancementProjet[]
@@ -27,9 +28,11 @@ export default function ListeSourceFinancement({
   const [open, setOpen] = useDialogState<'delete'>(null)
   const [currentRow, setCurrentRow] = useState<SourFinancementProjet | null>(null)
 
+   const { data: config } = useGeneralParamsQuery()
+   const currencyCode = config?.currencyCode
   const columns = useMemo(
-    () => buildSourceFinancementProjetColumns(setOpen, setCurrentRow, onEdit),
-    [onEdit, setOpen, setCurrentRow]
+    () => buildSourceFinancementProjetColumns(setOpen, setCurrentRow, onEdit, currencyCode),
+    [onEdit, setOpen, setCurrentRow, currencyCode]
   )
 
   const deleteMutation = useDeleteSourceFinancement(idActivite as any)
