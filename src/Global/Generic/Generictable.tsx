@@ -68,6 +68,10 @@ type GenericTableProps<TData> = {
   showViewOptions?: boolean
   showSearch?: boolean
   showPagination?: boolean
+  /** Pagination compacte (sans libellés « Page X sur Y » / « Lignes par page »). */
+  compactPagination?: boolean
+  /** Classes appliquées au conteneur du tableau (ex. min-h + overflow pour scroll). */
+  tableContainerClassName?: string
   toolbarEndSlot?: React.ReactNode
 
   onRowClick?: (row: TData) => void
@@ -99,6 +103,8 @@ export function GenericTable<TData>({
   showViewOptions = true,
   showSearch = true,
   showPagination = true,
+  compactPagination = false,
+  tableContainerClassName,
   toolbarEndSlot,
   onRowClick,
   //Valeur par défaut false, pas de chargement si rien n'est passé
@@ -167,7 +173,8 @@ export function GenericTable<TData>({
     <div
       className={cn(
         'max-sm:has-[div[role="toolbar"]]:mb-16',
-        'flex flex-1 flex-col gap-4'
+        'flex flex-1 flex-col gap-4',
+        tableContainerClassName && 'min-h-0'
       )}
     >
       <DataTableToolbar
@@ -180,7 +187,12 @@ export function GenericTable<TData>({
         toolbarEndSlot={toolbarEndSlot}
       />
 
-      <div className='relative overflow-hidden rounded-md border'>
+      <div
+        className={cn(
+          'relative overflow-hidden rounded-md border',
+          tableContainerClassName
+        )}
+      >
         {/* Seul isLoadingProp déclenche l'overlay de chargement, pas isRouterPending */}
         {isLoadingProp && <TableLoadingOverlay />}
 
@@ -251,7 +263,13 @@ export function GenericTable<TData>({
         </Table>
       </div>
 
-      {showPagination && <DataTablePagination table={table} className='mt-auto' />}
+      {showPagination && (
+        <DataTablePagination
+          table={table}
+          compact={compactPagination}
+          className='mt-auto shrink-0'
+        />
+      )}
 
       {bulkActionsSlot?.(table)}
     </div>

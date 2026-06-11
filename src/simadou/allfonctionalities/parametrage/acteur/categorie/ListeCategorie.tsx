@@ -41,23 +41,27 @@ export default function ListeCategorieActeur({
 
   return (
     <>
-      <GenericTable
-        data={data}
-        columns={columns}
-        search={search}
-        showSearch={false}
-        showPagination={false}
-        navigate={navigate}
-        showViewOptions={false}
-        toolbarEndSlot={
-          <DataTableToolbarOutlineButton
-            className='ms-auto'
-            onClick={onAdd}
-          >
-            Ajouter
-          </DataTableToolbarOutlineButton>
-        }
-      />
+      <div className='@container/content flex min-h-[14rem] w-full min-w-0 flex-1 flex-col'>
+        <GenericTable
+          data={data}
+          columns={columns}
+          search={search}
+          showSearch={false}
+          navigate={navigate}
+          defaultPageSize={5}
+          tableContainerClassName='min-h-[10rem] max-h-[min(45vh,22rem)] flex-1 overflow-y-auto'
+          showViewOptions={false}
+          emptyMessage="Aucune catégorie d'acteur."
+          toolbarEndSlot={
+            <DataTableToolbarOutlineButton
+              className='ms-auto shrink-0'
+              onClick={onAdd}
+            >
+              Ajouter
+            </DataTableToolbarOutlineButton>
+          }
+        />
+      </div>
 
       <GenericDialogs
         open={open}
