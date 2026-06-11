@@ -2,6 +2,7 @@
 
 import { ActiviteProgramme } from "./activiteProgramme";
 import { CadreAnalytique } from "./cadreAnalytique";
+import { IndicateurStrategique } from "./indicateurStrategique";
 import { NiveauLocalite } from "./niveauLocalite";
 import { Projet } from "./projet";
 
