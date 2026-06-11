@@ -150,14 +150,14 @@ export const UNITE_INDICATEUR = {
 // =========INDICATEUR_CMR==================
 export const INDICATEUR_CMR = {
   code_ref_ind: "",
-  resultat_cmr: "",
+  resultat_cmr: null,
   intitule_ref_ind: "",
   reference_cmr: "",
   annee_reference: "",
   responsable_collecte_cmr: "",
   cible_cmr: "",
   fonction_agregat_cmr: "",
-  unite_cmr: null,
+  referentiel_cmr: null,
 };
 
 // =========NIVEAU_LOCALITE==================

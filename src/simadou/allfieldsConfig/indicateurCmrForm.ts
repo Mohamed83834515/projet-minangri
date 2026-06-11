@@ -12,13 +12,13 @@ const FONCTION_AGREGAT_OPTIONS: SelectOption[] = [
 ];
 
 export const getIndicateurCmrFormConfigForDialog = ({
-  uniteOptions,
-  isLoadingUnites,
+  referentielOptions,
+  isLoadingReferentiels,
   indicateurStrategiqueOptions,
   isLoadingIndicateursStrategiques,
 }: {
-  uniteOptions: SelectOption[];
-  isLoadingUnites?: boolean;
+  referentielOptions: SelectOption[];
+  isLoadingReferentiels?: boolean;
   indicateurStrategiqueOptions?: SelectOption[];
   isLoadingIndicateursStrategiques?: boolean;
 }): FormConfig => ({
@@ -75,13 +75,13 @@ export const getIndicateurCmrFormConfigForDialog = ({
       gridCols: 2,
     },
     {
-      name: "unite_cmr",
-      label: "Unité de mesure",
+      name: "referentiel_cmr",
+      label: "Référentiel",
       type: "select",
-      placeholder: "Sélectionner une unité…",
+      placeholder: "Sélectionner un indicateur du dictionnaire…",
       required: false,
-      options: uniteOptions,
-      isLoading: isLoadingUnites,
+      options: referentielOptions,
+      isLoading: isLoadingReferentiels,
       gridCols: 2,
     },
     {

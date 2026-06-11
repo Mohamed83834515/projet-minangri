@@ -1,6 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { IndicateurCmrFormData } from '@/simadou/allTypes'
+import type {
+  IndicateurCmrProjet,
+  IndicateurCmrProjetFormData,
+} from '@/simadou/allTypes/indicateurCmrProjet'
 import { indicateurCmrService } from '@/simadou/allSercices/indicateurCmrService'
+import { indicateurCmrProjetService } from '@/simadou/allSercices/indicateurCmrProjetService'
+import {
+  matchesIndicateurCmrProjet,
+  withIndicateurCmrProjetCode,
+} from '@/simadou/lib/indicateurCmrProjetUtils'
 import {
   cibleCmrService,
   type CibleCmrFormData,
@@ -13,6 +22,12 @@ import { invalidateAndRefetch } from '@/simadou/allHooks/admin/queryInvalidation
 
 export const indicateurCmrQueryKeys = {
   all: ['indicateurs-cmr'] as const,
+}
+
+export const indicateurCmrProjetQueryKeys = {
+  all: ['indicateurs-cmr-projet'] as const,
+  byProjet: (codeProjet: string | undefined) =>
+    [...indicateurCmrProjetQueryKeys.all, 'by-projet', codeProjet] as const,
 }
 
 export const cibleCmrQueryKeys = {
@@ -97,6 +112,114 @@ export function useDeleteIndicateurCmr() {
   })
 }
 
+export function useGetIndicateursCmrProjet(
+  codeProjet: string | undefined,
+  idProjet?: number | null
+) {
+  return useQuery({
+    queryKey: indicateurCmrProjetQueryKeys.byProjet(codeProjet),
+    queryFn: async () => {
+      if (!codeProjet) return []
+
+      try {
+        const scoped = await indicateurCmrProjetService.getByProjet(codeProjet)
+        if (scoped.length > 0) return scoped
+      } catch {
+        // fallback client-side
+      }
+
+      const all = await indicateurCmrProjetService.getAll()
+      const filtered = all.filter((indicateur) =>
+        matchesIndicateurCmrProjet(indicateur, codeProjet, idProjet)
+      )
+      if (filtered.length > 0) return filtered
+
+      // L'API peut renvoyer des enregistrements sans code_projet sur la liste.
+      return all.filter(
+        (indicateur) =>
+          indicateur.code_projet == null &&
+          indicateur.projet == null &&
+          !(indicateur as Record<string, unknown>).projet_cmr
+      )
+    },
+    enabled: !!codeProjet,
+  })
+}
+
+export function useGetIndicateurCmrProjet(id: number | null | undefined) {
+  return useQuery({
+    queryKey: [...indicateurCmrProjetQueryKeys.all, id] as const,
+    queryFn: () => indicateurCmrProjetService.getById(id!),
+    enabled: id != null,
+  })
+}
+
+export function useCreateIndicateurCmrProjet(codeProjet: string | undefined) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: IndicateurCmrProjetFormData) =>
+      indicateurCmrProjetService.create({
+        ...data,
+        code_projet: codeProjet ?? data.code_projet ?? null,
+      }),
+    meta: { suppressGlobalErrorToast: true },
+    onSuccess: async (created) => {
+      if (codeProjet) {
+        const normalized = withIndicateurCmrProjetCode(created, codeProjet)
+        queryClient.setQueryData<IndicateurCmrProjet[]>(
+          indicateurCmrProjetQueryKeys.byProjet(codeProjet),
+          (current = []) => {
+            if (
+              current.some(
+                (item) => item.id_ref_ind_cmr === normalized.id_ref_ind_cmr
+              )
+            ) {
+              return current
+            }
+            return [...current, normalized]
+          }
+        )
+      }
+
+      await invalidateAndRefetch(queryClient, indicateurCmrProjetQueryKeys.all)
+      if (codeProjet) {
+        await invalidateAndRefetch(
+          queryClient,
+          indicateurCmrProjetQueryKeys.byProjet(codeProjet)
+        )
+      }
+    },
+  })
+}
+
+export function useUpdateIndicateurCmrProjet() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: number
+      data: Partial<IndicateurCmrProjetFormData>
+    }) => indicateurCmrProjetService.update(id, data),
+    meta: { suppressGlobalErrorToast: true },
+    onSuccess: async () => {
+      await invalidateAndRefetch(queryClient, indicateurCmrProjetQueryKeys.all)
+    },
+  })
+}
+
+export function useDeleteIndicateurCmrProjet() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: number) => indicateurCmrProjetService.delete(id),
+    meta: { suppressGlobalErrorToast: true },
+    onSuccess: async () => {
+      await invalidateAndRefetch(queryClient, indicateurCmrProjetQueryKeys.all)
+    },
+  })
+}
+
 export function useGetAllCiblesCmr() {
   return useQuery({
     queryKey: cibleCmrQueryKeys.all,
@@ -151,32 +274,10 @@ export function useDeleteCibleCmr() {
   })
 }
 
-export function useGetCiblesCmrProjet(codeProjet: string | undefined) {
-  return useQuery({
-    queryKey: cibleCmrProjetQueryKeys.byProjet(codeProjet),
-    queryFn: () => cibleCmrProjetService.getByProjet(codeProjet!),
-    enabled: !!codeProjet,
-  })
-}
-
 export function useGetAllCiblesCmrProjet() {
   return useQuery({
     queryKey: cibleCmrProjetQueryKeys.all,
     queryFn: () => cibleCmrProjetService.getAll(),
-  })
-}
-
-export function useGetCiblesCmrByIndicateurCrp(
-  indicateurCrpId: number | null | undefined
-) {
-  return useQuery({
-    queryKey: [
-      ...cibleCmrProjetQueryKeys.all,
-      'by-indicateur-crp',
-      indicateurCrpId,
-    ] as const,
-    queryFn: () => cibleCmrProjetService.getByIndicateur(indicateurCrpId!),
-    enabled: indicateurCrpId != null,
   })
 }
 

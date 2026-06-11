@@ -9,9 +9,9 @@ import {
   DetailViewHeader,
   DetailViewLoading,
 } from '@/Global/Detail/DetailFields'
-import { useGetIndicateurCmr } from '@/simadou/allHooks/admin/indicateurCmrHooks'
-import { resolveResultatCmrLabel } from '@/simadou/allfonctionalities/politique/indicateurs-cmr/indicateurCmrFormUtils'
+import { useGetIndicateurCmrProjet } from '@/simadou/allHooks/admin/indicateurCmrHooks'
 import { resolveRelationCode } from '@/simadou/lib/resolveApiRelation'
+import { resolveResultatCmrProjetLabel } from './indicateurCmrProjetFormUtils'
 
 function formatReferentiel(value: unknown): string {
   if (value == null) return ''
@@ -28,14 +28,15 @@ function formatReferentiel(value: unknown): string {
   return String(value)
 }
 
-export default function IndicateurCmrDetailView({
+export default function IndicateurCmrProjetDetailView({
   indicateurId,
   onClose,
 }: {
   indicateurId: number
   onClose: () => void
 }) {
-  const { data: indicateur, isLoading, isError } = useGetIndicateurCmr(indicateurId)
+  const { data: indicateur, isLoading, isError } =
+    useGetIndicateurCmrProjet(indicateurId)
 
   if (isLoading) return <DetailViewLoading />
 
@@ -56,7 +57,7 @@ export default function IndicateurCmrDetailView({
 
       {indicateur.resultat_cmr != null ? (
         <DetailHighlight label='Résultat CMR'>
-          {resolveResultatCmrLabel(indicateur.resultat_cmr)}
+          {resolveResultatCmrProjetLabel(indicateur.resultat_cmr)}
         </DetailHighlight>
       ) : null}
 
@@ -65,50 +66,21 @@ export default function IndicateurCmrDetailView({
           <DetailField label='Référence CMR' value={indicateur.reference_cmr} />
           <DetailField
             label='Année de référence'
-            value={indicateur.annee_reference}
-          />
-          <DetailField
-            label='Référentiel'
-            value={formatReferentiel(indicateur.referentiel_cmr)}
-            className='sm:col-span-2'
-          />
-        </DetailFieldGrid>
-      </DetailSection>
-
-      <DetailSection title='Collecte & agrégation'>
-        <DetailFieldGrid>
-          <DetailField
-            label='Responsable collecte'
-            value={indicateur.responsable_collecte_cmr}
+            value={String(indicateur.annee_reference)}
           />
           <DetailField label='Cible CMR' value={indicateur.cible_cmr} />
           <DetailField
             label="Fonction d'agrégation"
-            value={indicateur.fonction_agregat_cmr || 'Non définie'}
-            className='sm:col-span-2'
+            value={indicateur.fonction_agregat_cmr}
           />
-        </DetailFieldGrid>
-      </DetailSection>
-
-      <DetailSection title='Informations système'>
-        <DetailFieldGrid className='sm:grid-cols-3'>
           <DetailField
-            label='ID'
-            value={indicateur.id_ref_ind_cmr}
-            mono
+            label='Responsable de collecte'
+            value={indicateur.responsable_collecte_cmr}
           />
-          {indicateur.created_at ? (
-            <DetailField
-              label='Créé le'
-              value={new Date(indicateur.created_at).toLocaleDateString('fr-FR')}
-            />
-          ) : null}
-          {indicateur.updated_at ? (
-            <DetailField
-              label='Modifié le'
-              value={new Date(indicateur.updated_at).toLocaleDateString('fr-FR')}
-            />
-          ) : null}
+          <DetailField
+            label='Référentiel'
+            value={formatReferentiel(indicateur.referentiel_cmr)}
+          />
         </DetailFieldGrid>
       </DetailSection>
 

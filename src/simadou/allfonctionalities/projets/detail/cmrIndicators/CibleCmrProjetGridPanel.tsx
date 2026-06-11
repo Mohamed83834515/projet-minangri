@@ -18,79 +18,82 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import type { CibleCmrProjet, Projet } from '@/simadou/allTypes'
+import type { IndicateurCmrProjet } from '@/simadou/allTypes/indicateurCmrProjet'
 import {
-  useActiveProgramme,
-  useActiveProgrammeCode,
-} from '@/hooks/use-active-programme'
-import type { CibleCmr, IndicateurCmr } from '@/simadou/allTypes'
-import {
-  useCreateCibleCmr,
-  useDeleteCibleCmr,
-  useGetAllCiblesCmr,
-  useUpdateCibleCmr,
+  useCreateCibleCmrProjet,
+  useDeleteCibleCmrProjet,
+  useGetAllCiblesCmrProjet,
+  useUpdateCibleCmrProjet,
 } from '@/simadou/allHooks/admin/indicateurCmrHooks'
 import { useGetNiveauxLocalite } from '@/simadou/allHooks/admin/niveauLocaliteHooks'
 import { useGetLocalites } from '@/simadou/allHooks/admin/sharedHooks'
 import {
+  buildCibleCmrProjetGridRows,
+  buildCibleCmrProjetGridState,
   buildCibleCmrGridKey,
-  buildCibleCmrGridRows,
-  buildCibleCmrGridState,
-  buildCiblePayloadFromGridCell,
-  filterCiblesForZoneGrid,
+  buildCibleProjetPayloadFromGridCell,
+  filterCiblesForProjetZoneGrid,
   getCibleCmrGridRowId,
-  getProgrammeYearRange,
+  getProjetYearRange,
   hasCibleCmrGridChanges,
   isCibleCmrGridCellDirty,
   parseGridCellValue,
   type CibleCmrGridCell,
   type CibleCmrGridRow,
-} from '@/simadou/lib/cibleCmrGridUtils'
+} from '@/simadou/lib/cibleCmrProjetGridUtils'
+
 const DEFAULT_PAGE_SIZE = 5
-/** Above this count, year columns use min-widths and the grid scrolls horizontally */
 const YEAR_SCROLL_THRESHOLD = 10
 const ZONE_COLUMN_MIN_PX = 100
 const YEAR_COLUMN_MIN_PX = 58
 
 type Props = {
-  indicateur: IndicateurCmr
+  indicateur: IndicateurCmrProjet
+  codeProjet: string
+  projet: Projet
   onClose?: () => void
 }
 
-export default function CibleCmrGridPanel({ indicateur, onClose }: Props) {
-  const programme = useActiveProgramme()
-  const programmeCode = useActiveProgrammeCode()
+export default function CibleCmrProjetGridPanel({
+  indicateur,
+  codeProjet,
+  projet,
+  onClose,
+}: Props) {
   const { data: localites = [], isLoading: isLoadingLocalites } =
     useGetLocalites()
   const { data: niveaux = [], isLoading: isLoadingNiveaux } =
     useGetNiveauxLocalite()
   const { data: allCibles = [], isLoading: isLoadingCibles } =
-    useGetAllCiblesCmr()
+    useGetAllCiblesCmrProjet()
 
-  const createMutation = useCreateCibleCmr()
-  const updateMutation = useUpdateCibleCmr()
-  const deleteMutation = useDeleteCibleCmr()
+  const createMutation = useCreateCibleCmrProjet(codeProjet)
+  const updateMutation = useUpdateCibleCmrProjet(codeProjet)
+  const deleteMutation = useDeleteCibleCmrProjet(codeProjet)
 
-  const indicateurCmrId = indicateur.id_ref_ind_cmr
+  const indicateurCmrProjetId = indicateur.id_ref_ind_cmr
 
   const gridRows = useMemo(
-    () => buildCibleCmrGridRows(localites, niveaux),
+    () => buildCibleCmrProjetGridRows(localites, niveaux),
     [localites, niveaux]
   )
 
-  const years = useMemo(
-    () => getProgrammeYearRange(programme),
-    [programme]
-  )
+  const years = useMemo(() => getProjetYearRange(projet), [projet])
 
   const filteredCibles = useMemo(
     () =>
-      filterCiblesForZoneGrid(allCibles, indicateurCmrId, programmeCode),
-    [allCibles, indicateurCmrId, programmeCode]
+      filterCiblesForProjetZoneGrid(
+        allCibles,
+        indicateurCmrProjetId,
+        codeProjet
+      ),
+    [allCibles, indicateurCmrProjetId, codeProjet]
   )
 
   const initialGrid = useMemo(
     () =>
-      buildCibleCmrGridState({
+      buildCibleCmrProjetGridState({
         cibles: filteredCibles,
         gridRows,
         years,
@@ -137,9 +140,7 @@ export default function CibleCmrGridPanel({ indicateur, onClose }: Props) {
   )
 
   const isLoading =
-    isLoadingLocalites ||
-    isLoadingNiveaux ||
-    isLoadingCibles
+    isLoadingLocalites || isLoadingNiveaux || isLoadingCibles
   const isSaving =
     createMutation.isPending ||
     updateMutation.isPending ||
@@ -151,7 +152,7 @@ export default function CibleCmrGridPanel({ indicateur, onClose }: Props) {
       return
     }
 
-    const operations: Promise<CibleCmr | void>[] = []
+    const operations: Promise<CibleCmrProjet | void>[] = []
 
     for (const row of gridRows) {
       const rowId = getCibleCmrGridRowId(row)
@@ -171,12 +172,12 @@ export default function CibleCmrGridPanel({ indicateur, onClose }: Props) {
           continue
         }
 
-        const payload = buildCiblePayloadFromGridCell({
+        const payload = buildCibleProjetPayloadFromGridCell({
           localiteId: row.localiteId,
           year,
           value: parsedValue,
-          indicateurCmrId,
-          programmeCode,
+          indicateurCmrProjetId,
+          codeProjet,
         })
 
         if (existingId != null) {
@@ -220,19 +221,11 @@ export default function CibleCmrGridPanel({ indicateur, onClose }: Props) {
     )
   }
 
-  if (!programme) {
-    return (
-      <p className='py-10 text-center text-sm text-muted-foreground'>
-        Sélectionnez un programme pour afficher la période des cibles.
-      </p>
-    )
-  }
-
   if (years.length === 0) {
     return (
       <p className='py-10 text-center text-sm text-muted-foreground'>
-        Les dates de début et de fin du programme actif sont requises pour
-        générer les colonnes annuelles.
+        La date de démarrage et la durée du projet sont requises pour générer
+        les colonnes annuelles.
       </p>
     )
   }
@@ -276,9 +269,7 @@ export default function CibleCmrGridPanel({ indicateur, onClose }: Props) {
           <colgroup>
             <col
               style={{
-                width: needsHorizontalScroll
-                  ? ZONE_COLUMN_MIN_PX
-                  : '26%',
+                width: needsHorizontalScroll ? ZONE_COLUMN_MIN_PX : '26%',
               }}
             />
             {years.map((year) => (
@@ -319,7 +310,10 @@ export default function CibleCmrGridPanel({ indicateur, onClose }: Props) {
                   className='sticky left-0 z-10 border-r bg-background px-2 py-1.5 align-middle font-medium'
                   style={
                     needsHorizontalScroll
-                      ? { minWidth: ZONE_COLUMN_MIN_PX, maxWidth: ZONE_COLUMN_MIN_PX }
+                      ? {
+                          minWidth: ZONE_COLUMN_MIN_PX,
+                          maxWidth: ZONE_COLUMN_MIN_PX,
+                        }
                       : undefined
                   }
                 >
@@ -389,9 +383,7 @@ export default function CibleCmrGridPanel({ indicateur, onClose }: Props) {
                 <SelectItem value={`${gridRows.length}`}>Tout</SelectItem>
               </SelectContent>
             </Select>
-            <p className='hidden text-sm font-medium sm:block'>
-              Zones par page
-            </p>
+            <p className='hidden text-sm font-medium sm:block'>Zones par page</p>
           </div>
         </div>
 

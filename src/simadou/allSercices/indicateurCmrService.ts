@@ -2,28 +2,27 @@ import { apiClient } from "@/axios/api";
 import type { IndicateurCmr, IndicateurCmrFormData } from "../allTypes";
 import { normalizeApiList } from "./apiListUtils";
 
-/** L'API Django expose `Resultat_cmr` ; le front utilise `resultat_cmr`. */
 function mapIndicateurCmrFromApi(raw: Record<string, unknown>): IndicateurCmr {
-  const resultat =
-    typeof raw.resultat_cmr === "string"
-      ? raw.resultat_cmr
-      : typeof raw.Resultat_cmr === "string"
-        ? raw.Resultat_cmr
-        : "";
+  const rawResultat = raw.resultat_cmr ?? raw.Resultat_cmr;
 
   return {
     ...(raw as IndicateurCmr),
-    resultat_cmr: resultat,
+    ...(rawResultat !== undefined && rawResultat !== null
+      ? { resultat_cmr: rawResultat as IndicateurCmr["resultat_cmr"] }
+      : {}),
   };
 }
 
 function toIndicateurCmrApiPayload(
   data: Partial<IndicateurCmrFormData>,
 ): Record<string, unknown> {
-  const { resultat_cmr, ...rest } = data;
+  const { resultat_cmr, referentiel_cmr, ...rest } = data;
   return {
     ...rest,
-    ...(resultat_cmr !== undefined ? { Resultat_cmr: resultat_cmr } : {}),
+    ...(resultat_cmr !== undefined ? { resultat_cmr } : {}),
+    ...(referentiel_cmr !== undefined
+      ? { referentiel_cmr: referentiel_cmr ?? null }
+      : {}),
   };
 }
 

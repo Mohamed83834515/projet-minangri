@@ -1,8 +1,5 @@
 import { z } from "zod";
-import {
-  parseOptionalNumber,
-  resolveRelationId,
-} from "@/simadou/lib/resolveApiRelation";
+import { parseOptionalNumber } from "@/simadou/lib/resolveApiRelation";
 
 export const cibleCmrProjetSchema = z.object({
   annee: z.string().min(1, "L'année est obligatoire"),
@@ -32,19 +29,6 @@ export const cibleCmrProjetSchema = z.object({
 });
 
 export type CibleCmrProjetFormData = z.infer<typeof cibleCmrProjetSchema>;
-
-// Type pour les relations
-export type CibleCmrProjetWithRelations = CibleCmrProjetFormData & {
-  indicateur_crp?: any;
-  ugl?: any;
-};
-
-// Schéma pour la mise à jour (tous les champs optionnels)
-export const cibleCmrProjetUpdateSchema = cibleCmrProjetSchema.partial();
-
-export type CibleCmrProjetUpdateData = z.infer<
-  typeof cibleCmrProjetUpdateSchema
->;
 
 // Fonction utilitaire pour formater la valeur cible
 export const formatValeurCible = (valeur: number): string => {
@@ -88,36 +72,4 @@ export function normalizeAnneeCibleForForm(
 
   const byLabel = options.find((o) => o.label === year);
   return byLabel != null ? String(byLabel.value) : apiDate;
-}
-
-/** API attend l'id indicateur (PK), pas le code IOP. */
-export function resolveCodeIndicateurCrpForForm(
-  cible: {
-    code_indicateur_crp?: unknown;
-    indicateur_crp?: unknown;
-  } | null
-  | undefined,
-): number | null {
-  if (!cible) return null;
-
-  return (
-    resolveRelationId(cible.code_indicateur_crp, "id_indicateur_cr_iop") ??
-    resolveRelationId(cible.indicateur_crp, "id_indicateur_cr_iop") ??
-    (typeof cible.code_indicateur_crp === "number"
-      ? cible.code_indicateur_crp
-      : parseOptionalNumber(cible.code_indicateur_crp))
-  );
-}
-
-export function lookupIndicateurCadreResultatByCrpId<
-  T extends {
-    id_indicateur_cr_iop: number;
-    code_indicateur_cr_iop: string;
-    intitule_indicateur_cr_iop: string;
-  },
->(indicateurCrpId: number | null | undefined, indicateurs: T[]): T | null {
-  if (indicateurCrpId == null) return null;
-  return (
-    indicateurs.find((i) => i.id_indicateur_cr_iop === indicateurCrpId) ?? null
-  );
 }

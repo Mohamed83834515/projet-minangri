@@ -15,6 +15,7 @@ export * from "./fonction";
 export * from "./indicateurActivitePtba";
 export * from "./indicateurCadreResultat";
 export * from "./indicateurCmr";
+export * from "./indicateurCmrProjet";
 export * from "./indicateurPerformanceProjet";
 export * from "./localite";
 export * from "./niveauCadreResultat";

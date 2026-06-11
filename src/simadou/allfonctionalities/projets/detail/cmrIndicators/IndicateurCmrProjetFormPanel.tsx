@@ -3,52 +3,55 @@ import { toast } from 'sonner'
 import { DynamicForm } from '@/Global/Forms/DynamicForm'
 import { getApiErrorMessage } from '@/lib/api-error-message'
 import { getIndicateurCmrFormConfigForDialog } from '@/simadou/allfieldsConfig/indicateurCmrForm'
-import type { IndicateurCmr } from '@/simadou/allTypes'
-import type { IndicateurStrategique } from '@/simadou/allTypes/indicateurStrategique'
+import type { IndicateurCadreResultat } from '@/simadou/allTypes'
+import type { IndicateurCmrProjet } from '@/simadou/allTypes/indicateurCmrProjet'
 import {
   indicateurCmrCreateSchema,
   type IndicateurCmrCreateData,
 } from '@/simadou/schemas/indicateursSchemas'
 import {
-  useCreateIndicateurCmr,
-  useUpdateIndicateurCmr,
+  useCreateIndicateurCmrProjet,
+  useUpdateIndicateurCmrProjet,
 } from '@/simadou/allHooks/admin/indicateurCmrHooks'
 import { useGetDictionnaireIndicateurs } from '@/simadou/allHooks/admin/dictionnaireIndicateurHooks'
 import {
   buildDictionnaireIndicateurSelectOptions,
-  buildIndicateurStrategiqueSelectOptions,
-  filterIndicateursStrategiqueByNiveau,
-  indicateurCmrToFormValues,
+  buildIndicateurCadreResultatSelectOptions,
+  filterIndicateursCadreResultatByNiveau,
+  indicateurCmrProjetToFormValues,
   resolveReferentielCmrId,
-  resolveResultatCmrId,
-} from './indicateurCmrFormUtils'
+  resolveResultatCmrProjetId,
+} from './indicateurCmrProjetFormUtils'
 
-export default function IndicateurCmrFormPanel({
+export default function IndicateurCmrProjetFormPanel({
   indicateur,
-  niveauCodeNumber,
-  indicateursStrategiques,
+  codeProjet,
+  niveauNombre,
+  indicateursCadreResultat,
   onClose,
   onSuccess,
 }: {
-  indicateur?: IndicateurCmr | null
-  niveauCodeNumber: number
-  indicateursStrategiques: IndicateurStrategique[]
+  indicateur?: IndicateurCmrProjet | null
+  codeProjet: string
+  niveauNombre: number
+  indicateursCadreResultat: IndicateurCadreResultat[]
   onClose: () => void
   onSuccess: () => void
 }) {
   const isEditing = !!indicateur
-  const createMutation = useCreateIndicateurCmr()
-  const updateMutation = useUpdateIndicateurCmr()
+  const createMutation = useCreateIndicateurCmrProjet(codeProjet)
+  const updateMutation = useUpdateIndicateurCmrProjet()
   const { data: dictionnaires = [], isLoading: isLoadingReferentiels } =
     useGetDictionnaireIndicateurs()
 
-  const indicateursStrategiquesForNiveau = useMemo(
+  const indicateursCadreResultatForNiveau = useMemo(
     () =>
-      filterIndicateursStrategiqueByNiveau(
-        indicateursStrategiques,
-        niveauCodeNumber
+      filterIndicateursCadreResultatByNiveau(
+        indicateursCadreResultat,
+        niveauNombre,
+        codeProjet
       ),
-    [indicateursStrategiques, niveauCodeNumber]
+    [indicateursCadreResultat, niveauNombre, codeProjet]
   )
 
   const referentielOptions = useMemo(
@@ -60,13 +63,13 @@ export default function IndicateurCmrFormPanel({
     [dictionnaires, indicateur]
   )
 
-  const indicateurStrategiqueOptions = useMemo(
+  const resultatCmrOptions = useMemo(
     () =>
-      buildIndicateurStrategiqueSelectOptions(
-        indicateursStrategiquesForNiveau,
-        resolveResultatCmrId(indicateur)
+      buildIndicateurCadreResultatSelectOptions(
+        indicateursCadreResultatForNiveau,
+        resolveResultatCmrProjetId(indicateur)
       ),
-    [indicateursStrategiquesForNiveau, indicateur]
+    [indicateursCadreResultatForNiveau, indicateur]
   )
 
   const formConfig = useMemo(
@@ -74,13 +77,13 @@ export default function IndicateurCmrFormPanel({
       getIndicateurCmrFormConfigForDialog({
         referentielOptions,
         isLoadingReferentiels,
-        indicateurStrategiqueOptions,
+        indicateurStrategiqueOptions: resultatCmrOptions,
       }),
-    [referentielOptions, isLoadingReferentiels, indicateurStrategiqueOptions]
+    [referentielOptions, isLoadingReferentiels, resultatCmrOptions]
   )
 
   const defaultValues = useMemo(
-    () => indicateurCmrToFormValues(indicateur),
+    () => indicateurCmrProjetToFormValues(indicateur),
     [indicateur]
   )
 
@@ -88,6 +91,7 @@ export default function IndicateurCmrFormPanel({
     const payload = {
       ...data,
       referentiel_cmr: data.referentiel_cmr ?? null,
+      code_projet: codeProjet,
     }
 
     const callbacks = {
@@ -107,7 +111,10 @@ export default function IndicateurCmrFormPanel({
     }
 
     if (isEditing && indicateur) {
-      updateMutation.mutate({ id: indicateur.id_ref_ind_cmr, data: payload }, callbacks)
+      updateMutation.mutate(
+        { id: indicateur.id_ref_ind_cmr, data: payload },
+        callbacks
+      )
       return
     }
 
@@ -116,12 +123,12 @@ export default function IndicateurCmrFormPanel({
 
   return (
     <DynamicForm
-      key={`${indicateur?.id_ref_ind_cmr ?? 'new'}-${niveauCodeNumber}`}
+      key={`${indicateur?.id_ref_ind_cmr ?? 'new'}-${niveauNombre}`}
       config={formConfig}
       schema={indicateurCmrCreateSchema}
       defaultValues={defaultValues}
       onSubmit={onSubmit}
-      submitText={isEditing ? 'Mettre à jour' : 'Ajouter'}
+      submitText={isEditing ? 'Modifier' : 'Créer'}
       loadingText='Enregistrement…'
       isLoading={createMutation.isPending || updateMutation.isPending}
       onCancel={onClose}

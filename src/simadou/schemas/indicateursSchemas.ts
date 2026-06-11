@@ -75,7 +75,9 @@ export type IndicateurCadreResultatUpdateData = z.infer<
 export const indicateurCmrSchema = z.object({
   id_ref_ind_cmr: z.number(),
   code_ref_ind: z.string().min(1, "Le code est requis").max(50),
-  resultat_cmr: z.string().min(1, "Le résultat est requis").max(200),
+  resultat_cmr: z.coerce
+    .number()
+    .min(1, "Le résultat est requis"),
   intitule_ref_ind: z.string().min(1, "L'intitulé est requis").max(200),
   reference_cmr: z.string().min(1, "La référence est requise").max(200),
   annee_reference: z.coerce
@@ -91,7 +93,15 @@ export const indicateurCmrSchema = z.object({
     .string()
     .min(1, "La fonction d'agrégation est requise")
     .max(100),
-  unite_cmr: z.number().nullable().optional(),
+  referentiel_cmr: z
+    .union([z.string(), z.number()])
+    .nullable()
+    .optional()
+    .transform((value) => {
+      if (value == null || value === "") return null;
+      const parsed = Number(value);
+      return Number.isFinite(parsed) ? parsed : null;
+    }),
 });
 
 export const indicateurCmrCreateSchema = indicateurCmrSchema.omit({

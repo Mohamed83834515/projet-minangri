@@ -4,29 +4,54 @@ import { DataTableColumnHeader } from '@/components/data-table'
 import { LongText } from '@/components/others/long-text'
 import { Button } from '@/components/ui/button'
 import { buildEditDeleteActionsColumn } from '@/Global/Tableaux/buildEditDeleteActionsColumn'
-import type { IndicateurCmr } from '@/simadou/allTypes'
+import { resolveResultatCmrLabel } from '@/simadou/allfonctionalities/politique/indicateurs-cmr/indicateurCmrFormUtils'
 import { resolveRelationCode } from '@/simadou/lib/resolveApiRelation'
+
+export type IndicateurCmrTableRow = {
+  id_ref_ind_cmr: number
+  code_ref_ind: string
+  intitule_ref_ind: string
+  resultat_cmr?: unknown
+  referentiel_cmr?: unknown
+  annee_reference: number
+  cible_cmr: string
+  fonction_agregat_cmr: string
+  responsable_collecte_cmr: string
+  reference_cmr: string
+}
 
 function displayValue(value: string | null | undefined, fallback = '—'): string {
   if (value == null || value === '') return fallback
   return value
 }
 
-function resolveUniteLabel(value: IndicateurCmr['unite_cmr']): string {
-  return resolveRelationCode(value, 'unite_ui') ?? '—'
+function resolveReferentielLabel(value: unknown): string {
+  if (value == null) return '—'
+  if (typeof value === 'object') {
+    const record = value as Record<string, unknown>
+    const code = resolveRelationCode(value, 'code_ref_ind')
+    const intitule =
+      typeof record.intitule_ref_ind === 'string' ? record.intitule_ref_ind : null
+    if (code && intitule) return `${code} — ${intitule}`
+    if (intitule) return intitule
+    if (code) return code
+  }
+  return String(value)
 }
 
-export function buildIndicateurCmrColumns({
+export function buildIndicateurCmrColumns<T extends IndicateurCmrTableRow>({
   onView,
   onEdit,
   onDeleteRequest,
   onOpenCibles,
+  hideReferentielColumn = false,
 }: {
-  onView?: (row: IndicateurCmr) => void
-  onEdit: (row: IndicateurCmr) => void
-  onDeleteRequest: (row: IndicateurCmr) => void
-  onOpenCibles?: (row: IndicateurCmr) => void
-}): ColumnDef<IndicateurCmr>[] {
+  onView?: (row: T) => void
+  onEdit: (row: T) => void
+  onDeleteRequest: (row: T) => void
+  onOpenCibles?: (row: T) => void
+  hideReferentielColumn?: boolean
+}): ColumnDef<T>[] {
   const actionsColumn = buildEditDeleteActionsColumn({
     onView,
     onEdit,
@@ -54,30 +79,36 @@ export function buildIndicateurCmrColumns({
       cell: ({ row }) => (
         <div className='max-w-xs'>
           <div className='font-medium'>{row.original.intitule_ref_ind}</div>
-          {row.original.resultat_cmr ? (
+          {row.original.resultat_cmr != null ? (
             <p
               className='mt-1 truncate text-xs text-muted-foreground'
-              title={row.original.resultat_cmr}
+              title={resolveResultatCmrLabel(row.original.resultat_cmr)}
             >
-              Résultat: {row.original.resultat_cmr}
+              Résultat: {resolveResultatCmrLabel(row.original.resultat_cmr)}
             </p>
           ) : null}
         </div>
       ),
       enableHiding: false,
     },
-    {
-      id: 'unite_cmr',
-      accessorKey: 'unite_cmr',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Unité' />
-      ),
-      cell: ({ row }) => (
-        <span className='text-sm'>{resolveUniteLabel(row.original.unite_cmr)}</span>
-      ),
-      enableSorting: false,
-      enableHiding: false,
-    },
+    ...(hideReferentielColumn
+      ? []
+      : [
+          {
+            id: 'referentiel_cmr',
+            accessorKey: 'referentiel_cmr',
+            header: ({ column }) => (
+              <DataTableColumnHeader column={column} title='Référentiel' />
+            ),
+            cell: ({ row }) => (
+              <span className='text-sm'>
+                {resolveReferentielLabel(row.original.referentiel_cmr)}
+              </span>
+            ),
+            enableSorting: false,
+            enableHiding: false,
+          } satisfies ColumnDef<T>,
+        ]),
     {
       id: 'annee_reference',
       accessorKey: 'annee_reference',
@@ -102,7 +133,7 @@ export function buildIndicateurCmrColumns({
               <span className='text-sm'>{displayValue(row.original.cible_cmr)}</span>
             ),
             enableHiding: false,
-          } satisfies ColumnDef<IndicateurCmr>,
+          } satisfies ColumnDef<T>,
         ]),
     {
       id: 'fonction_agregat_cmr',
@@ -180,7 +211,7 @@ export function buildIndicateurCmrColumns({
             size: 120,
             enableSorting: false,
             enableHiding: false,
-          } satisfies ColumnDef<IndicateurCmr>,
+          } satisfies ColumnDef<T>,
         ]
       : []),
     actionsColumn,
