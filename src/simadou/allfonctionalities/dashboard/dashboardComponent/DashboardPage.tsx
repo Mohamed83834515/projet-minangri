@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 // import { useQuery } from "@tanstack/react-query";
 import { PlanSite, Projet, Ptba, TacheActivitePtba, VersionPtba } from "@/simadou/allTypes";
 import ProjectTable, { ProjetRow } from "./ProjectTable";
@@ -149,6 +149,7 @@ const DashboardPage: React.FC = () => {
     const [anneeIndicateurs, setAnneIndicateurs] = useState<number | null>(null);
     const [searchQuery, setSearchQuery] = useState("");
 
+    const [projets, setProjets] = useState<Projet[]>([]);
     const codeProgramme = useActiveProgrammeCode();
     const idProgramme = useActiveProgrammeId();
 
@@ -191,19 +192,23 @@ const DashboardPage: React.FC = () => {
     // ── DONNÉES FICTIVES (remplacement temporaire) ──
     const activites = FICTIVE_ACTIVITES;
     const taches = FICTIVE_TACHES;
-    const { data: projets = [] } = useQuery<Projet[]>({
-        queryKey: ["projects-dashboard"],
-        queryFn: async () => {
+
+    useEffect(() => {
+        if (!codeProgramme) return;
+
+        const fetchProjets = async () => {
             const all = await projetService.getAll();
-            return all.filter(
+            const filtered = all.filter(
                 (p: Projet) =>
                     p.programme_projet !== null &&
                     typeof p.programme_projet === 'object' &&
                     p.programme_projet?.code_programme === codeProgramme
-            )
-        },
-        enabled: !!codeProgramme,
-    });
+            );
+            setProjets(filtered);
+        };
+
+        fetchProjets();
+    }, [codeProgramme]);
     // const projets = FICTIVE_PROJETS.filter(
     //     (p: Projet) =>
     //         p.programme_projet !== null &&

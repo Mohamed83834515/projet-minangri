@@ -9,8 +9,10 @@ type SourceFinancementDialogType = 'delete'
 export const buildSourceFinancementProjetColumns = (
   setOpen: (dialog: SourceFinancementDialogType | null) => void,
   setCurrentRow: React.Dispatch<React.SetStateAction<SourFinancementProjet | null>>,
-  onEdit: (tache: SourFinancementProjet) => void
+  onEdit: (tache: SourFinancementProjet) => void,
+  currencyCode?: string
 ): ColumnDef<SourFinancementProjet>[] => {
+
   return [
     {
       id: 'intitule_source_financement',
@@ -30,7 +32,7 @@ export const buildSourceFinancementProjetColumns = (
       ),
       cell: ({ row }) => (
         <div className='font-mono tabular-nums'>
-          {new Intl.NumberFormat('fr-FR').format(Number(row.original.montant_source_financement))} FCFA
+          {new Intl.NumberFormat('fr-FR').format(Number(row.original.montant_source_financement))} {currencyCode || "GNF"}
         </div>
       ),
     },

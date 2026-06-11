@@ -788,6 +788,7 @@ import { SignOutDialog } from '@/components/others/sign-out-dialog'
 import useDialogState from '@/hooks/use-dialog-state'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { useGeneralParamsQuery } from '@/simadou/allHooks/generalParams/queries'
 
 const t = (key: string) => key
 
@@ -1121,6 +1122,9 @@ export function AppTopbar({ user }: UserProps) {
     setManualGroup(null)
   }
 
+
+  const { data: config } = useGeneralParamsQuery()
+
   const activeGroup = manualGroup ?? routeGroup
 
   const headerRef = useRef<HTMLElement>(null)
@@ -1132,7 +1136,7 @@ export function AppTopbar({ user }: UserProps) {
     }
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+  }, [config])
 
   const navRef = useRef<HTMLDivElement>(null)
   const [leftFade, setLeftFade] = useState(false)
@@ -1299,7 +1303,7 @@ export function AppTopbar({ user }: UserProps) {
                 textShadow: '0 2px 4px rgba(0,0,0,0.1)',
               }}
             >
-              SISE CEP Agriculture PS2040
+            {config?.systemTitle}
             </div>
             <div
               style={{
