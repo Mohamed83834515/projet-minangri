@@ -1,10 +1,7 @@
 import type { Acteur } from '@/simadou/allTypes/acteur'
 import type { CadreAnalytique, NiveauCadreAnalytique } from '@/simadou/allTypes/cadreAnalytique'
 import type { Programme } from '@/simadou/allTypes/programme'
-import {
-  resolveActeurLabel,
-  resolveRelationId,
-} from '@/simadou/lib/resolveApiRelation'
+import { resolveRelationId } from '@/simadou/lib/resolveApiRelation'
 
 export function resolveProgrammeCode(
   value: NiveauCadreAnalytique['programme'] | Programme | undefined
@@ -43,6 +40,32 @@ export function sortNiveauxCadreAnalytique(
   )
 }
 
+export function getNextNiveauCadreAnalytique(
+  niveaux: NiveauCadreAnalytique[],
+  currentNiveauCodeNumber: number
+): NiveauCadreAnalytique | null {
+  const sorted = sortNiveauxCadreAnalytique(niveaux)
+  const index = sorted.findIndex(
+    (n) => Number(n.code_number_nca) === currentNiveauCodeNumber
+  )
+  if (index < 0 || index >= sorted.length - 1) return null
+  return sorted[index + 1] ?? null
+}
+
+export function buildChildCountByParentCaId(
+  cadres: CadreAnalytique[],
+  nextNiveauCodeNumber: number
+): Map<number, number> {
+  const counts = new Map<number, number>()
+  for (const cadre of cadres) {
+    if (resolveNiveauCaNumber(cadre.niveau_ca) !== nextNiveauCodeNumber) continue
+    const parentId = resolveParentCaId(cadre.parent_ca)
+    if (parentId == null) continue
+    counts.set(parentId, (counts.get(parentId) ?? 0) + 1)
+  }
+  return counts
+}
+
 export function resolveNiveauCaNumber(
   value: CadreAnalytique['niveau_ca']
 ): number | null {
@@ -56,40 +79,27 @@ export function resolveParentCaId(
   return resolveRelationId(value, 'id_ca')
 }
 
-export function resolvePartenaireCaId(
+export function resolvePartenaireCaIds(
   value: CadreAnalytique['partenaire_ca']
-): number | null {
-  return resolveRelationId(value, 'id_acteur')
-}
-
-export function resolvePartenaireCaLabel(
-  value: CadreAnalytique['partenaire_ca'],
-  acteurs?: Pick<Acteur, 'id_acteur' | 'nom_acteur' | 'code_acteur'>[]
-): string {
-  const nestedLabel = resolveActeurLabel(value)
-  if (nestedLabel) return nestedLabel
-
-  const id = resolveRelationId(value, 'id_acteur')
-  if (id == null) return 'Non défini'
-
-  const acteur = acteurs?.find((a) => a.id_acteur === id)
-  if (acteur) {
-    return acteur.code_acteur
-      ? `${acteur.nom_acteur} (${acteur.code_acteur})`
-      : acteur.nom_acteur
+): number[] {
+  if (value == null) return []
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => resolveRelationId(item, 'id_acteur'))
+      .filter((id): id is number => id != null)
   }
-
-  return 'Non défini'
+  const id = resolveRelationId(value, 'id_acteur')
+  return id != null ? [id] : []
 }
 
-/** Valeur initiale du select partenaire — uniquement si l’ID existe dans la liste. */
+/** Valeurs initiales du multiselect acteurs — uniquement les IDs présents dans la liste. */
 export function toPartenaireCaFormValue(
   value: CadreAnalytique['partenaire_ca'] | undefined,
   acteurs: Pick<Acteur, 'id_acteur'>[]
-): number | null {
-  const id = resolvePartenaireCaId(value ?? null)
-  if (id == null) return null
-  return acteurs.some((a) => a.id_acteur === id) ? id : null
+): number[] {
+  return resolvePartenaireCaIds(value ?? null).filter((id) =>
+    acteurs.some((a) => a.id_acteur === id)
+  )
 }
 
 export function buildCadreAnalytiqueParentOptions({
@@ -108,7 +118,7 @@ export function buildCadreAnalytiqueParentOptions({
         cadreNiveau != null &&
         cadreNiveau === niveauCodeNumber - 1 &&
         cadre.id_ca !== excludeCadreId
-      )
+      ) 
     })
     .map((cadre) => ({
       value: cadre.id_ca,

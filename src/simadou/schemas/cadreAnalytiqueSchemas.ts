@@ -16,7 +16,7 @@ export const cadreAnalytiqueWriteSchema = z.object({
   abgrege_ca: z.string().optional().default(''),
   cout_axe: z.coerce.number().min(0, 'Le coût doit être positif'),
   parent_ca: optionalRelationId,
-  partenaire_ca: optionalRelationId,
+  partenaire_ca: z.array(z.coerce.number()).optional().default([]),
   niveau_ca: z.coerce.number().optional(),
   programme_ca: z.coerce.number().nullable().optional(),
 })

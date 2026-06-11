@@ -2,30 +2,27 @@
 import { useEffect, useRef } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useSessionStore } from '@/stores/others/session.store'
-import { useGeneralParamsQuery } from '../allHooks/generalParams/queries'
 import { useAuthStore } from '@/stores/auth-store'
 import { SessionWarningDialog } from '@/components/others/SessionWarningDialog'
 import { toast } from 'sonner'
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
   const navigate        = useNavigate()
-  const { data: config } = useGeneralParamsQuery()
   const { logout }      = useAuthStore()
   const { start, stop, remainingSeconds, isWarningVisible } = useSessionStore()
   const durationRef     = useRef<number>(0)
   const hasLoggedOut    = useRef(false)
 
   useEffect(() => {
-    if (!config) return
-    const duration = config.inactivityDelayMinutes ? config.inactivityDelayMinutes * 60  : 0 // convert to seconds
+    const duration =  60 ;// convert to seconds
 
-    if (duration === 0) return   // infinite — do nothing
+    if (duration ) return   // infinite — do nothing
 
     durationRef.current = duration
     start(duration)
 
     return () => stop()
-  }, [config])
+  }, [])
 
   // Watch for expiry
   useEffect(() => {

@@ -16,19 +16,18 @@ import {
   MapPin,
   FileStack,
   BarChart2,
-  TrendingUp,
   Target,
   LineChart,
+  TrendingUp,
 } from 'lucide-react'
 import { type SidebarData } from '../../components/layout/others/types'
-
 
 export const sidebarData: SidebarData = {
   user: {
     name: "Simadou",
     email: "hello@gmail.com",
     id: "zofmov",
-    statut : 1
+    statut: 1
   },
   teams: [
     {
@@ -137,11 +136,6 @@ export const sidebarData: SidebarData = {
               icon: BarChart2,
             },
             {
-              title: 'Indicateurs du CMR',
-              url: '/programme/indicateurs-cmr',
-              icon: TrendingUp,
-            },
-            {
               title: 'Cadre stratégique',
               url: '/programme/cadre-strategique',
               icon: Target,
@@ -151,6 +145,11 @@ export const sidebarData: SidebarData = {
               url: '/programme/indicateurs-performance',
               icon: LineChart,
             },
+            {
+              title: 'Indicateurs du CMR',
+              url: '/programme/indicateurs-cmr',
+              icon: TrendingUp,
+            }
           ],
         },
 
@@ -169,31 +168,11 @@ export const sidebarData: SidebarData = {
               url: '/programmation/ptba',
               icon: ClipboardList,
             },
-            // {
-            //   title: 'Indicateurs activités PTBA',
-            //   url: '/programmation/indicateurs-activites-ptba',
-            //   icon: Activity,
-            // },
             {
               title: 'Suivi du PTBA',
               url: '/programmation/suivi-ptba',
               icon: Eye,
             },
-            // {
-            //   title: 'Indicateurs de performance',
-            //   url: '/programmation/indicateurs-performance',
-            //   icon: Gauge,
-            // },
-            // {
-            //   title: 'Activités projet',
-            //   url: '/programmation/activites-projet',
-            //   icon: ListTodo,
-            // },
-            // {
-            //   title: 'Activités programme',
-            //   url: '/programmation/activites-programme',
-            //   icon: Layers,
-            // },
           ],
         },
       ],

@@ -5,12 +5,8 @@ import {
   Calendar,
   Clock,
   DollarSign,
-  Layout,
   Loader2,
-  MapPin,
   TrendingUp,
-  User,
-  Users,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Main } from '@/components/layout/others/main'
@@ -40,21 +36,6 @@ const route = getRouteApi('/_authenticated/programmation/projets/$id')
 /** Indicateurs démo (branche amadou) — API à brancher. */
 const DEMO_EXECUTION = 67
 const DEMO_DECAISSEMENT = 54
-
-function ActeurList({ items, emptyLabel }: { items: string[]; emptyLabel: string }) {
-  if (items.length === 0) {
-    return <p className='text-xs text-muted-foreground'>{emptyLabel}</p>
-  }
-  return (
-    <ul className='space-y-1'>
-      {items.map((name) => (
-        <li key={name} className='text-xs font-medium leading-snug'>
-          {name}
-        </li>
-      ))}
-    </ul>
-  )
-}
 
 export default function ProjetDetail() {
   const { id } = route.useParams()
@@ -115,16 +96,6 @@ export default function ProjetDetail() {
     )
   }
 
-  const structures =
-    projet.structure_projet?.map((a) => a.nom_acteur).filter(Boolean) ?? []
-  const signataires =
-    projet.signataires_projet?.map((a) => a.nom_acteur).filter(Boolean) ?? []
-  const partenairesExec =
-    projet.partenaires_execution_projet?.map((a) => a.nom_acteur).filter(Boolean) ??
-    []
-  const zones =
-    projet.zone_projet?.map((z) => z.intitule_loca).filter(Boolean) ?? []
-
   const duree = computeDureeConsommee(projet)
 
   return (
@@ -132,7 +103,7 @@ export default function ProjetDetail() {
       fixed={isSplitScroll}
       className={cn('flex flex-col gap-4 py-4', isSplitScroll && 'min-h-0')}
     >
-      <div className='flex shrink-0 items-center gap-3'>
+      {/* <div className='flex shrink-0 items-center gap-3'>
         <Button variant='outline' size='icon' className='h-8 w-8 shrink-0' asChild>
           <Link to='/programmation/projets'>
             <ArrowLeft className='h-4 w-4' />
@@ -147,7 +118,7 @@ export default function ProjetDetail() {
             #{projet.code_projet}
           </p>
         </div>
-      </div>
+      </div> */}
 
       <div
         className={cn(
@@ -159,14 +130,16 @@ export default function ProjetDetail() {
           className={cn(
             'w-full shrink-0 space-y-3',
             isSplitScroll &&
-              'min-h-0 max-h-full overflow-y-auto overscroll-contain lg:w-72'
+            'min-h-0 max-h-full overflow-y-auto overscroll-contain lg:w-72'
           )}
         >
           <Card className='shrink-0 gap-0 py-0'>
             <CardHeader className='border-b bg-primary/5 px-3 py-2.5'>
               <div className='flex items-start gap-2.5'>
                 <div className='mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground'>
-                  <Layout className='h-3.5 w-3.5' />
+                  <Link to='/programmation/projets'>
+                    <ArrowLeft className='h-4 w-4' />
+                  </Link>
                 </div>
                 <div className='min-w-0'>
                   <CardTitle className='line-clamp-2 text-xs leading-snug'>
@@ -278,7 +251,7 @@ export default function ProjetDetail() {
                 </div>
               </div>
 
-              <div className='border-t pt-2.5'>
+              {/* <div className='border-t pt-2.5'>
                 <span className='mb-0.5 flex items-center gap-1 text-[9px] font-bold tracking-tight text-muted-foreground uppercase'>
                   <User className='h-2 w-2 text-primary' />
                   Partenaire
@@ -314,8 +287,8 @@ export default function ProjetDetail() {
                     Zones
                   </span>
                   <ActeurList items={zones} emptyLabel='—' />
-                </div>
-              </div>
+                </div> 
+              </div>*/}
             </CardContent>
           </Card>
 

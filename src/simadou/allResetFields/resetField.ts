@@ -65,7 +65,7 @@ export const CADRE_ANALYTIQUE = {
   abgrege_ca: "",
   niveau_ca: "",
   cout_axe: "",
-  partenaire_ca: null,
+  partenaire_ca: [],
   parent_ca: null,
   programme_ca: null,
 };
@@ -98,7 +98,7 @@ export const CADRE_STRATEGIQUE = {
   abgrege_cs: "",
   niveau_cs: "",
   etat: null,
-  partenaire_cs: null,
+  partenaire_cs: [],
   parent_cs: null,
   programme_cs: null,
 };
@@ -309,8 +309,8 @@ export const NIVEAU_STRUCTURE = {
   id_programme: null,
 };
 
-// =========NIVEAU_STRUCTURE_CONFIG==================
-export const NIVEAU_STRUCTURE_CONFIG = {
+// =========niveaux_structure_config==================
+export const niveaux_structure_config = {
   nombre_nsc: "",
   libelle_nsc: "",
   code_number_nsc: "",
@@ -503,6 +503,12 @@ export const ZONE_COLLECTE = {
   nom_zone: "",
   type_zone: "",
 };
+
+// ======SET_PASSWORD=====
+export const SET_PASSWORD = {
+  new_password : "",
+  confirm_new_password : ""
+}
 
 
 // =========GENERAL_PARAMS_IDENTITE==================

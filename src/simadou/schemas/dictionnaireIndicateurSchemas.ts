@@ -12,6 +12,9 @@ export const fonctionAgregatOptions = [
 ] as const
 
 export const typologieOptions = [
+  'Produit',
+  'Effet',
+  'Impact',
   'Valeur absolue',
   'Valeur relative',
   'Typologie quantitative',

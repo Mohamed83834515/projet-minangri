@@ -31,9 +31,9 @@ export function getCadreAnalytiqueFormConfigForDialog({
       },
       {
         name: 'partenaire_ca',
-        label: 'Partenaire',
-        type: 'select',
-        placeholder: '-- Choisir un partenaire --',
+        label: 'Acteur(s)',
+        type: 'multiselect',
+        placeholder: 'Sélectionner un ou plusieurs acteurs',
         required: false,
         options: acteurOptions,
         isLoading: isLoadingActeurs,
@@ -42,10 +42,10 @@ export function getCadreAnalytiqueFormConfigForDialog({
       {
         name: 'intutile_ca',
         label: 'Intitulé',
-        type: 'text',
+        type: 'textarea',
         placeholder: "Entrez l'intitulé",
         required: true,
-        gridCols: 2,
+        gridCols: 1,
       },
       {
         name: 'abgrege_ca',
@@ -63,7 +63,7 @@ export function getCadreAnalytiqueFormConfigForDialog({
         required: true,
         min: 0,
         step: 0.01,
-        gridCols: 1,
+        gridCols: 2,
       },
       ...(showParent
         ? [

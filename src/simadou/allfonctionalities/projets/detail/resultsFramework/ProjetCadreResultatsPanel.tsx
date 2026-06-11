@@ -11,7 +11,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Tabs, TabsContent } from '@/components/ui/tabs'
-import { NiveauTabTrigger, NiveauTabsList } from '../NiveauTabs'
+import { NiveauTabTrigger, NiveauTabsList, useNiveauTabsTheme } from '@/components/ui/NiveauTabs'
 import { GenericTable } from '@/Global/Generic/Generictable'
 import { GenericDeleteDialog } from '@/Global/Tableaux/GenericDeleteDialog'
 import useDialogState from '@/hooks/use-dialog-state'
@@ -25,6 +25,7 @@ import {
 } from '@/simadou/allHooks/admin/cadreResultatHooks'
 import CadreResultatFormDialog from './CadreResultatFormDialog'
 import NiveauCadreResultatManager from './NiveauCadreResultatManager'
+import IndicateurCadreResultatCadreDialog from '../resultsFrameworkIndicators/IndicateurCadreResultatCadreDialog'
 import { resolveNiveauCrId, sortNiveauxCadreResultat } from '@/simadou/lib/cadreResultatUtils'
 
 type ModalState = 'form' | 'niveaux'
@@ -35,18 +36,27 @@ function CadreResultatNiveauTable({
   tableKey,
   onEdit,
   onDeleteRequest,
+  onOpenIndicateurs,
 }: {
   niveauId: number
   cadres: CadreResultat[]
   tableKey: string
   onEdit: (row: CadreResultat) => void
   onDeleteRequest: (row: CadreResultat) => void
+  onOpenIndicateurs: (row: CadreResultat) => void
 }) {
   const { search, navigate } = useEmbeddedTableState()
 
   const columns = useMemo(
-    () => buildCadreResultatColumns({ cadres, onEdit, onDeleteRequest }),
-    [cadres, onEdit, onDeleteRequest]
+    () =>
+      buildCadreResultatColumns({
+        cadres,
+        onEdit,
+        onDeleteRequest,
+        onOpenIndicateurs,
+        hideProjetColumn: true,
+      }),
+    [cadres, onEdit, onDeleteRequest, onOpenIndicateurs]
   )
 
   const rows = useMemo(
@@ -86,10 +96,15 @@ export default function ProjetCadreResultatsPanel({ projet }: { projet: Projet }
   const sortedNiveaux = useMemo(() => sortNiveauxCadreResultat(niveaux), [niveaux])
 
   const hasNiveaux = sortedNiveaux.length > 0
+  const { tabsStyle } = useNiveauTabsTheme()
 
   const [activeNiveauId, setActiveNiveauId] = useState<string>('')
   const [showModal, setShowModal] = useState<ModalState | null>(null)
   const [selectedCadre, setSelectedCadre] = useState<CadreResultat | null>(null)
+  const [indicateursOpen, setIndicateursOpen] = useState(false)
+  const [cadreForIndicateurs, setCadreForIndicateurs] = useState<CadreResultat | null>(
+    null
+  )
   const [deleteOpen, setDeleteOpen] = useDialogState<'delete'>(null)
   const [cadreToDelete, setCadreToDelete] = useState<CadreResultat | null>(null)
 
@@ -124,6 +139,16 @@ export default function ProjetCadreResultatsPanel({ projet }: { projet: Projet }
     [setDeleteOpen]
   )
 
+  const handleOpenIndicateurs = useCallback((cadre: CadreResultat) => {
+    setCadreForIndicateurs(cadre)
+    setIndicateursOpen(true)
+  }, [])
+
+  const handleCloseIndicateurs = useCallback((open: boolean) => {
+    setIndicateursOpen(open)
+    if (!open) setCadreForIndicateurs(null)
+  }, [])
+
   const handleConfirmDelete = (cadre: CadreResultat) => {
     deleteMutation.mutate(cadre.id_cr, {
       onSuccess: () => {
@@ -152,22 +177,6 @@ export default function ProjetCadreResultatsPanel({ projet }: { projet: Projet }
           <Settings className='h-4 w-4' />
           Niveaux
         </Button>
-        <Button
-          type='button'
-          onClick={() => {
-            if (!hasNiveaux) {
-              toast.info('Configurez d’abord les niveaux du cadre de résultats.')
-              setShowModal('niveaux')
-              return
-            }
-            setSelectedCadre(null)
-            setShowModal('form')
-          }}
-          disabled={isLoadingNiveaux}
-        >
-          <Plus className='h-4 w-4' />
-          Nouveau cadre
-        </Button>
         </div>
       </div>
 
@@ -183,25 +192,43 @@ export default function ProjetCadreResultatsPanel({ projet }: { projet: Projet }
         </Card>
       ) : (
         <Tabs
+          orientation='vertical'
+          className='space-y-4'
+          style={tabsStyle}
           key={sortedNiveaux.length}
           value={String(currentNiveauId)}
           onValueChange={setActiveNiveauId}
         >
-          <div className='overflow-x-auto'>
-            <NiveauTabsList>
-              {sortedNiveaux.map((n) => (
-                <NiveauTabTrigger
-                  key={n.id_ncr}
-                  value={String(n.id_ncr)}
-                  count={countByNiveau.get(n.id_ncr) ?? 0}
-                >
-                  {n.libelle_ncr}
-                </NiveauTabTrigger>
-              ))}
-            </NiveauTabsList>
+          <div className='flex items-center justify-between gap-4'>
+            <div className='flex-1 overflow-x-auto'>
+              <NiveauTabsList>
+                {sortedNiveaux.map((n) => (
+                  <NiveauTabTrigger
+                    key={n.id_ncr}
+                    value={String(n.id_ncr)}
+                    count={countByNiveau.get(n.id_ncr) ?? 0}
+                  >
+                    {n.libelle_ncr}
+                  </NiveauTabTrigger>
+                ))}
+              </NiveauTabsList>
+            </div>
+
+            <Button
+              type='button'
+              className='shrink-0'
+              onClick={() => {
+                setSelectedCadre(null)
+                setShowModal('form')
+              }}
+              disabled={isLoadingNiveaux}
+            >
+              <Plus className='h-4 w-4' />
+              Nouveau cadre
+            </Button>
           </div>
           {sortedNiveaux.map((n) => (
-            <TabsContent key={n.id_ncr} value={String(n.id_ncr)} className='mt-3'>
+            <TabsContent key={n.id_ncr} value={String(n.id_ncr)}>
               {n.id_ncr === currentNiveauId && (
                 <CadreResultatNiveauTable
                   niveauId={n.id_ncr}
@@ -209,6 +236,7 @@ export default function ProjetCadreResultatsPanel({ projet }: { projet: Projet }
                   tableKey={`cadres-${n.id_ncr}-${dataUpdatedAt}-${cadres.length}`}
                   onEdit={handleEdit}
                   onDeleteRequest={handleDeleteRequest}
+                  onOpenIndicateurs={handleOpenIndicateurs}
                 />
               )}
             </TabsContent>
@@ -226,6 +254,13 @@ export default function ProjetCadreResultatsPanel({ projet }: { projet: Projet }
           onDelete={handleConfirmDelete}
         />
       )}
+
+      <IndicateurCadreResultatCadreDialog
+        open={indicateursOpen}
+        onOpenChange={handleCloseIndicateurs}
+        cadre={cadreForIndicateurs}
+        codeProjet={codeProjet}
+      />
 
       <Dialog open={showModal === 'niveaux'} onOpenChange={(o) => !o && handleClose()}>
         <DialogContent className='sm:max-w-3xl'>

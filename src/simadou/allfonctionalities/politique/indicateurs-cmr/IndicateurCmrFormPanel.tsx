@@ -4,6 +4,7 @@ import { DynamicForm } from '@/Global/Forms/DynamicForm'
 import { getApiErrorMessage } from '@/lib/api-error-message'
 import { getIndicateurCmrFormConfigForDialog } from '@/simadou/allfieldsConfig/indicateurCmrForm'
 import type { IndicateurCmr } from '@/simadou/allTypes'
+import type { IndicateurStrategique } from '@/simadou/allTypes/indicateurStrategique'
 import {
   indicateurCmrCreateSchema,
   type IndicateurCmrCreateData,
@@ -13,14 +14,22 @@ import {
   useUpdateIndicateurCmr,
 } from '@/simadou/allHooks/admin/indicateurCmrHooks'
 import { useGetUnitesIndicateur } from '@/simadou/allHooks/admin/uniteIndicateurHooks'
-import { indicateurCmrToFormValues } from './indicateurCmrFormUtils'
+import {
+  buildIndicateurStrategiqueSelectOptions,
+  filterIndicateursStrategiqueByNiveau,
+  indicateurCmrToFormValues,
+} from './indicateurCmrFormUtils'
 
 export default function IndicateurCmrFormPanel({
   indicateur,
+  niveauCodeNumber,
+  indicateursStrategiques,
   onClose,
   onSuccess,
 }: {
   indicateur?: IndicateurCmr | null
+  niveauCodeNumber: number
+  indicateursStrategiques: IndicateurStrategique[]
   onClose: () => void
   onSuccess: () => void
 }) {
@@ -28,6 +37,15 @@ export default function IndicateurCmrFormPanel({
   const createMutation = useCreateIndicateurCmr()
   const updateMutation = useUpdateIndicateurCmr()
   const { data: unites = [], isLoading: isLoadingUnites } = useGetUnitesIndicateur()
+
+  const indicateursStrategiquesForNiveau = useMemo(
+    () =>
+      filterIndicateursStrategiqueByNiveau(
+        indicateursStrategiques,
+        niveauCodeNumber
+      ),
+    [indicateursStrategiques, niveauCodeNumber]
+  )
 
   const uniteOptions = useMemo(
     () =>
@@ -38,13 +56,23 @@ export default function IndicateurCmrFormPanel({
     [unites]
   )
 
+  const indicateurStrategiqueOptions = useMemo(
+    () =>
+      buildIndicateurStrategiqueSelectOptions(
+        indicateursStrategiquesForNiveau,
+        String(indicateur?.resultat_cmr)
+      ),
+    [indicateursStrategiquesForNiveau, indicateur?.resultat_cmr]
+  )
+
   const formConfig = useMemo(
     () =>
       getIndicateurCmrFormConfigForDialog({
         uniteOptions,
         isLoadingUnites,
+        indicateurStrategiqueOptions,
       }),
-    [uniteOptions, isLoadingUnites]
+    [uniteOptions, isLoadingUnites, indicateurStrategiqueOptions]
   )
 
   const defaultValues = useMemo(
@@ -84,7 +112,7 @@ export default function IndicateurCmrFormPanel({
 
   return (
     <DynamicForm
-      key={indicateur?.id_ref_ind_cmr ?? 'new'}
+      key={`${indicateur?.id_ref_ind_cmr ?? 'new'}-${niveauCodeNumber}`}
       config={formConfig}
       schema={indicateurCmrCreateSchema}
       defaultValues={defaultValues}

@@ -38,7 +38,7 @@ export default function DictionnaireIndicateurStats({
   dictionnaires: DictionnaireIndicateur[]
 }) {
   const total = dictionnaires.length
-  const avecUnite = dictionnaires.filter((d) => d.unite_cmr).length
+  const produit = dictionnaires.filter((d) => d.typologie === 'Produit').length
   const impact = dictionnaires.filter((d) => d.typologie === 'Impact').length
   const effet = dictionnaires.filter((d) => d.typologie === 'Effet').length
 
@@ -51,8 +51,8 @@ export default function DictionnaireIndicateurStats({
         iconClassName='bg-blue-500'
       />
       <StatCard
-        title='Avec unité'
-        value={avecUnite}
+        title='Avec Produit'
+        value={produit}
         icon={BarChart3}
         iconClassName='bg-emerald-500'
       />

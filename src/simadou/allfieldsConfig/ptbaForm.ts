@@ -41,16 +41,21 @@ const ugls = await getUgls();
 // Transformer les données en options pour le select
 const typeActivitesOptions = typeActivitesData?.map((item: any) => (
     {
-    label: item.intutile_type,
-    value: String(item.code_type)
-})) || [];
+        label: item.intutile_type,
+        value: String(item.code_type)
+    })) || [];
 
 const cadre_analytiquesOptions = cadre_analytiques
     // .filter((item: any) => item.niveau_cadre === 2) // Filtrer pour n'avoir que les cadres de niveau 2
     ?.map((item: any) => ({
         label: item.intutile_ca,
-        value: item.code_ca as string,
+        value: item.id_nca as string,
     })) || [];
+
+const cadreStrategiqueOptions = cadre_strategiques.map((cadre) => ({
+    value: String(cadre.id_cs),
+    label: cadre.intutile_cs,
+}));
 
 const localiteOptions = localites
     .filter((localite) => {
@@ -73,11 +78,6 @@ const acteurOptions = acteurs
 const personnelOptions = personnels.map((p) => ({
     value: p.n_personnel!,
     label: `${p.prenom_perso} ${p.nom_perso}`,
-}));
-
-const cadreStrategiqueOptions = cadre_strategiques.map((cadre) => ({
-    value: cadre.code_cs,
-    label: cadre.intutile_cs,
 }));
 
 const uglOptions = ugls.map((ugl) => ({

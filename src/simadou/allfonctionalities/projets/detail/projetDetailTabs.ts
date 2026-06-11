@@ -1,19 +1,18 @@
 import {
-  BarChart3,
   Briefcase,
   ClipboardList,
+  Eye,
   Layout,
   LayoutDashboard,
-  Target,
   type LucideIcon,
 } from 'lucide-react'
 
 export type ProjetDetailTabKey =
   | 'dashboard'
   | 'activities'
-  | 'activity_indicators'
+  | 'ptba'
+  | 'suivi_ptba'
   | 'results_framework'
-  | 'results_framework_indicators'
   | 'cmr_indicators'
 
 export type ProjetDetailTab = {
@@ -37,22 +36,22 @@ export const projetDetailTabs: ProjetDetailTab[] = [
     description: 'Liste et suivi des activités rattachées au projet.',
   },
   {
-    key: 'activity_indicators',
-    name: "Indicateurs d'activités",
-    icon: Target,
-    description: "Indicateurs de performance liés aux activités du projet.",
+    key: 'ptba',
+    name: 'PTBA',
+    icon: ClipboardList,
+    description: 'Planification PTBA des activités du projet.',
+  },
+  {
+    key: 'suivi_ptba',
+    name: 'Suivi PTBA',
+    icon: Eye,
+    description: "Suivi d'avancement des activités PTBA du projet.",
   },
   {
     key: 'results_framework',
     name: 'Cadre de résultats',
     icon: Layout,
-    description: 'Structure du cadre de résultats du projet.',
-  },
-  {
-    key: 'results_framework_indicators',
-    name: 'Indicateurs de résultats',
-    icon: BarChart3,
-    description: 'Indicateurs associés au cadre de résultats.',
+    description: 'Structure du cadre de résultats et indicateurs associés.',
   },
   {
     key: 'cmr_indicators',

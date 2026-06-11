@@ -20,6 +20,7 @@ import {
   useActiveProgrammeId,
 } from '@/hooks/use-active-programme'
 import type { CadreStrategique } from '@/simadou/allTypes/cadreStrategique'
+import type { NiveauCadreStrategique } from '@/simadou/allTypes/niveauCadreStrategique'
 import { buildCadreStrategiqueColumns } from '@/simadou/allColonnes/cadre-strategique-columns'
 import {
   useDeleteCadreStrategique,
@@ -30,7 +31,8 @@ import { useGetActeurs } from '@/simadou/allHooks/admin/acteurHooks'
 import {
   NiveauTabTrigger,
   NiveauTabsList,
-} from '@/simadou/allfonctionalities/projets/detail/NiveauTabs'
+  useNiveauTabsTheme,
+} from '@/components/ui/NiveauTabs'
 import {
   filterNiveauxByProgramme,
   getNiveauCadreStrategiqueLibelle,
@@ -42,6 +44,7 @@ import NiveauCadreStrategiqueDialog from './NiveauCadreStrategiqueDialog'
 
 function CadreStrategiqueNiveauTable({
   niveauCodeNumber,
+  niveaux,
   cadres,
   acteurs,
   searchTerm,
@@ -50,6 +53,7 @@ function CadreStrategiqueNiveauTable({
   onDeleteRequest,
 }: {
   niveauCodeNumber: number
+  niveaux: NiveauCadreStrategique[]
   cadres: CadreStrategique[]
   acteurs: { id_acteur: number; nom_acteur: string; code_acteur: string }[]
   searchTerm: string
@@ -60,8 +64,16 @@ function CadreStrategiqueNiveauTable({
   const { search, navigate } = useEmbeddedTableState()
 
   const columns = useMemo(
-    () => buildCadreStrategiqueColumns({ cadres, acteurs, onEdit, onDeleteRequest }),
-    [cadres, acteurs, onEdit, onDeleteRequest]
+    () =>
+      buildCadreStrategiqueColumns({
+        cadres,
+        niveaux,
+        currentNiveauCodeNumber: niveauCodeNumber,
+        acteurs,
+        onEdit,
+        onDeleteRequest,
+      }),
+    [cadres, niveaux, niveauCodeNumber, acteurs, onEdit, onDeleteRequest]
   )
 
   const rows = useMemo(() => {
@@ -116,6 +128,7 @@ export default function ListeCadreStrategique() {
   )
 
   const hasNiveaux = sortedNiveaux.length > 0
+  const { tabsStyle } = useNiveauTabsTheme()
 
   const [activeNiveauCode, setActiveNiveauCode] = useState<string>('')
   const [searchTerm, setSearchTerm] = useState('')
@@ -232,12 +245,15 @@ export default function ListeCadreStrategique() {
   return (
     <div className='space-y-4'>
       <Tabs
+        orientation='vertical'
+        className='space-y-4'
+        style={tabsStyle}
         key={sortedNiveaux.length}
         value={String(currentNiveauCode)}
         onValueChange={handleTabChange}
       >
-        <div className='flex flex-col gap-4 border-b pb-3 lg:flex-row lg:items-center lg:justify-between'>
-          <div className='overflow-x-auto'>
+        <div className='flex items-center justify-between gap-4'>
+          <div className='flex-1 overflow-x-auto'>
             <NiveauTabsList>
               {sortedNiveaux.map((n) => (
                 <NiveauTabTrigger
@@ -251,7 +267,7 @@ export default function ListeCadreStrategique() {
             </NiveauTabsList>
           </div>
 
-          <div className='flex flex-col gap-2 sm:flex-row sm:items-center'>
+          <div className='flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center'>
             <div className='relative'>
               <Search className='absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
               <Input
@@ -272,11 +288,11 @@ export default function ListeCadreStrategique() {
           <TabsContent
             key={n.id_nsc}
             value={String(n.code_number_nsc)}
-            className='mt-3'
           >
             {Number(n.code_number_nsc) === currentNiveauCode && (
               <CadreStrategiqueNiveauTable
                 niveauCodeNumber={Number(n.code_number_nsc)}
+                niveaux={sortedNiveaux}
                 cadres={cadres}
                 acteurs={acteurs}
                 searchTerm={searchTerm}

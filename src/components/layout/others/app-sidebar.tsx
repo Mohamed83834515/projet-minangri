@@ -9,7 +9,7 @@ import {
 import { sidebarData } from '../../../simadou/routescontantes/sidebar-data'
 import { NavGroup } from './nav-group'
 import { NavUser } from './nav-user'
-import { TeamSwitcher } from './team-switcher'
+
 import { useLayout } from '@/stores/others/layout-store'
 import { CHART_COLORS, useColor } from '@/stores/others/color-store'
 import { useMe } from '@/simadou/allHooks/auth/authHooks'

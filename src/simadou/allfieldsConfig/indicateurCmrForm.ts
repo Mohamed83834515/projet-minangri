@@ -14,9 +14,13 @@ const FONCTION_AGREGAT_OPTIONS: SelectOption[] = [
 export const getIndicateurCmrFormConfigForDialog = ({
   uniteOptions,
   isLoadingUnites,
+  indicateurStrategiqueOptions,
+  isLoadingIndicateursStrategiques,
 }: {
   uniteOptions: SelectOption[];
   isLoadingUnites?: boolean;
+  indicateurStrategiqueOptions?: SelectOption[];
+  isLoadingIndicateursStrategiques?: boolean;
 }): FormConfig => ({
   fields: [
     {
@@ -42,7 +46,7 @@ export const getIndicateurCmrFormConfigForDialog = ({
     {
       name: "intitule_ref_ind",
       label: "Intitulé de l'indicateur",
-      type: "text",
+      type: "textarea",
       placeholder: "Intitulé complet de l'indicateur de référence",
       required: true,
       maxLength: 200,
@@ -51,11 +55,15 @@ export const getIndicateurCmrFormConfigForDialog = ({
     {
       name: "resultat_cmr",
       label: "Résultat CMR",
-      type: "text",
-      placeholder: "Résultat attendu du cadre de mesure de résultats",
+      type: indicateurStrategiqueOptions ? "select" : "text",
+      placeholder: indicateurStrategiqueOptions
+        ? "Sélectionner un indicateur stratégique…"
+        : "Résultat attendu du cadre de mesure de résultats",
       required: true,
-      maxLength: 200,
-      gridCols: 1,
+      maxLength: indicateurStrategiqueOptions ? undefined : 200,
+      options: indicateurStrategiqueOptions ?? [],
+      isLoading: isLoadingIndicateursStrategiques,
+      gridCols: 2,
     },
     {
       name: "reference_cmr",
@@ -64,7 +72,7 @@ export const getIndicateurCmrFormConfigForDialog = ({
       placeholder: "Référence du cadre de mesure de résultats",
       required: true,
       maxLength: 200,
-      gridCols: 1,
+      gridCols: 2,
     },
     {
       name: "unite_cmr",
@@ -101,7 +109,7 @@ export const getIndicateurCmrFormConfigForDialog = ({
       placeholder: "Responsable de la collecte des données",
       required: true,
       maxLength: 100,
-      gridCols: 1,
+      gridCols: 2
     },
   ],
 });

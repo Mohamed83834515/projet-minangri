@@ -14,7 +14,7 @@ export const cadreStrategiqueWriteSchema = z.object({
   intutile_cs: z.string().min(1, "L'intitulé est obligatoire"),
   abgrege_cs: z.string().min(1, "L'abrégé est obligatoire"),
   parent_cs: optionalRelationId,
-  partenaire_cs: optionalRelationId,
+  partenaire_cs: z.array(z.coerce.number()).optional().default([]),
   niveau_cs: z.coerce.number().optional(),
   programme_cs: z.coerce.number().nullable().optional(),
 })

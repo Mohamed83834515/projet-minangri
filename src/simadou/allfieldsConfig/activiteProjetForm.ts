@@ -6,9 +6,7 @@ export const getActiviteProjetFormConfigForDialog = ({
   showParent,
   parentOptions,
   activiteProgrammeOptions,
-  projetOptions,
   isLoadingActivitesProgramme,
-  isLoadingProjets,
 }: {
   fixedCodeLength: number;
   parentNiveauLabel: string;
@@ -58,16 +56,6 @@ export const getActiviteProjetFormConfigForDialog = ({
       required: false,
       options: activiteProgrammeOptions,
       isLoading: isLoadingActivitesProgramme,
-      gridCols: 2,
-    },
-    {
-      name: "code_projet",
-      label: "Projet",
-      type: "select",
-      placeholder: "Sélectionner un projet",
-      required: true,
-      options: projetOptions,
-      isLoading: isLoadingProjets,
       gridCols: 2,
     },
   ],

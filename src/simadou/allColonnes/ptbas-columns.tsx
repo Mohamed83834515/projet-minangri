@@ -93,10 +93,10 @@ export const buildPtbasColumns = (
     ])
 
     const actionsColumn: ColumnDef<Ptba> = {
-        id: "responsable_ptba",
-        accessorKey: 'responsable_ptba',
+        id: "actions",
+        accessorKey: 'id_ptba',
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='Responsable' />
+            <DataTableColumnHeader column={column} title='Actions' />
         ),
         cell: (props) => (
             <PtbasRowActions
@@ -109,10 +109,10 @@ export const buildPtbasColumns = (
         enableHiding: false,
     }
     const responsableColumn: ColumnDef<Ptba> = {
-        id: "actions",
-        accessorKey: 'id_ptba',
+        id: "responsable_ptba",
+        accessorKey: 'responsable_ptba',
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='Actions' />
+            <DataTableColumnHeader column={column} title='Responsable' />
         ),
         cell: ({ row }) => {
             const responsable = row.original.responsable_ptba;

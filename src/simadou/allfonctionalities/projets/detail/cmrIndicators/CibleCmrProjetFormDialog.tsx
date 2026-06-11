@@ -16,25 +16,25 @@ import {
 } from '@/simadou/schemas/cibleCmrProjetSchema'
 import type { CibleCmrProjet } from '@/simadou/allTypes'
 import { useGetIndicateursCadreResultat } from '@/simadou/allHooks/admin/indicateurCadreResultatHooks'
-import {
-  useCreateCibleCmrProjet,
-  useUpdateCibleCmrProjet,
-} from '@/simadou/allHooks/admin/indicateurCmrHooks'
 import { parseOptionalNumber, resolveRelationCode } from '@/simadou/lib/resolveApiRelation'
 import { uglService } from '@/simadou/allSercices/uglService'
+import { useCreateCibleCmrProjet, useUpdateCibleCmrProjet } from '@/simadou/allHooks/admin/indicateurCmrProjetHooks'
 
 export default function CibleCmrProjetFormDialog({
   codeProjet,
   cible,
+  fixedIndicateurCrpId,
   onClose,
   onSuccess,
 }: {
   codeProjet: string
   cible?: CibleCmrProjet | null
+  fixedIndicateurCrpId?: number | null
   onClose: () => void
   onSuccess: () => void
 }) {
   const isEditing = !!cible
+  const hideIndicateurField = fixedIndicateurCrpId != null
   const createMutation = useCreateCibleCmrProjet(codeProjet)
   const updateMutation = useUpdateCibleCmrProjet(codeProjet)
   const { data: indicateurs = [], isLoading: isLoadingIndicateurs } =
@@ -76,30 +76,43 @@ export default function CibleCmrProjetFormDialog({
         uglOptions,
         isLoadingIndicateurs,
         isLoadingUgls,
+        hideIndicateurField,
       }),
-    [anneeOptions, indicateurOptions, uglOptions, isLoadingIndicateurs, isLoadingUgls]
+    [
+      anneeOptions,
+      indicateurOptions,
+      uglOptions,
+      isLoadingIndicateurs,
+      isLoadingUgls,
+      hideIndicateurField,
+    ]
   )
 
   const defaultValues = useMemo((): CibleCmrProjetFormData => {
     const annee = normalizeAnneeCibleForForm(cible?.annee, anneeOptions)
+    const indicateurCrpId =
+      fixedIndicateurCrpId ?? resolveCodeIndicateurCrpForForm(cible)
 
     return {
       annee,
       valeur_cible_indcateur_crp: cible?.valeur_cible_indcateur_crp ?? 0,
-      code_indicateur_crp: resolveCodeIndicateurCrpForForm(cible),
+      code_indicateur_crp: indicateurCrpId,
       code_ug:
         resolveRelationCode(cible?.code_ug, 'code_ugl') ??
         (typeof cible?.code_ug === 'string' ? cible.code_ug : null),
       code_projet: codeProjet,
     }
-  }, [cible, codeProjet, anneeOptions])
+  }, [cible, codeProjet, anneeOptions, fixedIndicateurCrpId])
 
   const onSubmit = (data: CibleCmrProjetFormData) => {
     const payload: CibleCmrProjetFormData = {
       ...data,
       annee: formatAnneeCibleForApi(data.annee),
       code_projet: codeProjet,
-      code_indicateur_crp: parseOptionalNumber(data.code_indicateur_crp),
+      code_indicateur_crp:
+        fixedIndicateurCrpId != null
+          ? fixedIndicateurCrpId
+          : parseOptionalNumber(data.code_indicateur_crp),
       code_ug: data.code_ug || null,
     }
 

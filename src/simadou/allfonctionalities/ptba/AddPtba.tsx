@@ -1,6 +1,7 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { DIALOG_SIZES } from "@/Global/Forms/dialog"
 import { StepDynamicForm } from "@/Global/Forms/StepDynamicForm"
+import { useActiveProgrammeCode } from "@/hooks/use-active-programme"
 import { getPtbaFormConfig } from "@/simadou/allfieldsConfig/ptbaForm"
 import ptbaService from "@/simadou/allSercices/ptbaService"
 import { CadreAnalytique } from "@/simadou/allTypes/cadreAnalytique"
@@ -16,7 +17,7 @@ export interface OpenPropsPTBA {
 const AddPtba = ({ open, onOpenChange, currentRow }: OpenPropsPTBA) => {
   const formConfig = getPtbaFormConfig()
   const isEdit = !!currentRow?.id_ptba
-
+  const codeProgramme = useActiveProgrammeCode();
   const versionPtbaSelect =
     localStorage.getItem("selectedVersionId") || "0"
 
@@ -51,7 +52,7 @@ const AddPtba = ({ open, onOpenChange, currentRow }: OpenPropsPTBA) => {
 
     version_ptba: Number(versionPtbaSelect),
 
-    code_programme: currentRow?.code_programme || "001",
+    code_programme: currentRow?.code_programme || codeProgramme,
 
     statut_activite: currentRow?.statut_activite || "En construction",
 

@@ -10,9 +10,11 @@ export interface CibleCmrProjetFormData {
   code_projet?: string | null;
 }
 
+const BASE_URL = "/cible_cmr_projet/"
+
 export const cibleCmrProjetService = {
   async getAll(): Promise<CibleCmrProjet[]> {
-    const response = await apiClient.request<unknown>("/cible_cmr_projet/");
+    const response = await apiClient.request<unknown>(BASE_URL);
     const list = normalizeApiList<CibleCmrProjet>(response);
     return list.sort(
       (a, b) => new Date(a.annee).getTime() - new Date(b.annee).getTime(),
@@ -21,12 +23,12 @@ export const cibleCmrProjetService = {
 
   async getById(id_cible_indicateur_crp: number): Promise<CibleCmrProjet> {
     return await apiClient.request<CibleCmrProjet>(
-      `/cible_cmr_projet/${id_cible_indicateur_crp}/`,
+      `${BASE_URL}${id_cible_indicateur_crp}/`,
     );
   },
 
   async create(data: CibleCmrProjetFormData): Promise<CibleCmrProjet> {
-    return await apiClient.request<CibleCmrProjet>("/cible_cmr_projet/", {
+    return await apiClient.request<CibleCmrProjet>(BASE_URL, {
       method: "POST",
       data,
     });
@@ -37,7 +39,7 @@ export const cibleCmrProjetService = {
     data: CibleCmrProjetFormData,
   ): Promise<CibleCmrProjet> {
     return await apiClient.request<CibleCmrProjet>(
-      `/cible_cmr_projet/${id_cible_indicateur_crp}/`,
+      `${BASE_URL}${id_cible_indicateur_crp}/`,
       {
         method: "PUT",
         data,
@@ -47,7 +49,7 @@ export const cibleCmrProjetService = {
 
   async delete(id_cible_indicateur_crp: number): Promise<void> {
     await apiClient.request<void>(
-      `/cible_cmr_projet/${id_cible_indicateur_crp}/`,
+      `${BASE_URL}${id_cible_indicateur_crp}/`,
       {
         method: "DELETE",
       },
@@ -56,7 +58,7 @@ export const cibleCmrProjetService = {
 
   async search(query: string): Promise<CibleCmrProjet[]> {
     const response = await apiClient.request<unknown>(
-      `/cible_cmr_projet/search/?q=${encodeURIComponent(query)}`,
+      `${BASE_URL}search/?q=${encodeURIComponent(query)}`,
     );
     return normalizeApiList<CibleCmrProjet>(response);
   },
@@ -65,21 +67,21 @@ export const cibleCmrProjetService = {
     code_indicateur_crp: number,
   ): Promise<CibleCmrProjet[]> {
     const response = await apiClient.request<unknown>(
-      `/cible_cmr_projet/?code_indicateur_crp=${code_indicateur_crp}`,
+      `${BASE_URL}?code_indicateur_crp=${code_indicateur_crp}`,
     );
     return normalizeApiList<CibleCmrProjet>(response);
   },
 
   async getByProjet(code_projet: string): Promise<CibleCmrProjet[]> {
     const response = await apiClient.request<unknown>(
-      `/cible_cmr_projet/?code_projet=${encodeURIComponent(code_projet)}`,
+      `${BASE_URL}?code_projet=${encodeURIComponent(code_projet)}`,
     );
     return normalizeApiList<CibleCmrProjet>(response);
   },
 
   async getByAnnee(annee: string): Promise<CibleCmrProjet[]> {
     const response = await apiClient.request<unknown>(
-      `/cible_cmr_projet/?annee=${encodeURIComponent(annee)}`,
+      `${BASE_URL}?annee=${encodeURIComponent(annee)}`,
     );
     return normalizeApiList<CibleCmrProjet>(response);
   },

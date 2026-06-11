@@ -1,4 +1,3 @@
-// simadou/allfonctionalities/parametrage/localite/ListeLocalite.tsx
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Plus, Settings } from 'lucide-react'
 import { toast } from 'sonner'
@@ -12,7 +11,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog'
 import { Tabs, TabsContent } from '@/components/ui/tabs'
-import { NiveauTabTrigger, NiveauTabsList } from '../../../../components/ui/NiveauTabs'
+import { NiveauTabTrigger, NiveauTabsList, useNiveauTabsTheme } from '@/components/ui/NiveauTabs'
 import { useGetAllLocalites, useDeleteLocalite } from '@/simadou/allHooks/admin/localiteHooks'
 import { useGetNiveauxLocalite } from '@/simadou/allHooks/admin/niveauLocaliteHooks'
 import AddLocalite from './AddLocalite'
@@ -21,7 +20,6 @@ import useDialogState from '@/hooks/use-dialog-state'
 import type { Localite } from '@/simadou/allTypes/localite'
 import { LocaliteNiveauTable } from './localiteNiveauTableau'
 import NiveauLocaliteManager from './niveau/NiveauLocaliteManager'
-import { CHART_COLORS, useColor } from '@/stores/others/color-store'
 
 type ModalState = 'form' | 'niveaux'
 
@@ -35,8 +33,7 @@ export default function ListeLocalite() {
         [niveaux]
     )
 
-    const { color } = useColor()
-    const { stroke } = CHART_COLORS[color]
+    const { tabsStyle } = useNiveauTabsTheme()
     const hasNiveaux = sortedNiveaux.length > 0
 
     const [activeNiveauId, setActiveNiveauId] = useState<string>('')
@@ -137,12 +134,7 @@ export default function ListeLocalite() {
                     orientation='vertical'
                     defaultValue='overview'
                     className='space-y-4'
-                    style={
-                        {
-                            '--tab-active-bg': stroke,
-                            '--tab-active-color': '#ffffff',
-                        } as React.CSSProperties
-                    }
+                    style={tabsStyle}
                     key={sortedNiveaux.length}
                     value={String(currentNiveauId)}
                     onValueChange={setActiveNiveauId}

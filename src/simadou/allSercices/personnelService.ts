@@ -3,7 +3,6 @@ import { apiClient } from "@/axios/api";
 import type { Personnel } from "../allTypes";
 import { PersonnelFormData } from "../allTypes/entities";
 
-
 interface UpdateProfilePictureResponse {
   profilePicture: string  
 }
