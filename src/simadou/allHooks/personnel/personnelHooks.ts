@@ -1,4 +1,4 @@
-// features/personnel/mutations.ts
+
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/axios/api'
 
@@ -103,7 +103,7 @@ export function useCreatePersonnel ({id , isEdit, onSuccess} : {id : number, isE
 
 
 
-// 
+// Titles
 export function useTitres() {
   return useQuery({
     queryKey: personnelKeys.titres(),
@@ -167,6 +167,18 @@ export const useUpdateProfilePicture = (n_personel: number) => {
 
   return useMutation({
     mutationFn: (file: File) => personnelService.updateProfilePicture(n_personel, file),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['me'] })
+    },
+  })
+}
+
+
+export const useDeleteProfilPicture = (n_personel : number)=> {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: () => personnelService.deleteProfilePicture(n_personel),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['me'] })
     },

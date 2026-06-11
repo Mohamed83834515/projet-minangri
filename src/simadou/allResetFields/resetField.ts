@@ -504,28 +504,23 @@ export const ZONE_COLLECTE = {
   type_zone: "",
 };
 
+// ======SET_PASSWORD=====
+export const SET_PASSWORD = {
+  new_password : "",
+  confirm_new_password : ""
+}
+
 
 // =========GENERAL_PARAMS_IDENTITE==================
 export const GENERAL_PARAMS_IDENTITE = {
-  appName:          '',
   systemSigle:      '',
   systemTitle:      '',
   structureSigle:   '',
   structureName:    '',
   structureAddress: '',
-  primaryColor:     '',
 }
 
-// =========GENERAL_PARAMS_CONTACTS==================
-export const GENERAL_PARAMS_CONTACTS = {
-  contactEmail:      '',
-  contactPhone:      '',
-  address:           '',
-  website:           '',
-  structureEmail:    '',
-  structurePhone:    '',
-  structureWhatsapp: '',
-}
+
 
 // =========GENERAL_PARAMS_FINANCE==================
 export const GENERAL_PARAMS_FINANCE = {
@@ -537,23 +532,42 @@ export const GENERAL_PARAMS_FINANCE = {
 // =========GENERAL_PARAMS_SECURITE==================
 export const GENERAL_PARAMS_SECURITE = {
   maintenanceMode:            false,
-  inactivityDelayMinutes:     30,
-  maxSessions:                2,
-  loginAttemptsLimit:         3,
-  tpCodeDelayMinutes:         5,
-  passwordChangeDelayMonths:  6,
-  deleteOrUpdateDelaySeconds: 5,
+  inactivityDelayMinutes:     0,
+  maxSessions:                0,
+  loginAttemptsLimit:         0,
+  tpCodeDelayMinutes:         0,
+  passwordChangeDelayMonths:  0,
+  deleteOrUpdateDelaySeconds: 0,
 }
 
-// =========GENERAL_PARAMS_NOTIFICATIONS==================
+
+
+
+
+// GENERAL_PARAMS_NOTIFICATIONS
 export const GENERAL_PARAMS_NOTIFICATIONS = {
   whatsappInstanceCode:      '',
+  whatsappNumberId:          '',
   notificationEmail:         '',
   notificationEmailPassword: '',
   smtpHost:                  '',
+  smtpPort:                  587,
+  smtpEncryption:            '',
+  smtpFromName:              '',
 }
 
-// =========GENERAL_PARAMS_INTEGRATIONS==================
+// GENERAL_PARAMS_INTEGRATIONS
 export const GENERAL_PARAMS_INTEGRATIONS = {
-  parentApiUrl: '',
+  parentApiUrl:            '',
+  parentApiKey:            '',
+  parentApiSecret:         '',
+  parentApiTimeoutSeconds: 30,
+  whatsappApiKey:          '',
+}
+
+// GENERAL_PARAMS_CONTACTS — trimmed to match API
+export const GENERAL_PARAMS_CONTACTS = {
+  structureEmail:    '',
+  structurePhone:    '',
+  structureWhatsapp: '',
 }

@@ -138,8 +138,8 @@ export function useResetLinkMutation() {
 
 
   return useMutation({
-  mutationFn: async ({ data }: { data: ResetLinkCredentials }) => {
-      await authService.reset_link(data)
+  mutationFn: async ({ data, mode }: { data: ResetLinkCredentials, mode : "reset" | "setup" }) => {
+      await authService.reset_link(data, mode)
     },
     onSuccess: () => {
       toast.success('Email de réinitialisation envoyé avec succès')

@@ -1,8 +1,11 @@
 import { z } from 'zod'
-import { getFieldSchema } from '@/simadou/schemas/generalParams.schema'
 
 export const integrationsSchema = z.object({
-  parentApiUrl: getFieldSchema('url'),
+  parentApiUrl:            z.string().nullable().optional(),
+  parentApiKey:            z.string().nullable().optional(),
+  parentApiSecret:         z.string().nullable().optional(),
+  parentApiTimeoutSeconds: z.coerce.number().int().min(0).optional(),
+  whatsappApiKey:          z.string().nullable().optional(),
 })
 
 export type IntegrationsInput = z.infer<typeof integrationsSchema>

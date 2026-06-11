@@ -4,7 +4,10 @@ import { UserAuthForm } from './components/user-auth-form'
 import { Logo } from '@/assets/logo'
 import pilier1Img from '@/assets/images/pilier1_simandou.png'
 
-import { ArrowRight, KeyRound } from 'lucide-react'
+
+import {ArrowRight, KeyRound } from 'lucide-react'
+
+
 
 export function SignIn() {
   const { redirect } = useSearch({ from: '/(auth)/sign-in' })

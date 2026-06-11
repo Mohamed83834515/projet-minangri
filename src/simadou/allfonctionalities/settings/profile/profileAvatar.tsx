@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { profilePictureSchema } from '@/simadou/schemas/personnelSchema'
-import { useUpdateProfilePicture } from '@/simadou/allHooks/personnel/personnelHooks'
+import { useDeleteProfilPicture, useUpdateProfilePicture } from '@/simadou/allHooks/personnel/personnelHooks'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Camera, ImageUp, Loader2, Trash2 } from 'lucide-react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
@@ -16,7 +16,7 @@ export function ProfileAvatar({ n_personel, currentPicture, initials }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [preview, setPreview] = useState<string | null>(null)
   const { mutate: updatePicture, isPending } = useUpdateProfilePicture(n_personel)
-
+  const {mutate : deletePicture , isPending : isDeleting} = useDeleteProfilPicture(n_personel)
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -44,6 +44,8 @@ export function ProfileAvatar({ n_personel, currentPicture, initials }: Props) {
       },
     })
   }
+
+  
 
   return (
     <div className="relative flex-shrink-0">
@@ -91,7 +93,8 @@ export function ProfileAvatar({ n_personel, currentPicture, initials }: Props) {
           {currentPicture && (
             <DropdownMenuItem
               className="cursor-pointer text-destructive focus:text-destructive"
-              onClick={() => {/* TODO: delete handler */}}
+              onClick={() => deletePicture()}
+              disabled={isDeleting}
             >
               <Trash2 className="size-4" />
               Supprimer la photo

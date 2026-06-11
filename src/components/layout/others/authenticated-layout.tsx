@@ -107,7 +107,7 @@ function AuthenticatedLayoutInner({
             onLogout={() => setOpen(true)}
             trigger={
               <Button className='rounded-full h-8 w-8'>
-                 <Avatar className='h-8 w-8'>
+                 <Avatar className='h-8 w-8 text-foreground font-semibold'>
                   <AvatarImage src={user.personnel_profile_picture ?? ''} alt='profile' />
                   <AvatarFallback>{userInitials}</AvatarFallback>
                 </Avatar>

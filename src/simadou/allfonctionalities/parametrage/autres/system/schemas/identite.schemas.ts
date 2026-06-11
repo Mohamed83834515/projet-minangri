@@ -1,14 +1,11 @@
 import { z } from 'zod'
-import { getFieldSchema } from '@/simadou/schemas/generalParams.schema'
 
 export const identiteSchema = z.object({
-  appName:          getFieldSchema('text', true),
-  systemSigle:      getFieldSchema('text'),
-  systemTitle:      getFieldSchema('text'),
-  structureSigle:   getFieldSchema('text'),
-  structureName:    getFieldSchema('text'),
-  structureAddress: getFieldSchema('text'),
-  primaryColor:     getFieldSchema('text'),
+  systemSigle:      z.string().optional(),
+  systemTitle:      z.string().optional(),
+  structureSigle:   z.string().optional(),
+  structureName:    z.string().optional(),
+  structureAddress: z.string().optional(),
 })
 
 export type IdentiteInput = z.infer<typeof identiteSchema>
