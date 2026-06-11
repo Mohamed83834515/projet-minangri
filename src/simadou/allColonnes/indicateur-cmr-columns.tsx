@@ -57,7 +57,7 @@ export function buildIndicateurCmrColumns({
           {row.original.resultat_cmr ? (
             <p
               className='mt-1 truncate text-xs text-muted-foreground'
-              title={row.original.resultat_cmr}
+              title={String(row.original.resultat_cmr)}
             >
               Résultat: {row.original.resultat_cmr}
             </p>

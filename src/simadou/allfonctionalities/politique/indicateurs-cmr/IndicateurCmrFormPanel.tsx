@@ -60,7 +60,7 @@ export default function IndicateurCmrFormPanel({
     () =>
       buildIndicateurStrategiqueSelectOptions(
         indicateursStrategiquesForNiveau,
-        indicateur?.resultat_cmr
+        String(indicateur?.resultat_cmr)
       ),
     [indicateursStrategiquesForNiveau, indicateur?.resultat_cmr]
   )

@@ -38,7 +38,7 @@ export function indicateurCmrToFormValues(
 ): IndicateurCmrCreateData {
   return {
     code_ref_ind: indicateur?.code_ref_ind ?? '',
-    resultat_cmr: indicateur?.resultat_cmr ?? '',
+    resultat_cmr: indicateur?.resultat_cmr ?? 0,
     intitule_ref_ind: indicateur?.intitule_ref_ind ?? '',
     reference_cmr: indicateur?.reference_cmr ?? '',
     annee_reference: indicateur?.annee_reference ?? new Date().getFullYear(),
