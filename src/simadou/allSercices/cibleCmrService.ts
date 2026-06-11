@@ -2,17 +2,16 @@ import { apiClient } from "@/axios/api";
 import type { CibleCmrProjet } from "../allTypes";
 import { normalizeApiList } from "./apiListUtils";
 
-export interface CibleCmrProjetFormData {
+export interface CibleCmrFormData {
   annee: string;
-  valeur_cible_indcateur_crp: number;
-  code_indicateur_crp?: number | null;
-  code_ug?: string | null;
-  code_projet?: string | null;
+  valeur_cible_indcateur_cmr: number;
+  code_indicateur_cmr?: number | null;
+  localite?: string | null;
 }
 
-const BASE_URL = "/cible_cmr_projet/"
+const BASE_URL = "/cible_cmr/"
 
-export const cibleCmrProjetService = {
+export const cibleCmrService = {
   async getAll(): Promise<CibleCmrProjet[]> {
     const response = await apiClient.request<unknown>(BASE_URL);
     const list = normalizeApiList<CibleCmrProjet>(response);
@@ -27,7 +26,7 @@ export const cibleCmrProjetService = {
     );
   },
 
-  async create(data: CibleCmrProjetFormData): Promise<CibleCmrProjet> {
+  async create(data: CibleCmrFormData): Promise<CibleCmrProjet> {
     return await apiClient.request<CibleCmrProjet>(BASE_URL, {
       method: "POST",
       data,
@@ -36,7 +35,7 @@ export const cibleCmrProjetService = {
 
   async update(
     id_cible_indicateur_crp: number,
-    data: CibleCmrProjetFormData,
+    data: CibleCmrFormData,
   ): Promise<CibleCmrProjet> {
     return await apiClient.request<CibleCmrProjet>(
       `${BASE_URL}${id_cible_indicateur_crp}/`,

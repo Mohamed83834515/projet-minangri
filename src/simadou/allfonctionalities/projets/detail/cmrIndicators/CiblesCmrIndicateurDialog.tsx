@@ -16,10 +16,6 @@ import useDialogState from '@/hooks/use-dialog-state'
 import { useEmbeddedTableState } from '@/hooks/use-embedded-table-state'
 import type { CibleCmrProjet, IndicateurCmr } from '@/simadou/allTypes'
 import { buildCibleCmrProjetColumns } from '@/simadou/allColonnes/cible-cmr-projet-columns'
-import {
-  useDeleteCibleCmrProjet,
-  useGetAllCiblesCmrProjet,
-} from '@/simadou/allHooks/admin/indicateurCmrHooks'
 import { useGetIndicateursCadreResultat } from '@/simadou/allHooks/admin/indicateurCadreResultatHooks'
 import { uglService } from '@/simadou/allSercices/uglService'
 import {
@@ -32,6 +28,7 @@ import {
   filterCiblesForIndicateurCmr,
   resolveFixedCodeIndicateurCrpFromCmr,
 } from './cmrIndicateurFormUtils'
+import { useDeleteCibleCmrProjet, useGetAllCiblesCmrProjet } from '@/simadou/allHooks/admin/indicateurCmrProjetHooks'
 
 type Modal = 'list' | 'form' | 'view'
 

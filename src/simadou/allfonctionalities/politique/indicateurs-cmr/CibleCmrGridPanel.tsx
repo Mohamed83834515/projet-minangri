@@ -1,30 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  DoubleArrowLeftIcon,
-  DoubleArrowRightIcon,
-} from '@radix-ui/react-icons'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Save, X } from 'lucide-react'
 import { toast } from 'sonner'
-import { cn, getPageNumbers } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { Badge } from '@/components/ui/badge'
 import { useActiveProgramme } from '@/hooks/use-active-programme'
 import type { CibleCmrProjet, IndicateurCmr } from '@/simadou/allTypes'
-import {
-  useCreateCibleCmrProjet,
-  useDeleteCibleCmrProjet,
-  useGetAllCiblesCmrProjet,
-  useUpdateCibleCmrProjet,
-} from '@/simadou/allHooks/admin/indicateurCmrHooks'
 import { useGetNiveauxLocalite } from '@/simadou/allHooks/admin/niveauLocaliteHooks'
 import { useGetLocalites } from '@/simadou/allHooks/admin/sharedHooks'
 import {
@@ -38,12 +20,17 @@ import {
   type CibleCmrGridCell,
 } from '@/simadou/lib/cibleCmrGridUtils'
 import { resolveFixedCodeIndicateurCrpFromCmr } from '@/simadou/allfonctionalities/projets/detail/cmrIndicators/cmrIndicateurFormUtils'
+import {
+  useCreateCibleCmr,
+  useDeleteCibleCmr,
+  useGetAllCiblesCmr,
+  useUpdateCibleCmr,
+} from '@/simadou/allHooks/admin/indicateurCmrHooks'
 
-const DEFAULT_PAGE_SIZE = 5
-/** Above this count, year columns use min-widths and the grid scrolls horizontally */
+const SCROLL_MODE_THRESHOLD = 8
 const YEAR_SCROLL_THRESHOLD = 10
-const ZONE_COLUMN_MIN_PX = 100
-const YEAR_COLUMN_MIN_PX = 58
+const ZONE_COLUMN_MIN_PX    = 120
+const YEAR_COLUMN_MIN_PX    = 64
 
 type Props = {
   indicateur: IndicateurCmr
@@ -52,408 +39,250 @@ type Props = {
 
 export default function CibleCmrGridPanel({ indicateur, onClose }: Props) {
   const programme = useActiveProgramme()
-  const { data: localites = [], isLoading: isLoadingLocalites } =
-    useGetLocalites()
-  const { data: niveaux = [], isLoading: isLoadingNiveaux } =
-    useGetNiveauxLocalite()
-  const { data: allCibles = [], isLoading: isLoadingCibles } =
-    useGetAllCiblesCmrProjet()
+  const { data: localites = [], isLoading: isLoadingLocalites } = useGetLocalites()
+  const { data: niveaux   = [], isLoading: isLoadingNiveaux   } = useGetNiveauxLocalite()
+  const { data: allCibles = [], isLoading: isLoadingCibles    } = useGetAllCiblesCmr()
 
-  const createMutation = useCreateCibleCmrProjet(undefined)
-  const updateMutation = useUpdateCibleCmrProjet(undefined)
-  const deleteMutation = useDeleteCibleCmrProjet(undefined)
+  const createMutation = useCreateCibleCmr(undefined)
+  const updateMutation = useUpdateCibleCmr(undefined)
+  const deleteMutation = useDeleteCibleCmr(undefined)
 
   const indicateurCrpId = useMemo(
     () => resolveFixedCodeIndicateurCrpFromCmr(indicateur),
     [indicateur]
   )
 
-  const zones = useMemo(
-    () => getLocalitesNiveau1(localites, niveaux),
-    [localites, niveaux]
-  )
-
-  const years = useMemo(
-    () => getProgrammeYearRange(programme),
-    [programme]
-  )
+  const zones  = useMemo(() => getLocalitesNiveau1(localites, niveaux), [localites, niveaux])
+  const years  = useMemo(() => getProgrammeYearRange(programme),        [programme])
 
   const filteredCibles = useMemo(
     () => filterCiblesForIndicateurCmrId(allCibles, indicateurCrpId),
     [allCibles, indicateurCrpId]
   )
 
-  const zoneCodes = useMemo(
-    () => zones.map((zone) => zone.code_loca),
-    [zones]
-  )
+  // ← IDs numériques (pas les codes)
+  const zoneIds = useMemo(() => zones.map((z) => z.id_loca as number), [zones])
 
   const initialGrid = useMemo(
-    () =>
-      buildCibleCmrGridState({
-        cibles: filteredCibles,
-        zoneCodes,
-        years,
-      }),
-    [filteredCibles, zoneCodes, years]
+    () => buildCibleCmrGridState({ cibles: filteredCibles, zoneIds, years }),
+    [filteredCibles, zoneIds, years]
   )
 
-  const [grid, setGrid] = useState<Record<string, CibleCmrGridCell>>(initialGrid)
-  const [pageIndex, setPageIndex] = useState(0)
-  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE)
+  const [grid,       setGrid      ] = useState<Record<string, CibleCmrGridCell>>(initialGrid)
+  const [isSavingAll, setIsSavingAll] = useState(false)
+  const [dirtyKeys,  setDirtyKeys ] = useState<Set<string>>(new Set())
 
-  useEffect(() => {
-    setGrid(initialGrid)
-  }, [initialGrid])
+  const filledCount = useMemo(
+    () => Object.values(grid).filter((c) => c?.value !== '' && c?.value != null).length,
+    [grid]
+  )
 
-  useEffect(() => {
-    setPageIndex(0)
-  }, [zones.length, pageSize])
+  useEffect(() => { setGrid(initialGrid) }, [initialGrid])
 
-  const totalPages = Math.max(1, Math.ceil(zones.length / pageSize))
-  const currentPage = Math.min(pageIndex + 1, totalPages)
-  const safePageIndex = currentPage - 1
-  const pageNumbers = getPageNumbers(currentPage, totalPages)
-
-  const paginatedZones = useMemo(() => {
-    const start = safePageIndex * pageSize
-    return zones.slice(start, start + pageSize)
-  }, [zones, safePageIndex, pageSize])
-
+  const useScrollMode        = zones.length > SCROLL_MODE_THRESHOLD
   const needsHorizontalScroll = years.length > YEAR_SCROLL_THRESHOLD
 
-  const handleCellChange = useCallback(
-    (zoneCode: string, year: number, value: string) => {
-      const key = buildCibleCmrGridKey(zoneCode, year)
-      setGrid((prev) => ({
-        ...prev,
-        [key]: {
-          ...prev[key],
-          value,
-        },
-      }))
-    },
-    []
-  )
+  // ── Changement cellule ────────────────────────────────────────────────────────
+  const handleCellChange = useCallback((zoneId: number, year: number, value: string) => {
+    const key = buildCibleCmrGridKey(zoneId, year)
+    setGrid((prev) => ({ ...prev, [key]: { ...prev[key], value } }))
+    setDirtyKeys((prev) => new Set(prev).add(key))
+  }, [])
 
-  const isLoading =
-    isLoadingLocalites || isLoadingNiveaux || isLoadingCibles
-  const isSaving =
-    createMutation.isPending ||
-    updateMutation.isPending ||
-    deleteMutation.isPending
-
+  // ── Enregistrement ────────────────────────────────────────────────────────────
   const handleSave = async () => {
+    setIsSavingAll(true)
     const operations: Promise<CibleCmrProjet | void>[] = []
+    let toProcess = 0
 
     for (const zone of zones) {
+      const zoneId = zone.id_loca as number
       for (const year of years) {
-        const key = buildCibleCmrGridKey(zone.code_loca, year)
-        const cell = grid[key]
-        const parsedValue = parseGridCellValue(cell?.value ?? '')
+        const key        = buildCibleCmrGridKey(zoneId, year)
+        const cell       = grid[key]
+        const parsed     = parseGridCellValue(cell?.value ?? '')
         const existingId = cell?.cibleId
 
-        if (parsedValue == null) {
+        if (parsed == null) {
           if (existingId != null) {
+            toProcess++
             operations.push(deleteMutation.mutateAsync(existingId))
           }
           continue
         }
 
+        toProcess++
         const payload = buildCiblePayloadFromGridCell({
-          zoneCode: zone.code_loca,
+          zoneId,
           year,
-          value: parsedValue,
-          indicateurCrpId,
+          value:           parsed,
+          indicateurCmrId: indicateurCrpId,
         })
 
         if (existingId != null) {
-          operations.push(
-            updateMutation.mutateAsync({
-              id: existingId,
-              data: payload,
-            })
-          )
+          operations.push(updateMutation.mutateAsync({ id: existingId, data: payload as any }))
         } else {
-          operations.push(createMutation.mutateAsync(payload))
+          operations.push(createMutation.mutateAsync(payload as any))
         }
       }
     }
 
+    if (toProcess === 0) {
+      toast.info('Aucune modification à enregistrer')
+      setIsSavingAll(false)
+      return
+    }
+
     try {
       await Promise.all(operations)
-      toast.success('Cibles CMR enregistrées')
+      toast.success(`${toProcess} cible${toProcess > 1 ? 's' : ''} enregistrée${toProcess > 1 ? 's' : ''}`)
+      setDirtyKeys(new Set())
       onClose?.()
     } catch {
-      toast.error('Erreur lors de l’enregistrement des cibles')
+      toast.error("Erreur lors de l'enregistrement des cibles")
+    } finally {
+      setIsSavingAll(false)
     }
   }
 
-  if (isLoading) {
-    return (
-      <div className='flex items-center justify-center gap-2 py-16 text-sm text-muted-foreground'>
-        <Loader2 className='h-4 w-4 animate-spin' />
-        Chargement des zones et cibles…
+  const isLoading  = isLoadingLocalites || isLoadingNiveaux || isLoadingCibles
+  const isMutating = isSavingAll || createMutation.isPending || updateMutation.isPending || deleteMutation.isPending
+
+  if (isLoading) return (
+    <div className='flex items-center justify-center gap-2 py-16 text-sm text-muted-foreground'>
+      <Loader2 className='h-4 w-4 animate-spin' /> Chargement des zones et cibles…
+    </div>
+  )
+  if (!programme) return (
+    <p className='py-10 text-center text-sm text-muted-foreground'>
+      Sélectionnez un programme pour afficher la période des cibles.
+    </p>
+  )
+  if (years.length === 0) return (
+    <p className='py-10 text-center text-sm text-muted-foreground'>
+      Les dates de début et de fin du programme actif sont requises.
+    </p>
+  )
+  if (zones.length === 0) return (
+    <p className='py-10 text-center text-sm text-muted-foreground'>
+      Aucune localité de niveau 2 n'est configurée.
+    </p>
+  )
+
+  // ── ActionBar sticky ──────────────────────────────────────────────────────────
+  const ActionBar = ({ position }: { position: 'top' | 'bottom' }) => (
+    <div className={cn(
+      'flex items-center justify-between gap-3 rounded-lg border bg-background/95 px-4 py-2.5 backdrop-blur',
+      position === 'top'
+        ? 'sticky top-0 z-30 shadow-sm border-b'
+        : 'sticky bottom-0 z-30 shadow-[0_-2px_8px_rgba(0,0,0,.08)] border-t'
+    )}>
+      <div className='flex items-center gap-2 text-sm text-muted-foreground'>
+        <span className='font-medium text-foreground'>{zones.length} zones</span>
+        <span>·</span>
+        <span>{years.length} années</span>
+        {filledCount > 0 && (
+          <><span>·</span>
+          <Badge variant='secondary' className='text-xs'>
+            {filledCount} valeur{filledCount > 1 ? 's' : ''}
+          </Badge></>
+        )}
+        {dirtyKeys.size > 0 && (
+          <Badge variant='outline' className='text-xs text-amber-600 border-amber-300 bg-amber-50'>
+            {dirtyKeys.size} non sauvegardée{dirtyKeys.size > 1 ? 's' : ''}
+          </Badge>
+        )}
       </div>
-    )
-  }
-
-  if (!programme) {
-    return (
-      <p className='py-10 text-center text-sm text-muted-foreground'>
-        Sélectionnez un programme pour afficher la période des cibles.
-      </p>
-    )
-  }
-
-  if (years.length === 0) {
-    return (
-      <p className='py-10 text-center text-sm text-muted-foreground'>
-        Les dates de début et de fin du programme actif sont requises pour
-        générer les colonnes annuelles.
-      </p>
-    )
-  }
-
-  if (zones.length === 0) {
-    return (
-      <p className='py-10 text-center text-sm text-muted-foreground'>
-        Aucune localité de niveau 2 n&apos;est configurée.
-      </p>
-    )
-  }
+      <div className='flex items-center gap-2'>
+        {onClose && (
+          <Button type='button' variant='outline' size='sm' onClick={onClose} disabled={isMutating}>
+            <X className='h-3.5 w-3.5' /> Annuler
+          </Button>
+        )}
+        <Button type='button' size='sm' onClick={handleSave} disabled={isMutating} className='gap-1.5'>
+          {isMutating
+            ? <><Loader2 className='h-3.5 w-3.5 animate-spin' />Enregistrement…</>
+            : <><Save className='h-3.5 w-3.5' />Enregistrer</>
+          }
+        </Button>
+      </div>
+    </div>
+  )
 
   return (
-    <div className='space-y-4'>
-      <div className='flex justify-center'>
-        <p className='w-full rounded-md border bg-primary/5 px-4 py-3 text-center text-sm font-medium text-primary'>
-          Valeurs cibles annuelles par zone (niveau 2)
-        </p>
-      </div>
+    <div className='flex flex-col gap-0'>
+      <ActionBar position='top' />
 
-      <div
-        className={cn(
-          'max-h-[min(52vh,480px)] overflow-y-auto rounded-md border',
-          needsHorizontalScroll ? 'overflow-x-auto pe-2' : 'overflow-x-hidden'
-        )}
-      >
+      <div className={cn(
+        'rounded-none border-x',
+        useScrollMode ? 'max-h-[min(55vh,520px)] overflow-y-auto' : 'overflow-y-visible',
+        needsHorizontalScroll ? 'overflow-x-auto' : 'overflow-x-hidden'
+      )}>
         <table
-          className={cn(
-            'w-full border-collapse text-xs',
-            needsHorizontalScroll ? 'min-w-max' : 'table-fixed'
-          )}
-          style={
-            needsHorizontalScroll
-              ? {
-                  minWidth:
-                    ZONE_COLUMN_MIN_PX + years.length * YEAR_COLUMN_MIN_PX,
-                }
-              : undefined
-          }
+          className={cn('w-full border-collapse text-xs', needsHorizontalScroll ? 'min-w-max' : 'table-fixed')}
+          style={needsHorizontalScroll ? { minWidth: ZONE_COLUMN_MIN_PX + years.length * YEAR_COLUMN_MIN_PX } : undefined}
         >
           <colgroup>
-            <col
-              style={{
-                width: needsHorizontalScroll
-                  ? ZONE_COLUMN_MIN_PX
-                  : '26%',
-              }}
-            />
-            {years.map((year) => (
-              <col key={year} />
-            ))}
+            <col style={{ width: needsHorizontalScroll ? ZONE_COLUMN_MIN_PX : '24%' }} />
+            {years.map((y) => <col key={y} />)}
           </colgroup>
-          <thead className='sticky top-0 z-10 bg-muted/95 backdrop-blur'>
+          <thead className='sticky top-0 z-20 bg-muted/95 backdrop-blur'>
             <tr>
-              <th
-                className='sticky left-0 z-20 border-b border-r bg-muted/95 px-2 py-1.5 text-left text-xs font-semibold'
-                style={
-                  needsHorizontalScroll
-                    ? { minWidth: ZONE_COLUMN_MIN_PX }
-                    : undefined
-                }
-              >
+              <th className='sticky left-0 z-30 border-b border-r bg-muted/95 px-3 py-2 text-left text-xs font-semibold'
+                style={needsHorizontalScroll ? { minWidth: ZONE_COLUMN_MIN_PX } : undefined}>
                 Zones
               </th>
-              {years.map((year) => (
-                <th
-                  key={year}
-                  className='border-b px-1 py-1.5 text-center text-xs font-semibold tabular-nums'
-                  style={
-                    needsHorizontalScroll
-                      ? { minWidth: YEAR_COLUMN_MIN_PX }
-                      : undefined
-                  }
-                >
-                  {year}
+              {years.map((y) => (
+                <th key={y} className='border-b px-1 py-2 text-center text-xs font-semibold tabular-nums'
+                  style={needsHorizontalScroll ? { minWidth: YEAR_COLUMN_MIN_PX } : undefined}>
+                  {y}
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {paginatedZones.map((zone) => (
-              <tr key={zone.id_loca} className='border-b last:border-b-0'>
-                <td
-                  className='sticky left-0 z-10 border-r bg-background px-2 py-1.5 align-middle font-medium'
-                  style={
-                    needsHorizontalScroll
-                      ? { minWidth: ZONE_COLUMN_MIN_PX, maxWidth: ZONE_COLUMN_MIN_PX }
-                      : undefined
-                  }
-                >
-                  <span
-                    className='block truncate'
-                    title={zone.intitule_loca}
-                  >
-                    {zone.intitule_loca}
-                  </span>
-                </td>
-                {years.map((year) => {
-                  const key = buildCibleCmrGridKey(zone.code_loca, year)
-                  const cell = grid[key]
-                  return (
-                    <td
-                      key={year}
-                      className='px-1 py-1 align-middle'
-                      style={
-                        needsHorizontalScroll
-                          ? { minWidth: YEAR_COLUMN_MIN_PX }
-                          : undefined
-                      }
-                    >
-                      <Input
-                        type='number'
-                        inputMode='decimal'
-                        min={0}
-                        step={1}
-                        value={cell?.value ?? ''}
-                        onChange={(e) =>
-                          handleCellChange(zone.code_loca, year, e.target.value)
-                        }
-                        className='h-7 w-full min-w-0 px-1 text-center text-xs tabular-nums'
-                        aria-label={`Cible ${zone.intitule_loca} ${year}`}
-                      />
-                    </td>
-                  )
-                })}
-              </tr>
-            ))}
+            {zones.map((zone, zIdx) => {
+              const zoneId = zone.id_loca as number
+              return (
+                <tr key={zoneId} className={cn(
+                  'border-b last:border-b-0 transition-colors',
+                  zIdx % 2 === 0 ? 'bg-background' : 'bg-muted/20'
+                )}>
+                  <td className='sticky left-0 z-10 border-r bg-inherit px-3 py-1.5 align-middle font-medium'
+                    style={needsHorizontalScroll ? { minWidth: ZONE_COLUMN_MIN_PX, maxWidth: ZONE_COLUMN_MIN_PX } : undefined}>
+                    <span className='block truncate text-xs' title={zone.intitule_loca}>
+                      {zone.intitule_loca}
+                    </span>
+                  </td>
+                  {years.map((year) => {
+                    const key    = buildCibleCmrGridKey(zoneId, year)
+                    const cell   = grid[key]
+                    const isDirty = dirtyKeys.has(key)
+                    return (
+                      <td key={year} className='px-1 py-1 align-middle'
+                        style={needsHorizontalScroll ? { minWidth: YEAR_COLUMN_MIN_PX } : undefined}>
+                        <Input
+                          type='text'
+                          inputMode='decimal'
+                          value={cell?.value ?? ''}
+                          onChange={(e) => handleCellChange(zoneId, year, e.target.value)}
+                          className={cn(
+                            'h-7 w-full min-w-0 px-1 text-center text-xs tabular-nums transition-colors',
+                            isDirty && 'border-amber-400 bg-amber-50/50 focus:border-amber-500'
+                          )}
+                          aria-label={`Cible ${zone.intitule_loca} ${year}`}
+                        />
+                      </td>
+                    )
+                  })}
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       </div>
 
-      <div
-        className={cn(
-          'flex w-full flex-col-reverse items-center justify-between gap-4 sm:flex-row'
-        )}
-      >
-        <div className='flex w-full items-center justify-between sm:w-auto sm:justify-start sm:gap-4'>
-          <p className='text-sm font-medium sm:hidden'>
-            Page {currentPage} sur {totalPages}
-          </p>
-          <div className='flex items-center gap-2'>
-            <Select
-              value={`${pageSize}`}
-              onValueChange={(value) => {
-                setPageSize(Number(value))
-              }}
-            >
-              <SelectTrigger className='h-8 w-[4.5rem]'>
-                <SelectValue placeholder={pageSize} />
-              </SelectTrigger>
-              <SelectContent side='top'>
-                {[5, 10, 20, 40].map((size) => (
-                  <SelectItem key={size} value={`${size}`}>
-                    {size}
-                  </SelectItem>
-                ))}
-                <SelectItem value={`${zones.length}`}>Tout</SelectItem>
-              </SelectContent>
-            </Select>
-            <p className='hidden text-sm font-medium sm:block'>
-              Zones par page
-            </p>
-          </div>
-        </div>
-
-        <div className='flex min-w-0 max-w-full items-center gap-4'>
-          <p className='hidden shrink-0 text-sm font-medium sm:block'>
-            Page {currentPage} sur {totalPages}
-          </p>
-          <div className='flex min-w-0 items-center gap-1 overflow-x-auto pb-0.5'>
-            <Button
-              type='button'
-              variant='outline'
-              className='size-8 p-0'
-              onClick={() => setPageIndex(0)}
-              disabled={safePageIndex <= 0}
-            >
-              <span className='sr-only'>Première page</span>
-              <DoubleArrowLeftIcon className='h-4 w-4' />
-            </Button>
-            <Button
-              type='button'
-              variant='outline'
-              className='size-8 p-0'
-              onClick={() => setPageIndex((p) => Math.max(0, p - 1))}
-              disabled={safePageIndex <= 0}
-            >
-              <span className='sr-only'>Page précédente</span>
-              <ChevronLeftIcon className='h-4 w-4' />
-            </Button>
-            {pageNumbers.map((pageNumber, index) => (
-              <div key={`${pageNumber}-${index}`} className='flex items-center'>
-                {pageNumber === '...' ? (
-                  <span className='px-1 text-sm text-muted-foreground'>…</span>
-                ) : (
-                  <Button
-                    type='button'
-                    variant={currentPage === pageNumber ? 'default' : 'outline'}
-                    className='h-8 min-w-8 px-2'
-                    onClick={() => setPageIndex((pageNumber as number) - 1)}
-                  >
-                    <span className='sr-only'>Aller à la page {pageNumber}</span>
-                    {pageNumber}
-                  </Button>
-                )}
-              </div>
-            ))}
-            <Button
-              type='button'
-              variant='outline'
-              className='size-8 p-0'
-              onClick={() =>
-                setPageIndex((p) => Math.min(totalPages - 1, p + 1))
-              }
-              disabled={safePageIndex >= totalPages - 1}
-            >
-              <span className='sr-only'>Page suivante</span>
-              <ChevronRightIcon className='h-4 w-4' />
-            </Button>
-            <Button
-              type='button'
-              variant='outline'
-              className='size-8 p-0'
-              onClick={() => setPageIndex(totalPages - 1)}
-              disabled={safePageIndex >= totalPages - 1}
-            >
-              <span className='sr-only'>Dernière page</span>
-              <DoubleArrowRightIcon className='h-4 w-4' />
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      <div className='flex justify-end gap-2 border-t pt-4'>
-        {onClose ? (
-          <Button type='button' variant='outline' onClick={onClose}>
-            Annuler
-          </Button>
-        ) : null}
-        <Button type='button' onClick={handleSave} disabled={isSaving}>
-          {isSaving ? 'Enregistrement…' : 'Enregistrer'}
-        </Button>
-      </div>
+      <ActionBar position='bottom' />
     </div>
   )
 }

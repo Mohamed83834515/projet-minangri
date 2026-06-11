@@ -29,7 +29,7 @@ function toIndicateurCmrApiPayload(
   };
 }
 
-export const indicateurCmrService = {
+export const indicateurCmrProjetService = {
   getAll: async (): Promise<IndicateurCmr[]> => {
     const response = await apiClient.request<unknown>(BASE_URL);
     return normalizeApiList<Record<string, unknown>>(response).map(

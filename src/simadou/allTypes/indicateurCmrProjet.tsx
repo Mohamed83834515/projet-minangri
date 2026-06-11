@@ -1,4 +1,4 @@
-export interface IndicateurCmr extends Record<string, unknown> {
+export interface IndicateurCmrProjet extends Record<string, unknown> {
   id_ref_ind_cmr: number;
   code_ref_ind: string;
   resultat_cmr: number;
@@ -13,4 +13,4 @@ export interface IndicateurCmr extends Record<string, unknown> {
   updated_at?: string;
 }
 
-export type IndicateurCmrFormData = Omit<IndicateurCmr, "id_ref_ind_cmr">;
+export type IndicateurCmrFormData = Omit<IndicateurCmrProjet, "id_ref_ind_cmr">;

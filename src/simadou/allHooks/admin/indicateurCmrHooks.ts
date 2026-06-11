@@ -1,31 +1,28 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { IndicateurCmrFormData } from '@/simadou/allTypes'
 import { indicateurCmrService } from '@/simadou/allSercices/indicateurCmrService'
-import {
-  cibleCmrProjetService,
-  type CibleCmrProjetFormData,
-} from '@/simadou/allSercices/cibleCmrProjetService'
 import { invalidateAndRefetch } from '@/simadou/allHooks/admin/queryInvalidation'
+import { CibleCmrFormData, cibleCmrService } from '@/simadou/allSercices/cibleCmrService'
 
 export const indicateurCmrQueryKeys = {
   all: ['indicateurs-cmr'] as const,
 }
 
-export const cibleCmrProjetQueryKeys = {
-  all: ['cibles-cmr-projet'] as const,
+export const cibleCmrQueryKeys = {
+  all: ['cibles-cmr'] as const,
   byProjet: (codeProjet: string | undefined) =>
-    [...cibleCmrProjetQueryKeys.all, 'by-projet', codeProjet] as const,
+    [...cibleCmrQueryKeys.all, 'by-projet', codeProjet] as const,
 }
 
 async function invalidateCibleCmrQueries(
   queryClient: ReturnType<typeof useQueryClient>,
   codeProjet?: string
 ) {
-  await invalidateAndRefetch(queryClient, cibleCmrProjetQueryKeys.all)
+  await invalidateAndRefetch(queryClient, cibleCmrQueryKeys.all)
   if (codeProjet) {
     await invalidateAndRefetch(
       queryClient,
-      cibleCmrProjetQueryKeys.byProjet(codeProjet)
+      cibleCmrQueryKeys.byProjet(codeProjet)
     )
   }
 }
@@ -81,18 +78,18 @@ export function useDeleteIndicateurCmr() {
   })
 }
 
-export function useGetCiblesCmrProjet(codeProjet: string | undefined) {
+export function useGetCiblesCmr(codeProjet: string | undefined) {
   return useQuery({
-    queryKey: cibleCmrProjetQueryKeys.byProjet(codeProjet),
-    queryFn: () => cibleCmrProjetService.getByProjet(codeProjet!),
+    queryKey: cibleCmrQueryKeys.byProjet(codeProjet),
+    queryFn: () => cibleCmrService.getByProjet(codeProjet!),
     enabled: !!codeProjet,
   })
 }
 
-export function useGetAllCiblesCmrProjet() {
+export function useGetAllCiblesCmr() {
   return useQuery({
-    queryKey: cibleCmrProjetQueryKeys.all,
-    queryFn: () => cibleCmrProjetService.getAll(),
+    queryKey: cibleCmrQueryKeys.all,
+    queryFn: () => cibleCmrService.getAll(),
   })
 }
 
@@ -101,23 +98,20 @@ export function useGetCiblesCmrByIndicateurCrp(
 ) {
   return useQuery({
     queryKey: [
-      ...cibleCmrProjetQueryKeys.all,
+      ...cibleCmrQueryKeys.all,
       'by-indicateur-crp',
       indicateurCrpId,
     ] as const,
-    queryFn: () => cibleCmrProjetService.getByIndicateur(indicateurCrpId!),
+    queryFn: () => cibleCmrService.getByIndicateur(indicateurCrpId!),
     enabled: indicateurCrpId != null,
   })
 }
 
-export function useCreateCibleCmrProjet(codeProjet: string | undefined) {
+export function useCreateCibleCmr(codeProjet: string | undefined) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data: CibleCmrProjetFormData) =>
-      cibleCmrProjetService.create({
-        ...data,
-        code_projet: codeProjet ?? data.code_projet ?? null,
-      }),
+    mutationFn: (data: CibleCmrFormData) =>
+      cibleCmrService.create(data),
     meta: { suppressGlobalErrorToast: true },
     onSuccess: async () => {
       await invalidateCibleCmrQueries(queryClient, codeProjet)
@@ -125,7 +119,7 @@ export function useCreateCibleCmrProjet(codeProjet: string | undefined) {
   })
 }
 
-export function useUpdateCibleCmrProjet(codeProjet: string | undefined) {
+export function useUpdateCibleCmr(codeProjet: string | undefined) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({
@@ -133,8 +127,8 @@ export function useUpdateCibleCmrProjet(codeProjet: string | undefined) {
       data,
     }: {
       id: number
-      data: CibleCmrProjetFormData
-    }) => cibleCmrProjetService.update(id, data),
+      data: CibleCmrFormData
+    }) => cibleCmrService.update(id, data),
     meta: { suppressGlobalErrorToast: true },
     onSuccess: async () => {
       await invalidateCibleCmrQueries(queryClient, codeProjet)
@@ -142,10 +136,10 @@ export function useUpdateCibleCmrProjet(codeProjet: string | undefined) {
   })
 }
 
-export function useDeleteCibleCmrProjet(codeProjet?: string) {
+export function useDeleteCibleCmr(codeProjet?: string) {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (id: number) => cibleCmrProjetService.delete(id),
+    mutationFn: (id: number) => cibleCmrService.delete(id),
     meta: { suppressGlobalErrorToast: true },
     onSuccess: async () => {
       await invalidateCibleCmrQueries(queryClient, codeProjet)

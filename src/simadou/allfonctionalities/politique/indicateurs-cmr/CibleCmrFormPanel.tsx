@@ -15,13 +15,10 @@ import {
   type CibleCmrProjetFormData,
 } from '@/simadou/schemas/cibleCmrProjetSchema'
 import type { CibleCmrProjet } from '@/simadou/allTypes'
-import { useGetIndicateursCadreResultat } from '@/simadou/allHooks/admin/indicateurCadreResultatHooks'
-import {
-  useCreateCibleCmrProjet,
-  useUpdateCibleCmrProjet,
-} from '@/simadou/allHooks/admin/indicateurCmrHooks'
 import { parseOptionalNumber, resolveRelationCode } from '@/simadou/lib/resolveApiRelation'
 import { uglService } from '@/simadou/allSercices/uglService'
+import { useGetIndicateursCadreResultat } from '@/simadou/allHooks/admin/indicateurCadreResultatHooks'
+import { useCreateCibleCmrProjet, useUpdateCibleCmrProjet } from '@/simadou/allHooks/admin/indicateurCmrProjetHooks'
 
 export default function CibleCmrProjetFormPanel({
   cible,

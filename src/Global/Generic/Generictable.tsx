@@ -25,7 +25,6 @@ import {
 } from '@/components/ui/table'
 import { DataTablePagination, DataTableToolbar } from '@/components/data-table'
 import { TableLoadingOverlay } from './table-loading-overlay'
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -73,6 +72,8 @@ type GenericTableProps<TData> = {
 
   onRowClick?: (row: TData) => void
 
+  //Prop optionnelle pour signaler un fetch/refetch externe 
+  // Indépendante du routerState couvre les cas où la navigation n'est pas impliquée
   isLoading?: boolean
 
   initialState?: Partial<{
@@ -89,17 +90,18 @@ export function GenericTable<TData>({
   search,
   navigate,
   searchKey,
-  searchPlaceholder = 'Filtrer...',
+  searchPlaceholder = 'Filter...',
   urlFilterConfig = [],
   facetedFilters = [],
   bulkActionsSlot,
   defaultPageSize = 10,
-  emptyMessage = 'Aucun résultat.',
+  emptyMessage = 'No results.',
   showViewOptions = true,
   showSearch = true,
   showPagination = true,
   toolbarEndSlot,
   onRowClick,
+  //Valeur par défaut false, pas de chargement si rien n'est passé
   isLoading: isLoadingProp = false,
   initialState,
 }: GenericTableProps<TData>) {
@@ -112,6 +114,9 @@ export function GenericTable<TData>({
   )
 
   const routerState = useRouterState()
+  // chargement global déclenché si :
+  //   • la navigation est en cours (changement de route, de filtres URL...)
+  //   • ou si le parent signale un chargement via isLoadingProp (fetch/refetch des données)
   const isRouterPending = routerState.status === 'pending'
   const isLoading = isRouterPending || isLoadingProp
 
@@ -129,6 +134,7 @@ export function GenericTable<TData>({
     columnFilters: urlFilterConfig,
   })
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns,
@@ -158,8 +164,12 @@ export function GenericTable<TData>({
   }, [table, ensurePageInRange])
 
   return (
-    <div className="flex flex-1 flex-col gap-5">
-
+    <div
+      className={cn(
+        'max-sm:has-[div[role="toolbar"]]:mb-16',
+        'flex flex-1 flex-col gap-4'
+      )}
+    >
       <DataTableToolbar
         table={table}
         searchPlaceholder={searchPlaceholder}
@@ -170,229 +180,80 @@ export function GenericTable<TData>({
         toolbarEndSlot={toolbarEndSlot}
       />
 
-      <div
-        className={cn(
-          "group relative overflow-hidden rounded-2xl",
-          "border border-border/60",
-          "bg-gradient-to-b from-background to-muted/10",
-          "shadow-sm transition-all duration-300",
-          "hover:shadow-xl hover:shadow-primary/5"
-        )}
-      >
+      <div className='relative overflow-hidden rounded-md border'>
+        {/* Seul isLoadingProp déclenche l'overlay de chargement, pas isRouterPending */}
         {isLoadingProp && <TableLoadingOverlay />}
 
-        <ScrollArea className="w-full">
-
-          <div className="min-w-full">
-
-            <Table
-              className={cn(
-                "w-full transition duration-300",
-                isLoading && "pointer-events-none opacity-50"
-              )}
-            >
-
-              {/* HEADER */}
-
-              <TableHeader>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow
-                    key={headerGroup.id}
-                    className='border-b-2 border-emerald-200 dark:border-emerald-800 bg-muted/30 dark:bg-muted/10'
-                  >
-                    {headerGroup.headers.map((header) => (
-                      <TableHead
-                        key={header.id}
-                        style={{
-                          width: (header.column.columnDef.meta as any)?.width,
-                          minWidth: (header.column.columnDef.meta as any)?.minWidth || 100,
-                        }}
-                        className={cn(
-                          'py-3 px-4 text-xs font-semibold uppercase tracking-wide',
-                          'text-slate-600 dark:text-slate-300',
-                          'border-r border-border/30 last:border-r-0',
-                          'first:rounded-tl-lg last:rounded-tr-lg',
-                          'bg-muted/20 dark:bg-muted/5',
-                          (header.column.columnDef.meta as any)?.className,
-                          (header.column.columnDef.meta as any)?.thClassName
-                        )}
-                      >
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(header.column.columnDef.header, header.getContext())}
-                      </TableHead>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableHeader>
-
-              {/* BODY */}
-
-              <TableBody>
-
-                {table.getRowModel().rows.length ? (
-                  table
-                    .getRowModel()
-                    .rows
-                    .map((row, index) => (
-                      <TableRow
-                        key={row.id}
-                        data-state={
-                          row.getIsSelected() &&
-                          "selected"
-                        }
-                        onClick={() =>
-                          onRowClick?.(
-                            row.original
-                          )
-                        }
-                        className={cn(
-                          "group transition-all duration-200",
-
-                          index % 2 === 0
-                            ? "bg-background"
-                            : "bg-muted/[0.03]",
-
-                          "hover:bg-primary/[0.04]",
-
-                          "border-b border-border/40",
-
-                          onRowClick &&
-                          "cursor-pointer",
-
-                          row.getIsSelected() &&
-                          "bg-primary/10"
-                        )}
-                      >
-                        {row
-                          .getVisibleCells()
-                          .map((cell) => (
-                            <TableCell
-                              key={cell.id}
-                              style={{
-                                width:
-                                  (cell.column
-                                    .columnDef
-                                    .meta as any)
-                                    ?.width,
-
-                                minWidth:
-                                  (cell.column
-                                    .columnDef
-                                    .meta as any)
-                                    ?.minWidth ||
-                                  100,
-                              }}
-                              className={cn(
-                                "px-5 py-4",
-
-                                "text-sm",
-
-                                "align-middle",
-
-                                "border-r border-border/20 last:border-r-0",
-
-                                "group-hover:border-primary/10",
-
-                                (cell.column
-                                  .columnDef
-                                  .meta as any)
-                                  ?.tdClassName
-                              )}
-                            >
-                              <div className="break-words leading-relaxed">
-                                {flexRender(
-                                  cell.column
-                                    .columnDef.cell,
-                                  cell.getContext()
-                                )}
-                              </div>
-                            </TableCell>
-                          ))}
-                      </TableRow>
-                    ))
-                ) : (
-
-                  <TableRow>
-
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-[340px]"
-                    >
-
-                      <div className="flex h-full flex-col items-center justify-center gap-5">
-
-                        <div
-                          className={cn(
-                            "rounded-2xl",
-                            "bg-muted/30",
-                            "p-6"
-                          )}
-                        >
-                          <svg
-                            className="h-10 w-10 text-muted-foreground"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={1.4}
-                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5l5 5v11a2 2 0 01-2 2z"
-                            />
-                          </svg>
-                        </div>
-
-                        <div className="space-y-1 text-center">
-
-                          <p className="font-medium">
-                            Aucun résultat
-                          </p>
-
-                          <p className="text-sm text-muted-foreground">
-                            {emptyMessage}
-                          </p>
-
-                        </div>
-
-                      </div>
-
-                    </TableCell>
-
-                  </TableRow>
-
-                )}
-
-              </TableBody>
-
-            </Table>
-
-          </div>
-
-          <ScrollBar orientation="horizontal" />
-
-        </ScrollArea>
-
-      </div>
-
-      {showPagination && (
-        <div
+        <Table
           className={cn(
-            "rounded-xl",
-            "border border-border/50",
-            "bg-muted/[0.03]",
-            "p-2"
+            'transition-opacity duration-200',
+            isLoading && 'opacity-40 pointer-events-none select-none'
           )}
         >
-          <DataTablePagination
-            table={table}
-          />
-        </div>
-      )}
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id} className='group/row'>
+                {headerGroup.headers.map((header) => (
+                  <TableHead
+                    key={header.id}
+                    colSpan={header.colSpan}
+                    className={cn(
+                      'bg-background group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted',
+                      header.column.columnDef.meta?.className,
+                      header.column.columnDef.meta?.thClassName
+                    )}
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && 'selected'}
+                  className={cn(
+                    'group/row',
+                    onRowClick && 'cursor-pointer'
+                  )}
+                  onClick={() => onRowClick?.(row.original)}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell
+                      key={cell.id}
+                      className={cn(
+                        'bg-background group-hover/row:bg-muted group-data-[state=selected]/row:bg-muted',
+                        cell.column.columnDef.meta?.className,
+                        cell.column.columnDef.meta?.tdClassName
+                      )}
+                    >
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} className='h-24 text-center'>
+                  {emptyMessage}
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      {showPagination && <DataTablePagination table={table} className='mt-auto' />}
 
       {bulkActionsSlot?.(table)}
-
     </div>
   )
 }
