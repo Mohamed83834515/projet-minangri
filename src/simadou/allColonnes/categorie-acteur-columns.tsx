@@ -21,6 +21,7 @@ export const buildCategorieActeurColumns = (
       type: "text",
       key: "nom_categorie",
       title: "Nom catégorie",
+      maxWidth: "max-w-[min(100%,14rem)]",
     },
   ]),
   {

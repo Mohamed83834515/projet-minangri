@@ -43,6 +43,7 @@ export default function AddCategorieActeur({
       loadingText="Enregistrement..."
       onCancel={onBack}
       cancelText='Retour'
+      embedded
     />
   )
 }

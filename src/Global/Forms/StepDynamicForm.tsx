@@ -521,9 +521,25 @@ export const StepDynamicForm = forwardRef<
             className: 'text-muted-foreground/50',
           }
 
-    const handleNext = async () => {
+    const handleNext = async (e?: React.MouseEvent<HTMLButtonElement>) => {
+      e?.preventDefault()
+      e?.stopPropagation()
+
       const valid = await trigger(currentStepFieldNames as any)
-      if (valid) setCurrentStep((s) => Math.min(s + 1, totalSteps))
+      if (!valid) return
+
+      // Évite qu'un même clic active le bouton « Soumettre » après le changement d'étape.
+      requestAnimationFrame(() => {
+        setCurrentStep((s) => Math.min(s + 1, totalSteps))
+      })
+    }
+
+    const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault()
+    }
+
+    const handleFinalSubmit = () => {
+      void handleSubmit(onSubmit as any)()
     }
 
     const handleBack = () => setCurrentStep((s) => Math.max(s - 1, 1))
@@ -655,15 +671,7 @@ export const StepDynamicForm = forwardRef<
 
         {/* ── Champs du formulaire ────────────────────────────────── */}
         <Form {...form}>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault()
-
-              if (!isLastStep) return
-
-              handleSubmit(onSubmit as any)(e)
-            }}
-          >
+          <form onSubmit={handleFormSubmit}>
             <div className='p-6'>
               <div className='grid grid-cols-1 gap-x-5 gap-y-5 sm:grid-cols-2'>
                 {visibleFields.map((field, index) => (
@@ -721,9 +729,10 @@ export const StepDynamicForm = forwardRef<
 
                 {isLastStep ? (
                   <Button
-                    type='submit'
+                    type='button'
                     disabled={isLoading}
                     size='sm'
+                    onClick={handleFinalSubmit}
                     className={formPrimaryButtonClassName}
                   >
                     {isLoading ? (
@@ -742,6 +751,7 @@ export const StepDynamicForm = forwardRef<
                   <Button
                     type='button'
                     size='sm'
+                    onMouseDown={(e) => e.preventDefault()}
                     onClick={handleNext}
                     className={formPrimaryButtonClassName}
                   >
