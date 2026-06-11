@@ -1,17 +1,125 @@
-import type { CibleCmrProjet } from '@/simadou/allTypes'
+import type { CibleCmr } from '@/simadou/allTypes/cibleCmr'
 import type { Localite } from '@/simadou/allTypes/localite'
 import type { NiveauLocalite } from '@/simadou/allTypes/niveauLocalite'
 import type { Programme } from '@/simadou/allTypes/programme'
 import {
-  formatAnneeCible,
-  formatAnneeCibleForApi,
-  resolveCodeIndicateurCrpForForm,
-} from '@/simadou/schemas/cibleCmrProjetSchema'
-import { resolveRelationCode } from '@/simadou/lib/resolveApiRelation'
+  resolveRelationCode,
+  resolveRelationId,
+} from '@/simadou/lib/resolveApiRelation'
 
 export type CibleCmrGridCell = {
   cibleId?: number
   value: string
+}
+
+export type CibleCmrGridRow = {
+  rowId: string
+  label: string
+  localiteId: number
+}
+
+export function resolveCibleAnnee(
+  annee: number | string | null | undefined
+): number | null {
+  if (typeof annee === 'number' && Number.isFinite(annee)) return annee
+  if (typeof annee === 'string' && annee.trim()) {
+    const yearMatch = annee.match(/^(\d{4})/)
+    if (yearMatch) return Number(yearMatch[1])
+    const parsed = new Date(annee)
+    if (Number.isFinite(parsed.getTime())) return parsed.getFullYear()
+  }
+  return null
+}
+
+export function resolveCodeIndicateurCmrId(
+  cible: CibleCmr | null | undefined
+): number | null {
+  if (!cible) return null
+  return (
+    resolveRelationId(cible.code_indicateur_cmr, 'id_ref_ind_cmr') ??
+    (typeof cible.code_indicateur_cmr === 'number'
+      ? cible.code_indicateur_cmr
+      : null)
+  )
+}
+
+export function resolveCibleLocaliteId(
+  cible: CibleCmr | null | undefined
+): number | null {
+  if (!cible) return null
+  return resolveRelationId(cible.localite, 'id_loca')
+}
+
+export function resolveCibleProgrammeCode(
+  cible: CibleCmr | null | undefined
+): string | null {
+  if (!cible?.programme) return null
+  if (typeof cible.programme === 'string') return cible.programme.trim() || null
+  return resolveRelationCode(cible.programme, 'code_programme')
+}
+
+export function getLocalitesByNombreNlc(
+  localites: Localite[],
+  niveaux: NiveauLocalite[] = [],
+  nombreNlc: number
+): Localite[] {
+  const niveauConfig = niveaux.find((n) => Number(n.nombre_nlc) === nombreNlc)
+
+  return localites
+    .filter((localite) => {
+      const niveau = localite.niveau_loca
+      if (typeof niveau === 'object' && niveau !== null) {
+        if (Number(niveau.nombre_nlc) === nombreNlc) return true
+        if (niveauConfig?.id_nlc != null && niveau.id_nlc === niveauConfig.id_nlc) {
+          return true
+        }
+        return false
+      }
+      if (typeof niveau === 'number' && niveauConfig?.id_nlc != null) {
+        return niveau === niveauConfig.id_nlc
+      }
+      if (nombreNlc === 1 && localite.parent_loca == null) return true
+      return resolveLocaliteNiveauNombre(localite) === nombreNlc
+    })
+    .sort((a, b) => a.intitule_loca.localeCompare(b.intitule_loca, 'fr'))
+}
+
+/** Zones = localités de second niveau (préfectures, nombre_nlc === 2). */
+export function getLocalitesZones(
+  localites: Localite[],
+  niveaux: NiveauLocalite[] = []
+): Localite[] {
+  return getLocalitesByNombreNlc(localites, niveaux, 2)
+}
+
+/** @deprecated Utiliser getLocalitesZones — conservé pour compatibilité. */
+export function getLocalitesNiveau1(
+  localites: Localite[],
+  niveaux: NiveauLocalite[] = []
+): Localite[] {
+  return getLocalitesZones(localites, niveaux)
+}
+
+export function buildCibleCmrGridRows(
+  localites: Localite[],
+  niveaux: NiveauLocalite[]
+): CibleCmrGridRow[] {
+  return getLocalitesZones(localites, niveaux).map((localite) => ({
+    rowId: String(localite.id_loca),
+    label: localite.intitule_loca,
+    localiteId: localite.id_loca,
+  }))
+}
+
+export function getCibleCmrGridRowId(row: CibleCmrGridRow): string {
+  return row.rowId
+}
+
+export function findGridRowByLocaliteId(
+  gridRows: CibleCmrGridRow[],
+  localiteId: number
+): CibleCmrGridRow | undefined {
+  return gridRows.find((row) => row.localiteId === localiteId)
 }
 
 export function parseProgrammeYear(
@@ -48,72 +156,66 @@ export function resolveLocaliteNiveauNombre(
   return null
 }
 
-export function getLocalitesNiveau1(
-  localites: Localite[],
-  niveaux: NiveauLocalite[] = []
-): Localite[] {
-  const niveauConfig = niveaux.find((n) => Number(n.nombre_nlc) === 1)
+export function buildCibleCmrGridKey(rowId: string, year: number): string {
+  return `${rowId}|${year}`
+}
 
-  return localites
-    .filter((localite) => {
-      const niveau = localite.niveau_loca
-      if (typeof niveau === 'object' && niveau !== null) {
-        if (Number(niveau.nombre_nlc) === 2) return true
-        if (niveauConfig?.id_nlc != null && niveau.id_nlc === niveauConfig.id_nlc) {
-          return true
-        }
+/** Cibles affichées dans la grille zone × année (politique / programme). */
+export function filterCiblesForZoneGrid(
+  cibles: CibleCmr[],
+  indicateurCmrId: number,
+  programmeCode?: string | null
+): CibleCmr[] {
+  return cibles.filter((cible) => {
+    if (resolveCodeIndicateurCmrId(cible) !== indicateurCmrId) return false
+    if (resolveCibleLocaliteId(cible) == null) return false
+
+    if (programmeCode) {
+      const cibleProgramme = resolveCibleProgrammeCode(cible)
+      if (cibleProgramme != null && cibleProgramme !== programmeCode) {
         return false
       }
-      if (typeof niveau === 'number' && niveauConfig?.id_nlc != null) {
-        return niveau === niveauConfig.id_nlc
-      }
-      return resolveLocaliteNiveauNombre(localite) === 2
-    })
-    .sort((a, b) => a.intitule_loca.localeCompare(b.intitule_loca, 'fr'))
-}
+    }
 
-export function buildCibleCmrGridKey(zoneCode: string, year: number): string {
-  return `${zoneCode}|${year}`
-}
-
-export function resolveCibleZoneCode(cible: CibleCmrProjet): string | null {
-  if (typeof cible.code_ug === 'string' && cible.code_ug.trim()) {
-    return cible.code_ug
-  }
-  return resolveRelationCode(cible.code_ug, 'code_loca')
+    return true
+  })
 }
 
 export function buildCibleCmrGridState({
   cibles,
-  zoneCodes,
+  gridRows,
   years,
 }: {
-  cibles: CibleCmrProjet[]
-  zoneCodes: string[]
+  cibles: CibleCmr[]
+  gridRows: CibleCmrGridRow[]
   years: number[]
 }): Record<string, CibleCmrGridCell> {
   const state: Record<string, CibleCmrGridCell> = {}
 
-  for (const zoneCode of zoneCodes) {
+  for (const row of gridRows) {
+    const rowId = getCibleCmrGridRowId(row)
     for (const year of years) {
-      state[buildCibleCmrGridKey(zoneCode, year)] = { value: '' }
+      state[buildCibleCmrGridKey(rowId, year)] = { value: '' }
     }
   }
 
   for (const cible of cibles) {
-    const zoneCode = resolveCibleZoneCode(cible)
-    const year = Number(formatAnneeCible(cible.annee))
-    if (!zoneCode || !Number.isFinite(year)) continue
+    const localiteId = resolveCibleLocaliteId(cible)
+    const year = resolveCibleAnnee(cible.annee)
+    if (localiteId == null || year == null) continue
 
-    const key = buildCibleCmrGridKey(zoneCode, year)
+    const row = findGridRowByLocaliteId(gridRows, localiteId)
+    if (!row) continue
+
+    const key = buildCibleCmrGridKey(getCibleCmrGridRowId(row), year)
     if (!(key in state)) continue
 
     state[key] = {
       cibleId: cible.id_cible_indicateur_crp,
       value:
-        cible.valeur_cible_indcateur_crp == null
+        cible.valeur_cible_indcateur_cmr == null
           ? ''
-          : String(cible.valeur_cible_indcateur_crp),
+          : String(cible.valeur_cible_indcateur_cmr),
     }
   }
 
@@ -128,30 +230,42 @@ export function parseGridCellValue(raw: string): number | null {
 }
 
 export function buildCiblePayloadFromGridCell({
-  zoneCode,
+  localiteId,
   year,
   value,
-  indicateurCrpId,
+  indicateurCmrId,
+  programmeCode = null,
 }: {
-  zoneCode: string
+  localiteId: number
   year: number
   value: number
-  indicateurCrpId: number
+  indicateurCmrId: number
+  programmeCode?: string | null
 }) {
   return {
-    annee: formatAnneeCibleForApi(String(year)),
-    valeur_cible_indcateur_crp: value,
-    code_indicateur_crp: indicateurCrpId,
-    code_ug: zoneCode,
-    code_projet: null,
+    annee: year,
+    valeur_cible_indcateur_cmr: value,
+    code_indicateur_cmr: indicateurCmrId,
+    localite: localiteId,
+    programme: programmeCode?.trim() || null,
   }
 }
 
-export function filterCiblesForIndicateurCmrId(
-  cibles: CibleCmrProjet[],
-  indicateurCrpId: number
-): CibleCmrProjet[] {
-  return cibles.filter(
-    (cible) => resolveCodeIndicateurCrpForForm(cible) === indicateurCrpId
-  )
+export function isCibleCmrGridCellDirty(
+  grid: Record<string, CibleCmrGridCell>,
+  initialGrid: Record<string, CibleCmrGridCell>,
+  key: string
+): boolean {
+  return (grid[key]?.value ?? '') !== (initialGrid[key]?.value ?? '')
+}
+
+export function hasCibleCmrGridChanges(
+  grid: Record<string, CibleCmrGridCell>,
+  initialGrid: Record<string, CibleCmrGridCell>
+): boolean {
+  const keys = new Set([...Object.keys(grid), ...Object.keys(initialGrid)])
+  for (const key of keys) {
+    if (isCibleCmrGridCellDirty(grid, initialGrid, key)) return true
+  }
+  return false
 }

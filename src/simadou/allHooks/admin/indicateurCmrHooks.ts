@@ -2,6 +2,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { IndicateurCmrFormData } from '@/simadou/allTypes'
 import { indicateurCmrService } from '@/simadou/allSercices/indicateurCmrService'
 import {
+  cibleCmrService,
+  type CibleCmrFormData,
+} from '@/simadou/allSercices/cibleCmrService'
+import {
   cibleCmrProjetService,
   type CibleCmrProjetFormData,
 } from '@/simadou/allSercices/cibleCmrProjetService'
@@ -11,10 +15,22 @@ export const indicateurCmrQueryKeys = {
   all: ['indicateurs-cmr'] as const,
 }
 
+export const cibleCmrQueryKeys = {
+  all: ['cibles-cmr'] as const,
+  byIndicateur: (indicateurCmrId: number | undefined) =>
+    [...cibleCmrQueryKeys.all, 'by-indicateur', indicateurCmrId] as const,
+}
+
 export const cibleCmrProjetQueryKeys = {
   all: ['cibles-cmr-projet'] as const,
   byProjet: (codeProjet: string | undefined) =>
     [...cibleCmrProjetQueryKeys.all, 'by-projet', codeProjet] as const,
+}
+
+async function invalidateCibleCmrPolitiqueQueries(
+  queryClient: ReturnType<typeof useQueryClient>
+) {
+  await invalidateAndRefetch(queryClient, cibleCmrQueryKeys.all)
 }
 
 async function invalidateCibleCmrQueries(
@@ -77,6 +93,60 @@ export function useDeleteIndicateurCmr() {
     meta: { suppressGlobalErrorToast: true },
     onSuccess: async () => {
       await invalidateAndRefetch(queryClient, indicateurCmrQueryKeys.all)
+    },
+  })
+}
+
+export function useGetAllCiblesCmr() {
+  return useQuery({
+    queryKey: cibleCmrQueryKeys.all,
+    queryFn: () => cibleCmrService.getAll(),
+  })
+}
+
+export function useGetCiblesCmrByIndicateur(
+  indicateurCmrId: number | null | undefined
+) {
+  return useQuery({
+    queryKey: cibleCmrQueryKeys.byIndicateur(indicateurCmrId ?? undefined),
+    queryFn: async () => {
+      const list = await cibleCmrService.getAll()
+      return list
+    },
+    enabled: indicateurCmrId != null,
+  })
+}
+
+export function useCreateCibleCmr() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: CibleCmrFormData) => cibleCmrService.create(data),
+    meta: { suppressGlobalErrorToast: true },
+    onSuccess: async () => {
+      await invalidateCibleCmrPolitiqueQueries(queryClient)
+    },
+  })
+}
+
+export function useUpdateCibleCmr() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: CibleCmrFormData }) =>
+      cibleCmrService.update(id, data),
+    meta: { suppressGlobalErrorToast: true },
+    onSuccess: async () => {
+      await invalidateCibleCmrPolitiqueQueries(queryClient)
+    },
+  })
+}
+
+export function useDeleteCibleCmr() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: number) => cibleCmrService.delete(id),
+    meta: { suppressGlobalErrorToast: true },
+    onSuccess: async () => {
+      await invalidateCibleCmrPolitiqueQueries(queryClient)
     },
   })
 }

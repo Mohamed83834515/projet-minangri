@@ -7,6 +7,7 @@ import {
 } from '@radix-ui/react-icons'
 import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
+import { getApiErrorMessage } from '@/lib/api-error-message'
 import { cn, getPageNumbers } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -17,25 +18,32 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { useActiveProgramme } from '@/hooks/use-active-programme'
-import type { CibleCmrProjet, IndicateurCmr } from '@/simadou/allTypes'
 import {
-  useCreateCibleCmrProjet,
-  useDeleteCibleCmrProjet,
-  useGetAllCiblesCmrProjet,
-  useUpdateCibleCmrProjet,
+  useActiveProgramme,
+  useActiveProgrammeCode,
+} from '@/hooks/use-active-programme'
+import type { CibleCmr, IndicateurCmr } from '@/simadou/allTypes'
+import {
+  useCreateCibleCmr,
+  useDeleteCibleCmr,
+  useGetAllCiblesCmr,
+  useUpdateCibleCmr,
 } from '@/simadou/allHooks/admin/indicateurCmrHooks'
 import { useGetNiveauxLocalite } from '@/simadou/allHooks/admin/niveauLocaliteHooks'
 import { useGetLocalites } from '@/simadou/allHooks/admin/sharedHooks'
 import {
   buildCibleCmrGridKey,
+  buildCibleCmrGridRows,
   buildCibleCmrGridState,
   buildCiblePayloadFromGridCell,
-  filterCiblesForIndicateurCmrId,
-  getLocalitesNiveau1,
+  filterCiblesForZoneGrid,
+  getCibleCmrGridRowId,
   getProgrammeYearRange,
+  hasCibleCmrGridChanges,
+  isCibleCmrGridCellDirty,
   parseGridCellValue,
   type CibleCmrGridCell,
+  type CibleCmrGridRow,
 } from '@/simadou/lib/cibleCmrGridUtils'
 import { resolveFixedCodeIndicateurCrpFromCmr } from '@/simadou/allfonctionalities/projets/detail/cmrIndicators/cmrIndicateurFormUtils'
 
@@ -52,24 +60,25 @@ type Props = {
 
 export default function CibleCmrGridPanel({ indicateur, onClose }: Props) {
   const programme = useActiveProgramme()
+  const programmeCode = useActiveProgrammeCode()
   const { data: localites = [], isLoading: isLoadingLocalites } =
     useGetLocalites()
   const { data: niveaux = [], isLoading: isLoadingNiveaux } =
     useGetNiveauxLocalite()
   const { data: allCibles = [], isLoading: isLoadingCibles } =
-    useGetAllCiblesCmrProjet()
+    useGetAllCiblesCmr()
 
-  const createMutation = useCreateCibleCmrProjet(undefined)
-  const updateMutation = useUpdateCibleCmrProjet(undefined)
-  const deleteMutation = useDeleteCibleCmrProjet(undefined)
+  const createMutation = useCreateCibleCmr()
+  const updateMutation = useUpdateCibleCmr()
+  const deleteMutation = useDeleteCibleCmr()
 
-  const indicateurCrpId = useMemo(
+  const indicateurCmrId = useMemo(
     () => resolveFixedCodeIndicateurCrpFromCmr(indicateur),
     [indicateur]
   )
 
-  const zones = useMemo(
-    () => getLocalitesNiveau1(localites, niveaux),
+  const gridRows = useMemo(
+    () => buildCibleCmrGridRows(localites, niveaux),
     [localites, niveaux]
   )
 
@@ -79,23 +88,19 @@ export default function CibleCmrGridPanel({ indicateur, onClose }: Props) {
   )
 
   const filteredCibles = useMemo(
-    () => filterCiblesForIndicateurCmrId(allCibles, indicateurCrpId),
-    [allCibles, indicateurCrpId]
-  )
-
-  const zoneCodes = useMemo(
-    () => zones.map((zone) => zone.code_loca),
-    [zones]
+    () =>
+      filterCiblesForZoneGrid(allCibles, indicateurCmrId, programmeCode),
+    [allCibles, indicateurCmrId, programmeCode]
   )
 
   const initialGrid = useMemo(
     () =>
       buildCibleCmrGridState({
         cibles: filteredCibles,
-        zoneCodes,
+        gridRows,
         years,
       }),
-    [filteredCibles, zoneCodes, years]
+    [filteredCibles, gridRows, years]
   )
 
   const [grid, setGrid] = useState<Record<string, CibleCmrGridCell>>(initialGrid)
@@ -108,23 +113,23 @@ export default function CibleCmrGridPanel({ indicateur, onClose }: Props) {
 
   useEffect(() => {
     setPageIndex(0)
-  }, [zones.length, pageSize])
+  }, [gridRows.length, pageSize])
 
-  const totalPages = Math.max(1, Math.ceil(zones.length / pageSize))
+  const totalPages = Math.max(1, Math.ceil(gridRows.length / pageSize))
   const currentPage = Math.min(pageIndex + 1, totalPages)
   const safePageIndex = currentPage - 1
   const pageNumbers = getPageNumbers(currentPage, totalPages)
 
-  const paginatedZones = useMemo(() => {
+  const paginatedGridRows = useMemo(() => {
     const start = safePageIndex * pageSize
-    return zones.slice(start, start + pageSize)
-  }, [zones, safePageIndex, pageSize])
+    return gridRows.slice(start, start + pageSize)
+  }, [gridRows, safePageIndex, pageSize])
 
   const needsHorizontalScroll = years.length > YEAR_SCROLL_THRESHOLD
 
   const handleCellChange = useCallback(
-    (zoneCode: string, year: number, value: string) => {
-      const key = buildCibleCmrGridKey(zoneCode, year)
+    (row: CibleCmrGridRow, year: number, value: string) => {
+      const key = buildCibleCmrGridKey(getCibleCmrGridRowId(row), year)
       setGrid((prev) => ({
         ...prev,
         [key]: {
@@ -137,21 +142,32 @@ export default function CibleCmrGridPanel({ indicateur, onClose }: Props) {
   )
 
   const isLoading =
-    isLoadingLocalites || isLoadingNiveaux || isLoadingCibles
+    isLoadingLocalites ||
+    isLoadingNiveaux ||
+    isLoadingCibles
   const isSaving =
     createMutation.isPending ||
     updateMutation.isPending ||
     deleteMutation.isPending
 
   const handleSave = async () => {
-    const operations: Promise<CibleCmrProjet | void>[] = []
+    if (!hasCibleCmrGridChanges(grid, initialGrid)) {
+      toast.info('Aucune modification à enregistrer')
+      return
+    }
 
-    for (const zone of zones) {
+    const operations: Promise<CibleCmr | void>[] = []
+
+    for (const row of gridRows) {
+      const rowId = getCibleCmrGridRowId(row)
+
       for (const year of years) {
-        const key = buildCibleCmrGridKey(zone.code_loca, year)
+        const key = buildCibleCmrGridKey(rowId, year)
+        if (!isCibleCmrGridCellDirty(grid, initialGrid, key)) continue
+
         const cell = grid[key]
         const parsedValue = parseGridCellValue(cell?.value ?? '')
-        const existingId = cell?.cibleId
+        const existingId = cell?.cibleId ?? initialGrid[key]?.cibleId
 
         if (parsedValue == null) {
           if (existingId != null) {
@@ -161,10 +177,11 @@ export default function CibleCmrGridPanel({ indicateur, onClose }: Props) {
         }
 
         const payload = buildCiblePayloadFromGridCell({
-          zoneCode: zone.code_loca,
+          localiteId: row.localiteId,
           year,
           value: parsedValue,
-          indicateurCrpId,
+          indicateurCmrId,
+          programmeCode,
         })
 
         if (existingId != null) {
@@ -180,12 +197,22 @@ export default function CibleCmrGridPanel({ indicateur, onClose }: Props) {
       }
     }
 
+    if (operations.length === 0) {
+      toast.info('Aucune modification à enregistrer')
+      return
+    }
+
     try {
       await Promise.all(operations)
       toast.success('Cibles CMR enregistrées')
       onClose?.()
-    } catch {
-      toast.error('Erreur lors de l’enregistrement des cibles')
+    } catch (error) {
+      toast.error(
+        getApiErrorMessage(
+          error,
+          'Erreur lors de l’enregistrement des cibles'
+        )
+      )
     }
   }
 
@@ -215,10 +242,10 @@ export default function CibleCmrGridPanel({ indicateur, onClose }: Props) {
     )
   }
 
-  if (zones.length === 0) {
+  if (gridRows.length === 0) {
     return (
       <p className='py-10 text-center text-sm text-muted-foreground'>
-        Aucune localité de niveau 2 n&apos;est configurée.
+        Aucune zone (préfecture) n&apos;est configurée dans les localités.
       </p>
     )
   }
@@ -227,7 +254,7 @@ export default function CibleCmrGridPanel({ indicateur, onClose }: Props) {
     <div className='space-y-4'>
       <div className='flex justify-center'>
         <p className='w-full rounded-md border bg-primary/5 px-4 py-3 text-center text-sm font-medium text-primary'>
-          Valeurs cibles annuelles par zone (niveau 2)
+          Valeurs cibles annuelles par zone
         </p>
       </div>
 
@@ -291,8 +318,8 @@ export default function CibleCmrGridPanel({ indicateur, onClose }: Props) {
             </tr>
           </thead>
           <tbody>
-            {paginatedZones.map((zone) => (
-              <tr key={zone.id_loca} className='border-b last:border-b-0'>
+            {paginatedGridRows.map((row) => (
+              <tr key={row.rowId} className='border-b last:border-b-0'>
                 <td
                   className='sticky left-0 z-10 border-r bg-background px-2 py-1.5 align-middle font-medium'
                   style={
@@ -301,15 +328,12 @@ export default function CibleCmrGridPanel({ indicateur, onClose }: Props) {
                       : undefined
                   }
                 >
-                  <span
-                    className='block truncate'
-                    title={zone.intitule_loca}
-                  >
-                    {zone.intitule_loca}
+                  <span className='block truncate' title={row.label}>
+                    {row.label}
                   </span>
                 </td>
                 {years.map((year) => {
-                  const key = buildCibleCmrGridKey(zone.code_loca, year)
+                  const key = buildCibleCmrGridKey(getCibleCmrGridRowId(row), year)
                   const cell = grid[key]
                   return (
                     <td
@@ -328,10 +352,10 @@ export default function CibleCmrGridPanel({ indicateur, onClose }: Props) {
                         step={1}
                         value={cell?.value ?? ''}
                         onChange={(e) =>
-                          handleCellChange(zone.code_loca, year, e.target.value)
+                          handleCellChange(row, year, e.target.value)
                         }
                         className='h-7 w-full min-w-0 px-1 text-center text-xs tabular-nums'
-                        aria-label={`Cible ${zone.intitule_loca} ${year}`}
+                        aria-label={`Cible ${row.label} ${year}`}
                       />
                     </td>
                   )
@@ -367,7 +391,7 @@ export default function CibleCmrGridPanel({ indicateur, onClose }: Props) {
                     {size}
                   </SelectItem>
                 ))}
-                <SelectItem value={`${zones.length}`}>Tout</SelectItem>
+                <SelectItem value={`${gridRows.length}`}>Tout</SelectItem>
               </SelectContent>
             </Select>
             <p className='hidden text-sm font-medium sm:block'>

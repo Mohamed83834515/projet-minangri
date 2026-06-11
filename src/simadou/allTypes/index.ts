@@ -39,6 +39,7 @@ export * from "./typeZone";
 export * from "./uniteIndicateur";
 export * from "./versionPtba";
 export * from "./ugl";
+export * from "./cibleCmr";
 export * from "./cibleCmrProjet";
 export * from "./zoneCollecte";
 export * from "./niveauLocalite";
