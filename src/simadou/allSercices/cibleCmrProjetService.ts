@@ -10,25 +10,17 @@ export interface CibleCmrProjetFormData {
   code_projet?: string | null;
 }
 
-const BASE_URL = "/cible_cmr_projet/"
-
 export const cibleCmrProjetService = {
   async getAll(): Promise<CibleCmrProjet[]> {
-    const response = await apiClient.request<unknown>(BASE_URL);
+    const response = await apiClient.request<unknown>("/cible_cmr_projet/");
     const list = normalizeApiList<CibleCmrProjet>(response);
     return list.sort(
       (a, b) => new Date(a.annee).getTime() - new Date(b.annee).getTime(),
     );
   },
 
-  async getById(id_cible_indicateur_crp: number): Promise<CibleCmrProjet> {
-    return await apiClient.request<CibleCmrProjet>(
-      `${BASE_URL}${id_cible_indicateur_crp}/`,
-    );
-  },
-
   async create(data: CibleCmrProjetFormData): Promise<CibleCmrProjet> {
-    return await apiClient.request<CibleCmrProjet>(BASE_URL, {
+    return await apiClient.request<CibleCmrProjet>("/cible_cmr_projet/", {
       method: "POST",
       data,
     });
@@ -39,7 +31,7 @@ export const cibleCmrProjetService = {
     data: CibleCmrProjetFormData,
   ): Promise<CibleCmrProjet> {
     return await apiClient.request<CibleCmrProjet>(
-      `${BASE_URL}${id_cible_indicateur_crp}/`,
+      `/cible_cmr_projet/${id_cible_indicateur_crp}/`,
       {
         method: "PUT",
         data,
@@ -49,40 +41,10 @@ export const cibleCmrProjetService = {
 
   async delete(id_cible_indicateur_crp: number): Promise<void> {
     await apiClient.request<void>(
-      `${BASE_URL}${id_cible_indicateur_crp}/`,
+      `/cible_cmr_projet/${id_cible_indicateur_crp}/`,
       {
         method: "DELETE",
       },
     );
-  },
-
-  async search(query: string): Promise<CibleCmrProjet[]> {
-    const response = await apiClient.request<unknown>(
-      `${BASE_URL}search/?q=${encodeURIComponent(query)}`,
-    );
-    return normalizeApiList<CibleCmrProjet>(response);
-  },
-
-  async getByIndicateur(
-    code_indicateur_crp: number,
-  ): Promise<CibleCmrProjet[]> {
-    const response = await apiClient.request<unknown>(
-      `${BASE_URL}?code_indicateur_crp=${code_indicateur_crp}`,
-    );
-    return normalizeApiList<CibleCmrProjet>(response);
-  },
-
-  async getByProjet(code_projet: string): Promise<CibleCmrProjet[]> {
-    const response = await apiClient.request<unknown>(
-      `${BASE_URL}?code_projet=${encodeURIComponent(code_projet)}`,
-    );
-    return normalizeApiList<CibleCmrProjet>(response);
-  },
-
-  async getByAnnee(annee: string): Promise<CibleCmrProjet[]> {
-    const response = await apiClient.request<unknown>(
-      `${BASE_URL}?annee=${encodeURIComponent(annee)}`,
-    );
-    return normalizeApiList<CibleCmrProjet>(response);
   },
 };

@@ -1,87 +1,55 @@
-import { apiClient } from "@/axios/api";
-import type { CibleCmrProjet } from "../allTypes";
-import { normalizeApiList } from "./apiListUtils";
+import { apiClient } from '@/axios/api'
+import type { CibleCmr } from '../allTypes/cibleCmr'
+import { normalizeApiList } from './apiListUtils'
 
 export interface CibleCmrFormData {
-  annee: string;
-  valeur_cible_indcateur_cmr: number;
-  code_indicateur_cmr?: number | null;
-  localite?: string | null;
+  annee: number
+  valeur_cible_indcateur_cmr: number
+  code_indicateur_cmr: number
+  localite: number
+  programme?: string | null
 }
 
-const BASE_URL = "/cible_cmr/"
+const BASE_URL = '/cible_cmr/'
+
+function sortByAnnee(a: CibleCmr, b: CibleCmr): number {
+  return Number(a.annee) - Number(b.annee)
+}
 
 export const cibleCmrService = {
-  async getAll(): Promise<CibleCmrProjet[]> {
-    const response = await apiClient.request<unknown>(BASE_URL);
-    const list = normalizeApiList<CibleCmrProjet>(response);
-    return list.sort(
-      (a, b) => new Date(a.annee).getTime() - new Date(b.annee).getTime(),
-    );
+  async getAll(): Promise<CibleCmr[]> {
+    const response = await apiClient.request<unknown>(BASE_URL)
+    return normalizeApiList<CibleCmr>(response).sort(sortByAnnee)
   },
 
-  async getById(id_cible_indicateur_crp: number): Promise<CibleCmrProjet> {
-    return await apiClient.request<CibleCmrProjet>(
-      `${BASE_URL}${id_cible_indicateur_crp}/`,
-    );
+  async getById(id: number): Promise<CibleCmr> {
+    return await apiClient.request<CibleCmr>(`${BASE_URL}${id}/`)
   },
 
-  async create(data: CibleCmrFormData): Promise<CibleCmrProjet> {
-    return await apiClient.request<CibleCmrProjet>(BASE_URL, {
-      method: "POST",
+  async create(data: CibleCmrFormData): Promise<CibleCmr> {
+    return await apiClient.request<CibleCmr>(BASE_URL, {
+      method: 'POST',
       data,
-    });
+    })
   },
 
-  async update(
-    id_cible_indicateur_crp: number,
-    data: CibleCmrFormData,
-  ): Promise<CibleCmrProjet> {
-    return await apiClient.request<CibleCmrProjet>(
-      `${BASE_URL}${id_cible_indicateur_crp}/`,
-      {
-        method: "PUT",
-        data,
-      },
-    );
+  async update(id: number, data: CibleCmrFormData): Promise<CibleCmr> {
+    return await apiClient.request<CibleCmr>(`${BASE_URL}${id}/`, {
+      method: 'PUT',
+      data,
+    })
   },
 
-  async delete(id_cible_indicateur_crp: number): Promise<void> {
-    await apiClient.request<void>(
-      `${BASE_URL}${id_cible_indicateur_crp}/`,
-      {
-        method: "DELETE",
-      },
-    );
+  async delete(id: number): Promise<void> {
+    await apiClient.request<void>(`${BASE_URL}${id}/`, {
+      method: 'DELETE',
+    })
   },
 
-  async search(query: string): Promise<CibleCmrProjet[]> {
+  async getByIndicateur(code_indicateur_cmr: number): Promise<CibleCmr[]> {
     const response = await apiClient.request<unknown>(
-      `${BASE_URL}search/?q=${encodeURIComponent(query)}`,
-    );
-    return normalizeApiList<CibleCmrProjet>(response);
+      `${BASE_URL}?code_indicateur_cmr=${code_indicateur_cmr}`
+    )
+    return normalizeApiList<CibleCmr>(response).sort(sortByAnnee)
   },
-
-  async getByIndicateur(
-    code_indicateur_crp: number,
-  ): Promise<CibleCmrProjet[]> {
-    const response = await apiClient.request<unknown>(
-      `${BASE_URL}?code_indicateur_crp=${code_indicateur_crp}`,
-    );
-    return normalizeApiList<CibleCmrProjet>(response);
-  },
-
-  async getByProjet(code_projet: string): Promise<CibleCmrProjet[]> {
-    const response = await apiClient.request<unknown>(
-      `${BASE_URL}?code_projet=${encodeURIComponent(code_projet)}`,
-    );
-    return normalizeApiList<CibleCmrProjet>(response);
-  },
-
-  async getByAnnee(annee: string): Promise<CibleCmrProjet[]> {
-    const response = await apiClient.request<unknown>(
-      `${BASE_URL}?annee=${encodeURIComponent(annee)}`,
-    );
-    return normalizeApiList<CibleCmrProjet>(response);
-  },
-};
+}

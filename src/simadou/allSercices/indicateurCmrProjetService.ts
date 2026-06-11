@@ -1,105 +1,79 @@
-import { apiClient } from "@/axios/api";
-import type { IndicateurCmr, IndicateurCmrFormData } from "../allTypes";
-import { normalizeApiList } from "./apiListUtils";
+import { apiClient } from '@/axios/api'
+import type {
+  IndicateurCmrProjet,
+  IndicateurCmrProjetFormData,
+} from '../allTypes/indicateurCmrProjet'
+import { normalizeIndicateurCmrProjetFromApi } from '@/simadou/lib/indicateurCmrProjetUtils'
+import { normalizeApiList } from './apiListUtils'
 
-const BASE_URL = "/indicateur_cmr/"
-
-/** L'API Django expose `Resultat_cmr` ; le front utilise `resultat_cmr`. */
-function mapIndicateurCmrFromApi(raw: Record<string, unknown>): IndicateurCmr {
-  const resultat =
-    typeof raw.resultat_cmr === "string"
-      ? raw.resultat_cmr
-      : typeof raw.Resultat_cmr === "string"
-        ? raw.Resultat_cmr
-        : "";
-
-  return {
-    ...(raw as IndicateurCmr),
-    resultat_cmr: resultat as any,
-  };
-}
-
-function toIndicateurCmrApiPayload(
-  data: Partial<IndicateurCmrFormData>,
+function toIndicateurCmrProjetApiPayload(
+  data: Partial<IndicateurCmrProjetFormData>
 ): Record<string, unknown> {
-  const { resultat_cmr, ...rest } = data;
+  const { resultat_cmr, referentiel_cmr, code_projet, ...rest } = data
   return {
     ...rest,
-    ...(resultat_cmr !== undefined ? { Resultat_cmr: resultat_cmr } : {}),
-  };
+    ...(resultat_cmr !== undefined ? { resultat_cmr } : {}),
+    ...(referentiel_cmr !== undefined
+      ? { referentiel_cmr: referentiel_cmr ?? null }
+      : {}),
+    ...(code_projet !== undefined ? { code_projet: code_projet ?? null } : {}),
+  }
 }
 
 export const indicateurCmrProjetService = {
-  getAll: async (): Promise<IndicateurCmr[]> => {
-    const response = await apiClient.request<unknown>(BASE_URL);
+  getAll: async (): Promise<IndicateurCmrProjet[]> => {
+    const response = await apiClient.request<unknown>('/indicateur_cmr_projet/')
     return normalizeApiList<Record<string, unknown>>(response).map(
-      mapIndicateurCmrFromApi,
-    );
+      normalizeIndicateurCmrProjetFromApi
+    )
   },
 
-  getById: async (id: number): Promise<IndicateurCmr> => {
-    const response = await apiClient.request<Record<string, unknown>>(
-      `${BASE_URL}${id}/`,
-    );
-    return mapIndicateurCmrFromApi(response);
-  },
-
-  getByResultat: async (resultatId: number): Promise<IndicateurCmr[]> => {
+  getByProjet: async (codeProjet: string): Promise<IndicateurCmrProjet[]> => {
     const response = await apiClient.request<unknown>(
-      `${BASE_URL}?resultat_cmr=${resultatId}`,
-    );
+      `/indicateur_cmr_projet/?code_projet=${encodeURIComponent(codeProjet)}`
+    )
     return normalizeApiList<Record<string, unknown>>(response).map(
-      mapIndicateurCmrFromApi,
-    );
+      normalizeIndicateurCmrProjetFromApi
+    )
   },
 
-  getByResponsable: async (responsable: string): Promise<IndicateurCmr[]> => {
-    const response = await apiClient.request<unknown>(
-      `${BASE_URL}?responsable_collecte_cmr=${encodeURIComponent(responsable)}`,
-    );
-    return normalizeApiList<Record<string, unknown>>(response).map(
-      mapIndicateurCmrFromApi,
-    );
-  },
-
-  create: async (data: IndicateurCmrFormData): Promise<IndicateurCmr> => {
+  getById: async (id: number): Promise<IndicateurCmrProjet> => {
     const response = await apiClient.request<Record<string, unknown>>(
-      BASE_URL,
+      `/indicateur_cmr_projet/${id}/`
+    )
+    return normalizeIndicateurCmrProjetFromApi(response)
+  },
+
+  create: async (
+    data: IndicateurCmrProjetFormData
+  ): Promise<IndicateurCmrProjet> => {
+    const response = await apiClient.request<Record<string, unknown>>(
+      '/indicateur_cmr_projet/',
       {
-        method: "POST",
-        data: toIndicateurCmrApiPayload(data),
-      },
-    );
-    return mapIndicateurCmrFromApi(response);
+        method: 'POST',
+        data: toIndicateurCmrProjetApiPayload(data),
+      }
+    )
+    return normalizeIndicateurCmrProjetFromApi(response)
   },
 
   update: async (
     id: number,
-    data: Partial<IndicateurCmrFormData>,
-  ): Promise<IndicateurCmr> => {
+    data: Partial<IndicateurCmrProjetFormData>
+  ): Promise<IndicateurCmrProjet> => {
     const response = await apiClient.request<Record<string, unknown>>(
-      `${BASE_URL}${id}/`,
+      `/indicateur_cmr_projet/${id}/`,
       {
-        method: "PUT",
-        data: toIndicateurCmrApiPayload(data),
-      },
-    );
-    return mapIndicateurCmrFromApi(response);
+        method: 'PUT',
+        data: toIndicateurCmrProjetApiPayload(data),
+      }
+    )
+    return normalizeIndicateurCmrProjetFromApi(response)
   },
 
   delete: async (id: number): Promise<void> => {
-    await apiClient.request<IndicateurCmr>(`${BASE_URL}${id}/`, {
-      method: "DELETE",
-    });
+    await apiClient.request<void>(`/indicateur_cmr_projet/${id}/`, {
+      method: 'DELETE',
+    })
   },
-
-  toggleStatus: async (id: number): Promise<IndicateurCmr> => {
-    const response = await apiClient.request<Record<string, unknown>>(
-      `${BASE_URL}${id}/toggle_status/`,
-      {
-        method: "PATCH",
-      },
-    );
-    return mapIndicateurCmrFromApi(response);
-  },
-};
+}
