@@ -11,7 +11,6 @@ import DecaissementCharts from "./DecaissementCharts";
 import RecapitulatifTable from "./RecapitulatifTable";
 import { useActiveProgrammeCode, useActiveProgrammeId } from "@/hooks/use-active-programme";
 import { projetService } from "@/simadou/allSercices/projetService";
-import { useQuery } from "@tanstack/react-query";
 // import { projetService } from "@/simadou/allSercices/projetService";
 // import tacheActivitePtbaService from "@/simadou/allSercices/tacheActivitePtbaService";
 // import ptbaService from "@/simadou/allSercices/ptbaService";
