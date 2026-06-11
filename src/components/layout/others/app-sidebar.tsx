@@ -13,13 +13,13 @@ import { TeamSwitcher } from './team-switcher'
 import { useLayout } from '@/stores/others/layout-store'
 import { CHART_COLORS, useColor } from '@/stores/others/color-store'
 import { useMe } from '@/simadou/allHooks/auth/authHooks'
-
+import simadouLogo from '@/assets/images/SimandouImg.png'
 export function AppSidebar() {
   const { collapsible, variant } = useLayout()
   const { color } = useColor()                     
   const { stroke } = CHART_COLORS[color]  
   const {data : user} = useMe()  
-    console.log("user",user)
+    // console.log("user",user)
 
   return (
     <Sidebar
@@ -33,7 +33,17 @@ export function AppSidebar() {
       } as React.CSSProperties}
     >
       <SidebarHeader>
-        <TeamSwitcher teams={sidebarData.teams} />
+     <div className='flex items-start gap-4'>
+        <div className='flex aspect-square size-8 items-center justify-center rounded-lg  text-sidebar-primary-foreground'>
+                <img src={simadouLogo} className='size-4' />
+              </div>
+              <div className='grid flex-1 text-start text-sm leading-tight'>
+                <span className='truncate font-semibold'>
+                  SIMANDOU
+                </span>
+                <span className='truncate text-xs'>Agriculture</span>
+              </div>
+     </div>
       </SidebarHeader>
       <SidebarContent>
         {sidebarData.navGroups.map((props) => (

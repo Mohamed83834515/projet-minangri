@@ -19,7 +19,7 @@ export const getZoneCollecteFormConfig = (): FormConfig => ({
             type: "text",
             placeholder: "Nom de la zone de collecte",
             required: true,
-            gridCols: 1,
+            gridCols: 2,
         },
         {
             name: "shape_file",

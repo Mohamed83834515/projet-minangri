@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/axios/api'
 
 import type { Acteur, Localite, Personnel, TitrePersonnel } from '@/simadou/allTypes'
-import { PersonnelCreateData, UpdateProfilePictureInput } from '@/simadou/schemas/personnelSchema'
+import { PersonnelCreateData } from '@/simadou/schemas/personnelSchema'
 import { personnelService } from '@/simadou/allSercices/personnelService'
 import { fonctionService } from '@/simadou/allSercices/fonctionService'
 import { planSiteService } from '@/simadou/allSercices/planSiteService'
@@ -167,6 +167,18 @@ export const useUpdateProfilePicture = (n_personel: number) => {
 
   return useMutation({
     mutationFn: (file: File) => personnelService.updateProfilePicture(n_personel, file),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['me'] })
+    },
+  })
+}
+
+
+export const useDeleteProfilPicture = (n_personel : number)=> {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: () => personnelService.deleteProfilePicture(n_personel),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['me'] })
     },

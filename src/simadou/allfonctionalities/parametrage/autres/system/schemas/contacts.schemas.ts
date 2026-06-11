@@ -1,14 +1,9 @@
 import { z } from 'zod'
-import { getFieldSchema } from '@/simadou/schemas/generalParams.schema'
 
 export const contactsSchema = z.object({
-  contactEmail:      getFieldSchema('email'),
-  contactPhone:      getFieldSchema('tel'),
-  address:           getFieldSchema('text'),
-  website:           getFieldSchema('url'),
-  structureEmail:    getFieldSchema('email'),
-  structurePhone:    getFieldSchema('tel'),
-  structureWhatsapp: getFieldSchema('tel'),
+  structureEmail:    z.string().email('Email invalide').nullable().optional(),
+  structurePhone:    z.string().nullable().optional(),
+  structureWhatsapp: z.string().nullable().optional(),
 })
 
 export type ContactsInput = z.infer<typeof contactsSchema>

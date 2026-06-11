@@ -15,7 +15,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { useResetLinkMutation } from '@/simadou/allHooks/auth/authHooks'
 import { useState } from 'react'
-
+import { useGeneralParamsQuery } from '@/simadou/allHooks/generalParams/queries'
 
 
 const formSchema = z.object({
@@ -32,7 +32,7 @@ export function ForgotPasswordForm({mode } : {mode : "reset" | "setup"}) {
 
   const [isSubmitted, setIsSubmitted] = useState(false)
 const [submittedEmail, setSubmittedEmail] = useState('')
-
+const { data : config} = useGeneralParamsQuery()
   
 
  
@@ -96,8 +96,8 @@ const handleResend = () => {
       <div className="flex items-center gap-2.5 border-b border-zinc-200 px-3.5 py-2.5
                       dark:border-zinc-800">
         <Inbox className="size-3.5 shrink-0 text-zinc-400" aria-hidden />
-        {/* TODO : Config email */}
-        <span className="text-xs text-zinc-400">simandoumail.com</span>  
+       
+        <span className="text-xs text-zinc-400">{config?.structureEmail ?? 'simandou@gmail.com'}</span>  
       </div>
       <div className="flex items-center gap-2.5 px-3.5 py-2.5">
         <Clock className="size-3.5 shrink-0 text-zinc-400" aria-hidden />

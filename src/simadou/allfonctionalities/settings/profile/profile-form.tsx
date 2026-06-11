@@ -4,6 +4,7 @@ import { useState } from 'react'
 import EditFieldDialog from './EditFieldDialog'
 import { useMe } from '@/simadou/allHooks/auth/authHooks'
 import { formatDate } from '@/lib/utils'
+import { useGeneralParamsQuery } from '@/simadou/allHooks/generalParams/queries'
 
 export type EditableField =
   | "title"
@@ -18,6 +19,17 @@ export function ProfileForm() {
 
   const {data : personnel} = useMe()
   const [openedDialog, setOpenedDialog] = useState<EditableField | null>(null)
+  const {data : config} = useGeneralParamsQuery()
+  const lastModified = new Date(personnel!.password_last_modified);
+
+const canChangePassword = config?.passwordChangeDelayMonths
+  ? new Date(
+      lastModified.getFullYear(),
+      lastModified.getMonth() + config.passwordChangeDelayMonths,
+      lastModified.getDate()
+    ) <= new Date()
+  : true;
+
 
   const details : {key:string,label : string, icon : LucideIcon, value : string, isEditable : boolean}[] = [
     {
@@ -65,7 +77,7 @@ export function ProfileForm() {
 
     {
       label: "Service",
-      value: `${personnel?.service_perso?.intutile_ds} (${personnel?.service_perso?.code_ds})` ||
+      value: personnel?.service_perso !== null ?  `${personnel?.service_perso }` :
         "Non renseigné",
       icon: Building2,
        isEditable : false,
@@ -91,19 +103,16 @@ export function ProfileForm() {
     },
 
     {
-      label: "Mot de passe",
-      value: `Dernière modification le ${formatDate(new Date(personnel!.password_last_modified))}`,
-      icon:KeyRound,
-       isEditable : true,
-        key :"password"
-    },
+  label: "Mot de passe",
+  value: `Dernière modification le ${formatDate(lastModified)}`,
+  icon: KeyRound,
+  isEditable: canChangePassword,
+  key: "password",
+}
 
   ];
 
-  // const { fields, append } = useFieldArray({
-  //   name: 'urls',
-  //   control: form.control,
-  // })
+  
 
   return (
        <div className="rounded-3xl border bg-card shadow-sm overflow-hidden">

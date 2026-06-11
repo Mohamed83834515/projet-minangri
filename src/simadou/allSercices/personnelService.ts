@@ -127,7 +127,7 @@ export const personnelService = {
       throw error;
     }
   },
-
+  //  Update profile picture
   async updateProfilePicture(n_personnel : number, file : File) : Promise<UpdateProfilePictureResponse>{
     try {
       const formData = new FormData()
@@ -140,8 +140,23 @@ export const personnelService = {
     })
     return  res
     } catch (error) {
-      toast.error("Erreur lors de la désactivation du personnel");
+      toast.error("Erreur lors de la modification de la photo de profile");
       throw error;
+    }
+  },
+
+
+  // Delete profile picture
+  async deleteProfilePicture (n_personel : number) : Promise<void> {
+    try {
+        await apiClient.request<void>(`/personnels/${n_personel}/profile-picture/`, {
+          method : 'DELETE'
+        })
+        toast.success("Photo de profile supprimée");
+    } catch (error) {
+      toast.error("Erreur lors de la suppression de la photo de profile");
+      throw new Error
+      
     }
   }
 

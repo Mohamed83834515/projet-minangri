@@ -1,13 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { localiteService } from '@/simadou/allSercices/localiteService';
-<<<<<<< HEAD
-import { niveauLocaliteService } from '@/simadou/allSercices/niveauLocaliteService';
-import { toast } from 'sonner';
-import { Localite, NiveauLocalite } from '@/simadou/allTypes';
-=======
 import { toast } from 'sonner';
 import { Localite } from '@/simadou/allTypes';
->>>>>>> develop
 
 // Gardez votre hook existant pour les composants React
 export const useGetLocalites = () => {

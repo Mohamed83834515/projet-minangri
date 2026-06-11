@@ -1,10 +1,9 @@
 import { z } from 'zod'
-import { getFieldSchema } from '@/simadou/schemas/generalParams.schema'
 
 export const financeSchema = z.object({
-  currencyCode: getFieldSchema('text'),
-  baseCurrency: getFieldSchema('text'),
-  exchangeRate: getFieldSchema('number'),
+  currencyCode: z.string().optional(),
+  baseCurrency: z.string().optional(),
+  exchangeRate: z.coerce.number().min(0).optional(),
 })
 
 export type FinanceInput = z.infer<typeof financeSchema>

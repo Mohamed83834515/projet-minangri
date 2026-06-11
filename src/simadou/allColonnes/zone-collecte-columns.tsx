@@ -1,17 +1,10 @@
 // simadou/allColonnes/zoneCollecte-columns.tsx
 import { GenericRowActions } from "@/Global/Tableaux/GenericRowActions"
-<<<<<<< HEAD
-import { UserPen, Trash2 } from "lucide-react"
-import { ZoneCollecte } from "../allTypes"
-import { DataTableColumnHeader } from "@/components/data-table/column-header"
-import { ColumnDef } from "@tanstack/react-table"
-=======
 import { UserPen, Trash2, Download } from "lucide-react"
 import { ZoneCollecte } from "../allTypes"
 import { DataTableColumnHeader } from "@/components/data-table/column-header"
 import { ColumnDef } from "@tanstack/react-table"
 import { Button } from "@/components/ui/button"
->>>>>>> develop
 
 type ZoneCollecteDialogType = 'add' | 'edit' | 'delete'
 
@@ -51,8 +44,6 @@ export const buildZoneCollecteColumns = (
             ),
         },
         {
-<<<<<<< HEAD
-=======
             id: 'shape_file',
             accessorKey: 'shape_file',
             header: ({ column }) => (
@@ -91,7 +82,6 @@ export const buildZoneCollecteColumns = (
             },
         },
         {
->>>>>>> develop
             id: 'actions',
             header: ({ column }) => (
                 <DataTableColumnHeader column={column} title='Actions' />

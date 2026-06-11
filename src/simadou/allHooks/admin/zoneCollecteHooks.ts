@@ -16,26 +16,16 @@ export const useGetZonesCollecte = () => {
   })
 }
 
-<<<<<<< HEAD
-=======
 // simadou/allHooks/admin/zoneCollecteHooks.ts
 
->>>>>>> develop
 export const useSaveZoneCollecte = (isEdit: boolean, currentRow?: any, onSuccess?: () => void) => {
   const queryClient = useQueryClient()
 
   return useMutation({
-<<<<<<< HEAD
-    mutationFn: (data: ZoneCollecte) =>
-      isEdit && currentRow?.id_zone_collecte
-        ? zoneCollecteService.update(data)
-        : zoneCollecteService.create(data),
-=======
     mutationFn: ({ data, file }: { data: ZoneCollecte; file?: File }) =>
       isEdit && currentRow?.id_zone_collecte
         ? zoneCollecteService.update(currentRow.id_zone_collecte, data, file)
         : zoneCollecteService.create(data, file),
->>>>>>> develop
 
     onSuccess: async () => {
       await queryClient.invalidateQueries({
