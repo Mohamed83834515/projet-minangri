@@ -43,9 +43,7 @@ type CoutUnitaireRow = {
   unite_cu: string
   intitule_tache: string
   ordre: number
-  annee: number
   id_personnel: number
-  etat: boolean
   isNew: boolean
 }
 
@@ -62,9 +60,7 @@ function toRow(item: CoutUnitairePtba): CoutUnitaireRow {
     unite_cu: item.unite_cu ?? '',
     intitule_tache: item.intitule_tache ?? '',
     ordre: Number(item.ordre) || 0,
-    annee: Number(item.annee) || new Date().getFullYear(),
     id_personnel: personnelId,
-    etat: item.etat ?? true,
     isNew: false,
   }
 }
@@ -76,9 +72,7 @@ function createEmptyRow(defaultPersonnelId?: number): CoutUnitaireRow {
     unite_cu: '',
     intitule_tache: '',
     ordre: 0,
-    annee: new Date().getFullYear(),
     id_personnel: defaultPersonnelId ?? 0,
-    etat: true,
     isNew: true,
   }
 }
@@ -119,7 +113,6 @@ export default function CoutUnitairePtbaManager({
     isFetching,
     refetch,
   } = useGetCoutsUnitairesByActivite(idActivite)
-  const { data: personnels = [] } = useGetPersonnels()
   const createMutation = useCreateCoutUnitairePtba(idActivite)
   const updateMutation = useUpdateCoutUnitairePtba(idActivite)
   const deleteMutation = useDeleteCoutUnitairePtba(idActivite)
@@ -127,7 +120,6 @@ export default function CoutUnitairePtbaManager({
   const [rows, setRows] = useState<CoutUnitaireRow[]>([])
   const [initialized, setInitialized] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
-
   useEffect(() => {
     if (initialized || isLoading || isFetching) return
     setRows(syncRowsFromItems(coutsUnitaires, modifierPar))
@@ -221,9 +213,7 @@ export default function CoutUnitairePtbaManager({
             unite_cu: row.unite_cu,
             intitule_tache: row.intitule_tache,
             ordre: row.ordre,
-            annee: row.annee,
-            id_personnel: row.id_personnel,
-            etat: row.etat,
+            id_personnel: user?.n_personnel || 0,
           },
           idActivite,
           modifierPar
@@ -278,20 +268,28 @@ export default function CoutUnitairePtbaManager({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className='min-w-48'>Intitulé tâche</TableHead>
-              <TableHead className='min-w-28'>Prix unitaire</TableHead>
-              <TableHead className='min-w-28'>Quantité</TableHead>
-              <TableHead className='min-w-24'>Unité</TableHead>
               <TableHead className='w-20'>Ordre</TableHead>
-              <TableHead className='w-24'>Année</TableHead>
-              <TableHead className='min-w-40'>Personnel</TableHead>
-              <TableHead className='w-16 text-center'>État</TableHead>
+              <TableHead className='min-w-48'>Intitulé tâche</TableHead>
+              <TableHead className='min-w-24'>Unité</TableHead>
+              <TableHead className='min-w-28'>Quantité</TableHead>
+              <TableHead className='min-w-28'>Prix unitaire</TableHead>
               <TableHead className='w-16 text-end'>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {rows.map((row, index) => (
               <TableRow key={row.id ?? `new-${index}`}>
+                <TableCell className='align-top'>
+                  <Input
+                    type='number'
+                    value={row.ordre}
+                    onChange={(e) =>
+                      updateRow(index, {
+                        ordre: Number(e.target.value) || 0,
+                      })
+                    }
+                  />
+                </TableCell>
                 <TableCell className='align-top'>
                   <Input
                     placeholder='Intitulé'
@@ -303,12 +301,10 @@ export default function CoutUnitairePtbaManager({
                 </TableCell>
                 <TableCell className='align-top'>
                   <Input
-                    type='text'
-                    inputMode='decimal'
-                    placeholder='0'
-                    value={row.prix_unitaire}
+                    placeholder='Unité'
+                    value={row.unite_cu}
                     onChange={(e) =>
-                      updateRow(index, { prix_unitaire: e.target.value })
+                      updateRow(index, { unite_cu: e.target.value })
                     }
                   />
                 </TableCell>
@@ -325,67 +321,14 @@ export default function CoutUnitairePtbaManager({
                 </TableCell>
                 <TableCell className='align-top'>
                   <Input
-                    placeholder='Unité'
-                    value={row.unite_cu}
+                    type='text'
+                    inputMode='decimal'
+                    placeholder='0'
+                    value={row.prix_unitaire}
                     onChange={(e) =>
-                      updateRow(index, { unite_cu: e.target.value })
+                      updateRow(index, { prix_unitaire: e.target.value })
                     }
                   />
-                </TableCell>
-                <TableCell className='align-top'>
-                  <Input
-                    type='number'
-                    value={row.ordre}
-                    onChange={(e) =>
-                      updateRow(index, {
-                        ordre: Number(e.target.value) || 0,
-                      })
-                    }
-                  />
-                </TableCell>
-                <TableCell className='align-top'>
-                  <Input
-                    type='number'
-                    value={row.annee}
-                    onChange={(e) =>
-                      updateRow(index, {
-                        annee: Number(e.target.value) || new Date().getFullYear(),
-                      })
-                    }
-                  />
-                </TableCell>
-                <TableCell className='align-top'>
-                  <Select
-                    value={row.id_personnel ? String(row.id_personnel) : undefined}
-                    onValueChange={(value) =>
-                      updateRow(index, { id_personnel: Number(value) })
-                    }
-                  >
-                    <SelectTrigger className='w-full'>
-                      <SelectValue placeholder='Personnel' />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {personnels.map((p) => (
-                        <SelectItem
-                          key={p.n_personnel}
-                          value={String(p.n_personnel)}
-                        >
-                          {`${p.prenom_perso ?? ''} ${p.nom_perso ?? ''}`.trim() ||
-                            `Personnel ${p.n_personnel}`}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </TableCell>
-                <TableCell className='align-middle'>
-                  <div className='flex justify-center'>
-                    <Switch
-                      checked={row.etat}
-                      onCheckedChange={(checked) =>
-                        updateRow(index, { etat: checked })
-                      }
-                    />
-                  </div>
                 </TableCell>
                 <TableCell className='text-end align-top'>
                   <Button
