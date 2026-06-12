@@ -106,20 +106,20 @@ export const ptbaSchema = z.object({
     .min(1, "Le statut est requis")
     .max(100, "Le statut ne peut pas dépasser 100 caractères"),
   code_crp: z
-    .string()
-    .max(50, "Le code CRP ne peut pas dépasser 50 caractères")
+    .number()
+    .positive("Le cadre stratégique doit être sélectionné")
     .optional(),
   cadre_analytique: z
-    .string()
-    .max(50, "Le code cadre analytique ne peut pas dépasser 50 caractères")
+    .number()
+    .positive("Le cadre analytique doit être sélectionné")
     .optional(),
   responsable_ptba: z
     .number()
     .positive("Le responsable doit être sélectionné")
     .optional(),
-  direction_ptba: z
+  ugl_ptba: z
     .string()
-    .max(50, "Le code direction ne peut pas dépasser 50 caractères")
+    .max(50, "Le code unité de gestion ne peut pas dépasser 50 caractères")
     .optional(),
   code_programme: z
     .string()

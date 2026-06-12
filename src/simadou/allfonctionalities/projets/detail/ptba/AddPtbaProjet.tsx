@@ -14,8 +14,8 @@ import {
   resolveActiviteProjetId,
 } from '@/simadou/allfieldsConfig/ptbaProjetForm'
 import type { ActiviteProjet, Projet } from '@/simadou/allTypes'
+import { resolveProgrammeProjetId } from '@/simadou/allTypes/projet'
 import type { PtbaProjet } from '@/simadou/allTypes/ptbaProjet'
-import { CadreAnalytique } from '@/simadou/allTypes/cadreAnalytique'
 import { Localite } from '@/simadou/allTypes/localite'
 import type { Acteur } from '@/simadou/allTypes/acteur'
 import {
@@ -23,6 +23,26 @@ import {
   type PtbaProjetFormData,
 } from '@/simadou/schemas/ptbaProjetSchemas'
 import { useGetActivitesProjet } from '@/simadou/allHooks/admin/activiteProjetHooks'
+import {
+  useGetCadresAnalytique,
+  useGetNiveauxCadreAnalytique,
+} from '@/simadou/allHooks/admin/cadreAnalytiqueHooks'
+import {
+  buildCadreAnalytiqueSelectOptions,
+  filterNiveauxByProgramme,
+  getPtbaCadreAnalytiqueNiveauCode,
+  sortNiveauxCadreAnalytique,
+} from '@/simadou/lib/cadreAnalytiqueUtils'
+import {
+  resolveCadreAnalytiqueFormValue,
+  resolveCodeCrpFormValue,
+  resolveResponsablePtbaFormValue,
+  resolveUglPtbaFormValue,
+} from '@/simadou/lib/ptbaFormUtils'
+import {
+  useActiveProgrammeCode,
+  useActiveProgrammeId,
+} from '@/hooks/use-active-programme'
 import {
   useCreatePtbaProjet,
   useUpdatePtbaProjet,
@@ -43,7 +63,34 @@ export default function AddPtbaProjet({
 }: AddPtbaProjetProps) {
   const codeProjet = projet.code_projet
   const isEdit = !!currentRow?.id_ptba
+  const activeProgrammeId = useActiveProgrammeId()
+  const activeProgrammeCode = useActiveProgrammeCode()
+  const programmeId =
+    resolveProgrammeProjetId(projet.programme_projet) ?? activeProgrammeId
+  const codeProgramme =
+    typeof projet.programme_projet === 'object' &&
+    projet.programme_projet?.code_programme
+      ? projet.programme_projet.code_programme
+      : activeProgrammeCode
   const { data: activites = [] } = useGetActivitesProjet(codeProjet)
+  const { data: cadresAnalytique = [] } = useGetCadresAnalytique(programmeId)
+  const { data: niveaux = [] } = useGetNiveauxCadreAnalytique()
+
+  const ptbaNiveauCode = useMemo(() => {
+    const sortedNiveaux = sortNiveauxCadreAnalytique(
+      filterNiveauxByProgramme(niveaux, codeProgramme, programmeId)
+    )
+    return getPtbaCadreAnalytiqueNiveauCode(sortedNiveaux)
+  }, [niveaux, codeProgramme, programmeId])
+
+  const selectedCadreId = useMemo(
+    () =>
+      resolveCadreAnalytiqueFormValue(
+        currentRow?.cadre_analytique,
+        cadresAnalytique
+      ),
+    [currentRow?.cadre_analytique, cadresAnalytique]
+  )
 
   const activiteOptions = useMemo((): SelectOption[] =>
     activites.map((activite: ActiviteProjet) => ({
@@ -53,9 +100,18 @@ export default function AddPtbaProjet({
     [activites]
   )
 
+  const cadreAnalytiqueOptions = useMemo(
+    () =>
+      buildCadreAnalytiqueSelectOptions(cadresAnalytique, {
+        niveauCodeNumber: ptbaNiveauCode,
+        includeCadreIds: selectedCadreId ? [selectedCadreId] : [],
+      }),
+    [cadresAnalytique, ptbaNiveauCode, selectedCadreId]
+  )
+
   const formConfig = useMemo(
-    () => getPtbaProjetFormConfig(activiteOptions),
-    [activiteOptions]
+    () => getPtbaProjetFormConfig(activiteOptions, cadreAnalytiqueOptions),
+    [activiteOptions, cadreAnalytiqueOptions]
   )
 
   const defaultValues = useMemo((): PtbaProjetFormData => {
@@ -76,27 +132,17 @@ export default function AddPtbaProjet({
       intitule_activite_ptba: currentRow?.intitule_activite_ptba || '',
       chronogramme: currentRow?.chronogramme || '',
       observation: currentRow?.observation || '',
-      code_crp: currentRow?.code_crp || '',
-      cadre_analytique:
-        (currentRow?.cadre_analytique as CadreAnalytique)?.code_ca || '',
-      responsable_ptba:
-        typeof currentRow?.responsable_ptba === 'number'
-          ? currentRow.responsable_ptba
-          : typeof currentRow?.responsable_ptba === 'object' &&
-              currentRow.responsable_ptba
-            ? (currentRow.responsable_ptba as { n_personnel?: number })
-                .n_personnel
-            : undefined,
-      ugl_ptba:
-        typeof currentRow?.ugl_ptba === 'object' && currentRow.ugl_ptba
-          ? String((currentRow.ugl_ptba as { code_ugl?: string }).code_ugl ?? '')
-          : typeof currentRow?.ugl_ptba === 'string'
-            ? currentRow.ugl_ptba
-            : '',
+      code_crp: resolveCodeCrpFormValue(currentRow?.code_crp),
+      cadre_analytique: resolveCadreAnalytiqueFormValue(
+        currentRow?.cadre_analytique,
+        cadresAnalytique
+      ),
+      responsable_ptba: resolveResponsablePtbaFormValue(currentRow ?? undefined),
+      ugl_ptba: resolveUglPtbaFormValue(currentRow ?? undefined),
       code_projet: codeProjet,
       statut_activite: currentRow?.statut_activite || 'Planifiée',
     }
-  }, [currentRow, codeProjet])
+  }, [currentRow, codeProjet, cadresAnalytique])
 
   const createMutation = useCreatePtbaProjet(codeProjet)
   const updateMutation = useUpdatePtbaProjet(codeProjet)
@@ -105,8 +151,6 @@ export default function AddPtbaProjet({
     const payload: PtbaProjetFormData = {
       ...data,
       code_projet: codeProjet,
-      code_crp: data.code_crp?.trim() || undefined,
-      cadre_analytique: data.cadre_analytique?.trim() || undefined,
       observation: data.observation?.trim() || undefined,
       ugl_ptba: data.ugl_ptba?.trim() || undefined,
     }

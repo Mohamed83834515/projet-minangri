@@ -1,6 +1,5 @@
 import type { FormConfig, SelectOption } from '../../Global/types/formConfig'
 import { getActeurs } from '../allHooks/admin/acteurHooks'
-import { getCadreAnalytique } from '../allHooks/admin/cadreAnalytiqueHooks'
 import { getCadreStrategiques } from '../allHooks/admin/cadreStrategiqueHooks'
 import { getLocalites } from '../allHooks/admin/localiteHooks'
 import { getPersonnels } from '../allHooks/admin/personnelHooks'
@@ -21,23 +20,15 @@ const chronogrammeOptions = [
   { label: 'Déc', value: 'Déc' },
 ]
 
-const cadre_analytiques = await getCadreAnalytique()
 const localites = await getLocalites()
 const acteurs = await getActeurs()
 const personnels = await getPersonnels()
 const cadre_strategiques = await getCadreStrategiques()
 const ugls = await getUgls()
 
-const cadre_analytiquesOptions = cadre_analytiques
-  // .filter((item: any) => item.niveau_cadre === 2) // Filtrer pour n'avoir que les cadres de niveau 2
-  ?.map((item: any) => ({
-    label: item.intutile_ca,
-    value: item.id_nca as string,
-  })) || [];
-
 const cadreStrategiqueOptions = cadre_strategiques.map((cadre) => ({
-  value: String(cadre.id_cs),
-  label: cadre.intutile_cs,
+  value: cadre.id_cs,
+  label: `${cadre.code_cs} - ${cadre.intutile_cs}`,
 }));
 
 
@@ -72,7 +63,8 @@ const uglOptions = ugls.map((ugl) => ({
 }))
 
 export function getPtbaProjetFormConfig(
-  activiteProjetOptions: SelectOption[]
+  activiteProjetOptions: SelectOption[],
+  cadreAnalytiqueOptions: SelectOption[] = []
 ): FormConfig {
   return {
     steps: [
@@ -115,7 +107,7 @@ export function getPtbaProjetFormConfig(
         type: 'select',
         placeholder: 'Sélectionner un cadre analytique (optionnel)',
         required: true,
-        options: cadre_analytiquesOptions,
+        options: cadreAnalytiqueOptions,
         gridCols: 1,
         formStep: 1,
       },
