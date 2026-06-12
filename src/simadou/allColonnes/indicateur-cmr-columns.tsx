@@ -1,5 +1,4 @@
 import { type ColumnDef } from '@tanstack/react-table'
-import { ClipboardList } from 'lucide-react'
 import { DataTableColumnHeader } from '@/components/data-table'
 import { LongText } from '@/components/others/long-text'
 import { Button } from '@/components/ui/button'
