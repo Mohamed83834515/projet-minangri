@@ -7,9 +7,7 @@ export type CoutUnitairePtbaApiPayload = {
   unite_cu: string
   intitule_tache: string
   ordre: number
-  annee: number
   id_personnel: number
-  etat: boolean
   modifier_le: string
   modifier_par: number
   ptba_activite: number
@@ -37,9 +35,7 @@ export function buildCoutUnitairePtbaPayload(
     unite_cu: string
     intitule_tache: string
     ordre: number
-    annee: number
     id_personnel: number
-    etat: boolean
   },
   idActivite: number,
   modifierPar: number
