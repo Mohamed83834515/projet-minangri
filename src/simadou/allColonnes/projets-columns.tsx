@@ -65,15 +65,30 @@ export function buildProjetsColumns(
       enableHiding: false,
     },
     {
-      id: 'partenaire_projet',
+      id: 'partenaires_execution',
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Partenaire' />
+        <DataTableColumnHeader column={column} title="Partenaires d'exécution" />
       ),
-      cell: ({ row }) => (
-        <span className='text-muted-foreground'>
-          {row.original.partenaire_projet?.nom_acteur?.trim() || '—'}
-        </span>
-      ),
+      cell: ({ row }) => {
+        const partenaires = row.original.partenaires_execution_projet
+        if (!partenaires || partenaires.length === 0) {
+          return <span className='text-muted-foreground'>—</span>
+        }
+        return (
+          <div className='flex flex-col gap-0.5'>
+            {partenaires.slice(0, 2).map((partenaire, idx) => (
+              <span key={idx} className='text-sm text-muted-foreground'>
+                {partenaire.nom_acteur?.trim()}
+              </span>
+            ))}
+            {partenaires.length > 2 && (
+              <span className='text-xs text-muted-foreground'>
+                +{partenaires.length - 2} autre(s)
+              </span>
+            )}
+          </div>
+        )
+      },
       enableSorting: false,
       enableHiding: false,
     },

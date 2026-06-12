@@ -304,6 +304,12 @@ const DashboardPage: React.FC = () => {
                 statut = "suspendu";
             }
 
+            // Récupérer les partenaires d'exécution
+            const partenairesExecution = p.partenaires_execution_projet || [];
+            const partenairesNoms = partenairesExecution
+                .map((partenaire: any) => partenaire.nom_acteur?.trim())
+                .filter(Boolean);
+
             return {
                 id: p.id_projet ?? p.id,
                 sigle: p.sigle_projet ?? p.sigle ?? "—",
@@ -316,7 +322,7 @@ const DashboardPage: React.FC = () => {
                 montant_decaisse: Number(p.montant_decaisse ?? 450000),
                 taux_decaissement: Number(p.taux_decaissement ?? 45),
                 taux_avancement_technique: avancement,
-                bailleur: p.bailleur_projet?.nom_acteur ?? p.bailleur ?? "—",
+                bailleur: partenairesNoms.join(', ') || "—", // Affichage des partenaires d'exécution
                 statut,
             };
         });
