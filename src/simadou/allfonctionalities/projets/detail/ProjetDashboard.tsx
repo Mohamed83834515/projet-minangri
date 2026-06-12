@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import {
   Activity, BarChart3, DollarSign, Wallet,
-  Calendar, FileText, Gauge, Rocket, Shield, Zap,
+  Calendar, FileText, Gauge, Rocket, Shield,
   TrendingUp, CheckCircle2, Clock, Circle,
 } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -162,7 +162,7 @@ export default function ProjetDashboard({ codeProjet: _ }: ProjetDashboardProps)
         </Card>
       </div>
       {/* ══ 7. SYNTHÈSE PERFORMANCE ══ */}
-      <div className='grid gap-4 sm:grid-cols-2'>
+      {/* <div className='grid gap-4 sm:grid-cols-2'>
         <Card className='bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-950/20'>
           <CardContent className='p-4 flex items-center justify-between'>
             <div>
@@ -183,7 +183,7 @@ export default function ProjetDashboard({ codeProjet: _ }: ProjetDashboardProps)
             <div className='rounded-full bg-green-500/20 p-3'><Zap className='h-6 w-6 text-green-600' /></div>
           </CardContent>
         </Card>
-      </div>
+      </div> */}
 
 
       {/* ══ 3. JAUGE GLOBALE + EXÉCUTION PAR PTBA ══ */}
