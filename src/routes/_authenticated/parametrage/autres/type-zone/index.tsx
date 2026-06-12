@@ -1,7 +1,7 @@
 import AddTypeZone from '@/simadou/allfonctionalities/parametrage/autres/type-zones/AddTypeZone'
 import ListeTypeZone from '@/simadou/allfonctionalities/parametrage/autres/type-zones/ListeTypeZone'
 import { createFileRoute } from '@tanstack/react-router'
-import { Map } from 'lucide-react'
+import { MapPin } from 'lucide-react'
 import { useState } from 'react'
 
 export const Route = createFileRoute(
@@ -25,7 +25,7 @@ function TypeZonePage() {
 
       <div className="flex items-center gap-3">
         <div className="flex size-9 items-center justify-center rounded-lg border border-border bg-muted">
-          <Map className="size-4 text-muted-foreground" />
+          <MapPin className="size-4 text-muted-foreground" />
         </div>
         <div>
           <h2 className="text-sm font-medium leading-none">

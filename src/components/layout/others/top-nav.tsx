@@ -1169,6 +1169,8 @@ export function AppTopbar({ user }: UserProps) {
     setManualGroup((prev) => (prev?.title === item.title ? null : item))
   }
 
+ 
+
   return (
     <>
       <CSSInjector />
@@ -1343,10 +1345,10 @@ export function AppTopbar({ user }: UserProps) {
                 side={"bottom"}
                 onLogout={() => setOpen(true)}
                 trigger={
-                  <Button>
-                    <Avatar className='h-8 w-8'>
+                  <Button className='h-8 w-8 rounded-full'>
+                    <Avatar className='h-8 w-8 rounded-full'>
                       <AvatarImage src={user.personnel_profile_picture ?? ''} alt='profile' />
-                      <AvatarFallback>{userInitials}</AvatarFallback>
+                      <AvatarFallback className='text-foreground font-semibold'>{userInitials}</AvatarFallback>
                     </Avatar>
                   </Button>
                 }

@@ -3,8 +3,9 @@ import { apiClient } from "@/axios/api";
 import type { Personnel } from "../allTypes";
 import { PersonnelFormData } from "../allTypes/entities";
 
+
 interface UpdateProfilePictureResponse {
-  profilePicture: string  
+   personnel_profile_picture: "string"
 }
 const BASE_URL = "/personnels/";
 

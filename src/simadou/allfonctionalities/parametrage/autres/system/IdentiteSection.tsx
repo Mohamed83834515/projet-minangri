@@ -31,13 +31,13 @@ export function IdentiteSection({ params, onSave, isSaving }: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4  h-94 rounded-md">
 
       {/* Logo — outside scroll, always visible */}
       <StructureLogoUploader currentLogo={params.structureLogo} structureSigle={params.structureSigle} />
 
       <div className="flex flex-col">
-        <div className="h-75 overflow-y-auto px-1">
+        <div className="h-60 overflow-y-auto px-1">
           <DynamicForm
             key={resetKey}
             formId={FORM_ID}

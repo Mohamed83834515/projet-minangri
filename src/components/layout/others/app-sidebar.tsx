@@ -19,7 +19,7 @@ export function AppSidebar() {
   const { color } = useColor()                     
   const { stroke } = CHART_COLORS[color]  
   const {data : user} = useMe()  
-    // console.log("user",user)
+   
 
   return (
     <Sidebar
