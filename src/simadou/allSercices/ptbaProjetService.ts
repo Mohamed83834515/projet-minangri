@@ -1,6 +1,7 @@
 import { apiClient } from '@/axios/api'
 import type { PtbaProjet } from '../allTypes/ptbaProjet'
 import type { PtbaProjetFormData } from '../schemas/ptbaProjetSchemas'
+import { buildPtbaProjetApiPayload } from '@/simadou/lib/ptbaFormUtils'
 
 const ENDPOINT = '/ptbas-projets/'
 
@@ -41,14 +42,20 @@ const ptbaProjetService = {
   },
 
   async create(data: PtbaProjetFormData): Promise<PtbaProjet> {
-    return apiClient.request(ENDPOINT, { method: 'POST', data })
+    return apiClient.request(ENDPOINT, {
+      method: 'POST',
+      data: buildPtbaProjetApiPayload(data),
+    })
   },
 
   async update(
     id: number,
     data: Partial<PtbaProjetFormData>
   ): Promise<PtbaProjet> {
-    return apiClient.request(`${ENDPOINT}${id}/`, { method: 'PUT', data })
+    return apiClient.request(`${ENDPOINT}${id}/`, {
+      method: 'PUT',
+      data: buildPtbaProjetApiPayload(data as PtbaProjetFormData),
+    })
   },
 
   async delete(id: number): Promise<void> {

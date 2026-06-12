@@ -1,3 +1,4 @@
+import type { SelectOption } from '@/Global/types/formConfig'
 import type { Acteur } from '@/simadou/allTypes/acteur'
 import type { CadreAnalytique, NiveauCadreAnalytique } from '@/simadou/allTypes/cadreAnalytique'
 import type { Programme } from '@/simadou/allTypes/programme'
@@ -154,4 +155,55 @@ export function getNiveauCadreAnalytiqueLibelle(
     (n) => Number(n.code_number_nca) === niveauCodeNumber
   )
   return niveauConfig?.libelle_nca ?? ''
+}
+
+/** 2e niveau du cadre analytique — niveau des activités PTBA (code_number_nca = 2). */
+export function getPtbaCadreAnalytiqueNiveauCode(
+  niveaux: NiveauCadreAnalytique[]
+): number {
+  const sorted = sortNiveauxCadreAnalytique(niveaux)
+  const secondByCode = sorted.find((n) => Number(n.code_number_nca) === 2)
+  if (secondByCode) return 2
+
+  const secondByOrder = sorted[1]
+  const code = Number(secondByOrder?.code_number_nca)
+  return Number.isFinite(code) && code > 0 ? code : 2
+}
+
+/** Options select PTBA — valeur = id_ca (clé API), filtrées par niveau. */
+export function buildCadreAnalytiqueSelectOptions(
+  cadres: CadreAnalytique[],
+  options?: {
+    niveauCodeNumber?: number
+    /** Conserver la valeur en édition même si le niveau a changé. */
+    includeCadreIds?: number[]
+  }
+): SelectOption[] {
+  const { niveauCodeNumber, includeCadreIds = [] } = options ?? {}
+  const extraIds = new Set(
+    includeCadreIds.filter((id) => Number.isFinite(id) && id > 0)
+  )
+
+  const scoped =
+    niveauCodeNumber == null
+      ? cadres
+      : cadres.filter((cadre) => {
+          if (extraIds.has(cadre.id_ca)) return true
+          return resolveNiveauCaNumber(cadre.niveau_ca) === niveauCodeNumber
+        })
+
+  const seen = new Set<number>()
+  const result: SelectOption[] = []
+
+  for (const cadre of scoped) {
+    const id = cadre.id_ca
+    if (!Number.isFinite(id) || id <= 0 || seen.has(id)) continue
+    seen.add(id)
+    result.push({
+      value: id,
+      label: `${cadre.code_ca} - ${cadre.intutile_ca}`,
+    })
+  }
+
+  return result
 }

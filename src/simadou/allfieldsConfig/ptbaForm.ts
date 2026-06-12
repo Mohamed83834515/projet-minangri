@@ -1,6 +1,5 @@
-import type { FormConfig } from "../../Global/types/formConfig";
+import type { FormConfig, SelectOption } from "../../Global/types/formConfig";
 import { getActeurs } from "../allHooks/admin/acteurHooks";
-import { getCadreAnalytique } from "../allHooks/admin/cadreAnalytiqueHooks";
 import { getCadreStrategiques } from "../allHooks/admin/cadreStrategiqueHooks";
 import { getLocalites } from "../allHooks/admin/localiteHooks";
 import { getPersonnels } from "../allHooks/admin/personnelHooks";
@@ -24,8 +23,6 @@ const chronogrammeOptions = [
 
 const typeActivitesData = await getTypeActivites();
 
-const cadre_analytiques = await getCadreAnalytique();
-
 const localites = await getLocalites();
 
 const acteurs = await getActeurs();
@@ -45,16 +42,9 @@ const typeActivitesOptions = typeActivitesData?.map((item: any) => (
         value: String(item.code_type)
     })) || [];
 
-const cadre_analytiquesOptions = cadre_analytiques
-    // .filter((item: any) => item.niveau_cadre === 2) // Filtrer pour n'avoir que les cadres de niveau 2
-    ?.map((item: any) => ({
-        label: item.intutile_ca,
-        value: item.id_nca as string,
-    })) || [];
-
 const cadreStrategiqueOptions = cadre_strategiques.map((cadre) => ({
-    value: String(cadre.id_cs),
-    label: cadre.intutile_cs,
+    value: cadre.id_cs,
+    label: `${cadre.code_cs} - ${cadre.intutile_cs}`,
 }));
 
 const localiteOptions = localites
@@ -89,7 +79,9 @@ const uglOptions = ugls.map((ugl) => ({
 //     label: planSite.intutile_ds,
 // }));
 
-export const getPtbaFormConfig = (): FormConfig => ({
+export const getPtbaFormConfig = (
+    cadreAnalytiqueOptions: SelectOption[] = []
+): FormConfig => ({
 
 
     // Definition des etapes du formulaire
@@ -145,7 +137,7 @@ export const getPtbaFormConfig = (): FormConfig => ({
             type: "select",
             placeholder: "Sélectionner un cadre analytique (optionnel)",
             required: true,
-            options: cadre_analytiquesOptions, // À remplir dynamiquement depuis l'API
+            options: cadreAnalytiqueOptions,
             gridCols: 1,
             formStep: 1,
         },
