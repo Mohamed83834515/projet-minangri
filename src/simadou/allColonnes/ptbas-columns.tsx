@@ -162,22 +162,31 @@ export const buildPtbasColumns = (
         enableHiding: false,
     }))
 
-
     const coutColumns: ColumnDef<Ptba> = {
         id: 'cout_row',
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='Coût' />
+            <DataTableColumnHeader column={column} title='Coût (GNF)' />
         ),
-        cell: () => (
-            <div className='flex justify-center'>
-                <span className='inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold tabular-nums text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400'>
-                    <span className='mr-1 text-emerald-500'>💰</span>
-                    300 000
-                </span>
-            </div>
-        ),
+        cell: ({ row }) => {
+            // Générer un coût aléatoire entre 1 000 000 et 3 000 000 GNF
+            // Basé sur l'ID de la ligne pour rester cohérent (éviter les changements à chaque rendu)
+            const id = row.original.id_ptba || row.index || Math.random()
+            const minCout = 1_000_000
+            const maxCout = 3_000_000
+            const cout = minCout + (Math.abs(Number(id) * 12345) % (maxCout - minCout))
+
+            return (
+                <div className='flex justify-center'>
+                    <span className='inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold tabular-nums text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400'>
+                        <span className='mr-1 text-emerald-500'>💰</span>
+                        {new Intl.NumberFormat('fr-FR').format(cout)} GNF
+                    </span>
+                </div>
+            )
+        },
         meta: { thClassName: 'text-center', className: 'text-center' },
-        enableSorting: false,
+        enableSorting: true,
+        sortDescFirst: true,
         enableHiding: false,
     }
 

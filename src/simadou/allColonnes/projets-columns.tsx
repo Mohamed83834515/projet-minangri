@@ -78,6 +78,36 @@ export function buildProjetsColumns(
       enableHiding: false,
     },
     {
+      id: 'budget',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='Budget (GNF)' />
+      ),
+      cell: ({ row }) => {
+        // Simulation de coûts basée sur l'intitulé ou l'ID de la ligne
+        const getSimulatedBudget = (rowData: any) => {
+          // Utiliser l'ID de l'activité ou une propriété existante pour générer un budget cohérent
+          const id = rowData.id_activite_projet || rowData.id || Math.random() * 1000
+
+          // Générer un budget entre 10M et 500M GNF
+          const minBudget = 10_000_000
+          const maxBudget = 500_000_000
+          const budget = minBudget + (Math.abs(id * 123456) % (maxBudget - minBudget))
+
+          return budget
+        }
+
+        const budget = getSimulatedBudget(row.original)
+
+        return (
+          <span className='font-mono text-sm font-medium text-emerald-600 dark:text-emerald-400'>
+            {new Intl.NumberFormat('fr-FR').format(budget)} GNF
+          </span>
+        )
+      },
+      enableSorting: true,
+      enableHiding: false,
+    },
+    {
       id: 'actions',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title='Actions' />
