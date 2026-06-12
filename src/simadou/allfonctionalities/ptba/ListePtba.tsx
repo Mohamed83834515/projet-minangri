@@ -14,6 +14,7 @@ import AddPtba from './AddPtba'
 import ActiviteTabbedDialog from './ActiviteTabbedDialog'
 import TacheActiviteManager from './tache-activite/TacheActiviteManager'
 import IndicateurTacheManager from './indicateur-tache/IndicateurTacheManager'
+import CoutUnitairePtbaManager from './cout-unitaire/CoutUnitairePtbaManager'
 
 const route = getRouteApi('/_authenticated/programmation/ptba/')
 
@@ -105,6 +106,13 @@ function ListePtbas() {
                   label: 'Planification des indicateurs',
                   content: (
                     <IndicateurTacheManager activite={planifierActivite} />
+                  ),
+                },
+                {
+                  value: 'couts-unitaires',
+                  label: 'Coût Unitaire',
+                  content: (
+                    <CoutUnitairePtbaManager activite={planifierActivite} />
                   ),
                 },
               ]
