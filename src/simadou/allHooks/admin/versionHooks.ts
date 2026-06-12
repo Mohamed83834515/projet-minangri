@@ -7,16 +7,23 @@ import { useActiveProgrammeCode } from '@/hooks/use-active-programme'
 import { toast } from 'sonner'
 
 export const useGetVersions = () => {
-
   const codeProgramme = useActiveProgrammeCode()
-  // nous allons filtrer par programme 
+
   return useQuery({
     queryKey: ['versions-ptba', codeProgramme],
-    queryFn: () => versionPtbaService.getAll(),
+    queryFn: async () => {
+      const allVersions = await versionPtbaService.getAll()
+      if (!codeProgramme) return []
+      // Filtrer par programme - la version a une propriété 'programme' qui contient l'objet programme
+      return allVersions.filter(version =>
+        version.programme &&
+        typeof version.programme === 'object' &&
+        version.programme.code_programme === codeProgramme
+      )
+    },
     enabled: !!codeProgramme,
   })
 }
-
 export const useSaveVersion = (
   isEdit: boolean,
   currentRow?: any,
@@ -47,7 +54,7 @@ export const useSaveVersion = (
     onError: (error: any) => {
       console.error("Erreur version PTBA:", error)
       toast.error(
-        error?.response?.data?.message || 
+        error?.response?.data?.message ||
         "Une erreur est survenue lors de l'enregistrement"
       )
     },
