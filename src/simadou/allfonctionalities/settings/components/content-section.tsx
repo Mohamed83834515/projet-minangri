@@ -108,7 +108,7 @@ export function ContentSection({  children }: ContentSectionProps) {
       <Separator className="flex-none" />
 
       {/* Content */}
-      <div className="faded-bottom h-[75vh] w-full overflow-y-auto scroll-smooth pb-12 pe-4">
+      <div className="h-[75vh] w-full overflow-y-auto scroll-smooth pb-12 pe-4">
         <div className="px-1.5 pt-4 w-full">{children}</div>
       </div>
 
