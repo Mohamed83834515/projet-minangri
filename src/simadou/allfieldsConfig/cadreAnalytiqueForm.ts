@@ -57,9 +57,9 @@ export function getCadreAnalytiqueFormConfigForDialog({
       },
       {
         name: 'cout_axe',
-        label: 'Coût axe',
+        label: 'Budget (GNF)',
         type: 'number',
-        placeholder: 'Entrez le coût',
+        placeholder: 'Saisissez le budget ',
         required: true,
         min: 0,
         step: 0.01,
