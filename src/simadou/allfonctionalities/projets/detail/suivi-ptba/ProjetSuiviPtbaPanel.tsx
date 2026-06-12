@@ -10,7 +10,6 @@ import { DIALOG_SIZES } from '@/Global/Forms/dialog'
 import { useEmbeddedTableState } from '@/hooks/use-embedded-table-state'
 import type { Projet } from '@/simadou/allTypes'
 import type { PtbaProjet } from '@/simadou/allTypes/ptbaProjet'
-import { buildSuiviPtbaColumns } from '@/simadou/allColonnes/suivi-ptba-columns'
 import { useGetPtbasProjet } from '@/simadou/allHooks/admin/ptbaProjetHooks'
 import { useSuiviPtbaProjetActivitesProgress } from '@/simadou/allHooks/admin/suiviPtbaProjetHooks'
 import ActiviteTabbedDialog from '@/simadou/allfonctionalities/suivi-ptba/ActiviteTabbedDialog'
@@ -18,6 +17,7 @@ import SuiviTacheActiviteProjetManager from './suivi-tache/SuiviTacheActiviteMan
 import SuiviIndicateurProjetManager from './suivi-indicateur/SuiviIndicateurManager'
 import SuiviAvancementContratProjetManager from './suivi-avancement-contrat/SuiviAvancementContratManager'
 import SuiviDecaissementPtbaProjetManager from './suivi-decaissement/SuiviDecaissementPtbaProjetManager'
+import { buildSuiviPtbaProjetColumns } from '@/simadou/allColonnes/suivi-ptba-projet-columns'
 
 type ProjetSuiviPtbaPanelProps = {
   projet: Projet
@@ -50,7 +50,7 @@ export default function ProjetSuiviPtbaPanel({ projet }: ProjetSuiviPtbaPanelPro
 
   const columns = useMemo(
     () =>
-      buildSuiviPtbaColumns({
+      buildSuiviPtbaProjetColumns({
         onOpenSuivi: (activite) => {
           setSuiviActivite(activite as PtbaProjet)
           setShowSuiviModal(true)

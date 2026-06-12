@@ -100,7 +100,7 @@ export function buildProjetsColumns(
 
         return (
           <span className='font-mono text-sm font-medium text-emerald-600 dark:text-emerald-400'>
-            {new Intl.NumberFormat('fr-FR').format(budget)} GNF
+            {new Intl.NumberFormat('fr-FR').format(budget)}
           </span>
         )
       },
