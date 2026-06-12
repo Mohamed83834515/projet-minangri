@@ -14,7 +14,7 @@ export type SuiviPtbaColumnHandlers = {
   progressLoading: boolean
 }
 
-export function buildSuiviPtbaColumns(
+export function buildSuiviPtbaProjetColumns(
   handlers: SuiviPtbaColumnHandlers
 ): ColumnDef<Ptba>[] {
   const {
