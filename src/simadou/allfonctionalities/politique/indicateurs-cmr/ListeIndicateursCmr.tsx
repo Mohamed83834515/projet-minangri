@@ -252,7 +252,7 @@ export default function ListeIndicateursCmr() {
         showViewOptions={false}
         toolbarEndSlot={
           <DataTableToolbarOutlineButton onClick={handleAddForm}>
-            Nouvel indicateur
+            Ajouter un nouvel indicateur
           </DataTableToolbarOutlineButton>
         }
         emptyMessage='Aucun indicateur CMR.'

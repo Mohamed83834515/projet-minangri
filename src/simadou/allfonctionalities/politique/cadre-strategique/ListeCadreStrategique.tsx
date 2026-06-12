@@ -279,7 +279,7 @@ export default function ListeCadreStrategique() {
             </div>
             <Button type='button' onClick={handleAddForm}>
               <Plus className='h-4 w-4' />
-              Nouveau {currentNiveauLibelle}
+               Ajout des {currentNiveauLibelle}s
             </Button>
           </div>
         </div>

@@ -64,7 +64,7 @@ function CadreAnalytiqueNiveauTable({
   onDeleteRequest: (row: CadreAnalytique) => void
 }) {
   const { search, navigate } = useEmbeddedTableState()
-
+  
   const columns = useMemo(
     () =>
       buildCadreAnalytiqueColumns({
@@ -281,7 +281,7 @@ export default function ListeCadreAnalytique() {
             </div>
             <Button type='button' onClick={handleAddForm}>
               <Plus className='h-4 w-4' />
-              Nouveau {currentNiveauLibelle}
+              Ajout des {currentNiveauLibelle}s
             </Button>
           </div>
         </div>

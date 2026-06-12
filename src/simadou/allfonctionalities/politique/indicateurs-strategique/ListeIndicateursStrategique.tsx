@@ -300,7 +300,7 @@ export default function ListeIndicateursStrategique() {
               />
             </div>
             <DataTableToolbarOutlineButton onClick={handleAddForm}>
-              Nouvel {currentNiveauLibelle}
+               Ajout des {currentNiveauLibelle}s
             </DataTableToolbarOutlineButton>
           </div>
         </div>

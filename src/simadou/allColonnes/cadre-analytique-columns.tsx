@@ -16,7 +16,7 @@ import {
 function formatCoutAxe(value: number | undefined): string {
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
-    currency: 'XOF',
+    currency: 'GNF',  // ← Changé de XOF à GNF
     maximumFractionDigits: 0,
   }).format(value ?? 0)
 }
