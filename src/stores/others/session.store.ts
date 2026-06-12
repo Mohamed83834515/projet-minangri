@@ -12,37 +12,42 @@ interface SessionState {
   setWarning: (visible: boolean) => void
 }
 
-const WARNING_THRESHOLD_SECONDS = 10 * 60  // show warning at 10 min remaining
+
 
 export const useSessionStore = create<SessionState>((set, get) => ({
   remainingSeconds:  0,
   isWarningVisible:  false,
   intervalRef:       null,
 
-  start: (durationSeconds) => {
-    const { stop } = get()
-    stop()  // clear any existing interval first
+start: (durationSeconds) => {
+  const { stop } = get()
+  stop()
 
-    const ref = setInterval(() => {
-      const { remainingSeconds, setWarning } = get()
-      const next = remainingSeconds - 1
+  // Warning at 25% of duration remaining, max 10 minutes
+  const warningThreshold = Math.min(
+    Math.floor(durationSeconds * 0.25),
+    600  // never more than 10 min
+  )
 
-      if (next <= 0) {
-        get().stop()
-        // signal logout — SessionProvider listens to this
-        set({ remainingSeconds: 0 })
-        return
-      }
+  const ref = setInterval(() => {
+    const { remainingSeconds, setWarning } = get()
+    const next = remainingSeconds - 1
 
-      if (next <= WARNING_THRESHOLD_SECONDS && !get().isWarningVisible) {
-        setWarning(true)
-      }
+    if (next <= 0) {
+      get().stop()
+      set({ remainingSeconds: 0 })
+      return
+    }
 
-      set({ remainingSeconds: next })
-    }, 1000)
+    if (next <= warningThreshold && !get().isWarningVisible) {
+      setWarning(true)
+    }
 
-    set({ remainingSeconds: durationSeconds, intervalRef: ref, isWarningVisible: false })
-  },
+    set({ remainingSeconds: next })
+  }, 1000)
+
+  set({ remainingSeconds: durationSeconds, intervalRef: ref, isWarningVisible: false })
+},
 
   reset: (durationSeconds) => {
     const { isWarningVisible } = get()
