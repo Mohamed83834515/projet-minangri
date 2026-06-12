@@ -27,7 +27,7 @@ export const getLocaliteFormConfig = (): FormConfig => ({
             name: "intitule_loca",
             label: "Intitulé localité",
             type: "text",
-            placeholder: "Ex: Dakar, Thiès, Saint-Louis...",
+            placeholder: "Ex: Kindia, Labé, Mamou...",
             required: true,
             gridCols: 2,
         },

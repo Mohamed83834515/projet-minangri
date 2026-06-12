@@ -145,7 +145,7 @@ export const buildPtbasColumns = (
         header: ({ column }) => (
             <DataTableColumnHeader
                 column={column}
-                title={mois.value}
+                title={mois.label}
                 className="text-center"
             />
         ),

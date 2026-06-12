@@ -77,12 +77,12 @@ export default function AddUgl({
             <DialogContent className={DIALOG_SIZES.lg}>
                 <DialogHeader>
                     <DialogTitle>
-                        {isEdit ? "Modifier une Activité" : "Ajouter une Activité"}
+                        {isEdit ? "Modifier une unité de gestion" : "Ajouter une unité de gestion"}
                     </DialogTitle>
                     <DialogDescription>
                         {isEdit
-                            ? "Modification de l'activité existante"
-                            : "Création d'une nouvelle activité"}
+                            ? "Modification de l'unité de gestion"
+                            : "Création d'une unité de gestion"}
                     </DialogDescription>
                 </DialogHeader>
 

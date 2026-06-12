@@ -94,21 +94,20 @@ export function buildIndicateurCmrColumns<T extends IndicateurCmrTableRow>({
     ...(hideReferentielColumn
       ? []
       : [
-          {
-            id: 'referentiel_cmr',
-            accessorKey: 'referentiel_cmr',
-            header: ({ column }) => (
-              <DataTableColumnHeader column={column} title='Référentiel' />
-            ),
-            cell: ({ row }) => (
-              <span className='text-sm'>
-                {resolveReferentielLabel(row.original.referentiel_cmr)}
-              </span>
-            ),
-            enableSorting: false,
-            enableHiding: false,
-          } satisfies ColumnDef<T>,
-        ]),
+        {
+          id: 'referentiel_cmr',
+          accessorKey: 'referentiel_cmr',
+          header: ({ column }) => (
+            <DataTableColumnHeader column={column} title='Indicateur référentiel' />
+          ),
+          cell: ({ row }) => (
+            <span className='text-sm'>
+              {resolveReferentielLabel(row.original.referentiel_cmr)}
+            </span>
+          ),
+          enableHiding: false,
+        } satisfies ColumnDef<T>,
+      ]),
     {
       id: 'annee_reference',
       accessorKey: 'annee_reference',
@@ -123,46 +122,19 @@ export function buildIndicateurCmrColumns<T extends IndicateurCmrTableRow>({
     ...(onOpenCibles
       ? []
       : [
-          {
-            id: 'cible_cmr',
-            accessorKey: 'cible_cmr',
-            header: ({ column }) => (
-              <DataTableColumnHeader column={column} title='Cible' />
-            ),
-            cell: ({ row }) => (
-              <span className='text-sm'>{displayValue(row.original.cible_cmr)}</span>
-            ),
-            enableHiding: false,
-          } satisfies ColumnDef<T>,
-        ]),
-    {
-      id: 'fonction_agregat_cmr',
-      accessorKey: 'fonction_agregat_cmr',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Fonction agrégation' />
-      ),
-      cell: ({ row }) => (
-        <span className='text-sm'>
-          {displayValue(row.original.fonction_agregat_cmr, 'Non définie')}
-        </span>
-      ),
-      enableSorting: false,
-      enableHiding: false,
-    },
-    {
-      id: 'responsable_collecte_cmr',
-      accessorKey: 'responsable_collecte_cmr',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Responsable' />
-      ),
-      cell: ({ row }) => (
-        <LongText className='max-w-xs text-sm'>
-          {displayValue(row.original.responsable_collecte_cmr)}
-        </LongText>
-      ),
-      enableSorting: false,
-      enableHiding: false,
-    },
+        {
+          id: 'cible_cmr',
+          accessorKey: 'cible_cmr',
+          header: ({ column }) => (
+            <DataTableColumnHeader column={column} title='Cible' />
+          ),
+          cell: ({ row }) => (
+            <span className='text-sm'>{displayValue(row.original.cible_cmr)}</span>
+          ),
+          enableHiding: false,
+        } satisfies ColumnDef<T>,
+      ]),
+
     {
       id: 'reference_cmr',
       accessorKey: 'reference_cmr',
@@ -174,46 +146,56 @@ export function buildIndicateurCmrColumns<T extends IndicateurCmrTableRow>({
           {displayValue(row.original.reference_cmr)}
         </LongText>
       ),
-      enableSorting: false,
       enableHiding: false,
     },
     ...(onOpenCibles
       ? [
-          {
-            id: 'cibles',
-            header: ({ column }) => (
-              <DataTableColumnHeader
-                column={column}
-                title='Cibles'
-                className='flex w-full justify-center'
-              />
-            ),
-            cell: ({ row }) => (
-              <div className='flex justify-center'>
-                <Button
-                  type='button'
-                  variant='outline'
-                  size='sm'
-                  className='gap-2 border-blue-200 bg-blue-50 text-blue-700 transition-all duration-200 hover:bg-blue-100 hover:text-blue-800 dark:border-blue-800 dark:bg-blue-950/30 dark:text-blue-400 dark:hover:bg-blue-950/50'
-                  onClick={() => onOpenCibles(row.original)}
-                  aria-label='Gérer les cibles CMR'
-                  title='Cibles CMR'
-                >
-                  <ClipboardList className='h-4 w-4' />
-                  <span className='text-xs font-medium'>Planifier</span>
-                </Button>
-              </div>
-            ),
-            meta: {
-              thClassName: 'text-center w-[120px] pe-12',
-              className: 'text-center align-middle pe-12',
-            },
-            size: 120,
-            enableSorting: false,
-            enableHiding: false,
-          } satisfies ColumnDef<T>,
-        ]
+        {
+          id: 'cibles',
+          header: ({ column }) => (
+            <DataTableColumnHeader
+              column={column}
+              title='Cibles'
+              className='flex w-full justify-center'
+            />
+          ),
+          cell: ({ row }) => (
+            <div className='flex justify-center'>
+              <Button
+                type='button'
+                variant='outline'
+                size='sm'
+                className='gap-2 border-blue-200 bg-blue-50 text-blue-700 transition-all duration-200 hover:bg-blue-100 hover:text-blue-800 dark:border-blue-800 dark:bg-blue-950/30 dark:text-blue-400 dark:hover:bg-blue-950/50'
+                onClick={() => onOpenCibles(row.original)}
+                aria-label='Gérer les cibles CMR'
+                title='Cibles CMR'
+              >
+                <span className='text-xs font-medium'>{row.original.cible_cmr}</span>
+              </Button>
+            </div>
+          ),
+          enableHiding: false,
+          meta: {
+            thClassName: 'text-center w-[120px] pe-12',
+            className: 'text-center align-middle pe-12',
+          },
+          size: 120,
+        } satisfies ColumnDef<T>,
+      ]
       : []),
+
+    {
+      id: 'responsable_collecte_cmr',
+      accessorKey: 'responsable_collecte_cmr',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='Responsable' />
+      ),
+      cell: ({ row }) => (
+        <LongText className='max-w-xs text-sm'>
+          {displayValue(row.original.responsable_collecte_cmr)}
+        </LongText>
+      ),
+    },
     actionsColumn,
   ]
 }

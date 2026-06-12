@@ -40,7 +40,7 @@ export default function AddLocalite({ currentRow, niveauId, onClose, onSuccess }
         label: parentNiveau.libelle_nlc,
         type: 'select',
         placeholder: `Sélectionner ${parentNiveau.nombre_nlc}`,
-        required: false,
+        required: true,
         options: parentOptions,
         colSpan: 'full',
       })

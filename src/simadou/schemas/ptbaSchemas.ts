@@ -157,18 +157,18 @@ export const getStatutVersionColor = (statut: number | undefined): string => {
 };
 
 export const getMoisOptions = () => [
-  { value: "Jan", label: "Janvier" },
-  { value: "Fév", label: "Février" },
-  { value: "Mar", label: "Mars" },
-  { value: "Avr", label: "Avril" },
-  { value: "Mai", label: "Mai" },
-  { value: "Jun", label: "Juin" },
-  { value: "Jul", label: "Juillet" },
-  { value: "Aoû", label: "Août" },
-  { value: "Sep", label: "Septembre" },
-  { value: "Oct", label: "Octobre" },
-  { value: "Nov", label: "Novembre" },
-  { value: "Déc", label: "Décembre" },
+  { value: "Jan", label: "J" },
+  { value: "Fév", label: "F" },
+  { value: "Mar", label: "M" },
+  { value: "Avr", label: "A" },
+  { value: "Mai", label: "M" },
+  { value: "Jun", label: "J" },
+  { value: "Jul", label: "J" },
+  { value: "Aoû", label: "A" },
+  { value: "Sep", label: "S" },
+  { value: "Oct", label: "O" },
+  { value: "Nov", label: "N" },
+  { value: "Déc", label: "D" },
 ];
 
 export const formatChronogramme = (chronogramme: string): string => {

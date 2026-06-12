@@ -1204,11 +1204,14 @@ export function AppTopbar({ user }: UserProps) {
           position: 'relative',
         }}>
 
-          <SidebarTrigger
-            className="_tb-ibtn md:hidden"
-            aria-label={t('Ouvrir le menu')}
-            style={{ color: headerText, flexShrink: 0 }}
-          />
+          {/* SidebarTrigger - visible seulement en mode vertical */}
+          {subNavMode !== 'horizontal' && (
+            <SidebarTrigger
+              className="_tb-ibtn md:hidden"
+              aria-label={t('Ouvrir le menu')}
+              style={{ color: headerText, flexShrink: 0 }}
+            />
+          )}
 
           {/* LOGO — fond blanc pour lisibilité */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -1303,7 +1306,7 @@ export function AppTopbar({ user }: UserProps) {
                 textShadow: '0 2px 4px rgba(0,0,0,0.1)',
               }}
             >
-            {config?.systemTitle}
+              {config?.systemTitle || "SISE CEP Agriculture PS2040"}
             </div>
             <div
               style={{

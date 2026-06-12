@@ -1,5 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import UtilisateurFormPanel from './UtilisateurFormPanel'
+import { DIALOG_SIZES } from '@/Global/Forms/dialog'
 
 type OpenProps = {
   open: boolean
@@ -11,17 +12,15 @@ export default function UtilisateurDialog({ open, onOpenChange }: OpenProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        className='gap-0 overflow-hidden p-0 sm:max-w-3xl'
-        aria-describedby={undefined}
-      >
-        <DialogHeader className='border-b px-6 py-4'>
-          <DialogTitle>Ajouter un utilisateur</DialogTitle>
+      <DialogContent className={DIALOG_SIZES.lg}>
+        <DialogHeader>
+          <DialogTitle>
+            Ajouter un nouveau utilisatur 
+          </DialogTitle>
         </DialogHeader>
-        <div className='max-h-[min(70vh,36rem)] overflow-y-auto px-6 py-4'>
-          <UtilisateurFormPanel onClose={close} onSuccess={close} />
-        </div>
+        <UtilisateurFormPanel onClose={close} onSuccess={close} />
       </DialogContent>
+
     </Dialog>
   )
 }
