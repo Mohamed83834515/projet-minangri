@@ -3,16 +3,8 @@ import { useQueryClient } from '@tanstack/react-query'
 import { Plus, Save, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
-import { Switch } from '@/components/ui/switch'
 import { Input } from '@/components/ui/input'
 import { getApiErrorMessage } from '@/lib/api-error-message'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import {
   Table,
   TableBody,
@@ -29,7 +21,6 @@ import {
   useGetCoutsUnitairesByActivite,
   useUpdateCoutUnitairePtba,
 } from '@/simadou/allHooks/admin/coutUnitairePtbaHooks'
-import { useGetPersonnels } from '@/simadou/allHooks/admin/personnelHooks'
 import { useMe } from '@/simadou/allHooks/auth/authHooks'
 import {
   buildCoutUnitairePtbaPayload,
