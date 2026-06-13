@@ -105,7 +105,7 @@ export function buildVersionPtbaColumns({
       const item = row.original
       const isEnCours = item.statut_version === 0 || item.statut_version === undefined
       const isValide = item.statut_version === 1
-      const isArchive = item.statut_version === 2
+      // const isArchive = item.statut_version === 2
 
       return (
         <GenericRowActions
