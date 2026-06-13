@@ -99,24 +99,22 @@ export function buildProjetsColumns(
       ),
       cell: ({ row }) => {
         // Simulation de coûts basée sur l'intitulé ou l'ID de la ligne
-        const getSimulatedBudget = (rowData: any) => {
-          // Utiliser l'ID de l'activité ou une propriété existante pour générer un budget cohérent
-          const id = rowData.id_activite_projet || rowData.id || Math.random() * 1000
+        const budget = row.original.budget_projet
 
-          // Générer un budget entre 10M et 500M GNF
-          const minBudget = 10_000_000
-          const maxBudget = 500_000_000
-          const budget = minBudget + (Math.abs(id * 123456) % (maxBudget - minBudget))
-
-          return budget
+        if (!budget || budget === 0) {
+          return (
+            <div className='flex justify-center'>
+              <span className='text-sm text-muted-foreground'>—</span>
+            </div>
+          )
         }
 
-        const budget = getSimulatedBudget(row.original)
-
         return (
-          <span className='font-mono text-sm font-medium text-emerald-600 dark:text-emerald-400'>
-            {new Intl.NumberFormat('fr-FR').format(budget)}
-          </span>
+          <div className='flex justify-center'>
+            <span className='inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold tabular-nums text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400'>
+              {new Intl.NumberFormat('fr-FR').format(budget)}
+            </span>
+          </div>
         )
       },
       enableSorting: true,
