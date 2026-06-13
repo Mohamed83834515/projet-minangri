@@ -8,7 +8,9 @@ import { useActiveProgrammeCode } from '@/hooks/use-active-programme'
 import { Ptba } from '@/simadou/allTypes'
 import { buildPtbasColumns } from '@/simadou/allColonnes/ptbas-columns'
 import { useDeletePtba, useGetPtbas } from '@/simadou/allHooks/admin/ptbaHooks'
+import { useGetPersonnels } from '@/simadou/allHooks/admin/personnelHooks'
 import { usePtbaVersionSelection } from '@/simadou/allHooks/admin/versionHooks'
+import { resolvePersonnelLabel } from '@/simadou/lib/resolveApiRelation'
 import { PtbaVersionSelect } from './PtbaVersionSelect'
 import AddPtba from './AddPtba'
 import ActiviteTabbedDialog from './ActiviteTabbedDialog'
@@ -30,7 +32,24 @@ function ListePtbas() {
   const navigate = route.useNavigate()
 
   const { data: ptbas = [] } = useGetPtbas()
+  const { data: personnels = [] } = useGetPersonnels()
   const deleteMutation = useDeletePtba()
+
+  const personnelsById = useMemo(
+    () =>
+      new Map(
+        personnels
+          .filter((p) => p.n_personnel != null)
+          .map((p) => [p.n_personnel!, p])
+      ),
+    [personnels]
+  )
+
+  const getResponsableLabel = useCallback(
+    (ptba: Ptba) =>
+      resolvePersonnelLabel(ptba.responsable_ptba, personnelsById),
+    [personnelsById]
+  )
 
   const filteredPtbas = useMemo(() => {
     if (!selectedVersionId) return ptbas
@@ -48,8 +67,14 @@ function ListePtbas() {
   const [currentRow, setCurrentRow] = useState<Ptba | null>(null)
 
   const columns = useMemo(
-    () => buildPtbasColumns(setOpen, setCurrentRow, onOpenPlanification),
-    [setOpen, setCurrentRow, onOpenPlanification]
+    () =>
+      buildPtbasColumns(
+        setOpen,
+        setCurrentRow,
+        onOpenPlanification,
+        getResponsableLabel
+      ),
+    [setOpen, setCurrentRow, onOpenPlanification, getResponsableLabel]
   )
 
   return (

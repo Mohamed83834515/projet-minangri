@@ -7,6 +7,7 @@ import ProjetPtbaPanel from './ptba/ProjetPtbaPanel'
 import ProjetSuiviPtbaPanel from './suivi-ptba/ProjetSuiviPtbaPanel'
 import ProjetCadreResultatsPanel from './resultsFramework/ProjetCadreResultatsPanel'
 import ProjetIndicateursCmrPanel from './cmrIndicators/ProjetIndicateursCmrPanel'
+import ProjetDocumentsPanel from './documents/ProjetDocumentsPanel'
 import ProjetDetailPlaceholder from './ProjetDetailPlaceholder'
 
 
@@ -19,6 +20,7 @@ const TAB_PANEL_RENDERERS: Record<ProjetDetailTabKey, TabPanelRenderer> = {
   suivi_ptba: (projet) => <ProjetSuiviPtbaPanel projet={projet} />,
   results_framework: (projet) => <ProjetCadreResultatsPanel projet={projet} />,
   cmr_indicators: (projet) => <ProjetIndicateursCmrPanel projet={projet} />,
+  documents: (projet) => <ProjetDocumentsPanel projet={projet} />,
 }
 
 export function renderProjetDetailTabPanel(

@@ -12,6 +12,7 @@ export * from "./cadreStrategiqueConfig";
 export * from "./convention";
 export * from "./coutUnitairePtba";
 export * from "./dictionnaireIndicateur";
+export * from "./documentProjet";
 export * from "./fonction";
 export * from "./indicateurActivitePtba";
 export * from "./indicateurCadreResultat";

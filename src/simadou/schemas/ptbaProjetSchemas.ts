@@ -43,6 +43,7 @@ export const ptbaProjetSchema = z.object({
     .number()
     .int("L'activité projet est requise")
     .positive("L'activité projet est requise"),
+  version_ptba: z.number().optional(),
 })
 
 export type PtbaProjetFormData = z.infer<typeof ptbaProjetSchema>
