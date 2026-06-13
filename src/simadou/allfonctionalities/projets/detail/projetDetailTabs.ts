@@ -33,7 +33,7 @@ export const projetDetailTabs: ProjetDetailTab[] = [
   },
   {
     key: 'activities',
-    name: 'Activités',
+    name: 'Plan Analitique',
     icon: Briefcase,
     description: 'Liste et suivi des activités rattachées au projet.',
   },

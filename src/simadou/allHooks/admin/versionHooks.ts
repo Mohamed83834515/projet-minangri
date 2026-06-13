@@ -156,12 +156,12 @@ export function usePtbaVersionSelection(codeProgramme: string | undefined) {
   )
 
   useEffect(() => {
-    // Plus de vérification du codeProgramme
     if (versionsForProgramme.length === 0) {
       setSelectedVersionId(null)
       return
     }
 
+    // Vérifier le localStorage
     const stored = localStorage.getItem(SELECTED_VERSION_STORAGE_KEY)
     if (
       stored &&
@@ -173,15 +173,28 @@ export function usePtbaVersionSelection(codeProgramme: string | undefined) {
       return
     }
 
-    const currentYear = new Date().getFullYear()
-    const preferred =
-      versionsForProgramme.find((v) => v.annee_ptba === currentYear) ??
-      versionsForProgramme[0]
+    // Sélectionner par date de validation la plus récente
+    const getLatestVersion = (versions: VersionPtba[]): VersionPtba => {
+      // Filtrer les versions avec une date de validation valide
+      const validatedVersions = versions.filter(v => v.date_validation)
 
+      if (validatedVersions.length > 0) {
+        // Trier par date décroissante et prendre la première
+        return [...validatedVersions].sort((a, b) =>
+          new Date(b.date_validation!).getTime() - new Date(a.date_validation!).getTime()
+        )[0]
+      }
+
+      // Fallback : retourner la première version
+      return versions[0]
+    }
+
+    const preferred = getLatestVersion(versionsForProgramme)
     const preferredId = preferred.id_version_ptba.toString()
+
     setSelectedVersionId(preferredId)
     localStorage.setItem(SELECTED_VERSION_STORAGE_KEY, preferredId)
-  }, [versionsForProgramme]) // codeProgramme retiré des dépendances
+  }, [versionsForProgramme])
 
   const handleChangeVersion = (versionId: string | null) => {
     setSelectedVersionId(versionId)

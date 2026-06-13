@@ -61,10 +61,6 @@ type GenericTableProps<TData> = {
   showViewOptions?: boolean
   showSearch?: boolean
   showPagination?: boolean
-  /** Pagination compacte (sans libellés « Page X sur Y » / « Lignes par page »). */
-  compactPagination?: boolean
-  /** Classes appliquées au conteneur du tableau (ex. min-h + overflow pour scroll). */
-  tableContainerClassName?: string
   toolbarEndSlot?: React.ReactNode
   onRowClick?: (row: TData) => void
   isLoading?: boolean
@@ -91,8 +87,6 @@ export function GenericTable<TData>({
   showViewOptions = true,
   showSearch = true,
   showPagination = true,
-  compactPagination = false,
-  tableContainerClassName,
   toolbarEndSlot,
   onRowClick,
   isLoading: isLoadingProp = false,
@@ -148,13 +142,9 @@ export function GenericTable<TData>({
   }, [table, ensurePageInRange])
 
   return (
-    <div
-      className={cn(
-        'max-sm:has-[div[role="toolbar"]]:mb-16',
-        'flex flex-1 flex-col gap-4',
-        tableContainerClassName && 'min-h-0'
-      )}
-    >
+    <div className={cn('max-sm:has-[div[role="toolbar"]]:mb-16', 'flex flex-1 flex-col gap-4')}>
+
+      {/* ── Toolbar ── */}
       <DataTableToolbar
         table={table}
         searchPlaceholder={searchPlaceholder}
@@ -165,19 +155,14 @@ export function GenericTable<TData>({
         toolbarEndSlot={toolbarEndSlot}
       />
 
-      <div
-        className={cn(
-          'relative overflow-hidden rounded-md border',
-          tableContainerClassName
-        )}
-      >
-        {/* Seul isLoadingProp déclenche l'overlay de chargement, pas isRouterPending */}
+      {/* ── Table ── */}
+      <div className='relative w-full min-w-0'>
         {isLoadingProp && <TableLoadingOverlay />}
 
         <div
           className={cn(
-            'w-full rounded-xl border border-border/60 shadow-sm',
-            'overflow-hidden', // uniquement pour le border-radius, pas pour cacher du contenu
+            'w-full rounded-xl border border-border/60 shadow-sm overflow-x-auto',
+
             isLoading && 'opacity-50 pointer-events-none select-none transition-opacity duration-200'
           )}
         >
@@ -187,7 +172,7 @@ export function GenericTable<TData>({
           <Table
             // "w-full" + pas de min-w ni overflow-x → la table s'adapte à la largeur disponible
             // Les colonnes se partagent l'espace et les cellules wrappent le texte si nécessaire
-            className='w-full table-auto border-collapse'
+            className='w-full min-w-full table-auto border-collapse'
             style={{ tableLayout: 'auto' }}
           >
             <TableHeader>
@@ -202,7 +187,7 @@ export function GenericTable<TData>({
                       colSpan={header.colSpan}
                       className={cn(
                         // Texte wrappé + padding confortable
-                        'px-4 py-3 text-xs font-semibold uppercase tracking-wider',
+                        'px-4 py-1.5 text-xs font-semibold uppercase tracking-wider',
                         'text-muted-foreground whitespace-normal break-words align-top',
                         // Séparateur entre colonnes
                         'border-r border-border/30 last:border-r-0',
@@ -278,13 +263,8 @@ export function GenericTable<TData>({
         </div>
       </div>
 
-      {showPagination && (
-        <DataTablePagination
-          table={table}
-          compact={compactPagination}
-          className='mt-auto shrink-0'
-        />
-      )}
+      {/* ── Pagination ── */}
+      {showPagination && <DataTablePagination table={table} className='mt-auto' />}
 
       {bulkActionsSlot?.(table)}
     </div>

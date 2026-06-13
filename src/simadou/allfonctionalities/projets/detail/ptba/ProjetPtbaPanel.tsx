@@ -82,8 +82,7 @@ export default function ProjetPtbaPanel({ projet }: ProjetPtbaPanelProps) {
       buildPtbasColumns(
         setOpen,
         setCurrentRow,
-        onOpenPlanification,
-        getResponsableLabel
+        onOpenPlanification
       ),
     [setOpen, setCurrentRow, onOpenPlanification, getResponsableLabel]
   )

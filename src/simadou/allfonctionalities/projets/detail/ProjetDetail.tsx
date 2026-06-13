@@ -341,14 +341,14 @@ export default function ProjetDetail() {
               isSplitScroll && 'flex min-h-0 flex-1 flex-col overflow-hidden'
             )}
           >
-            <CardHeader className='shrink-0 border-b'>
+            {/* <CardHeader className='shrink-0 border-b'>
               <CardTitle className='text-base'>{selectedTab.name}</CardTitle>
               <CardDescription>{selectedTab.description}</CardDescription>
-            </CardHeader>
+            </CardHeader> */}
             <CardContent
               ref={mainContentRef}
               className={cn(
-                'p-5',
+                'p-3',
                 isSplitScroll && 'min-h-0 flex-1 overflow-y-auto'
               )}
             >
