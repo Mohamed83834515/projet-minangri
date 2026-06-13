@@ -155,6 +155,10 @@ export function buildPtbaProjetApiPayload(
     code_projet: data.code_projet.trim(),
   }
 
+  if (data.version_ptba != null && data.version_ptba > 0) {
+    payload.version_ptba = data.version_ptba
+  }
+
   appendOptionalString(payload, 'observation', data.observation)
   appendOptionalFkNumber(payload, 'cadre_analytique', data.cadre_analytique)
   appendOptionalString(payload, 'ugl_ptba', data.ugl_ptba)

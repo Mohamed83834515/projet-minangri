@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { toast } from 'sonner'
 import {
   Dialog,
   DialogContent,
@@ -38,6 +39,7 @@ import {
   resolveCodeCrpFormValue,
   resolveResponsablePtbaFormValue,
   resolveUglPtbaFormValue,
+  resolveVersionPtbaFormValue,
 } from '@/simadou/lib/ptbaFormUtils'
 import {
   useActiveProgrammeCode,
@@ -47,6 +49,7 @@ import {
   useCreatePtbaProjet,
   useUpdatePtbaProjet,
 } from '@/simadou/allHooks/admin/ptbaProjetHooks'
+import { usePtbaVersionSelection } from '@/simadou/allHooks/admin/versionHooks'
 
 export type AddPtbaProjetProps = {
   projet: Projet
@@ -72,6 +75,7 @@ export default function AddPtbaProjet({
     projet.programme_projet?.code_programme
       ? projet.programme_projet.code_programme
       : activeProgrammeCode
+  const { selectedVersionId } = usePtbaVersionSelection(codeProgramme)
   const { data: activites = [] } = useGetActivitesProjet(codeProjet)
   const { data: cadresAnalytique = [] } = useGetCadresAnalytique(programmeId)
   const { data: niveaux = [] } = useGetNiveauxCadreAnalytique()
@@ -141,16 +145,33 @@ export default function AddPtbaProjet({
       ugl_ptba: resolveUglPtbaFormValue(currentRow ?? undefined),
       code_projet: codeProjet,
       statut_activite: currentRow?.statut_activite || 'Planifiée',
+      version_ptba:
+        resolveVersionPtbaFormValue(currentRow ?? undefined, selectedVersionId) ??
+        0,
     }
-  }, [currentRow, codeProjet, cadresAnalytique])
+  }, [currentRow, codeProjet, cadresAnalytique, selectedVersionId])
 
   const createMutation = useCreatePtbaProjet(codeProjet)
   const updateMutation = useUpdatePtbaProjet(codeProjet)
 
   const onSubmit = (data: PtbaProjetFormData) => {
+    const versionPtba =
+      resolveVersionPtbaFormValue(currentRow ?? undefined, selectedVersionId) ??
+      (data.version_ptba != null && data.version_ptba > 0
+        ? data.version_ptba
+        : undefined)
+
+    if (!versionPtba) {
+      toast.error(
+        "Sélectionnez une version PTBA dans la liste avant d'ajouter une activité."
+      )
+      return
+    }
+
     const payload: PtbaProjetFormData = {
       ...data,
       code_projet: codeProjet,
+      version_ptba: versionPtba,
       observation: data.observation?.trim() || undefined,
       ugl_ptba: data.ugl_ptba?.trim() || undefined,
     }

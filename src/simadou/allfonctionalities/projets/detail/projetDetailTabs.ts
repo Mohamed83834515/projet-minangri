@@ -2,6 +2,7 @@ import {
   Briefcase,
   ClipboardList,
   Eye,
+  FileText,
   Layout,
   LayoutDashboard,
   type LucideIcon,
@@ -14,6 +15,7 @@ export type ProjetDetailTabKey =
   | 'suivi_ptba'
   | 'results_framework'
   | 'cmr_indicators'
+  | 'documents'
 
 export type ProjetDetailTab = {
   key: ProjetDetailTabKey
@@ -58,5 +60,11 @@ export const projetDetailTabs: ProjetDetailTab[] = [
     name: 'Indicateurs CMR',
     icon: ClipboardList,
     description: 'Indicateurs du cadre de mesure des résultats.',
+  },
+  {
+    key: 'documents',
+    name: 'Documents',
+    icon: FileText,
+    description: 'Documents rattachés au projet.',
   },
 ]

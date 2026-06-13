@@ -85,7 +85,8 @@ export const parseChronogramme = (value: unknown): string[] => {
 export const buildPtbasColumns = (
     setOpen: (dialog: PtbasDialogType | null) => void,
     setCurrentRow: React.Dispatch<React.SetStateAction<Ptba | null>>,
-    onOpenPlanification: (activite: Ptba) => void
+    onOpenPlanification: (activite: Ptba) => void,
+    getResponsableLabel?: (ptba: Ptba) => string | null | undefined
 ) => {
     const baseColumns = buildColumns<Ptba>([
         { type: "text", key: "code_activite_ptba", title: "Code", sticky: true },
@@ -115,18 +116,22 @@ export const buildPtbasColumns = (
             <DataTableColumnHeader column={column} title='Responsable' />
         ),
         cell: ({ row }) => {
-            const responsable = row.original.responsable_ptba;
+            const ptba = row.original
+            const fromLookup = getResponsableLabel?.(ptba)?.trim()
+            let nomComplet = fromLookup || ''
 
-            let nomComplet = "-";
-            if (responsable && typeof responsable === "object") {
-                const prenom = responsable.prenom_perso || "";
-                const nom = responsable.nom_perso || "";
-                nomComplet = `${prenom} ${nom}`.trim() || "-";
+            if (!nomComplet) {
+                const responsable = ptba.responsable_ptba
+                if (responsable && typeof responsable === 'object') {
+                    const prenom = responsable.prenom_perso || ''
+                    const nom = responsable.nom_perso || ''
+                    nomComplet = `${prenom} ${nom}`.trim()
+                }
             }
 
             return (
                 <div className='flex justify-center'>
-                    {nomComplet !== "-" ? (
+                    {nomComplet ? (
                         <span className='inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-950/30 dark:text-blue-400'>
                             {nomComplet}
                         </span>
