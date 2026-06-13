@@ -71,8 +71,7 @@ function ListePtbas() {
       buildPtbasColumns(
         setOpen,
         setCurrentRow,
-        onOpenPlanification,
-        getResponsableLabel
+        onOpenPlanification
       ),
     [setOpen, setCurrentRow, onOpenPlanification, getResponsableLabel]
   )

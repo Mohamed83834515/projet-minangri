@@ -1,7 +1,7 @@
 import { ColumnDef, type Row } from '@tanstack/react-table'
 import { GenericRowActions } from '@/Global/Tableaux/GenericRowActions'
 import { buildColumns } from '@/Global/Tableaux/column-builder'
-import { UserPen, Trash2, CheckCircle, MinusCircle, ClipboardList } from 'lucide-react'
+import { UserPen, Trash2,ClipboardList } from 'lucide-react'
 import { Ptba } from '../allTypes'
 import { getMoisOptions } from '../schemas/ptbaSchemas'
 import { DataTableColumnHeader } from '@/components/data-table/column-header'
@@ -54,14 +54,14 @@ type Props = {
 
 export function ChronogrammeMonthCell({ value, month }: Props) {
     const months = parseChronogramme(value)
-
     const isActive = months.includes(month)
+
     return (
         <div className="flex justify-center">
             {isActive ? (
-                <CheckCircle className="h-5 w-5 text-green-500" />
+                <div className="h-2.5 w-2.5 rounded-full bg-green-500 shadow-sm shadow-green-200" />
             ) : (
-                <MinusCircle className="h-5 w-5 text-gray-300" />
+                <div className="h-2 w-2 rounded-full bg-gray-200 dark:bg-gray-700" />
             )}
         </div>
     )
@@ -85,8 +85,7 @@ export const parseChronogramme = (value: unknown): string[] => {
 export const buildPtbasColumns = (
     setOpen: (dialog: PtbasDialogType | null) => void,
     setCurrentRow: React.Dispatch<React.SetStateAction<Ptba | null>>,
-    onOpenPlanification: (activite: Ptba) => void,
-    getResponsableLabel?: (ptba: Ptba) => string | null | undefined
+    onOpenPlanification: (activite: Ptba) => void
 ) => {
     const baseColumns = buildColumns<Ptba>([
         { type: "text", key: "code_activite_ptba", title: "Code", sticky: true },
@@ -109,42 +108,6 @@ export const buildPtbasColumns = (
         enableSorting: false,
         enableHiding: false,
     }
-    const responsableColumn: ColumnDef<Ptba> = {
-        id: "responsable_ptba",
-        accessorKey: 'responsable_ptba',
-        header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='Responsable' />
-        ),
-        cell: ({ row }) => {
-            const ptba = row.original
-            const fromLookup = getResponsableLabel?.(ptba)?.trim()
-            let nomComplet = fromLookup || ''
-
-            if (!nomComplet) {
-                const responsable = ptba.responsable_ptba
-                if (responsable && typeof responsable === 'object') {
-                    const prenom = responsable.prenom_perso || ''
-                    const nom = responsable.nom_perso || ''
-                    nomComplet = `${prenom} ${nom}`.trim()
-                }
-            }
-
-            return (
-                <div className='flex justify-center'>
-                    {nomComplet ? (
-                        <span className='inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-950/30 dark:text-blue-400'>
-                            {nomComplet}
-                        </span>
-                    ) : (
-                        <span className='text-sm text-muted-foreground'>-</span>
-                    )}
-                </div>
-            )
-        },
-        enableSorting: false,
-        enableHiding: false,
-    }
-
     const chronogrammeColumns: ColumnDef<Ptba>[] = getMoisOptions().map((mois) => ({
         id: `chronogramme_${mois.value}`,
         header: ({ column }) => (
@@ -183,7 +146,7 @@ export const buildPtbasColumns = (
             return (
                 <div className='flex justify-center'>
                     <span className='inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold tabular-nums text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400'>
-                        {new Intl.NumberFormat('fr-FR').format(cout)} 
+                        {new Intl.NumberFormat('fr-FR').format(cout)}
                     </span>
                 </div>
             )
@@ -233,7 +196,6 @@ export const buildPtbasColumns = (
 
     return [
         ...baseColumns,
-        responsableColumn,
         ...chronogrammeColumns,
         planificationColumn,
         coutColumns,
