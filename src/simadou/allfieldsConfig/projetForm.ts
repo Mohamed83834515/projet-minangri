@@ -112,7 +112,7 @@ export const getProjetFormConfig = (
       type: 'switch',
       helperText: 'Définir le projet comme étant un méga projet',
       className: 'field-card',
-      gridCols: 1,
+      gridCols: 2,
     },
 
     // ════════════ ÉTAPE 2 — Acteurs & zones ════════════

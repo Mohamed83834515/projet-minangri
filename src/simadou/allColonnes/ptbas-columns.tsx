@@ -178,8 +178,7 @@ export const buildPtbasColumns = (
             return (
                 <div className='flex justify-center'>
                     <span className='inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold tabular-nums text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400'>
-                        <span className='mr-1 text-emerald-500'>💰</span>
-                        {new Intl.NumberFormat('fr-FR').format(cout)} GNF
+                        {new Intl.NumberFormat('fr-FR').format(cout)} 
                     </span>
                 </div>
             )

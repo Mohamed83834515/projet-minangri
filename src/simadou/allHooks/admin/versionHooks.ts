@@ -3,27 +3,18 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { Programme } from '@/simadou/allTypes/programme'
 import type { VersionPtba } from '@/simadou/allTypes'
 import versionPtbaService from '@/simadou/allSercices/versionPtbaService'
-import { useActiveProgrammeCode } from '@/hooks/use-active-programme'
+
 import { toast } from 'sonner'
-
 export const useGetVersions = () => {
-  const codeProgramme = useActiveProgrammeCode()
-
   return useQuery({
-    queryKey: ['versions-ptba', codeProgramme],
+    queryKey: ['versions-ptba'],
     queryFn: async () => {
       const allVersions = await versionPtbaService.getAll()
-      if (!codeProgramme) return []
-      // Filtrer par programme - la version a une propriété 'programme' qui contient l'objet programme
-      return allVersions.filter(version =>
-        version.programme &&
-        typeof version.programme === 'object' &&
-        version.programme.code_programme === codeProgramme
-      )
+      return allVersions
     },
-    enabled: !!codeProgramme,
   })
 }
+
 export const useSaveVersion = (
   isEdit: boolean,
   currentRow?: any,
@@ -148,28 +139,24 @@ const SELECTED_VERSION_STORAGE_KEY = 'selectedVersionId'
 export function usePtbaVersionSelection(codeProgramme: string | undefined) {
   const { data: versions = [] } = useGetVersions()
   const [selectedVersionId, setSelectedVersionId] = useState<string | null>(null)
-
+  console.log(codeProgramme);
+  // Plus de filtrage par programme - on retourne toutes les versions
   const versionsForProgramme = useMemo(
-    () =>
-      versions.filter((v) => versionBelongsToProgramme(v, codeProgramme)),
-    [versions, codeProgramme]
+    () => versions, // Retourne toutes les versions sans filtre
+    [versions]
   )
 
   const versionOptions = useMemo(
     () =>
       versionsForProgramme.map((version: VersionPtba) => ({
-        label: `${version.version_ptba || `Version ${version.id_version_ptba}`} - ${version.annee_ptba}`,
+        label: `${version.annee_ptba}  -  ${version.version_ptba || `Version ${version.id_version_ptba}`} `,
         value: version.id_version_ptba.toString(),
       })),
     [versionsForProgramme]
   )
 
   useEffect(() => {
-    if (!codeProgramme) {
-      setSelectedVersionId(null)
-      return
-    }
-
+    // Plus de vérification du codeProgramme
     if (versionsForProgramme.length === 0) {
       setSelectedVersionId(null)
       return
@@ -194,7 +181,7 @@ export function usePtbaVersionSelection(codeProgramme: string | undefined) {
     const preferredId = preferred.id_version_ptba.toString()
     setSelectedVersionId(preferredId)
     localStorage.setItem(SELECTED_VERSION_STORAGE_KEY, preferredId)
-  }, [codeProgramme, versionsForProgramme])
+  }, [versionsForProgramme]) // codeProgramme retiré des dépendances
 
   const handleChangeVersion = (versionId: string | null) => {
     setSelectedVersionId(versionId)

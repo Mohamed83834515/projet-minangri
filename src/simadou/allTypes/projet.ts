@@ -17,6 +17,7 @@ export interface Projet {
   signataires_projet: Acteur[];
   partenaires_execution_projet: Acteur[];
   zone_projet: Localite[];
+  budget_projet?: number,
 }
 
 export type ProjetFormData = Omit<Projet, "id_projet">;
