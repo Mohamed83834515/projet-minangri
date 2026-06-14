@@ -3,8 +3,8 @@ import type { Ptba } from './ptba'
 
 export interface CoutUnitairePtba extends Record<string, unknown> {
   id_cout_unitaire: number
-  prix_unitaire: string
-  quantite_cu: string
+  prix_unitaire: number
+  quantite_cu: number
   unite_cu: string
   intitule_tache: string
   ordre: number

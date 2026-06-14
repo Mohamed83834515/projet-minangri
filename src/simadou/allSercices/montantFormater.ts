@@ -15,7 +15,7 @@ export const formatNumber = (value: number | string | null | undefined): string 
   if (isNaN(num)) return '0'
   
   // Formatage avec points comme séparateurs
-  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
 }
 
 /**

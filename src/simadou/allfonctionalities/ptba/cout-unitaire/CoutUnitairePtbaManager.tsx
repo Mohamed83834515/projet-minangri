@@ -32,8 +32,8 @@ import { formatNumber } from '@/simadou/allSercices/montantFormater'
 
 type CoutUnitaireRow = {
   id?: number
-  prix_unitaire: string
-  quantite_cu: string
+  prix_unitaire: number
+  quantite_cu: number
   unite_cu: string
   intitule_tache: string
   ordre: number
@@ -49,8 +49,8 @@ function toRow(item: CoutUnitairePtba): CoutUnitaireRow {
 
   return {
     id: item.id_cout_unitaire,
-    prix_unitaire: String(item.prix_unitaire ?? ''),
-    quantite_cu: String(item.quantite_cu ?? ''),
+    prix_unitaire: item.prix_unitaire ?? 0,
+    quantite_cu: item.quantite_cu ?? 0,
     unite_cu: item.unite_cu ?? '',
     intitule_tache: item.intitule_tache ?? '',
     ordre: Number(item.ordre) || 0,
@@ -61,8 +61,8 @@ function toRow(item: CoutUnitairePtba): CoutUnitaireRow {
 
 function createEmptyRow(defaultPersonnelId?: number): CoutUnitaireRow {
   return {
-    prix_unitaire: '',
-    quantite_cu: '',
+    prix_unitaire: 0,
+    quantite_cu: 0,
     unite_cu: '',
     intitule_tache: '',
     ordre: 0,
@@ -74,8 +74,8 @@ function createEmptyRow(defaultPersonnelId?: number): CoutUnitaireRow {
 function rowHasData(row: CoutUnitaireRow): boolean {
   return (
     !!row.intitule_tache.trim() ||
-    !!row.prix_unitaire.trim() ||
-    !!row.quantite_cu.trim() ||
+    !!row.prix_unitaire ||
+    !!row.quantite_cu ||
     !!row.unite_cu.trim()
   )
 }
@@ -114,6 +114,7 @@ export default function CoutUnitairePtbaManager({
   const [rows, setRows] = useState<CoutUnitaireRow[]>([])
   const [initialized, setInitialized] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  
   useEffect(() => {
     if (initialized || isLoading || isFetching) return
     setRows(syncRowsFromItems(coutsUnitaires, modifierPar))
@@ -162,7 +163,6 @@ export default function CoutUnitairePtbaManager({
     setRows((prev) => prev.filter((_, i) => i !== index))
   }
 
-
   const { data: config } = useGeneralParamsQuery()
   const currencyCode = config?.currencyCode
 
@@ -178,11 +178,11 @@ export default function CoutUnitairePtbaManager({
         toast.error("L'intitulé de la tâche est requis sur chaque ligne")
         return
       }
-      if (!row.prix_unitaire.trim()) {
+      if (!row.prix_unitaire) {
         toast.error('Le prix unitaire est requis sur chaque ligne')
         return
       }
-      if (!row.quantite_cu.trim()) {
+      if (!row.quantite_cu) {
         toast.error('La quantité est requise sur chaque ligne')
         return
       }
@@ -206,8 +206,8 @@ export default function CoutUnitairePtbaManager({
       for (const row of rowsToSave) {
         const payload = buildCoutUnitairePtbaPayload(
           {
-            prix_unitaire: row.prix_unitaire,
-            quantite_cu: row.quantite_cu,
+            prix_unitaire: row.prix_unitaire || 0,
+            quantite_cu: row.quantite_cu || 0,
             unite_cu: row.unite_cu,
             intitule_tache: row.intitule_tache,
             ordre: row.ordre,
@@ -235,17 +235,11 @@ export default function CoutUnitairePtbaManager({
 
   const calculerCoutTotal = (rows: any[]): number => {
     return rows.reduce((total, row) => {
-      const qte = parseFloat(row.quantite_cu) || 0
-      const prix = parseFloat(row.prix_unitaire) || 0
+      const qte = parseInt(row.quantite_cu) || 0
+      const prix = parseInt(row.prix_unitaire) || 0
       return total + (qte * prix)
     }, 0)
   }
-
-  // Formatage en GNF
-  // const formatGNF = (montant: number): string => {
-  //   return new Intl.NumberFormat('fr-FR').format(montant) 
-  // }
-
 
   if ((isLoading || isFetching) && !initialized) {
     return (
@@ -276,6 +270,7 @@ export default function CoutUnitairePtbaManager({
           </Button>
         </div>
       </div>
+
       {/* Tableau des lignes */}
       <div className='overflow-x-auto rounded-lg border'>
         <Table>
@@ -292,8 +287,8 @@ export default function CoutUnitairePtbaManager({
           </TableHeader>
           <TableBody>
             {rows.map((row, index) => {
-              const qte = parseFloat(row.quantite_cu) || 0
-              const prix = parseFloat(row.prix_unitaire) || 0
+              const qte = row.quantite_cu || 0
+              const prix = row.prix_unitaire  || 0
               const ligneTotal = qte * prix
 
               return (
@@ -332,25 +327,25 @@ export default function CoutUnitairePtbaManager({
                   </TableCell>
                   <TableCell className='align-top'>
                     <Input
-                      type='text'
-                      inputMode='decimal'
+                      type='number'
                       placeholder='0'
-                      value={row.quantite_cu}
-                      onChange={(e) =>
-                        updateRow(index, { quantite_cu: e.target.value })
-                      }
+                      value={Number(row.quantite_cu)}
+                      onChange={(e) => {
+                        const value = parseInt(e.target.value)
+                        updateRow(index, { quantite_cu: value })
+                      }}
                       className='h-9'
                     />
                   </TableCell>
                   <TableCell className='align-top'>
                     <Input
-                      type='text'
-                      inputMode='decimal'
+                      type='number'
                       placeholder='0'
-                      value={row.prix_unitaire}
-                      onChange={(e) =>
-                        updateRow(index, { prix_unitaire: e.target.value })
-                      }
+                      value={Number(row.prix_unitaire)}
+                      onChange={(e) => {
+                        const value = parseInt(e.target.value)
+                        updateRow(index, { prix_unitaire: value })
+                      }}
                       className='h-9'
                     />
                   </TableCell>

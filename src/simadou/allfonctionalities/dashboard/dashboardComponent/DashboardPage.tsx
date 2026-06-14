@@ -649,7 +649,7 @@ const DashboardPage: React.FC = () => {
 
                 {/* Carte 2 : PTBA Programme */}
                 <StatCard
-                    title={`PTBA ${ptbaProgrammeStats.annee} des Projets et Programmes`}
+                    title={`PTBA ${ptbaProgrammeStats.annee} des Projets-Programmes`}
                     color="emerald"
                     rows={[
                         { label: "Montant Total Prévu", value: ptbaProgrammeStats.montantPrevu.toLocaleString('fr-FR'), suffix: "GNF" },

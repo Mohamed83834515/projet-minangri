@@ -72,7 +72,7 @@ export const buildActeurColumns = (
       cell: ({ row }) => {
         const cat = row.original.categorie_acteur
         const label = cat && typeof cat === 'object' 
-          ? `${cat.code_cat}-${cat.nom_categorie}` 
+          ? `${cat.nom_categorie}` 
           : '-'
         return (
           <Badge variant='secondary' className='bg-blue-100 text-blue-800'>

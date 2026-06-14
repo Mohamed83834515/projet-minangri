@@ -2,8 +2,8 @@ import type { CoutUnitairePtba } from '@/simadou/allTypes/coutUnitairePtba'
 import { resolveRelationId } from '@/simadou/lib/resolveApiRelation'
 
 export type CoutUnitairePtbaApiPayload = {
-  prix_unitaire: string
-  quantite_cu: string
+  prix_unitaire: number
+  quantite_cu: number
   unite_cu: string
   intitule_tache: string
   ordre: number
@@ -30,8 +30,8 @@ export function filterCoutsUnitairesByActivite(
 
 export function buildCoutUnitairePtbaPayload(
   data: {
-    prix_unitaire: string
-    quantite_cu: string
+    prix_unitaire: number
+    quantite_cu: number
     unite_cu: string
     intitule_tache: string
     ordre: number
