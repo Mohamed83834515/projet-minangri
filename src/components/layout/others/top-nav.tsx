@@ -1169,6 +1169,8 @@ export function AppTopbar({ user }: UserProps) {
     setManualGroup((prev) => (prev?.title === item.title ? null : item))
   }
 
+ 
+
   return (
     <>
       <CSSInjector />
@@ -1204,11 +1206,14 @@ export function AppTopbar({ user }: UserProps) {
           position: 'relative',
         }}>
 
-          <SidebarTrigger
-            className="_tb-ibtn md:hidden"
-            aria-label={t('Ouvrir le menu')}
-            style={{ color: headerText, flexShrink: 0 }}
-          />
+          {/* SidebarTrigger - visible seulement en mode vertical */}
+          {subNavMode !== 'horizontal' && (
+            <SidebarTrigger
+              className="_tb-ibtn md:hidden"
+              aria-label={t('Ouvrir le menu')}
+              style={{ color: headerText, flexShrink: 0 }}
+            />
+          )}
 
           {/* LOGO — fond blanc pour lisibilité */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -1303,7 +1308,7 @@ export function AppTopbar({ user }: UserProps) {
                 textShadow: '0 2px 4px rgba(0,0,0,0.1)',
               }}
             >
-            {config?.systemTitle}
+              {config?.systemTitle || "SISE CEP Agriculture PS2040"}
             </div>
             <div
               style={{
@@ -1340,10 +1345,10 @@ export function AppTopbar({ user }: UserProps) {
                 side={"bottom"}
                 onLogout={() => setOpen(true)}
                 trigger={
-                  <Button>
-                    <Avatar className='h-8 w-8'>
+                  <Button className='h-8 w-8 rounded-full'>
+                    <Avatar className='h-8 w-8 rounded-full'>
                       <AvatarImage src={user.personnel_profile_picture ?? ''} alt='profile' />
-                      <AvatarFallback>{userInitials}</AvatarFallback>
+                      <AvatarFallback className='text-foreground font-semibold'>{userInitials}</AvatarFallback>
                     </Avatar>
                   </Button>
                 }
