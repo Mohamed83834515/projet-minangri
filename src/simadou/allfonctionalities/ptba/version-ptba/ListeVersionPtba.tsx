@@ -131,18 +131,6 @@ export default function ListeVersionPtba({ onAdd, onEdit }: ListeVersionPtbaProp
                                 ({counts.total})
                             </span>
                         </TabsTrigger>
-                        <TabsTrigger value="en_cours">
-                            En cours
-                            <span className='ml-2 rounded-full bg-muted px-1.5 py-0.5 text-xs text-black'>
-                                ({counts.enCours})
-                            </span>
-                        </TabsTrigger>
-                        <TabsTrigger value="valide">
-                            Validées
-                            <span className='ml-2 rounded-full bg-muted px-1.5 py-0.5 text-xs text-black'>
-                                ({counts.valide})
-                            </span>
-                        </TabsTrigger>
                         <TabsTrigger value="archive">
                             Archivées
                             <span className='ml-2 rounded-full bg-muted px-1.5 py-0.5 text-xs text-black'>
