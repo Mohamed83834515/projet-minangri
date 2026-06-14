@@ -638,7 +638,7 @@ const DashboardPage: React.FC = () => {
                 {/* Carte 1 : Projet Programme */}
                 {/* Carte 1 : Projet Programme */}
                 <StatCard
-                    title="Projet Programme"
+                    title="Projets et Programmes"
                     color="blue"
                     rows={[
                         { label: "Nombre total du projet", value: projetProgrammeStats.total },
@@ -649,7 +649,7 @@ const DashboardPage: React.FC = () => {
 
                 {/* Carte 2 : PTBA Programme */}
                 <StatCard
-                    title={`PTBA ${ptbaProgrammeStats.annee} Programme`}
+                    title={`PTBA ${ptbaProgrammeStats.annee} des Projets et Programmes`}
                     color="emerald"
                     rows={[
                         { label: "Montant Total Prévu", value: ptbaProgrammeStats.montantPrevu.toLocaleString('fr-FR'), suffix: "GNF" },
@@ -662,7 +662,7 @@ const DashboardPage: React.FC = () => {
 
                 {/* Carte 3 : PTBA Département */}
                 <StatCard
-                    title={`PTBA ${ptbaDepartementStats.annee} Département`}
+                    title={`PTBA ${ptbaDepartementStats.annee} du MINAGRI`}
                     color="purple"
                     rows={[
                         { label: "Montant Total Prévu", value: ptbaDepartementStats.montantPrevu.toLocaleString('fr-FR'), suffix: "GNF" },

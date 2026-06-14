@@ -143,7 +143,7 @@ export default function ProjetDetail() {
                 </div>
                 <div className='min-w-0'>
                   <CardTitle className='line-clamp-2 text-xs leading-snug'>
-                    {projet.intitule_projet}
+                    {projet.sigle_projet}
                   </CardTitle>
                   <CardDescription className='font-mono text-[9px] font-bold uppercase'>
                     {projet.code_projet}
@@ -193,7 +193,7 @@ export default function ProjetDetail() {
                       notation: 'compact',
                       compactDisplay: 'short',
                       style: 'currency',
-                      currency: 'XOF',
+                      currency: 'GNF',
                       maximumFractionDigits: 1,
                     }).format(0)}
                   </span>

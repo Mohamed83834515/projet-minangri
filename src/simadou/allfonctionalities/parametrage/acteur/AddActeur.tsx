@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { DIALOG_SIZES } from '@/Global/Forms/dialog'
 import { acteurSchema } from '@/simadou/schemas/acteurSchema'
 import { useGetCategoriesActeur } from '@/simadou/allHooks/admin/categorieActeurHooks'
+import { useActeurStore } from '@/stores/acteur-store'
 
 type Props = {
     open: boolean
@@ -21,50 +22,63 @@ export default function AddActeur({
     currentRow,
 }: Props) {
     const isEdit = !!currentRow
-    const {data : categorie_acteurs = []} = useGetCategoriesActeur()
+    const { data: categorie_acteurs = [] } = useGetCategoriesActeur()
+    const { selectedCategorieId } = useActeurStore()
+    const preselectedCategorieId = selectedCategorieId
+    const resolvedCategorieId = useMemo(() => {
+        if (isEdit && currentRow) {
+            const categorie = currentRow.categorie_acteur
+            return typeof categorie === 'object' && categorie !== null
+                ? categorie.id_categorie
+                : categorie || null
+        }
+        return preselectedCategorieId ?? null
+    }, [isEdit, currentRow, preselectedCategorieId])
 
+    // On cache le champ categorie_acteur : imposé par l'onglet
     const formConfig = useMemo(() => {
         const config = getActeurFormConfig()
-
-        // Transformer les localités en options pour les selects
-        const categorieOptions = categorie_acteurs.map((cat: any) => ({
-            label: cat.nom_categorie,
-            value: cat.id_categorie,
-        }))
-
-        // Mettre à jour les options des champs select
         return {
-            fields: config.fields.map((field) => {
-                if (field.name === 'categorie_acteur') {
-                    return { ...field, options: categorieOptions }
-                }
-                return field
-            }),
+            fields: config.fields.filter(
+                (field) => field.name !== 'categorie_acteur'
+            ),
         }
-    }, [categorie_acteurs])
+    }, [])
 
     const defaultValues = useMemo(() => {
-        const categorie = currentRow?.categorie_acteur
-        return {
-            code_acteur: currentRow?.code_acteur || '',
-            nom_acteur: currentRow?.nom_acteur || '',
-            description_acteur: currentRow?.description_acteur || '',
-            personne_responsable: currentRow?.personne_responsable || '',
-            contact: currentRow?.contact || '',
-            adresse_email: currentRow?.adresse_email || '',
-            categorie_acteur: typeof categorie === 'object' && categorie !== null
-                ? categorie.id_categorie
-                : categorie || null,
+        if (isEdit && currentRow) {
+            return {
+                code_acteur: currentRow.code_acteur || '',
+                nom_acteur: currentRow.nom_acteur || '',
+                description_acteur: currentRow.description_acteur || '',
+                personne_responsable: currentRow.personne_responsable || '',
+                contact: currentRow.contact || '',
+                adresse_email: currentRow.adresse_email || '',
+                categorie_acteur: resolvedCategorieId,  // injecté, pas affiché
+            }
         }
-    }, [currentRow])
+        return {
+            code_acteur: '',
+            nom_acteur: '',
+            description_acteur: '',
+            personne_responsable: '',
+            contact: '',
+            adresse_email: '',
+            categorie_acteur: resolvedCategorieId,  // injecté, pas affiché
+        }
+    }, [currentRow, isEdit, resolvedCategorieId])
+
+    // Nom de la catégorie pour l'affichage dans le titre
+    const selectedCategorieNom = useMemo(() => {
+        if (!resolvedCategorieId) return ''
+        return categorie_acteurs.find(
+            (c: any) => c.id_categorie === resolvedCategorieId
+        )?.nom_categorie || ''
+    }, [categorie_acteurs, resolvedCategorieId])
 
     const mutation = useSaveActeur(isEdit, currentRow, () => {
         onOpenChange(false)
     })
-
-    const handleSubmit = (data: ActeurFormData) => {
-        mutation.mutate(data)
-    }
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -75,16 +89,19 @@ export default function AddActeur({
                     </DialogTitle>
                     <DialogDescription>
                         {isEdit
-                            ? "Modification des informations de l'acteur"
-                            : "Création d'un nouvel acteur"}
+                            ? `Modification des informations de l'acteur${selectedCategorieNom ? ` — ${selectedCategorieNom}` : ''}`
+                            : selectedCategorieNom
+                                ? `Ajouter un acteur dans la catégorie "${selectedCategorieNom}"`
+                                : "Ajouter un nouvel acteur"}
                     </DialogDescription>
                 </DialogHeader>
 
                 <DynamicForm
+                    key={`${isEdit ? currentRow?.id_acteur : 'new'}-${resolvedCategorieId}, resolvedCategorieId`}
                     config={formConfig}
                     schema={acteurSchema}
                     defaultValues={defaultValues}
-                    onSubmit={handleSubmit}
+                    onSubmit={(data: ActeurFormData) => mutation.mutate(data)}
                     isLoading={mutation.isPending}
                     submitText={isEdit ? 'Mettre à jour' : 'Ajouter'}
                     loadingText='Enregistrement...'

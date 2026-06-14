@@ -28,6 +28,7 @@ import {
 } from '@/simadou/lib/coutUnitairePtbaUtils'
 import { resolveRelationId } from '@/simadou/lib/resolveApiRelation'
 import { useGeneralParamsQuery } from '@/simadou/allHooks/generalParams/queries'
+import { formatNumber } from '@/simadou/allSercices/montantFormater'
 
 type CoutUnitaireRow = {
   id?: number
@@ -241,9 +242,9 @@ export default function CoutUnitairePtbaManager({
   }
 
   // Formatage en GNF
-  const formatGNF = (montant: number): string => {
-    return new Intl.NumberFormat('fr-FR').format(montant) 
-  }
+  // const formatGNF = (montant: number): string => {
+  //   return new Intl.NumberFormat('fr-FR').format(montant) 
+  // }
 
 
   if ((isLoading || isFetching) && !initialized) {
@@ -353,10 +354,10 @@ export default function CoutUnitairePtbaManager({
                       className='h-9'
                     />
                   </TableCell>
-                  <TableCell className='text-center'>
+                  <TableCell className='text-right align-middle'>
                     {ligneTotal > 0 && (
-                      <span className='mr-2 text-lg font-medium text-emerald-600 dark:text-emerald-400'>
-                        {formatGNF(ligneTotal)}
+                      <span className='text-sm font-medium text-emerald-600 dark:text-emerald-400'>
+                        {formatNumber(ligneTotal)}
                       </span>
                     )}
                   </TableCell>
@@ -396,12 +397,12 @@ export default function CoutUnitairePtbaManager({
                     <p className='text-sm font-semibold'>{rows.length}</p>
                   </div>
                 </TableCell>
-                <TableCell colSpan={2} className='py-3'>
+                <TableCell colSpan={3} className='py-3'>
                   <div className='flex items-center justify-end gap-3'>
                     <div className='text-right'>
                       <p className='text-[10px] uppercase text-muted-foreground'>Total général</p>
                       <p className='text-xl font-bold text-primary'>
-                        {formatGNF(calculerCoutTotal(rows))} {currencyCode}
+                        {formatNumber(calculerCoutTotal(rows))} {currencyCode}
                       </p>
                     </div>
                   </div>
