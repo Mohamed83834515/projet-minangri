@@ -120,11 +120,11 @@ export default function ListeVersionPtba({ onAdd, onEdit }: ListeVersionPtbaProp
                 <Tabs
                     orientation='vertical'
                     defaultValue='overview'
-                    className='space-y-4'
+                    className='space-y-2'
                     style={tabsStyle}
                     value={filter} onValueChange={(v) => setFilter(v as FilterType)}
                 >
-                    <TabsList className="grid w-full grid-cols-4">
+                    <TabsList className="grid w-full grid-cols-2">
                         <TabsTrigger value="toutes">
                             Toutes
                             <span className='ml-2 rounded-full bg-muted px-1.5 py-0.5 text-xs text-black'>
