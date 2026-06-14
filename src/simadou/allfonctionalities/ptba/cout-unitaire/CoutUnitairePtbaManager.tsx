@@ -9,6 +9,7 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -26,6 +27,7 @@ import {
   buildCoutUnitairePtbaPayload,
 } from '@/simadou/lib/coutUnitairePtbaUtils'
 import { resolveRelationId } from '@/simadou/lib/resolveApiRelation'
+import { useGeneralParamsQuery } from '@/simadou/allHooks/generalParams/queries'
 
 type CoutUnitaireRow = {
   id?: number
@@ -159,6 +161,10 @@ export default function CoutUnitairePtbaManager({
     setRows((prev) => prev.filter((_, i) => i !== index))
   }
 
+
+  const { data: config } = useGeneralParamsQuery()
+  const currencyCode = config?.currencyCode
+
   const onSave = async () => {
     const rowsToSave = rows.filter(rowHasData)
     if (rowsToSave.length === 0) {
@@ -226,6 +232,20 @@ export default function CoutUnitairePtbaManager({
     }
   }
 
+  const calculerCoutTotal = (rows: any[]): number => {
+    return rows.reduce((total, row) => {
+      const qte = parseFloat(row.quantite_cu) || 0
+      const prix = parseFloat(row.prix_unitaire) || 0
+      return total + (qte * prix)
+    }, 0)
+  }
+
+  // Formatage en GNF
+  const formatGNF = (montant: number): string => {
+    return new Intl.NumberFormat('fr-FR').format(montant) 
+  }
+
+
   if ((isLoading || isFetching) && !initialized) {
     return (
       <div className='py-6 text-sm text-muted-foreground'>Chargement…</div>
@@ -233,18 +253,19 @@ export default function CoutUnitairePtbaManager({
   }
 
   return (
-    <div className='space-y-4'>
-      <div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
-        <p className='text-sm text-muted-foreground'>
-          Saisissez les coûts unitaires directement dans le tableau.
-        </p>
+    <div className='space-y-6'>
+      {/* En-tête avec boutons */}
+      <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
+        <div>
+          <p className='text-sm text-muted-foreground'>
+            Saisissez les coûts unitaires directement dans le tableau.
+          </p>
+          <p className='text-xs text-muted-foreground mt-1'>
+            Les prix unitaires sont exprimés en Francs Guinéens ({currencyCode})
+          </p>
+        </div>
         <div className='flex flex-col gap-2 sm:flex-row'>
-          <Button
-            type='button'
-            variant='outline'
-            onClick={onAddRow}
-            disabled={isSaving}
-          >
+          <Button type='button' variant='outline' onClick={onAddRow} disabled={isSaving}>
             <Plus className='h-4 w-4' />
             Ajouter une ligne
           </Button>
@@ -254,88 +275,140 @@ export default function CoutUnitairePtbaManager({
           </Button>
         </div>
       </div>
-
+      {/* Tableau des lignes */}
       <div className='overflow-x-auto rounded-lg border'>
         <Table>
           <TableHeader>
-            <TableRow>
+            <TableRow className='bg-muted/30'>
               <TableHead className='w-20'>Ordre</TableHead>
               <TableHead className='min-w-48'>Intitulé tâche</TableHead>
               <TableHead className='min-w-24'>Unité</TableHead>
               <TableHead className='min-w-28'>Quantité</TableHead>
-              <TableHead className='min-w-28'>Prix unitaire</TableHead>
+              <TableHead className='min-w-28'>Prix unitaire (GNF)</TableHead>
+              <TableHead className='min-w-28'>Montant (GNF)</TableHead>
               <TableHead className='w-16 text-end'>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {rows.map((row, index) => (
-              <TableRow key={row.id ?? `new-${index}`}>
-                <TableCell className='align-top'>
-                  <Input
-                    type='number'
-                    value={row.ordre}
-                    onChange={(e) =>
-                      updateRow(index, {
-                        ordre: Number(e.target.value) || 0,
-                      })
-                    }
-                  />
+            {rows.map((row, index) => {
+              const qte = parseFloat(row.quantite_cu) || 0
+              const prix = parseFloat(row.prix_unitaire) || 0
+              const ligneTotal = qte * prix
+
+              return (
+                <TableRow key={row.id ?? `new-${index}`} className='group'>
+                  <TableCell className='align-top'>
+                    <Input
+                      type='number'
+                      value={row.ordre}
+                      onChange={(e) =>
+                        updateRow(index, {
+                          ordre: Number(e.target.value) || 0,
+                        })
+                      }
+                      className='h-9 w-20'
+                    />
+                  </TableCell>
+                  <TableCell className='align-top'>
+                    <Input
+                      placeholder='Intitulé'
+                      value={row.intitule_tache}
+                      onChange={(e) =>
+                        updateRow(index, { intitule_tache: e.target.value })
+                      }
+                      className='h-9'
+                    />
+                  </TableCell>
+                  <TableCell className='align-top'>
+                    <Input
+                      placeholder='Unité'
+                      value={row.unite_cu}
+                      onChange={(e) =>
+                        updateRow(index, { unite_cu: e.target.value })
+                      }
+                      className='h-9'
+                    />
+                  </TableCell>
+                  <TableCell className='align-top'>
+                    <Input
+                      type='text'
+                      inputMode='decimal'
+                      placeholder='0'
+                      value={row.quantite_cu}
+                      onChange={(e) =>
+                        updateRow(index, { quantite_cu: e.target.value })
+                      }
+                      className='h-9'
+                    />
+                  </TableCell>
+                  <TableCell className='align-top'>
+                    <Input
+                      type='text'
+                      inputMode='decimal'
+                      placeholder='0'
+                      value={row.prix_unitaire}
+                      onChange={(e) =>
+                        updateRow(index, { prix_unitaire: e.target.value })
+                      }
+                      className='h-9'
+                    />
+                  </TableCell>
+                  <TableCell className='text-center'>
+                    {ligneTotal > 0 && (
+                      <span className='mr-2 text-lg font-medium text-emerald-600 dark:text-emerald-400'>
+                        {formatGNF(ligneTotal)}
+                      </span>
+                    )}
+                  </TableCell>
+                  <TableCell className='text-end align-top'>
+                    <div className='flex items-center justify-end gap-1'>
+                      <Button
+                        type='button'
+                        variant='ghost'
+                        size='icon'
+                        disabled={isSaving}
+                        onClick={() => onRemoveRow(index)}
+                        title='Supprimer la ligne'
+                        className='h-8 w-8 text-muted-foreground hover:text-red-500'
+                      >
+                        <Trash2 className='h-4 w-4' />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )
+            })}
+          </TableBody>
+          {rows.length > 0 && (
+            <TableFooter>
+              <TableRow className='border-t border-border/60 bg-gradient-to-r from-muted/30 via-muted/10 to-muted/30'>
+                <TableCell colSpan={3} className='py-3'>
+                  <div className='flex items-center gap-2'>
+                    <div className='h-1.5 w-1.5 rounded-full bg-primary' />
+                    <span className='text-xs font-medium uppercase tracking-wider text-muted-foreground'>
+                      Récapitulatif
+                    </span>
+                  </div>
                 </TableCell>
-                <TableCell className='align-top'>
-                  <Input
-                    placeholder='Intitulé'
-                    value={row.intitule_tache}
-                    onChange={(e) =>
-                      updateRow(index, { intitule_tache: e.target.value })
-                    }
-                  />
+                <TableCell colSpan={1} className='py-3'>
+                  <div className='text-center'>
+                    <p className='text-[10px] uppercase text-muted-foreground'>Lignes</p>
+                    <p className='text-sm font-semibold'>{rows.length}</p>
+                  </div>
                 </TableCell>
-                <TableCell className='align-top'>
-                  <Input
-                    placeholder='Unité'
-                    value={row.unite_cu}
-                    onChange={(e) =>
-                      updateRow(index, { unite_cu: e.target.value })
-                    }
-                  />
-                </TableCell>
-                <TableCell className='align-top'>
-                  <Input
-                    type='text'
-                    inputMode='decimal'
-                    placeholder='0'
-                    value={row.quantite_cu}
-                    onChange={(e) =>
-                      updateRow(index, { quantite_cu: e.target.value })
-                    }
-                  />
-                </TableCell>
-                <TableCell className='align-top'>
-                  <Input
-                    type='text'
-                    inputMode='decimal'
-                    placeholder='0'
-                    value={row.prix_unitaire}
-                    onChange={(e) =>
-                      updateRow(index, { prix_unitaire: e.target.value })
-                    }
-                  />
-                </TableCell>
-                <TableCell className='text-end align-top'>
-                  <Button
-                    type='button'
-                    variant='ghost'
-                    size='icon'
-                    disabled={isSaving}
-                    onClick={() => onRemoveRow(index)}
-                    title='Supprimer la ligne'
-                  >
-                    <Trash2 className='h-4 w-4' />
-                  </Button>
+                <TableCell colSpan={2} className='py-3'>
+                  <div className='flex items-center justify-end gap-3'>
+                    <div className='text-right'>
+                      <p className='text-[10px] uppercase text-muted-foreground'>Total général</p>
+                      <p className='text-xl font-bold text-primary'>
+                        {formatGNF(calculerCoutTotal(rows))} {currencyCode}
+                      </p>
+                    </div>
+                  </div>
                 </TableCell>
               </TableRow>
-            ))}
-          </TableBody>
+            </TableFooter>
+          )}
         </Table>
       </div>
     </div>

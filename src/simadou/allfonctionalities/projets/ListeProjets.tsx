@@ -10,6 +10,7 @@ import useDialogState from '@/hooks/use-dialog-state'
 import { GenericDialogs } from '@/Global/Generic/Genericdialogs'
 import { GenericDeleteDialog } from '@/Global/Tableaux/GenericDeleteDialog'
 import AddProjet from './AddProjet'
+import { useGeneralParamsQuery } from '@/simadou/allHooks/generalParams/queries'
 
 const route = getRouteApi('/_authenticated/programmation/projets/')
 
@@ -34,9 +35,12 @@ export default function ListeProjets() {
     [navigate]
   )
 
+  const { data: config } = useGeneralParamsQuery()
+  const currencyCode = config?.currencyCode
+
   const columns = useMemo(
-    () => buildProjetsColumns(setOpen, setCurrentRow, goToDetail),
-    [setOpen, setCurrentRow, goToDetail]
+    () => buildProjetsColumns(setOpen, setCurrentRow, goToDetail, currencyCode),
+    [setOpen, setCurrentRow, goToDetail, currencyCode]
   )
 
   if (!activeProgramme) {

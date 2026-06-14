@@ -10,7 +10,8 @@ type ProjetDialogType = 'add' | 'edit' | 'delete';
 export function buildProjetsColumns(
   setOpen: (dialog: ProjetDialogType | null) => void,
   setCurrentRow: React.Dispatch<React.SetStateAction<Projet | null>>,
-  onDetail: (projet: Projet) => void
+  onDetail: (projet: Projet) => void,
+  currencyCode?: string
 ): ColumnDef<Projet>[] {
   return [
     {
@@ -95,7 +96,7 @@ export function buildProjetsColumns(
     {
       id: 'budget',
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Budget (GNF)' />
+        <DataTableColumnHeader column={column} title={`Budget(${currencyCode})`} />
       ),
       cell: ({ row }) => {
         // Simulation de coûts basée sur l'intitulé ou l'ID de la ligne

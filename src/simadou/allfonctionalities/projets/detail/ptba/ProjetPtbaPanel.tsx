@@ -22,6 +22,7 @@ import { PtbaVersionSelect } from '@/simadou/allfonctionalities/ptba/PtbaVersion
 import AddPtbaProjet from './AddPtbaProjet'
 import TacheActiviteProjetManager from './tache-activite-projet/TacheActiviteManager'
 import IndicateurTacheProjetManager from './indicateur-tache-projet/IndicateurTacheManager'
+import { useGeneralParamsQuery } from '@/simadou/allHooks/generalParams/queries'
 
 type ProjetPtbaPanelProps = {
   projet: Projet
@@ -32,7 +33,7 @@ export default function ProjetPtbaPanel({ projet }: ProjetPtbaPanelProps) {
   const activeProgrammeCode = useActiveProgrammeCode()
   const codeProgramme =
     typeof projet.programme_projet === 'object' &&
-    projet.programme_projet?.code_programme
+      projet.programme_projet?.code_programme
       ? projet.programme_projet.code_programme
       : activeProgrammeCode
   const { selectedVersionId, handleChangeVersion, versionOptions } =
@@ -77,14 +78,18 @@ export default function ProjetPtbaPanel({ projet }: ProjetPtbaPanelProps) {
     setShowPlanificationModal(true)
   }, [])
 
+  const { data: config } = useGeneralParamsQuery()
+  const currencyCode = config?.currencyCode
+
   const columns = useMemo(
     () =>
       buildPtbasColumns(
         setOpen,
         setCurrentRow,
-        onOpenPlanification
+        onOpenPlanification,
+        currencyCode
       ),
-    [setOpen, setCurrentRow, onOpenPlanification, getResponsableLabel]
+    [setOpen, setCurrentRow, onOpenPlanification, getResponsableLabel, currencyCode]
   )
 
   return (
@@ -140,21 +145,21 @@ export default function ProjetPtbaPanel({ projet }: ProjetPtbaPanelProps) {
         tabs={
           planifierActivite
             ? [
-                {
-                  value: 'taches',
-                  label: 'Planification des tâches',
-                  content: (
-                    <TacheActiviteProjetManager activite={planifierActivite} />
-                  ),
-                },
-                {
-                  value: 'indicateurs',
-                  label: 'Planification des indicateurs',
-                  content: (
-                    <IndicateurTacheProjetManager activite={planifierActivite} />
-                  ),
-                },
-              ]
+              {
+                value: 'taches',
+                label: 'Planification des tâches',
+                content: (
+                  <TacheActiviteProjetManager activite={planifierActivite} />
+                ),
+              },
+              {
+                value: 'indicateurs',
+                label: 'Planification des indicateurs',
+                content: (
+                  <IndicateurTacheProjetManager activite={planifierActivite} />
+                ),
+              },
+            ]
             : []
         }
       />

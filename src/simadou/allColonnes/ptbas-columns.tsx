@@ -1,7 +1,7 @@
 import { ColumnDef, type Row } from '@tanstack/react-table'
 import { GenericRowActions } from '@/Global/Tableaux/GenericRowActions'
 import { buildColumns } from '@/Global/Tableaux/column-builder'
-import { UserPen, Trash2,ClipboardList } from 'lucide-react'
+import { UserPen, Trash2, ClipboardList } from 'lucide-react'
 import { Ptba } from '../allTypes'
 import { getMoisOptions } from '../schemas/ptbaSchemas'
 import { DataTableColumnHeader } from '@/components/data-table/column-header'
@@ -85,7 +85,8 @@ export const parseChronogramme = (value: unknown): string[] => {
 export const buildPtbasColumns = (
     setOpen: (dialog: PtbasDialogType | null) => void,
     setCurrentRow: React.Dispatch<React.SetStateAction<Ptba | null>>,
-    onOpenPlanification: (activite: Ptba) => void
+    onOpenPlanification: (activite: Ptba) => void,
+    currencyCode?:string
 ) => {
     const baseColumns = buildColumns<Ptba>([
         { type: "text", key: "code_activite_ptba", title: "Code", sticky: true },
@@ -133,20 +134,22 @@ export const buildPtbasColumns = (
     const coutColumns: ColumnDef<Ptba> = {
         id: 'cout_row',
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='Coût (GNF)' />
+            <DataTableColumnHeader column={column} title={`Cout Activites (${currencyCode})`}  />
         ),
         cell: ({ row }) => {
-            // Générer un coût aléatoire entre 1 000 000 et 3 000 000 GNF
-            // Basé sur l'ID de la ligne pour rester cohérent (éviter les changements à chaque rendu)
-            const id = row.original.id_ptba || row.index || Math.random()
-            const minCout = 1_000_000
-            const maxCout = 3_000_000
-            const cout = minCout + (Math.abs(Number(id) * 12345) % (maxCout - minCout))
+            const budget = row.original.cout_total_ptba
+            if (!budget || budget === 0) {
+                return (
+                    <div className='flex justify-center'>
+                        <span className='text-sm text-muted-foreground'>—</span>
+                    </div>
+                )
+            }
 
             return (
                 <div className='flex justify-center'>
                     <span className='inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold tabular-nums text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400'>
-                        {new Intl.NumberFormat('fr-FR').format(cout)}
+                        {new Intl.NumberFormat('fr-FR').format(budget)}
                     </span>
                 </div>
             )

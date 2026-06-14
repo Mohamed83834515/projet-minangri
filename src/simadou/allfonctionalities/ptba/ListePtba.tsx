@@ -17,6 +17,7 @@ import ActiviteTabbedDialog from './ActiviteTabbedDialog'
 import TacheActiviteManager from './tache-activite/TacheActiviteManager'
 import IndicateurTacheManager from './indicateur-tache/IndicateurTacheManager'
 import CoutUnitairePtbaManager from './cout-unitaire/CoutUnitairePtbaManager'
+import { useGeneralParamsQuery } from '@/simadou/allHooks/generalParams/queries'
 
 const route = getRouteApi('/_authenticated/programmation/ptba/')
 
@@ -66,14 +67,21 @@ function ListePtbas() {
   const [open, setOpen] = useDialogState<'add' | 'edit' | 'delete'>(null)
   const [currentRow, setCurrentRow] = useState<Ptba | null>(null)
 
+
+  const { data: config } = useGeneralParamsQuery()
+  const currencyCode = config?.currencyCode
+
   const columns = useMemo(
     () =>
       buildPtbasColumns(
         setOpen,
         setCurrentRow,
-        onOpenPlanification
+        onOpenPlanification,
+        currencyCode
       ),
-    [setOpen, setCurrentRow, onOpenPlanification, getResponsableLabel]
+    [setOpen, setCurrentRow, onOpenPlanification, getResponsableLabel,
+      currencyCode
+    ]
   )
 
   return (
@@ -118,28 +126,28 @@ function ListePtbas() {
         tabs={
           planifierActivite
             ? [
-                {
-                  value: 'taches',
-                  label: 'Planification des tâches',
-                  content: (
-                    <TacheActiviteManager activite={planifierActivite} />
-                  ),
-                },
-                {
-                  value: 'indicateurs',
-                  label: 'Planification des indicateurs',
-                  content: (
-                    <IndicateurTacheManager activite={planifierActivite} />
-                  ),
-                },
-                {
-                  value: 'couts-unitaires',
-                  label: 'Coût Unitaire',
-                  content: (
-                    <CoutUnitairePtbaManager activite={planifierActivite} />
-                  ),
-                },
-              ]
+              {
+                value: 'taches',
+                label: 'Planification des tâches',
+                content: (
+                  <TacheActiviteManager activite={planifierActivite} />
+                ),
+              },
+              {
+                value: 'indicateurs',
+                label: 'Planification des indicateurs',
+                content: (
+                  <IndicateurTacheManager activite={planifierActivite} />
+                ),
+              },
+              {
+                value: 'couts-unitaires',
+                label: 'Coût Unitaire',
+                content: (
+                  <CoutUnitairePtbaManager activite={planifierActivite} />
+                ),
+              },
+            ]
             : []
         }
       />

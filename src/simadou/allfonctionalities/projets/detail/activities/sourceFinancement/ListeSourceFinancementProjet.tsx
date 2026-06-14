@@ -28,8 +28,9 @@ export default function ListeSourceFinancement({
   const [open, setOpen] = useDialogState<'delete'>(null)
   const [currentRow, setCurrentRow] = useState<SourFinancementProjet | null>(null)
 
-   const { data: config } = useGeneralParamsQuery()
-   const currencyCode = config?.currencyCode
+  const { data: config } = useGeneralParamsQuery()
+  const currencyCode = config?.currencyCode
+
   const columns = useMemo(
     () => buildSourceFinancementProjetColumns(setOpen, setCurrentRow, onEdit, currencyCode),
     [onEdit, setOpen, setCurrentRow, currencyCode]
