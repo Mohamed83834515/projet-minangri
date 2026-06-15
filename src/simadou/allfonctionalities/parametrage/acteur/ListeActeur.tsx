@@ -73,7 +73,7 @@ export function ListeActeur() {
 
   if (isLoadingActeurs || isLoadingCategories) {
     return (
-      <div className='flex items-center justify-center py-12'>
+      <div className='flex items-center justify-center py-6'>
         <Loader2 className='h-6 w-6 animate-spin text-muted-foreground' />
       </div>
     )
@@ -82,9 +82,9 @@ export function ListeActeur() {
   const currentActiveId = selectedCategorieId ?? defaultCategorieId
 
   return (
-    <div className='space-y-6'>
+    <div className='space-y-2 px-2'>
       {/* En-tête */}
-      <div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
+      <div className='flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between'>
         <div>
           <h2 className='text-2xl font-bold tracking-tight'>Gestion des acteurs</h2>
           <p className='text-sm text-muted-foreground'>
@@ -97,7 +97,7 @@ export function ListeActeur() {
       <div className='overflow-x-auto'>
         <Tabs
           orientation='vertical'
-          className='space-y-2'
+          className='gap-1 space-y-1'
           style={tabsStyle}
           value={String(currentActiveId)}
           onValueChange={(val) => setSelectedCategorieId(Number(val))}
@@ -121,7 +121,7 @@ export function ListeActeur() {
       </div>
 
       {/* Tableau des acteurs */}
-      <div className='space-y-4'>
+      <div className='space-y-2'>
         <GenericTable
           data={filteredActeurs}
           columns={columns}
