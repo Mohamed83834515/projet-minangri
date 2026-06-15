@@ -19,6 +19,9 @@ import {
   Target,
   LineChart,
   TrendingUp,
+  FileBarChart,
+  ListChecks,
+  Wallet,
 } from 'lucide-react'
 import { type SidebarData } from '../../components/layout/others/types'
 
@@ -172,6 +175,29 @@ export const sidebarData: SidebarData = {
               title: 'Suivi du PTBA',
               url: '/programmation/suivi-ptba',
               icon: Eye,
+            },
+          ],
+        },
+
+        // ── Rapport ───────────────────────────────────────────
+        {
+          title: 'Rapport',
+          icon: FileBarChart,
+          items: [
+            {
+              title: 'PTBA',
+              url: '/rapport/ptba',
+              icon: ClipboardList,
+            },
+            {
+              title: 'État des activités',
+              url: '/rapport/etat-des-activites',
+              icon: ListChecks,
+            },
+            {
+              title: 'Décaissement',
+              url: '/rapport/decaissement',
+              icon: Wallet,
             },
           ],
         },

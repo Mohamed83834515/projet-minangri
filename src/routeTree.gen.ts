@@ -32,6 +32,9 @@ import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_a
 import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
 import { Route as AuthenticatedParametrageAutresRouteRouteImport } from './routes/_authenticated/parametrage/autres/route'
+import { Route as AuthenticatedRapportPtbaIndexRouteImport } from './routes/_authenticated/rapport/ptba/index'
+import { Route as AuthenticatedRapportEtatDesActivitesIndexRouteImport } from './routes/_authenticated/rapport/etat-des-activites/index'
+import { Route as AuthenticatedRapportDecaissementIndexRouteImport } from './routes/_authenticated/rapport/decaissement/index'
 import { Route as AuthenticatedProgrammePagesTestIndexRouteImport } from './routes/_authenticated/programme/pagesTest/index'
 import { Route as AuthenticatedProgrammeListeIndexRouteImport } from './routes/_authenticated/programme/liste/index'
 import { Route as AuthenticatedProgrammeIndicateursPerformanceIndexRouteImport } from './routes/_authenticated/programme/indicateurs-performance/index'
@@ -183,6 +186,24 @@ const AuthenticatedParametrageAutresRouteRoute =
   AuthenticatedParametrageAutresRouteRouteImport.update({
     id: '/parametrage/autres',
     path: '/parametrage/autres',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRapportPtbaIndexRoute =
+  AuthenticatedRapportPtbaIndexRouteImport.update({
+    id: '/rapport/ptba/',
+    path: '/rapport/ptba/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRapportEtatDesActivitesIndexRoute =
+  AuthenticatedRapportEtatDesActivitesIndexRouteImport.update({
+    id: '/rapport/etat-des-activites/',
+    path: '/rapport/etat-des-activites/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRapportDecaissementIndexRoute =
+  AuthenticatedRapportDecaissementIndexRouteImport.update({
+    id: '/rapport/decaissement/',
+    path: '/rapport/decaissement/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedProgrammePagesTestIndexRoute =
@@ -408,6 +429,9 @@ export interface FileRoutesByFullPath {
   '/programme/indicateurs-performance/': typeof AuthenticatedProgrammeIndicateursPerformanceIndexRoute
   '/programme/liste/': typeof AuthenticatedProgrammeListeIndexRoute
   '/programme/pagesTest/': typeof AuthenticatedProgrammePagesTestIndexRoute
+  '/rapport/decaissement/': typeof AuthenticatedRapportDecaissementIndexRoute
+  '/rapport/etat-des-activites/': typeof AuthenticatedRapportEtatDesActivitesIndexRoute
+  '/rapport/ptba/': typeof AuthenticatedRapportPtbaIndexRoute
   '/parametrage/autres/system/': typeof AuthenticatedParametrageAutresSystemIndexRoute
   '/parametrage/autres/type-zone/': typeof AuthenticatedParametrageAutresTypeZoneIndexRoute
   '/parametrage/autres/unites-indicateur/': typeof AuthenticatedParametrageAutresUnitesIndicateurIndexRoute
@@ -459,6 +483,9 @@ export interface FileRoutesByTo {
   '/programme/indicateurs-performance': typeof AuthenticatedProgrammeIndicateursPerformanceIndexRoute
   '/programme/liste': typeof AuthenticatedProgrammeListeIndexRoute
   '/programme/pagesTest': typeof AuthenticatedProgrammePagesTestIndexRoute
+  '/rapport/decaissement': typeof AuthenticatedRapportDecaissementIndexRoute
+  '/rapport/etat-des-activites': typeof AuthenticatedRapportEtatDesActivitesIndexRoute
+  '/rapport/ptba': typeof AuthenticatedRapportPtbaIndexRoute
   '/parametrage/autres/system': typeof AuthenticatedParametrageAutresSystemIndexRoute
   '/parametrage/autres/type-zone': typeof AuthenticatedParametrageAutresTypeZoneIndexRoute
   '/parametrage/autres/unites-indicateur': typeof AuthenticatedParametrageAutresUnitesIndicateurIndexRoute
@@ -514,6 +541,9 @@ export interface FileRoutesById {
   '/_authenticated/programme/indicateurs-performance/': typeof AuthenticatedProgrammeIndicateursPerformanceIndexRoute
   '/_authenticated/programme/liste/': typeof AuthenticatedProgrammeListeIndexRoute
   '/_authenticated/programme/pagesTest/': typeof AuthenticatedProgrammePagesTestIndexRoute
+  '/_authenticated/rapport/decaissement/': typeof AuthenticatedRapportDecaissementIndexRoute
+  '/_authenticated/rapport/etat-des-activites/': typeof AuthenticatedRapportEtatDesActivitesIndexRoute
+  '/_authenticated/rapport/ptba/': typeof AuthenticatedRapportPtbaIndexRoute
   '/_authenticated/parametrage/autres/system/': typeof AuthenticatedParametrageAutresSystemIndexRoute
   '/_authenticated/parametrage/autres/type-zone/': typeof AuthenticatedParametrageAutresTypeZoneIndexRoute
   '/_authenticated/parametrage/autres/unites-indicateur/': typeof AuthenticatedParametrageAutresUnitesIndicateurIndexRoute
@@ -569,6 +599,9 @@ export interface FileRouteTypes {
     | '/programme/indicateurs-performance/'
     | '/programme/liste/'
     | '/programme/pagesTest/'
+    | '/rapport/decaissement/'
+    | '/rapport/etat-des-activites/'
+    | '/rapport/ptba/'
     | '/parametrage/autres/system/'
     | '/parametrage/autres/type-zone/'
     | '/parametrage/autres/unites-indicateur/'
@@ -620,6 +653,9 @@ export interface FileRouteTypes {
     | '/programme/indicateurs-performance'
     | '/programme/liste'
     | '/programme/pagesTest'
+    | '/rapport/decaissement'
+    | '/rapport/etat-des-activites'
+    | '/rapport/ptba'
     | '/parametrage/autres/system'
     | '/parametrage/autres/type-zone'
     | '/parametrage/autres/unites-indicateur'
@@ -674,6 +710,9 @@ export interface FileRouteTypes {
     | '/_authenticated/programme/indicateurs-performance/'
     | '/_authenticated/programme/liste/'
     | '/_authenticated/programme/pagesTest/'
+    | '/_authenticated/rapport/decaissement/'
+    | '/_authenticated/rapport/etat-des-activites/'
+    | '/_authenticated/rapport/ptba/'
     | '/_authenticated/parametrage/autres/system/'
     | '/_authenticated/parametrage/autres/type-zone/'
     | '/_authenticated/parametrage/autres/unites-indicateur/'
@@ -855,6 +894,27 @@ declare module '@tanstack/react-router' {
       path: '/parametrage/autres'
       fullPath: '/parametrage/autres'
       preLoaderRoute: typeof AuthenticatedParametrageAutresRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rapport/ptba/': {
+      id: '/_authenticated/rapport/ptba/'
+      path: '/rapport/ptba'
+      fullPath: '/rapport/ptba/'
+      preLoaderRoute: typeof AuthenticatedRapportPtbaIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rapport/etat-des-activites/': {
+      id: '/_authenticated/rapport/etat-des-activites/'
+      path: '/rapport/etat-des-activites'
+      fullPath: '/rapport/etat-des-activites/'
+      preLoaderRoute: typeof AuthenticatedRapportEtatDesActivitesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rapport/decaissement/': {
+      id: '/_authenticated/rapport/decaissement/'
+      path: '/rapport/decaissement'
+      fullPath: '/rapport/decaissement/'
+      preLoaderRoute: typeof AuthenticatedRapportDecaissementIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/programme/pagesTest/': {
@@ -1142,6 +1202,9 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProgrammeIndicateursPerformanceIndexRoute: typeof AuthenticatedProgrammeIndicateursPerformanceIndexRoute
   AuthenticatedProgrammeListeIndexRoute: typeof AuthenticatedProgrammeListeIndexRoute
   AuthenticatedProgrammePagesTestIndexRoute: typeof AuthenticatedProgrammePagesTestIndexRoute
+  AuthenticatedRapportDecaissementIndexRoute: typeof AuthenticatedRapportDecaissementIndexRoute
+  AuthenticatedRapportEtatDesActivitesIndexRoute: typeof AuthenticatedRapportEtatDesActivitesIndexRoute
+  AuthenticatedRapportPtbaIndexRoute: typeof AuthenticatedRapportPtbaIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -1200,6 +1263,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProgrammeListeIndexRoute: AuthenticatedProgrammeListeIndexRoute,
   AuthenticatedProgrammePagesTestIndexRoute:
     AuthenticatedProgrammePagesTestIndexRoute,
+  AuthenticatedRapportDecaissementIndexRoute:
+    AuthenticatedRapportDecaissementIndexRoute,
+  AuthenticatedRapportEtatDesActivitesIndexRoute:
+    AuthenticatedRapportEtatDesActivitesIndexRoute,
+  AuthenticatedRapportPtbaIndexRoute: AuthenticatedRapportPtbaIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
