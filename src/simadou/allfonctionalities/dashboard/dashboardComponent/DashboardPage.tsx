@@ -625,7 +625,7 @@ const DashboardPage: React.FC = () => {
 
     // ── Render ────────────────────────────────────────────────────────────────────
     return (
-        <div className="space-y-8 p-6 bg-gray-50 dark:bg-gray-950 min-h-screen">
+        <div className="space-y-3 p-2 bg-gray-50 dark:bg-gray-950 min-h-screen">
             {/* En-tête */}
             <DashboardHeader
                 nomProgramme={`Programme ${codeProgramme || "Demo"}`}
@@ -634,7 +634,7 @@ const DashboardPage: React.FC = () => {
             />
 
             {/* ── Cartes statistiques ── */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
                 {/* Carte 1 : Projet Programme */}
                 {/* Carte 1 : Projet Programme */}
                 <StatCard
@@ -697,7 +697,7 @@ const DashboardPage: React.FC = () => {
             />
 
             {/* ── Graphiques ligne 1 : PTBA par composante + Réalisation/Cibles ── */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
                 <PTBAComposanteChart
                     data={composanteData}
                     anneesDisponibles={anneesDisponibles}
@@ -712,7 +712,7 @@ const DashboardPage: React.FC = () => {
             </div>
 
             {/* ── Graphiques ligne 2 : Avancement par service ── */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
                 <AvancementServiceChart
                     data={avancementTaches}
                     mode="pourcentage"

@@ -64,7 +64,7 @@ function CadreAnalytiqueNiveauTable({
   onDeleteRequest: (row: CadreAnalytique) => void
 }) {
   const { search, navigate } = useEmbeddedTableState()
-  
+
   const columns = useMemo(
     () =>
       buildCadreAnalytiqueColumns({
@@ -245,10 +245,10 @@ export default function ListeCadreAnalytique() {
   }
 
   return (
-    <div className='space-y-4'>
+    <div className='space-y-3'>
       <Tabs
         orientation='vertical'
-        className='space-y-4'
+        className='space-y-2'
         style={tabsStyle}
         key={sortedNiveaux.length}
         value={String(currentNiveauCode)}

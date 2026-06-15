@@ -153,25 +153,21 @@ export const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps>(
         className={cn(
           embedded
             ? 'overflow-visible border-0 bg-transparent shadow-none'
-            : 'overflow-hidden rounded-xl border border-border/60 bg-card shadow-sm transition-shadow duration-300 hover:shadow-md',
+            : 'overflow-visible border-0 bg-transparent shadow-none',
           className
         )}
       >
-        {!embedded && (
-          <div className='h-px w-full bg-gradient-to-r from-transparent via-border to-transparent' />
-        )}
-
         {/* ── Corps du formulaire ── */}
         <Form {...form}>
           <form onSubmit={handleSubmit(onSubmit as any)} id={formId}  >
             {hiddenFields.map((field) => (
               <input key={field.name} type='hidden' {...register(field.name)} />
             ))}
-            <div className={cn(embedded ? 'px-0 pt-0 pb-1' : 'p-6')}>
+            <div className={cn(embedded ? 'px-0 pt-0 pb-1' : 'px-2 pt-0 pb-1')}>
               <div
                 className={cn(
                   'grid grid-cols-1 sm:grid-cols-2',
-                  embedded ? 'gap-x-5 gap-y-3' : 'gap-x-5 gap-y-5'
+                  embedded ? 'gap-x-5 gap-y-3' : 'gap-x-4 gap-y-3'
                 )}
               >
                 {visibleFields.map((field, index) => (
@@ -206,7 +202,7 @@ export const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps>(
             <div
               className={cn(
                 'h-px bg-border/50',
-                embedded ? 'mt-3' : 'mx-6'
+                embedded ? 'mt-3' : 'mx-2 mt-3'
               )}
             />
 
@@ -215,7 +211,7 @@ export const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps>(
               <div
                 className={cn(
                   'flex items-center gap-4',
-                  embedded ? 'justify-end pt-3' : 'justify-between px-6 py-4',
+                  embedded ? 'justify-end pt-3' : 'justify-between px-2 pt-3',
 
                 )}
               >
