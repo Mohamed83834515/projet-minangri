@@ -1320,22 +1320,6 @@ export function AppTopbar({ user }: UserProps) {
               }}
             />
           </div>
-<<<<<<< HEAD
-=======
-
-          {/* ══ TITRE CENTRÉ ══ */}
-          <div className="_tb-center-title _tb-brand">
-            <div className="_tb-center-divider" />
-            <span className="_tb-center-main">Suivi &amp; Évaluation</span>
-            <span className="_tb-center-sub">République de Guinée</span>
-            <div className="_tb-center-divider" />
-          </div>
-
-          {/* ── Logo 1 & Logo 2 ── */}
-          <img src="/src/assets/images/logo1.png" alt="Logo 1" style={{ height: 40, width: 'auto', objectFit: 'contain', flexShrink: 0 }} />
-          <img src="/src/assets/images/logo3.png" alt="Logo 2" style={{ height: 40, width: 'auto', objectFit: 'contain', flexShrink: 0 }} />
-
->>>>>>> 9fb2626 (feat: add logo1 and logo2 images to top navigation bar)
           {/* Spacer */}
           <div style={{ flex: 1 }} />
 
