@@ -7,4 +7,5 @@ export interface PtbaProjet extends Ptba {
   /** Relation vers activite_projet via id_activite_projet (champ API : code_actvite_projet). */
   code_actvite_projet?: number | ActiviteProjet | null
   code_projet?: string | Projet | null
+  cout_ptba?: number;
 }

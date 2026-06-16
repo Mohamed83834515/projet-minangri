@@ -1,5 +1,5 @@
 // ProjetDashboard.tsx
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
   Activity, BarChart3, DollarSign, Wallet,
   Calendar, FileText, Gauge, Rocket, Shield,
@@ -8,8 +8,11 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Progress } from '@/components/ui/progress'
+import { Projet } from '@/simadou/allTypes'
+import { useGetActivitesProjet } from '@/simadou/allHooks/admin/activiteProjetHooks'
+import { useGetPtbasProjet } from '@/simadou/allHooks/admin/ptbaProjetHooks'
 
-interface ProjetDashboardProps { codeProjet: string }
+interface ProjetDashboardProps { projet: Projet }
 
 const DEMO_DATA = {
   ptbaExecution: [
@@ -59,11 +62,66 @@ const PtbaYear = ({ annee }: { annee: number }) => (
   <span>PTBA <span className='text-primary font-bold'>{annee}</span></span>
 )
 
-export default function ProjetDashboard({ codeProjet: _ }: ProjetDashboardProps) {
-  const [selectedYear, setSelectedYear] = useState(2026)
-  const maxBudget = Math.max(...DEMO_DATA.budgetParAnnee.map((d) => d.prevu))
-  const maxDecaissement = Math.max(...DEMO_DATA.decaissementParAnnee.map((d) => d.taux))
-  const sel = DEMO_DATA.budgetParAnnee.find((d) => d.annee === selectedYear)
+export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
+  const projectYears = useMemo(() => {
+    if (!projet?.date_demarrage_projet || !projet?.duree_projet) {
+      return [new Date().getFullYear()]
+    }
+    const start = new Date(projet.date_demarrage_projet)
+    const startYear = start.getFullYear()
+    const endDate = new Date(start)
+    endDate.setMonth(endDate.getMonth() + projet.duree_projet)
+    const endYear = endDate.getFullYear()
+
+    const years: number[] = []
+    for (let year = startYear; year <= endYear; year++) {
+      years.push(year)
+    }
+    return years
+  }, [projet])
+
+  // Année par défaut = la plus récente (dernière année du projet)
+  const defaultYear = projectYears[projectYears.length - 1] || new Date().getFullYear()
+  const [selectedYear, setSelectedYear] = useState(defaultYear)
+
+  // Récupérer les données
+  const { data: activites = [] } = useGetActivitesProjet(projet?.code_projet)
+  const { data: ptbas = [] } = useGetPtbasProjet(projet?.code_projet)
+
+  // Calculer les statistiques
+  const totalActivites = activites.length
+  const activitesTerminees = 0
+  const totalPtbas = ptbas.length
+  // Calculer le budget par année (répartition linéaire)
+  const budgetParAnnee = useMemo(() => {
+    const totalBudget = projet?.budget_projet || 0
+    const nbAnnees = projectYears.length
+
+    return projectYears.map((annee, index) => {
+      // Répartition égale sur toutes les années
+      const prevu = totalBudget / nbAnnees
+      // Pour l'exemple, je mets 60% d'exécution (à remplacer par vos vraies données)
+      const execute = prevu * 0.6
+
+      return {
+        annee,
+        prevu,
+        execute
+      }
+    })
+  }, [projet, projectYears])
+  // Calculer les décaissements par année (exemple)
+  const decaissementParAnnee = useMemo(() => {
+    return projectYears.map((annee) => ({
+      annee,
+      taux: 45 // À remplacer par vos vraies données
+    }))
+  }, [projectYears])
+
+  // Calculer les valeurs pour l'année sélectionnée
+  const maxBudget = Math.max(...budgetParAnnee.map((d) => d.prevu))
+  const maxDecaissement = Math.max(...decaissementParAnnee.map((d) => d.taux))
+  const sel = budgetParAnnee.find((d) => d.annee === selectedYear)
   const budgetPct = sel ? Math.round((sel.execute / sel.prevu) * 100) : 0
 
   return (
@@ -84,15 +142,13 @@ export default function ProjetDashboard({ codeProjet: _ }: ProjetDashboardProps)
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {DEMO_DATA.budgetParAnnee.map((d) => (
-                <SelectItem key={d.annee} value={String(d.annee)}>{d.annee}</SelectItem>
+              {projectYears.map((year) => (
+                <SelectItem key={year} value={String(year)}>{year}</SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
       </div>
-
-
       {/* ══ 2. CARTES KPI GLOBAUX (avec Budget total projet remonté) ══ */}
       <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-5'>
         <Card className='border-l-4 border-l-blue-500'>
@@ -100,10 +156,12 @@ export default function ProjetDashboard({ codeProjet: _ }: ProjetDashboardProps)
             <div className='flex items-center justify-between'>
               <div>
                 <p className='text-xs font-semibold uppercase text-muted-foreground'>Activités</p>
-                <p className='mt-2 text-2xl font-bold'>{DEMO_DATA.stats.totalActivites}</p>
-                <p className='text-xs text-muted-foreground'>{DEMO_DATA.stats.activitesTerminees} terminées</p>
+                <p className='mt-2 text-2xl font-bold'>{totalActivites}</p>
+                <p className='text-xs text-muted-foreground'>{activitesTerminees} terminées</p>
               </div>
-              <div className='rounded-full bg-blue-500/10 p-3'><Activity className='h-5 w-5 text-blue-500' /></div>
+              <div className='rounded-full bg-blue-500/10 p-3'>
+                <Activity className='h-5 w-5 text-blue-500' />
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -113,10 +171,12 @@ export default function ProjetDashboard({ codeProjet: _ }: ProjetDashboardProps)
             <div className='flex items-center justify-between'>
               <div>
                 <p className='text-xs font-semibold uppercase text-muted-foreground'>PTBA</p>
-                <p className='mt-2 text-2xl font-bold'>{DEMO_DATA.stats.totalPtbas}</p>
+                <p className='mt-2 text-2xl font-bold'>{totalPtbas}</p>
                 <p className='text-xs text-muted-foreground'>plans annuels</p>
               </div>
-              <div className='rounded-full bg-emerald-500/10 p-3'><FileText className='h-5 w-5 text-emerald-500' /></div>
+              <div className='rounded-full bg-emerald-500/10 p-3'>
+                <FileText className='h-5 w-5 text-emerald-500' />
+              </div>
             </div>
           </CardContent>
         </Card>

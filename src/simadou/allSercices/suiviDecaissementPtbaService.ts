@@ -5,7 +5,7 @@ import { resolveActivitePtbaId } from '../allTypes/suiviAvancementContrat'
 import type { SuiviDecaissementPtbaFormData } from '../schemas/suiviDecaissementPtbaSchemas'
 import { normalizeApiList } from './apiListUtils'
 
-const ENDPOINT = '/suivi_decaissement_ptba/'
+const ENDPOINT = '/suivis-decaissement-ptbas/'
 
 /** POST/PUT body for programme PTBA (distinct from projet `activite_ptba_projet`). */
 type SuiviDecaissementPtbaApiPayload = {

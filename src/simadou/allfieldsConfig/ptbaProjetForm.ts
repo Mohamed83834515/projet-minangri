@@ -108,7 +108,16 @@ export function getPtbaProjetFormConfig(
         placeholder: 'Sélectionner un cadre analytique (optionnel)',
         required: true,
         options: cadreAnalytiqueOptions,
-        gridCols: 1,
+        gridCols: 2,
+        formStep: 1,
+      },
+      {
+        name: 'cout_ptba',
+        label: 'Cout Ptba',
+        type: 'number',
+        placeholder: "le cout de l'activite du ptba ",
+        required: true,
+        gridCols: 2,
         formStep: 1,
       },
       {
