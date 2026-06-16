@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useCallback, useMemo, useRef } from 'react'
 import { getRouteApi } from '@tanstack/react-router'
 import { GenericTable } from '@/Global/Generic/Generictable'
 import { useActiveProgrammeCode } from '@/hooks/use-active-programme'
@@ -15,6 +15,16 @@ import {
   buildPlaceholderDecaissementMap,
   filterPtbasByVersion,
 } from '@/simadou/allfonctionalities/rapport/rapportTableUtils'
+import {
+  buildRapportDecaissementExportRows,
+  getRapportDecaissementExportColumns,
+} from '@/simadou/allfonctionalities/rapport/export/rapportExportRowBuilders'
+import {
+  mapTableColumnsToExportIds,
+  RAPPORT_DECAISSEMENT_COLUMN_MAP,
+} from '@/simadou/allfonctionalities/rapport/export/rapportExportColumnMap'
+import { useExportTableContextRef } from '@/simadou/allfonctionalities/rapport/useExportTableContextRef'
+import { useRapportExportRegistration } from '@/simadou/allfonctionalities/rapport/useRapportExportRegistration'
 
 const route = getRouteApi('/_authenticated/rapport/decaissement/')
 
@@ -25,6 +35,8 @@ export default function ListeRapportDecaissement() {
 
   const { selectedVersionId, handleChangeVersion, versionOptions } =
     usePtbaVersionSelection(codeProgramme)
+
+  const { exportContextRef, onExportContext } = useExportTableContextRef<Ptba>()
 
   const { data: ptbas } = useGetPtbas()
   const { data: config } = useGeneralParamsQuery()
@@ -40,6 +52,28 @@ export default function ListeRapportDecaissement() {
     () => buildPlaceholderDecaissementMap(filteredPtbas),
     [filteredPtbas]
   )
+
+  const decaissementRef = useRef(decaissementByActivite)
+  decaissementRef.current = decaissementByActivite
+
+  const buildExportTable = useCallback(
+    () => ({
+      columns: getRapportDecaissementExportColumns(currencyCode),
+      rows: buildRapportDecaissementExportRows(
+        exportContextRef.current.filteredData,
+        decaissementRef.current
+      ),
+      visibleColumnIds: mapTableColumnsToExportIds(
+        exportContextRef.current.visibleColumnIds,
+        RAPPORT_DECAISSEMENT_COLUMN_MAP
+      ),
+    }),
+    [currencyCode, exportContextRef]
+  )
+
+  useRapportExportRegistration({
+    buildExportTable,
+  })
 
   const columns = useMemo(
     () =>
@@ -68,6 +102,7 @@ export default function ListeRapportDecaissement() {
       }
       showViewOptions={false}
       initialState={RAPPORT_PTBA_TABLE_INITIAL_STATE}
+      onExportContext={onExportContext}
     />
   )
 }

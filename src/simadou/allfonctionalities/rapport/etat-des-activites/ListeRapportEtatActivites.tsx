@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useCallback, useMemo, useRef } from 'react'
 import { getRouteApi } from '@tanstack/react-router'
 import { GenericTable } from '@/Global/Generic/Generictable'
 import { useActiveProgrammeCode } from '@/hooks/use-active-programme'
@@ -16,6 +16,16 @@ import {
   filterPtbasByVersion,
   resolvePtbaActiviteId,
 } from '@/simadou/allfonctionalities/rapport/rapportTableUtils'
+import {
+  buildRapportEtatActivitesExportRows,
+  getRapportEtatActivitesExportColumns,
+} from '@/simadou/allfonctionalities/rapport/export/rapportExportRowBuilders'
+import {
+  mapTableColumnsToExportIds,
+  RAPPORT_ETAT_COLUMN_MAP,
+} from '@/simadou/allfonctionalities/rapport/export/rapportExportColumnMap'
+import { useExportTableContextRef } from '@/simadou/allfonctionalities/rapport/useExportTableContextRef'
+import { useRapportExportRegistration } from '@/simadou/allfonctionalities/rapport/useRapportExportRegistration'
 
 const route = getRouteApi('/_authenticated/rapport/etat-des-activites/')
 
@@ -26,6 +36,8 @@ export default function ListeRapportEtatActivites() {
 
   const { selectedVersionId, handleChangeVersion, versionOptions } =
     usePtbaVersionSelection(codeProgramme)
+
+  const { exportContextRef, onExportContext } = useExportTableContextRef<Ptba>()
 
   const { data: ptbas } = useGetPtbas()
   const ptbaList = ptbas ?? EMPTY_PTBA_LIST
@@ -52,6 +64,39 @@ export default function ListeRapportEtatActivites() {
 
   const { observationsByActivite, isLoading: isLoadingObservations } =
     useObservationsByActiviteIds(activiteIds)
+
+  const exportHandlersRef = useRef({
+    tachesByActivite,
+    avancementByActivite,
+    suivisByActivite,
+    observationsByActivite,
+  })
+  exportHandlersRef.current = {
+    tachesByActivite,
+    avancementByActivite,
+    suivisByActivite,
+    observationsByActivite,
+  }
+
+  const buildExportTable = useCallback(
+    () => ({
+      columns: getRapportEtatActivitesExportColumns(),
+      rows: buildRapportEtatActivitesExportRows(
+        exportContextRef.current.filteredData,
+        exportHandlersRef.current
+      ),
+      visibleColumnIds: mapTableColumnsToExportIds(
+        exportContextRef.current.visibleColumnIds,
+        RAPPORT_ETAT_COLUMN_MAP
+      ),
+    }),
+    [exportContextRef]
+  )
+
+  useRapportExportRegistration({
+    buildExportTable,
+    isLoading: progressLoading || isLoadingObservations,
+  })
 
   const columns = useMemo(
     () =>
@@ -91,6 +136,7 @@ export default function ListeRapportEtatActivites() {
       }
       showViewOptions={false}
       initialState={RAPPORT_PTBA_TABLE_INITIAL_STATE}
+      onExportContext={onExportContext}
     />
   )
 }

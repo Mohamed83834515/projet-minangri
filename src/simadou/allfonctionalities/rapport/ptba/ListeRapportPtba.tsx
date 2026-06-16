@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useRef } from 'react'
 import { getRouteApi } from '@tanstack/react-router'
 import { GenericTable } from '@/Global/Generic/Generictable'
 import { useActiveProgrammeCode } from '@/hooks/use-active-programme'
@@ -21,6 +21,16 @@ import {
   filterPtbasByVersion,
   resolvePtbaActiviteId,
 } from '@/simadou/allfonctionalities/rapport/rapportTableUtils'
+import {
+  buildRapportPtbaExportRows,
+  getRapportPtbaExportColumns,
+} from '@/simadou/allfonctionalities/rapport/export/rapportExportRowBuilders'
+import {
+  mapTableColumnsToExportIds,
+  RAPPORT_PTBA_COLUMN_MAP,
+} from '@/simadou/allfonctionalities/rapport/export/rapportExportColumnMap'
+import { useExportTableContextRef } from '@/simadou/allfonctionalities/rapport/useExportTableContextRef'
+import { useRapportExportRegistration } from '@/simadou/allfonctionalities/rapport/useRapportExportRegistration'
 
 const route = getRouteApi('/_authenticated/rapport/ptba/')
 
@@ -28,6 +38,8 @@ export default function ListeRapportPtba() {
   const codeProgramme = useActiveProgrammeCode()
   const { selectedVersionId, handleChangeVersion, versionOptions } =
     usePtbaVersionSelection(codeProgramme)
+
+  const { exportContextRef, onExportContext } = useExportTableContextRef<Ptba>()
 
   const search = route.useSearch()
   const navigate = route.useNavigate()
@@ -107,6 +119,37 @@ export default function ListeRapportPtba() {
     [personnelsById]
   )
 
+  const exportHandlersRef = useRef({
+    getResponsableLabel,
+    tachesCountByActivite,
+    indicateursCountByActivite,
+  })
+  exportHandlersRef.current = {
+    getResponsableLabel,
+    tachesCountByActivite,
+    indicateursCountByActivite,
+  }
+
+  const buildExportTable = useCallback(
+    () => ({
+      columns: getRapportPtbaExportColumns(currencyCode),
+      rows: buildRapportPtbaExportRows(
+        exportContextRef.current.filteredData,
+        exportHandlersRef.current
+      ),
+      visibleColumnIds: mapTableColumnsToExportIds(
+        exportContextRef.current.visibleColumnIds,
+        RAPPORT_PTBA_COLUMN_MAP
+      ),
+    }),
+    [currencyCode, exportContextRef]
+  )
+
+  useRapportExportRegistration({
+    buildExportTable,
+    isLoading: tachesLoading || indicateursLoading,
+  })
+
   const columns = useMemo(
     () =>
       buildRapportPtbasColumns({
@@ -144,6 +187,7 @@ export default function ListeRapportPtba() {
       }
       showViewOptions={false}
       initialState={RAPPORT_PTBA_TABLE_INITIAL_STATE}
+      onExportContext={onExportContext}
     />
   )
 }

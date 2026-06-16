@@ -4,7 +4,7 @@ import ListeRapportEtatActivites from './ListeRapportEtatActivites'
 
 export default function RapportEtatActivitesPage() {
   return (
-    <RapportPageLayout title='État des activités' icon={ListChecks}>
+    <RapportPageLayout title="Rapport de l'état des activités" icon={ListChecks}>
       <ListeRapportEtatActivites />
     </RapportPageLayout>
   )

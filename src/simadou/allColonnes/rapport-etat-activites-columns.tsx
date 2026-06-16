@@ -1,6 +1,11 @@
 import { type ColumnDef } from '@tanstack/react-table'
 import { buildColumns } from '@/Global/Tableaux/column-builder'
 import { DataTableColumnHeader } from '@/components/data-table/column-header'
+import {
+  computeRetardAccuse,
+  getLatestObservation,
+  getMostRecentDateRealisation,
+} from '@/simadou/allColonnes/rapport-etat-activites-utils'
 import { resolvePtbaActiviteId } from '@/simadou/allfonctionalities/rapport/rapportTableUtils'
 import type { Ptba, SuiviAvancementContrat, TacheActivitePtba } from '@/simadou/allTypes'
 import type { SuiviTacheActivite } from '@/simadou/allTypes/suiviTacheActivite'
@@ -14,16 +19,6 @@ type RapportEtatActivitesColumnHandlers = {
   isLoadingObservations: boolean
 }
 
-function getLatestObservation(
-  observations: SuiviAvancementContrat[]
-): SuiviAvancementContrat | undefined {
-  if (observations.length === 0) return undefined
-  return [...observations].sort(
-    (a, b) =>
-      new Date(b.date_suivi).getTime() - new Date(a.date_suivi).getTime()
-  )[0]
-}
-
 function formatDateRealisation(value: string | undefined | null): string {
   if (!value?.trim()) return '—'
   const d = new Date(value)
@@ -33,57 +28,6 @@ function formatDateRealisation(value: string | undefined | null): string {
     month: 'short',
     year: 'numeric',
   })
-}
-
-function getMostRecentDateRealisation(
-  suivis: SuiviTacheActivite[]
-): string | undefined {
-  let latest: Date | null = null
-  let latestRaw: string | undefined
-
-  for (const suivi of suivis) {
-    const raw = suivi.date_reele?.trim()
-    if (!raw) continue
-    const date = new Date(raw)
-    if (Number.isNaN(date.getTime())) continue
-    if (!latest || date.getTime() > latest.getTime()) {
-      latest = date
-      latestRaw = raw
-    }
-  }
-
-  return latestRaw
-}
-
-function startOfDay(date: Date): Date {
-  const normalized = new Date(date)
-  normalized.setHours(0, 0, 0, 0)
-  return normalized
-}
-
-type RetardAccuseInfo =
-  | { kind: 'none' }
-  | { kind: 'today' }
-  | { kind: 'until'; days: number }
-  | { kind: 'passed'; days: number }
-
-/** Écart en jours entre la date de réalisation et aujourd'hui. */
-function computeRetardAccuse(
-  dateRealisation: string | undefined
-): RetardAccuseInfo {
-  if (!dateRealisation?.trim()) return { kind: 'none' }
-
-  const delai = startOfDay(new Date(dateRealisation))
-  if (Number.isNaN(delai.getTime())) return { kind: 'none' }
-
-  const today = startOfDay(new Date())
-  const diffDays = Math.round(
-    (delai.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
-  )
-
-  if (diffDays === 0) return { kind: 'today' }
-  if (diffDays > 0) return { kind: 'until', days: diffDays }
-  return { kind: 'passed', days: Math.abs(diffDays) }
 }
 
 function LoadingCell() {
@@ -242,8 +186,10 @@ export function buildRapportEtatActivitesColumns({
       }
 
       const suivis = suivisByActivite.get(id) ?? []
+      const hasTaches = (tachesByActivite.get(id) ?? []).length > 0
+      const percent = avancementByActivite.get(id) ?? 0
       const latestDate = getMostRecentDateRealisation(suivis)
-      const retard = computeRetardAccuse(latestDate)
+      const retard = computeRetardAccuse(latestDate, { hasTaches, percent })
 
       if (retard.kind === 'none') {
         return <span className='text-xs text-muted-foreground'>—</span>
