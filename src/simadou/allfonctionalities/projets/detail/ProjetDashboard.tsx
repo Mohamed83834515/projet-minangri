@@ -97,7 +97,7 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
     const totalBudget = projet?.budget_projet || 0
     const nbAnnees = projectYears.length
 
-    return projectYears.map((annee, index) => {
+    return projectYears.map((annee) => {
       // Répartition égale sur toutes les années
       const prevu = totalBudget / nbAnnees
       // Pour l'exemple, je mets 60% d'exécution (à remplacer par vos vraies données)
