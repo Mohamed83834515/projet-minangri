@@ -1,34 +1,21 @@
 import type { FormConfig, SelectOption } from '@/Global/types/formConfig'
-import { statutActiviteOptions } from '@/simadou/schemas/suiviAvancementContratSchemas'
-
+import { typeMissionRecommandationOptions } from '../schemas/missionRecommandationSchemas'
 export function getRecommandationMissionProjetFormConfig(
   personnelOptions: SelectOption[],
   acteurOptions: SelectOption[],
-  missionOptions: SelectOption[]
 ): FormConfig {
   return {
     steps: [
       { step: 1, title: 'Identification' },
       { step: 2, title: 'Détails' },
-      { step: 3, title: 'Compléments' },
     ],
     fields: [
       {
-        name: 'mission',
-        label: 'Mission de supervision',
-        type: 'select',
-        placeholder: 'Sélectionner une mission',
-        required: true,
-        options: missionOptions,
-        gridCols: 2,
-        formStep: 1,
-      },
-      {
-        name: 'etat',
-        label: 'État',
+        name: 'type_recommandation',
+        label: 'Type',
         type: 'select',
         placeholder: 'Sélectionner un état',
-        options: [...statutActiviteOptions],
+        options: typeMissionRecommandationOptions,
         gridCols: 2,
         formStep: 1,
       },
@@ -56,22 +43,14 @@ export function getRecommandationMissionProjetFormConfig(
         gridCols: 2,
         formStep: 1,
       },
-      {
-        name: 'type_recommandation',
-        label: 'Type',
-        type: 'text',
-        placeholder: 'Ex: À échéance, Immédiat…',
-        maxLength: 100,
-        gridCols: 2,
-        formStep: 1,
-      },
+
       {
         name: 'recommandation',
         label: 'Recommandation',
         type: 'textarea',
         rows: 3,
         gridCols: 2,
-        formStep: 2,
+        formStep: 1,
       },
       {
         name: 'observation',
@@ -79,16 +58,16 @@ export function getRecommandationMissionProjetFormConfig(
         type: 'textarea',
         rows: 3,
         gridCols: 2,
-        formStep: 2,
+        formStep: 1,
       },
       {
         name: 'responsable',
-        label: 'Responsable',
+        label: 'Autre Responsable',
         type: 'select',
         placeholder: 'Sélectionner une personne',
         options: personnelOptions,
         gridCols: 2,
-        formStep: 2,
+        formStep: 1,
       },
       {
         name: 'responsable_interne',
@@ -97,7 +76,7 @@ export function getRecommandationMissionProjetFormConfig(
         placeholder: 'Sélectionner une personne',
         options: personnelOptions,
         gridCols: 2,
-        formStep: 2,
+        formStep: 1,
       },
       {
         name: 'structure',
@@ -114,7 +93,7 @@ export function getRecommandationMissionProjetFormConfig(
         type: 'text',
         maxLength: 200,
         gridCols: 2,
-        formStep: 3,
+        formStep: 2,
       },
       {
         name: 'rubrique',
@@ -122,7 +101,7 @@ export function getRecommandationMissionProjetFormConfig(
         type: 'text',
         maxLength: 200,
         gridCols: 2,
-        formStep: 3,
+        formStep: 2,
       },
       {
         name: 'rapport',
@@ -132,7 +111,7 @@ export function getRecommandationMissionProjetFormConfig(
         maxSize: 10,
         helperText: 'PDF, DOC ou DOCX — max. 10 Mo',
         gridCols: 1,
-        formStep: 3,
+        formStep: 2,
       },
     ],
   }

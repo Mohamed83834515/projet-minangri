@@ -12,7 +12,7 @@ import { GenericDeleteDialog } from '@/Global/Tableaux/GenericDeleteDialog'
 import AddProjet from './AddProjet'
 import { useGeneralParamsQuery } from '@/simadou/allHooks/generalParams/queries'
 
-const route = getRouteApi('/_authenticated/programmation/projets/')
+const route = getRouteApi('/_authenticated/projet-programme/projets/')
 
 export default function ListeProjets() {
   const search = route.useSearch()
@@ -28,7 +28,7 @@ export default function ListeProjets() {
     (projet: Projet) => {
       const routeId = projet.code_projet || String(projet.id_projet)
       navigate({
-        to: '/programmation/projets/$id',
+        to: '/projet-programme/projets/$id',
         params: { id: routeId },
       })
     },

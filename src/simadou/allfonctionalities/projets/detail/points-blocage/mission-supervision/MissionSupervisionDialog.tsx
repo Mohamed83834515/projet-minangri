@@ -68,7 +68,7 @@ export default function MissionSupervisionDialog({
         className={cn(
           isListMode
             ? cn(DIALOG_SIZES.formWide, 'sm:max-w-[50rem]')
-            : DIALOG_SIZES.form,
+            : DIALOG_SIZES.lg,
           'flex flex-col gap-0 overflow-hidden p-0 transition-[max-width] duration-200',
           isListMode
             ? 'min-h-[min(72vh,32rem)] max-h-[min(90vh,42rem)]'

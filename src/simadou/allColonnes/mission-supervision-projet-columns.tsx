@@ -1,9 +1,10 @@
 import type { ColumnDef } from '@tanstack/react-table'
-import { Download, Trash2, UserPen } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import {  Trash2, UserPen } from 'lucide-react'
 import { DataTableColumnHeader } from '@/components/data-table/column-header'
 import { GenericRowActions } from '@/Global/Tableaux/GenericRowActions'
 import type { MissionSupervisionProjet } from '@/simadou/allTypes/missionSupervisionProjet'
+import { Badge } from '@/components/ui/badge'
+import { typeMissionSupervisionOptions } from '../schemas/missionRecommandationSchemas'
 
 type BuildMissionSupervisionProjetColumnsProps = {
   setDeleteOpen: (open: boolean) => void
@@ -35,7 +36,18 @@ export function buildMissionSupervisionProjetColumns({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title='Type' />
       ),
-      cell: ({ row }) => row.original.type_mission || '—',
+      cell: ({ row }) => {
+        const type_mission = row.original.type_mission
+        const typeFound = typeMissionSupervisionOptions.find(
+          (type) => type.value === type_mission
+        )
+
+        return (
+          <Badge variant='secondary' className='bg-blue-100 text-blue-800'>
+            {typeFound?.label || type_mission || 'Non défini'}
+          </Badge>
+        )
+      },
     },
     {
       id: 'objet',
@@ -71,27 +83,27 @@ export function buildMissionSupervisionProjetColumns({
           ? new Date(row.original.fin).toLocaleDateString('fr-FR')
           : '—',
     },
-    {
-      id: 'document',
-      accessorKey: 'document',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Document' />
-      ),
-      cell: ({ row }) => {
-        const url = row.original.document
-        if (!url || typeof url !== 'string') {
-          return <span className='text-muted-foreground'>—</span>
-        }
-        return (
-          <Button variant='ghost' size='sm' className='gap-2' asChild>
-            <a href={url} target='_blank' rel='noreferrer'>
-              <Download className='h-4 w-4' />
-              Télécharger
-            </a>
-          </Button>
-        )
-      },
-    },
+    // {
+    //   id: 'document',
+    //   accessorKey: 'document',
+    //   header: ({ column }) => (
+    //     <DataTableColumnHeader column={column} title='Document' />
+    //   ),
+    //   cell: ({ row }) => {
+    //     const url = row.original.document
+    //     if (!url || typeof url !== 'string') {
+    //       return <span className='text-muted-foreground'>—</span>
+    //     }
+    //     return (
+    //       <Button variant='ghost' size='sm' className='gap-2' asChild>
+    //         <a href={url} target='_blank' rel='noreferrer'>
+    //           <Download className='h-4 w-4' />
+    //           Télécharger
+    //         </a>
+    //       </Button>
+    //     )
+    //   },
+    // },
     {
       id: 'actions',
       header: ({ column }) => (
