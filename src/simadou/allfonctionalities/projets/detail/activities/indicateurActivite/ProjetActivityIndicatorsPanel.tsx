@@ -97,8 +97,8 @@ export default function IndicateurPerformanceActiviteManager({
           <DialogTitle>Indicateurs de performance</DialogTitle>
         </DialogHeader>
 
-        {isLoading ? (
-          <div className='flex items-center justify-center py-8'>
+        {isLoading && !showForm ? (
+          <div className='flex flex-1 items-center justify-center py-12'>
             <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' />
           </div>
         ) : (
