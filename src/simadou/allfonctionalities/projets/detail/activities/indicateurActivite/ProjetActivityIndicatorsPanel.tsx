@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { DIALOG_SIZES } from "@/Global/Forms/dialog"
 import { ActiviteProjet } from '@/simadou/allTypes'
 import { IndicateurPerformanceProjet } from '@/simadou/allTypes'
 import { indicateurPerformanceProjetQueryKeys, useGetIndicateurPerformanceByActiviteProjet } from '@/simadou/allHooks/admin/indicateurPerformanceProjetHooks'
@@ -65,15 +64,14 @@ export default function IndicateurPerformanceActiviteManager({
   if (showForm) {
     return (
       <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogContent className={DIALOG_SIZES.xl} style={{ maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
+        <DialogContent className='flex max-h-[90vh] flex-col overflow-hidden sm:max-w-3xl'>
           <DialogHeader className='flex-shrink-0'>
             <DialogTitle>
-              {editing ? 'Modifier indicateur de performance' : 'Nouvel indicateur de performance'}
+              {editing ? 'Modifier un indicateur' : 'Ajouter un indicateur'}
             </DialogTitle>
           </DialogHeader>
 
-          {/* Zone scrollable — contient le formulaire + CiblesAnnuelles */}
-          <div className='flex-1 overflow-y-auto min-h-0 pr-1'>
+          <div className='min-h-0 flex-1 overflow-y-auto pr-1'>
             <AddIndicateurPerformance
               currentRow={editing}
               activite={activite}
@@ -89,7 +87,7 @@ export default function IndicateurPerformanceActiviteManager({
   // ── Mode liste ─────────────────────────────────────────────────────────────
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className={DIALOG_SIZES.xl} style={{ maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
+      <DialogContent className='flex max-h-[90vh] flex-col overflow-hidden sm:max-w-4xl'>
         <DialogHeader className='flex-shrink-0'>
           <DialogTitle>Indicateurs de performance</DialogTitle>
         </DialogHeader>
