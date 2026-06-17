@@ -27,7 +27,7 @@ export default function SourceFinancementManager({
   const { data, isLoading } = useGetSourcesByActivite(
     activite.id_activite_projet
   )
-  
+
   const sources = data?.sourceFinancement ?? []
 
   const handleAdd = () => {
@@ -71,7 +71,7 @@ export default function SourceFinancementManager({
               {editing ? 'Modifier la source de financement' : 'Nouvelle source de financement'}
             </DialogTitle>
           </DialogHeader>
-          
+
           <AddSourceFinancement
             currentRow={editing}
             activite={activite}
@@ -108,9 +108,25 @@ export default function SourceFinancementManager({
               />
             </div>
 
-            <div className='shrink-0 border-t bg-muted/40 px-3 py-2 text-sm'>
-              <div className='text-xs text-muted-foreground'>
-                {sources.length} {sources.length === 1 ? 'source' : 'sources'} de financement
+            <div className='shrink-0 border-t bg-muted/40 px-4 py-3'>
+              <div className='flex items-center justify-between'>
+                <div className='flex items-center gap-2'>
+                  <span className='text-xs text-muted-foreground'>
+                    {sources.length} {sources.length === 1 ? 'source' : 'sources'}
+                  </span>
+                  <span className='text-xs text-muted-foreground'>•</span>
+                  <span className='text-xs text-muted-foreground'>
+                    {sources.filter(s => Number(s.montant_source_financement) > 0).length} avec montant
+                  </span>
+                </div>
+                <div className='flex items-center gap-2'>
+                  <span className='text-sm font-medium text-muted-foreground'>Total :</span>
+                  <span className='text-sm font-bold'>
+                    {new Intl.NumberFormat('fr-FR').format(
+                      sources.reduce((sum, source) => sum + (Number(source.montant_source_financement) || 0), 0)
+                    )} GNF
+                  </span>
+                </div>
               </div>
             </div>
           </>

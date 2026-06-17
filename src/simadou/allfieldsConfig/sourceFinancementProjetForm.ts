@@ -35,7 +35,7 @@ export const getSourceFinancementProjetFormConfig = (): FormConfig => ({
     },
     {
       name: 'code_partenaire',
-      label: 'Partenaire',
+      label: 'Partenaire Financier',
       type: 'select',
       placeholder: 'Sélectionner un partenaire',
       required: true,

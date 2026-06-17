@@ -115,13 +115,13 @@ export function buildActiviteProjetColumns({
 
   const actionsColumn = buildEditDeleteActionsColumn({ onEdit, onDeleteRequest })
 
-  const columns = [...baseColumns]
+  const columns = []
 
   // Ajouter les colonnes des parents avec leurs libellés
   if (showParent && niveauActuel && niveauActuel > 1) {
-    columns.push(...parentColumns)
+    columns.push(...parentColumns,...baseColumns)
   } else {
-    columns.push(planificationColumn)
+    columns.push(...baseColumns, planificationColumn)
 
   }
 

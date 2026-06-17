@@ -121,7 +121,7 @@ export const sidebarData: SidebarData = {
 
         // ── Politique ─────────────────────────────────────────
         {
-          title: 'Plan Stratégiques',
+          title: 'Plans Stratégiques',
           icon: FileStack,
           items: [
             {
@@ -190,7 +190,7 @@ export const sidebarData: SidebarData = {
 
         // ── Rapport ───────────────────────────────────────────
         {
-          title: 'Rapport',
+          title: 'Etats et Rapports',
           icon: FileBarChart,
           items: [
             {

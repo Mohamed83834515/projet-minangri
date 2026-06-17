@@ -15,6 +15,7 @@ import { useCreateProjet, useUpdateProjet } from '@/simadou/allHooks/admin/proje
 import { ProjectCreateData, projectCreateSchema } from '@/simadou/schemas/projetSchema'
 import { toast } from 'sonner'
 import { StepDynamicForm } from '@/Global/Forms/StepDynamicForm'
+import { useGetUgls } from '@/simadou/allHooks/admin/uglHooks'
 
 interface OpenPropsProjet {
   currentRow?: any | null
@@ -29,12 +30,12 @@ export default function AddProjet({ open, onOpenChange, currentRow }: OpenPropsP
   // ── Données pour les options ──
   const { data: acteurs = [] } = useGetActeurs()
   const { data: localites = [] } = useGetLocalites()
-
+  const { data: ugls = [] } = useGetUgls()
 
   // ── Config du formulaire (options injectées ici, pas dans le fichier config) ──
   const formConfig = useMemo(
-    () => getProjetFormConfig(acteurs, localites),
-    [acteurs, localites]
+    () => getProjetFormConfig(acteurs, localites, ugls),
+    [acteurs, localites, ugls]
   )
 
   // ── Mutations ──
