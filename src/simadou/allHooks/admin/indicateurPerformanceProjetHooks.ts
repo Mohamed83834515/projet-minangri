@@ -6,7 +6,7 @@ import indicateurPerformanceProjetService from '@/simadou/allSercices/indicateur
 import { invalidateAndRefetch } from '@/simadou/allHooks/admin/queryInvalidation'
 import { useGetActivitesProjet } from './activiteProjetHooks'
 import { useMemo } from 'react'
-import type { IndicateurPerformanceProjet, CiblesIndicateurPerformanceProjet, Projet } from '@/simadou/allTypes'
+import type { IndicateurPerformanceProjet, CibleIndicateurPerformanceProjet, Projet } from '@/simadou/allTypes'
 
 export const indicateurPerformanceProjetQueryKeys = {
   all: ['indicateurs-performance-projet'] as const,
@@ -73,13 +73,13 @@ export function useIndicateursPerformanceByProjet(
   const indicateursAvecCibles = useMemo(() => {
     return indicateurs.map((indicateur: IndicateurPerformanceProjet) => {
       // Récupérer les cibles
-      let cibles: CiblesIndicateurPerformanceProjet[] = []
+      let cibles: CibleIndicateurPerformanceProjet[] = []
 
       if (indicateur.cibles) {
         if (Array.isArray(indicateur.cibles)) {
-          cibles = indicateur.cibles as CiblesIndicateurPerformanceProjet[]
+          cibles = indicateur.cibles
         } else if (typeof indicateur.cibles === 'object') {
-          cibles = [indicateur.cibles as CiblesIndicateurPerformanceProjet]
+          cibles = [indicateur.cibles]
         }
       }
 
