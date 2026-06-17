@@ -3,6 +3,16 @@ import { FormConfig } from '@/Global/types/formConfig'
 export const getSourceFinancementProjetFormConfig = (): FormConfig => ({
   fields: [
     {
+      name: 'code_activite_projet',
+      label: 'Activité',
+      type: 'hidden',
+    },
+    {
+      name: 'etat_source_financement',
+      label: 'État',
+      type: 'hidden',
+    },
+    {
       name: 'intitule_source_financement',
       label: 'Intitulé',
       type: 'textarea',
