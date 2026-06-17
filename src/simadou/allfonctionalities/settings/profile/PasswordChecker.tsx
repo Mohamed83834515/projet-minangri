@@ -1,4 +1,4 @@
-import { Check, Dot, Lock, Unlock } from "lucide-react";
+import { Check, Dot} from "lucide-react";
 import React from "react";
 
 type PasswordCheckerProps = {
