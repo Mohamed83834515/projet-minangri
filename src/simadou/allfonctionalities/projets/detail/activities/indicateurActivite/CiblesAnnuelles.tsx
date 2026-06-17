@@ -16,12 +16,27 @@ export default function CiblesAnnuelles({ onCiblesChange, initialCibles }: Cible
     const { id } = route.useParams()
     const { data: projet, isLoading: isLoadingProjet } = useGetProjet(id)
 
-    const annees = useMemo(() => {
+   const annees = useMemo(() => {
         if (!projet) return []
-        const anneeDebut = new Date(projet.date_demarrage_projet).getFullYear()
-        const dureeAnnees = projet.duree_projet || 1
-        return Array.from({ length: dureeAnnees }, (_, i) => anneeDebut + i)
+
+        const dateDebut = new Date(projet.date_demarrage_projet)
+        const anneeDebut = dateDebut.getFullYear()
+        const dureeMois = projet.duree_projet || 1
+
+        // Calculer la date de fin en ajoutant les mois
+        const dateFin = new Date(dateDebut)
+        dateFin.setMonth(dateFin.getMonth() + dureeMois)
+        const anneeFin = dateFin.getFullYear()
+
+        // Générer toutes les années entre l'année de début et l'année de fin
+        const annees: number[] = []
+        for (let annee = anneeDebut; annee <= anneeFin; annee++) {
+            annees.push(annee)
+        }
+
+        return annees
     }, [projet])
+    
 
     const [cibles, setCibles] = React.useState<any[]>([])
 

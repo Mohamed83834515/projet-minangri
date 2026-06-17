@@ -52,6 +52,7 @@ export default function IndicateurPerformanceActiviteManager({
       queryKey: indicateurPerformanceProjetQueryKeys.byActivite(activite.code_activite_projet),
     })
   }
+
   const handleOpenChange = (newOpen: boolean) => {
     if (!newOpen) {
       setShowForm(false)
@@ -59,36 +60,38 @@ export default function IndicateurPerformanceActiviteManager({
     }
     onOpenChange(newOpen)
   }
-  // Si on est en mode formulaire, on affiche juste le formulaire
+
+  // ── Mode formulaire ────────────────────────────────────────────────────────
   if (showForm) {
     return (
       <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogContent className={DIALOG_SIZES.xl}>
-          <DialogHeader>
+        <DialogContent className={DIALOG_SIZES.xl} style={{ maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
+          <DialogHeader className='flex-shrink-0'>
             <DialogTitle>
               {editing ? 'Modifier indicateur de performance' : 'Nouvel indicateur de performance'}
             </DialogTitle>
           </DialogHeader>
 
-          <AddIndicateurPerformance
-            currentRow={editing}
-            activite={activite}
-            onClose={handleCloseForm}
-            onSuccess={handleSuccess}
-          />
+          {/* Zone scrollable — contient le formulaire + CiblesAnnuelles */}
+          <div className='flex-1 overflow-y-auto min-h-0 pr-1'>
+            <AddIndicateurPerformance
+              currentRow={editing}
+              activite={activite}
+              onClose={handleCloseForm}
+              onSuccess={handleSuccess}
+            />
+          </div>
         </DialogContent>
       </Dialog>
     )
   }
 
-  // Sinon on affiche la liste
+  // ── Mode liste ─────────────────────────────────────────────────────────────
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className={DIALOG_SIZES.xl}>
-        <DialogHeader>
-          <DialogTitle>
-            Indicateurs de performance skhfws
-          </DialogTitle>
+      <DialogContent className={DIALOG_SIZES.xl} style={{ maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
+        <DialogHeader className='flex-shrink-0'>
+          <DialogTitle>Indicateurs de performance</DialogTitle>
         </DialogHeader>
 
         {isLoading ? (
@@ -97,7 +100,7 @@ export default function IndicateurPerformanceActiviteManager({
           </div>
         ) : (
           <>
-            <div className='min-h-0 flex-1 overflow-y-auto'>
+            <div className='flex-1 overflow-y-auto min-h-0'>
               <ListeIndicateurPerformance
                 indicateurs={indicateurs}
                 idActivite={activite.code_activite_projet}
@@ -106,10 +109,10 @@ export default function IndicateurPerformanceActiviteManager({
               />
             </div>
 
-            <div className='shrink-0 border-t bg-muted/40 px-3 py-2 text-sm'>
-              <div className='text-xs text-muted-foreground'>
+            <div className='flex-shrink-0 border-t bg-muted/40 px-3 py-2'>
+              <p className='text-xs text-muted-foreground'>
                 {indicateurs.length} {indicateurs.length === 1 ? 'indicateur' : 'indicateurs'}
-              </div>
+              </p>
             </div>
           </>
         )}
