@@ -25,7 +25,6 @@ import {
   buildRecommandationMissionProjetPayload,
   toApiRelationId,
 } from '@/simadou/lib/missionRecommandationUtils'
-import { resolveStatutActivite } from '@/simadou/allfonctionalities/projets/detail/suivi-ptba/suivi-avancement-contrat/suiviAvancementContratFormUtils'
 import {
   recommandationMissionProjetSchema,
   type RecommandationMissionProjetFormData,
@@ -93,10 +92,9 @@ export default function AddRecommandationMissionProjet({
     () =>
       getRecommandationMissionProjetFormConfig(
         personnelOptions,
-        acteurOptions,
-        missionOptions
+        acteurOptions
       ),
-    [personnelOptions, acteurOptions, missionOptions]
+    [personnelOptions, acteurOptions]
   )
 
   const createMutation = useCreateRecommandationMissionProjet(idProjet)
@@ -118,8 +116,8 @@ export default function AddRecommandationMissionProjet({
       type_recommandation: currentRow?.type_recommandation ?? '',
       observation: currentRow?.observation ?? '',
       rapport: typeof currentRow?.rapport === 'string' ? currentRow.rapport : '',
-      etat: resolveStatutActivite(currentRow?.etat),
-      mission: missionFromRow ?? missionFromFilter,
+      etat: isEdit ? 'modifier' : "Ajouter",
+      mission: missionFromRow ? missionFromRow : missionFromFilter ? missionFromFilter : 0,
       responsable:
         resolveRelationId(currentRow?.responsable, 'n_personnel') ?? undefined,
       responsable_interne:
@@ -173,8 +171,8 @@ export default function AddRecommandationMissionProjet({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className={cn(
-          DIALOG_SIZES.form,
-          'flex max-h-[min(90vh,36rem)] flex-col gap-0 overflow-hidden p-0'
+          DIALOG_SIZES.xl,
+          'flex max-h-[min(100vh,42rem)] flex-col gap-0 overflow-hidden p-0'
         )}
         aria-describedby={undefined}
       >

@@ -1,12 +1,7 @@
 import type { FormConfig } from '@/Global/types/formConfig'
-import { statutActiviteOptions } from '@/simadou/schemas/suiviAvancementContratSchemas'
-
+import { typeMissionSupervisionOptions } from '../schemas/missionRecommandationSchemas'
 export function getMissionSupervisionProjetFormConfig(): FormConfig {
   return {
-    steps: [
-      { step: 1, title: 'Identification' },
-      { step: 2, title: 'Détails' },
-    ],
     fields: [
       {
         name: 'code_ms',
@@ -21,37 +16,11 @@ export function getMissionSupervisionProjetFormConfig(): FormConfig {
       {
         name: 'type_mission',
         label: 'Type de mission',
-        type: 'text',
-        placeholder: 'Ex: Supervision technique',
-        maxLength: 100,
-        gridCols: 2,
-        formStep: 1,
-      },
-      {
-        name: 'debut',
-        label: 'Date de début',
-        type: 'date',
-        required: true,
-        gridCols: 2,
-        formStep: 1,
-      },
-      {
-        name: 'fin',
-        label: 'Date de fin',
-        type: 'date',
-        required: true,
-        gridCols: 2,
-        formStep: 1,
-      },
-      {
-        name: 'etat',
-        label: 'État',
         type: 'select',
-        placeholder: 'Sélectionner un état',
+        placeholder: 'Sélectionner un type',
         required: true,
-        options: [...statutActiviteOptions],
+        options: typeMissionSupervisionOptions,
         gridCols: 2,
-        formStep: 1,
       },
       {
         name: 'objet',
@@ -59,8 +28,21 @@ export function getMissionSupervisionProjetFormConfig(): FormConfig {
         type: 'textarea',
         placeholder: 'Objet de la mission',
         rows: 3,
+        gridCols: 1,
+      },
+      {
+        name: 'debut',
+        label: 'Date de début',
+        type: 'date',
+        required: true,
         gridCols: 2,
-        formStep: 2,
+      },
+      {
+        name: 'fin',
+        label: 'Date de fin',
+        type: 'date',
+        required: true,
+        gridCols: 2,
       },
       {
         name: 'resume',
@@ -68,18 +50,17 @@ export function getMissionSupervisionProjetFormConfig(): FormConfig {
         type: 'textarea',
         placeholder: 'Résumé de la mission',
         rows: 3,
-        gridCols: 2,
-        formStep: 2,
-      },
-      {
-        name: 'projection',
-        label: 'Projection',
-        type: 'textarea',
-        placeholder: 'Projection ou suites attendues',
-        rows: 3,
         gridCols: 1,
-        formStep: 2,
       },
+      // {
+      //   name: 'projection',
+      //   label: 'Projection',
+      //   type: 'textarea',
+      //   placeholder: 'Projection ou suites attendues',
+      //   rows: 3,
+      //   gridCols: 1,
+      //   formStep: 2,
+      // },
       {
         name: 'observation',
         label: 'Observation',
@@ -87,18 +68,16 @@ export function getMissionSupervisionProjetFormConfig(): FormConfig {
         placeholder: 'Observations complémentaires',
         rows: 3,
         gridCols: 1,
-        formStep: 2,
       },
-      {
-        name: 'document',
-        label: 'Document',
-        type: 'file',
-        accept: 'application/pdf,image/*,.doc,.docx',
-        maxSize: 10,
-        helperText: 'PDF, DOC ou DOCX — max. 10 Mo',
-        gridCols: 1,
-        formStep: 2,
-      },
+      // {
+      //   name: 'document',
+      //   label: 'Document',
+      //   type: 'file',
+      //   accept: 'application/pdf,image/*,.doc,.docx',
+      //   maxSize: 10,
+      //   helperText: 'PDF, DOC ou DOCX — max. 10 Mo',
+      //   gridCols: 1,
+      // },
     ],
   }
 }

@@ -1,7 +1,4 @@
 import { useMemo } from 'react'
-import { ArrowLeft } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { StepDynamicForm } from '@/Global/Forms/StepDynamicForm'
 import { getMissionSupervisionProjetFormConfig } from '@/simadou/allfieldsConfig/missionSupervisionProjetForm'
 import { useMe } from '@/simadou/allHooks/auth/authHooks'
 import {
@@ -10,11 +7,11 @@ import {
 } from '@/simadou/allHooks/admin/missionSupervisionProjetHooks'
 import type { Projet } from '@/simadou/allTypes'
 import type { MissionSupervisionProjet } from '@/simadou/allTypes/missionSupervisionProjet'
-import { resolveStatutActivite } from '@/simadou/allfonctionalities/projets/detail/suivi-ptba/suivi-avancement-contrat/suiviAvancementContratFormUtils'
 import {
   missionSupervisionProjetSchema,
   type MissionSupervisionProjetFormData,
 } from '@/simadou/schemas/missionRecommandationSchemas'
+import { DynamicForm } from '@/Global/Forms/DynamicForm'
 
 type Props = {
   projet: Projet
@@ -23,11 +20,11 @@ type Props = {
   onSuccess: () => void
 }
 
-function extractFile(value: unknown): File | undefined {
-  if (value instanceof File) return value
-  if (Array.isArray(value) && value[0] instanceof File) return value[0]
-  return undefined
-}
+// function extractFile(value: unknown): File | undefined {
+//   if (value instanceof File) return value
+//   if (Array.isArray(value) && value[0] instanceof File) return value[0]
+//   return undefined
+// }
 
 export default function AddMissionSupervisionProjet({
   projet,
@@ -53,13 +50,10 @@ export default function AddMissionSupervisionProjet({
     fin: currentRow?.fin ?? '',
     observation: currentRow?.observation ?? '',
     projection: currentRow?.projection ?? '',
-    document:
-      typeof currentRow?.document === 'string' ? currentRow.document : '',
-    etat: resolveStatutActivite(currentRow?.etat),
+    etat: isEdit ? 'modifier' : "Ajouter",
   }
 
   const handleSubmit = (data: MissionSupervisionProjetFormData) => {
-    const file = extractFile(data.document)
     const now = new Date().toISOString()
     const personnelId = user?.n_personnel
 
@@ -70,9 +64,9 @@ export default function AddMissionSupervisionProjet({
       resume: data.resume?.trim() || undefined,
       debut: data.debut,
       fin: data.fin,
+      etat:data.etat,
       observation: data.observation?.trim() || undefined,
       projection: data.projection?.trim() || undefined,
-      etat: data.etat,
       projet: idProjet,
       modifier_le: now,
       modifier_par: personnelId,
@@ -81,35 +75,26 @@ export default function AddMissionSupervisionProjet({
 
     if (isEdit && currentRow?.id_mission) {
       updateMutation.mutate(
-        { id: currentRow.id_mission, data: payload, file },
+        { id: currentRow.id_mission, data: payload },
         { onSuccess }
       )
       return
     }
 
-    createMutation.mutate({ data: payload, file }, { onSuccess })
+    createMutation.mutate({ data: payload }, { onSuccess })
   }
 
   return (
     <div className='space-y-3'>
-      <Button
-        type='button'
-        variant='ghost'
-        size='sm'
-        className='-ml-2 h-8 gap-1.5 px-2 text-muted-foreground'
-        onClick={onBack}
-      >
-        <ArrowLeft className='h-3.5 w-3.5' />
-        Retour à la liste
-      </Button>
-
-      <StepDynamicForm
+     
+      <DynamicForm
         key={`mission-supervision-${currentRow?.id_mission ?? 'new'}`}
         config={formConfig}
         schema={missionSupervisionProjetSchema}
         defaultValues={defaultValues}
         onSubmit={handleSubmit}
         isLoading={mutation.isPending}
+        onCancel={onBack}
         submitText={isEdit ? 'Enregistrer' : 'Créer la mission'}
         loadingText='Enregistrement…'
       />

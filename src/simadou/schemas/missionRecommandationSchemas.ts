@@ -16,15 +16,36 @@ export const missionSupervisionProjetSchema = z.object({
   fin: z.string().min(1, 'La date de fin est requise'),
   observation: z.string().optional(),
   projection: z.string().optional(),
-  document: z.union([z.instanceof(File), z.string()]).optional(),
-  etat: z.enum(STATUT_ACTIVITE_VALUES, {
-    message: "Sélectionnez un état",
-  }),
+  etat: z.string().optional(),
+  // document: z.union([z.instanceof(File), z.string()]).optional(),
 })
 
 export type MissionSupervisionProjetFormData = z.infer<
   typeof missionSupervisionProjetSchema
 >
+
+export const typeMissionSupervisionOptions = [
+  {
+    value: "0",
+    label: "Comité de pilotage"
+  },
+  {
+    value: "1",
+    label: "Supervision"
+  },
+  {
+    value: "2",
+    label: "Appui ponctuel"
+  },
+  {
+    value: "3",
+    label: "Suivi ministriel"
+  },
+  {
+    value: "4",
+    label: "Audit"
+  },
+]
 
 export const recommandationMissionProjetSchema = z.object({
   volet_recommandation: z
@@ -54,9 +75,7 @@ export const recommandationMissionProjetSchema = z.object({
     .optional(),
   observation: z.string().optional(),
   rapport: z.union([z.instanceof(File), z.string()]).optional(),
-  etat: z.enum(STATUT_ACTIVITE_VALUES, {
-    message: "Sélectionnez un état",
-  }).optional(),
+  etat: z.string().optional(),
   mission: z.coerce
     .number({
       message: 'Sélectionnez une mission de supervision',
@@ -66,6 +85,29 @@ export const recommandationMissionProjetSchema = z.object({
   responsable_interne: z.coerce.number().optional(),
   structure: z.coerce.number().optional(),
 })
+
+export const typeMissionRecommandationOptions = [
+  {
+    value: "a_echeance",
+    label: "Comité de pilotage"
+  },
+  {
+    value: "1",
+    label: "Supervision"
+  },
+  {
+    value: "2",
+    label: "Appui ponctuel"
+  },
+  {
+    value: "3",
+    label: "Suivi ministriel"
+  },
+  {
+    value: "4",
+    label: "Audit"
+  },
+]
 
 export type RecommandationMissionProjetFormData = z.infer<
   typeof recommandationMissionProjetSchema

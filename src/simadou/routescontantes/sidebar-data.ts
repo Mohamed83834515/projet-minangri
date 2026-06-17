@@ -44,7 +44,7 @@ export const sidebarData: SidebarData = {
       title: 'General',
       items: [
         {
-          title: 'Dashboard',
+          title: 'Tableau de bord',
           url: '/',
           icon: LayoutDashboard,
         },
@@ -69,11 +69,7 @@ export const sidebarData: SidebarData = {
               url: '/parametrage/localites',
               icon: MapPin,
             },
-            {
-              title: 'Unités de gestion',
-              url: '/parametrage/unites-de-gestion',
-              icon: LayoutGrid,
-            },
+
             {
               title: 'Acteurs',
               url: '/parametrage/acteurs',
@@ -96,7 +92,7 @@ export const sidebarData: SidebarData = {
               icon: Handshake,
             },
             {
-              title: 'Zone de Collecte',
+              title: 'Zones agroécologiques',
               url: '/parametrage/zone-de-collecte',
               icon: MapPin,
             },
@@ -106,7 +102,7 @@ export const sidebarData: SidebarData = {
             //   icon: FileText,
             // },
             {
-              title: 'Plans de Site',
+              title: 'Cadre Organique du MINAGRI',
               url: '/parametrage/plans-de-site',
               icon: ClipboardList,
             },
@@ -125,7 +121,7 @@ export const sidebarData: SidebarData = {
 
         // ── Politique ─────────────────────────────────────────
         {
-          title: 'Politique',
+          title: 'Plan Stratégiques',
           icon: FileStack,
           items: [
             {
@@ -161,20 +157,33 @@ export const sidebarData: SidebarData = {
           title: 'Programmation',
           icon: CalendarDays,
           items: [
+
             {
-              title: 'Liste des projets',
-              url: '/programmation/projets',
-              icon: FolderOpen,
-            },
-            {
-              title: 'PTBA',
+              title: 'PAO',
               url: '/programmation/ptba',
               icon: ClipboardList,
             },
             {
-              title: 'Suivi du PTBA',
+              title: 'Suivi du PAO',
               url: '/programmation/suivi-ptba',
               icon: Eye,
+            },
+          ],
+        },
+        // ── Projet ─────────────────────────────────────
+        {
+          title: 'Projets / Programmes',
+          icon: CalendarDays,
+          items: [
+            {
+              title: 'Liste des projets',
+              url: '/projet-programme/projets',
+              icon: FolderOpen,
+            },
+            {
+              title: 'Unités de gestion',
+              url: '/projet-programme/unites-de-gestion',
+              icon: LayoutGrid,
             },
           ],
         },
@@ -185,7 +194,7 @@ export const sidebarData: SidebarData = {
           icon: FileBarChart,
           items: [
             {
-              title: 'PTBA',
+              title: 'PAO',
               url: '/rapport/ptba',
               icon: ClipboardList,
             },
