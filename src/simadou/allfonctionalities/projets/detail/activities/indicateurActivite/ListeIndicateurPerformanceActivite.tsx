@@ -46,7 +46,8 @@ export default function ListeIndicateurPerformance({
 
   return (
     <>
-      <IndicateurPerformanceActiviteTable
+      <div className='flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden'>
+        <IndicateurPerformanceActiviteTable
         indicateurs={indicateurs}
         onEdit={onEdit}
         onDeleteRequest={(row) => {
@@ -54,7 +55,8 @@ export default function ListeIndicateurPerformance({
           setDeleteOpen('delete')
         }}
         onAdd={onAdd}
-      />
+        />
+      </div>
 
       <GenericDeleteDialog<IndicateurPerformanceProjet>
         open={deleteOpen === 'delete'}
