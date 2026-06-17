@@ -24,7 +24,7 @@ export default function AddSourceFinancement({
 }: AddSourceFinancementProps) {
     const isEditing = !!currentRow
 
-    const route = getRouteApi('/_authenticated/programmation/projets/$id')
+    const route = getRouteApi('/_authenticated/projet-programme/projets/$id')
 
     const { id } = route.useParams()
     const { data: projet } = useGetProjet(id)
