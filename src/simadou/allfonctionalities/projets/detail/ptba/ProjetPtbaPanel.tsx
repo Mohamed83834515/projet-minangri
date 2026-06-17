@@ -100,7 +100,7 @@ export default function ProjetPtbaPanel({ projet }: ProjetPtbaPanelProps) {
         </p>
         <Button type='button' onClick={() => setOpen('add')}>
           <Plus className='h-4 w-4' />
-          Ajouter PTBA
+          Ajouter PTBA 
         </Button>
       </div>
 

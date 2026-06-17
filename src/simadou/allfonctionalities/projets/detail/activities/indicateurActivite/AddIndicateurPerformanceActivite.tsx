@@ -56,12 +56,13 @@ export default function AddIndicateurPerformance({
             })),
         [unites]
     )
-    
+    console.log('odsjdojs', activite)
     const defaultValues: IndicateurPerformanceFormData = useMemo(
         () => ({
             code_indicateur_performance: currentRow?.code_indicateur_performance ?? '',
             intitule_indicateur_tache: currentRow?.intitule_indicateur_tache ?? '',
-            code_activite_projet: activite.code_activite_projet,
+            type_ind: currentRow?.type_ind ?? 1,
+            activite_projet: activite.id_activite_projet,
             unite_indicateur_performance: resolveUniteId(currentRow?.unite_indicateur_performance) ?? 1,
         }),
         [currentRow, activite]
@@ -75,7 +76,8 @@ export default function AddIndicateurPerformance({
 
     const onSubmit = async (data: IndicateurPerformanceFormData) => {
         const payload: any = {
-            code_activite_projet: activite.code_activite_projet,
+            activite_projet: activite.id_activite_projet,
+            type_ind: data.type_ind,
             code_indicateur_performance: data.code_indicateur_performance,
             intitule_indicateur_tache: data.intitule_indicateur_tache,
             unite_indicateur_performance: data.unite_indicateur_performance,
