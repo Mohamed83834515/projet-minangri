@@ -11,7 +11,7 @@ type KpiIndicateursProps = {
 
 export function KpiIndicateurs({ projet }: KpiIndicateursProps) {
   // Récupérer tous les indicateurs du projet (sans filtre par année)
-  const { indicateurs, isLoading, total } = useIndicateursPerformanceByProjet(
+  const { indicateurs, isLoading } = useIndicateursPerformanceByProjet(
     projet
   )
 

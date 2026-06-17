@@ -25,7 +25,7 @@ export default function SourceFinancementManager({
   const [editing, setEditing] = useState<SourFinancementProjet | undefined>()
 
   const { data, isLoading } = useGetSourcesByActivite(
-    activite.code_activite_projet
+    activite.id_activite_projet
   )
   
   const sources = data?.sourceFinancement ?? []
@@ -49,7 +49,7 @@ export default function SourceFinancementManager({
     setShowForm(false)
     setEditing(undefined)
     queryClient.invalidateQueries({
-      queryKey: sourceFinancementQueryKeys.byActivite(activite.code_activite_projet),
+      queryKey: sourceFinancementQueryKeys.byActivite(activite.id_activite_projet),
     })
   }
 

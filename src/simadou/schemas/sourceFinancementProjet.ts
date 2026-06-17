@@ -2,9 +2,8 @@ import z from "zod"
 
 export const sourceFinancementProjetSchema = z.object({
   code_activite_projet: z
-    .string()
-    .min(1, "Le code est requis")
-    .max(50, "Le code ne peut pas dépasser 50 caractères"),
+    .number()
+    .min(1, "Le code est requis"),
   intitule_source_financement: z
     .string()
     .min(1, "L'intitulé est requis")
