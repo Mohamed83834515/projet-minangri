@@ -502,7 +502,7 @@ const DashboardPage: React.FC = () => {
     );
     // ── Données pour les nouvelles cartes (basées sur TES projets réels) ───────────
 
-    // Récupérer la dernière année PTBA disponible (depuis tes versions)
+    // Récupérer la dernière année PAO disponible (depuis tes versions)
     const derniereAnneePtba = useMemo(() => {
         if (versions.length === 0) return 2026;
         return Math.max(...versions.map(v => v.annee_ptba));
@@ -538,7 +538,7 @@ const DashboardPage: React.FC = () => {
         };
     }, [projets]);
 
-    // Données pour la carte 2 : PTBA Programme (avec données fictives pour montants)
+    // Données pour la carte 2 : PAO Programme (avec données fictives pour montants)
     const ptbaProgrammeStats = useMemo(() => {
         const versionIds = versions
             .filter(v => v.annee_ptba === derniereAnneePtba)
@@ -568,7 +568,7 @@ const DashboardPage: React.FC = () => {
         };
     }, [activites, versions, derniereAnneePtba]);
 
-    // Données pour la carte 3 : PTBA Département
+    // Données pour la carte 3 : PAO Département
     const ptbaDepartementStats = useMemo(() => {
         const versionIds = versions
             .filter(v => v.annee_ptba === derniereAnneePtba)
@@ -647,9 +647,9 @@ const DashboardPage: React.FC = () => {
                     ]}
                 />
 
-                {/* Carte 2 : PTBA Programme */}
+                {/* Carte 2 : PAO Programme */}
                 <StatCard
-                    title={`PTBA ${ptbaProgrammeStats.annee} des Projets/Programmes`}
+                    title={`PAO ${ptbaProgrammeStats.annee} des Projets/Programmes`}
                     color="emerald"
                     rows={[
                         { label: "Montant Total Prévu", value: ptbaProgrammeStats.montantPrevu.toLocaleString('fr-FR'), suffix: "GNF" },
@@ -660,9 +660,9 @@ const DashboardPage: React.FC = () => {
                     progressColor="emerald"
                 />
 
-                {/* Carte 3 : PTBA Département */}
+                {/* Carte 3 : PAO Département */}
                 <StatCard
-                    title={`PTBA ${ptbaDepartementStats.annee} du MINAGRI`}
+                    title={`PAO ${ptbaDepartementStats.annee} du MINAGRI`}
                     color="purple"
                     rows={[
                         { label: "Montant Total Prévu", value: ptbaDepartementStats.montantPrevu.toLocaleString('fr-FR'), suffix: "GNF" },
@@ -696,7 +696,7 @@ const DashboardPage: React.FC = () => {
                 }}
             />
 
-            {/* ── Graphiques ligne 1 : PTBA par composante + Réalisation/Cibles ── */}
+            {/* ── Graphiques ligne 1 : PAO par composante + Réalisation/Cibles ── */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
                 <PTBAComposanteChart
                     data={composanteData}
