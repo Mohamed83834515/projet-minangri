@@ -12,7 +12,6 @@ import {
   User,
   SlidersHorizontal,
   Handshake,
-  Briefcase,
   MapPin,
   FileStack,
   BarChart2,
@@ -79,12 +78,6 @@ export const sidebarData: SidebarData = {
               title: 'Utilisateurs',
               url: '/parametrage/utilisateurs',
               icon: UserCog,
-            },
-            {
-              title: 'Fonctions',
-              url: '/parametrage/fonctions',
-              icon: Briefcase
-              ,
             },
             {
               title: 'Partenaire Financier',

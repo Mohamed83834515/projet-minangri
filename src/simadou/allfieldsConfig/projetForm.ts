@@ -105,14 +105,6 @@ export const getProjetFormConfig = (
       gridCols: 2,
       formStep: 1,
     },
-    {
-      name: 'mps',
-      label: 'Méga projet',
-      type: 'switch',
-      helperText: 'Définir le projet comme étant un méga projet',
-      className: 'field-card',
-      gridCols: 2,
-    },
 
     // ════════════ ÉTAPE 2 — Acteurs & zones ════════════
 

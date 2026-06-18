@@ -149,7 +149,7 @@ export default function ProjetPointsBlocagePanel({
       />
 
       <GenericDialogs<RecommandationMissionProjet, 'edit' | 'delete'>
-        open={open}
+        open={open as any}
         setOpen={setOpen}
         currentRow={currentRow}
         setCurrentRow={setCurrentRow}

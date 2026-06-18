@@ -23,7 +23,7 @@ export const getIndicateurPerformanceProjetFormConfigForDialog = ({
   fields: [
     {
       name: 'intitule_indicateur_tache',
-      label: 'Tâche',
+      label: 'Intitulé indicateur',
       type: 'text',
       placeholder: "Intitulé de la tâche ou de l'indicateur",
       required: true,
