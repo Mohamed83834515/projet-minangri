@@ -84,7 +84,6 @@ export function ListeActeur() {
   return (
     <div className='space-y-2 px-2'>
       {/* En-tête */}
-
       <div className='overflow-x-auto'>
         <Tabs
           orientation='vertical'
