@@ -81,12 +81,6 @@ export const sidebarData: SidebarData = {
               icon: UserCog,
             },
             {
-              title: 'Fonctions',
-              url: '/parametrage/fonctions',
-              icon: Briefcase
-              ,
-            },
-            {
               title: 'Partenaire Financier',
               url: '/parametrage/partenaire-financier',
               icon: Handshake,

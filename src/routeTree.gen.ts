@@ -55,7 +55,6 @@ import { Route as AuthenticatedParametrageUtilisateursIndexRouteImport } from '.
 import { Route as AuthenticatedParametragePlansDeSiteIndexRouteImport } from './routes/_authenticated/parametrage/plans-de-site/index'
 import { Route as AuthenticatedParametragePartenaireFinancierIndexRouteImport } from './routes/_authenticated/parametrage/partenaire-financier/index'
 import { Route as AuthenticatedParametrageLocalitesIndexRouteImport } from './routes/_authenticated/parametrage/localites/index'
-import { Route as AuthenticatedParametrageFonctionsIndexRouteImport } from './routes/_authenticated/parametrage/fonctions/index'
 import { Route as AuthenticatedParametrageDictionnaireIndicateursIndexRouteImport } from './routes/_authenticated/parametrage/dictionnaire-indicateurs/index'
 import { Route as AuthenticatedParametrageConventionsIndexRouteImport } from './routes/_authenticated/parametrage/conventions/index'
 import { Route as AuthenticatedParametrageAutresIndexRouteImport } from './routes/_authenticated/parametrage/autres/index'
@@ -66,6 +65,7 @@ import { Route as authSetPasswordUidTokenRouteImport } from './routes/(auth)/set
 import { Route as AuthenticatedParametrageAutresUnitesIndicateurIndexRouteImport } from './routes/_authenticated/parametrage/autres/unites-indicateur/index'
 import { Route as AuthenticatedParametrageAutresTypeZoneIndexRouteImport } from './routes/_authenticated/parametrage/autres/type-zone/index'
 import { Route as AuthenticatedParametrageAutresSystemIndexRouteImport } from './routes/_authenticated/parametrage/autres/system/index'
+import { Route as AuthenticatedParametrageAutresFonctionIndexRouteImport } from './routes/_authenticated/parametrage/autres/fonction/index'
 
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
@@ -328,12 +328,6 @@ const AuthenticatedParametrageLocalitesIndexRoute =
     path: '/parametrage/localites/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedParametrageFonctionsIndexRoute =
-  AuthenticatedParametrageFonctionsIndexRouteImport.update({
-    id: '/parametrage/fonctions/',
-    path: '/parametrage/fonctions/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedParametrageDictionnaireIndicateursIndexRoute =
   AuthenticatedParametrageDictionnaireIndicateursIndexRouteImport.update({
     id: '/parametrage/dictionnaire-indicateurs/',
@@ -393,6 +387,12 @@ const AuthenticatedParametrageAutresSystemIndexRoute =
     path: '/system/',
     getParentRoute: () => AuthenticatedParametrageAutresRouteRoute,
   } as any)
+const AuthenticatedParametrageAutresFonctionIndexRoute =
+  AuthenticatedParametrageAutresFonctionIndexRouteImport.update({
+    id: '/fonction/',
+    path: '/fonction/',
+    getParentRoute: () => AuthenticatedParametrageAutresRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
@@ -424,7 +424,6 @@ export interface FileRoutesByFullPath {
   '/parametrage/autres/': typeof AuthenticatedParametrageAutresIndexRoute
   '/parametrage/conventions/': typeof AuthenticatedParametrageConventionsIndexRoute
   '/parametrage/dictionnaire-indicateurs/': typeof AuthenticatedParametrageDictionnaireIndicateursIndexRoute
-  '/parametrage/fonctions/': typeof AuthenticatedParametrageFonctionsIndexRoute
   '/parametrage/localites/': typeof AuthenticatedParametrageLocalitesIndexRoute
   '/parametrage/partenaire-financier/': typeof AuthenticatedParametragePartenaireFinancierIndexRoute
   '/parametrage/plans-de-site/': typeof AuthenticatedParametragePlansDeSiteIndexRoute
@@ -448,6 +447,7 @@ export interface FileRoutesByFullPath {
   '/rapport/decaissement/': typeof AuthenticatedRapportDecaissementIndexRoute
   '/rapport/etat-des-activites/': typeof AuthenticatedRapportEtatDesActivitesIndexRoute
   '/rapport/ptba/': typeof AuthenticatedRapportPtbaIndexRoute
+  '/parametrage/autres/fonction/': typeof AuthenticatedParametrageAutresFonctionIndexRoute
   '/parametrage/autres/system/': typeof AuthenticatedParametrageAutresSystemIndexRoute
   '/parametrage/autres/type-zone/': typeof AuthenticatedParametrageAutresTypeZoneIndexRoute
   '/parametrage/autres/unites-indicateur/': typeof AuthenticatedParametrageAutresUnitesIndicateurIndexRoute
@@ -480,7 +480,6 @@ export interface FileRoutesByTo {
   '/parametrage/autres': typeof AuthenticatedParametrageAutresIndexRoute
   '/parametrage/conventions': typeof AuthenticatedParametrageConventionsIndexRoute
   '/parametrage/dictionnaire-indicateurs': typeof AuthenticatedParametrageDictionnaireIndicateursIndexRoute
-  '/parametrage/fonctions': typeof AuthenticatedParametrageFonctionsIndexRoute
   '/parametrage/localites': typeof AuthenticatedParametrageLocalitesIndexRoute
   '/parametrage/partenaire-financier': typeof AuthenticatedParametragePartenaireFinancierIndexRoute
   '/parametrage/plans-de-site': typeof AuthenticatedParametragePlansDeSiteIndexRoute
@@ -504,6 +503,7 @@ export interface FileRoutesByTo {
   '/rapport/decaissement': typeof AuthenticatedRapportDecaissementIndexRoute
   '/rapport/etat-des-activites': typeof AuthenticatedRapportEtatDesActivitesIndexRoute
   '/rapport/ptba': typeof AuthenticatedRapportPtbaIndexRoute
+  '/parametrage/autres/fonction': typeof AuthenticatedParametrageAutresFonctionIndexRoute
   '/parametrage/autres/system': typeof AuthenticatedParametrageAutresSystemIndexRoute
   '/parametrage/autres/type-zone': typeof AuthenticatedParametrageAutresTypeZoneIndexRoute
   '/parametrage/autres/unites-indicateur': typeof AuthenticatedParametrageAutresUnitesIndicateurIndexRoute
@@ -540,7 +540,6 @@ export interface FileRoutesById {
   '/_authenticated/parametrage/autres/': typeof AuthenticatedParametrageAutresIndexRoute
   '/_authenticated/parametrage/conventions/': typeof AuthenticatedParametrageConventionsIndexRoute
   '/_authenticated/parametrage/dictionnaire-indicateurs/': typeof AuthenticatedParametrageDictionnaireIndicateursIndexRoute
-  '/_authenticated/parametrage/fonctions/': typeof AuthenticatedParametrageFonctionsIndexRoute
   '/_authenticated/parametrage/localites/': typeof AuthenticatedParametrageLocalitesIndexRoute
   '/_authenticated/parametrage/partenaire-financier/': typeof AuthenticatedParametragePartenaireFinancierIndexRoute
   '/_authenticated/parametrage/plans-de-site/': typeof AuthenticatedParametragePlansDeSiteIndexRoute
@@ -564,6 +563,7 @@ export interface FileRoutesById {
   '/_authenticated/rapport/decaissement/': typeof AuthenticatedRapportDecaissementIndexRoute
   '/_authenticated/rapport/etat-des-activites/': typeof AuthenticatedRapportEtatDesActivitesIndexRoute
   '/_authenticated/rapport/ptba/': typeof AuthenticatedRapportPtbaIndexRoute
+  '/_authenticated/parametrage/autres/fonction/': typeof AuthenticatedParametrageAutresFonctionIndexRoute
   '/_authenticated/parametrage/autres/system/': typeof AuthenticatedParametrageAutresSystemIndexRoute
   '/_authenticated/parametrage/autres/type-zone/': typeof AuthenticatedParametrageAutresTypeZoneIndexRoute
   '/_authenticated/parametrage/autres/unites-indicateur/': typeof AuthenticatedParametrageAutresUnitesIndicateurIndexRoute
@@ -600,7 +600,6 @@ export interface FileRouteTypes {
     | '/parametrage/autres/'
     | '/parametrage/conventions/'
     | '/parametrage/dictionnaire-indicateurs/'
-    | '/parametrage/fonctions/'
     | '/parametrage/localites/'
     | '/parametrage/partenaire-financier/'
     | '/parametrage/plans-de-site/'
@@ -624,6 +623,7 @@ export interface FileRouteTypes {
     | '/rapport/decaissement/'
     | '/rapport/etat-des-activites/'
     | '/rapport/ptba/'
+    | '/parametrage/autres/fonction/'
     | '/parametrage/autres/system/'
     | '/parametrage/autres/type-zone/'
     | '/parametrage/autres/unites-indicateur/'
@@ -656,7 +656,6 @@ export interface FileRouteTypes {
     | '/parametrage/autres'
     | '/parametrage/conventions'
     | '/parametrage/dictionnaire-indicateurs'
-    | '/parametrage/fonctions'
     | '/parametrage/localites'
     | '/parametrage/partenaire-financier'
     | '/parametrage/plans-de-site'
@@ -680,6 +679,7 @@ export interface FileRouteTypes {
     | '/rapport/decaissement'
     | '/rapport/etat-des-activites'
     | '/rapport/ptba'
+    | '/parametrage/autres/fonction'
     | '/parametrage/autres/system'
     | '/parametrage/autres/type-zone'
     | '/parametrage/autres/unites-indicateur'
@@ -715,7 +715,6 @@ export interface FileRouteTypes {
     | '/_authenticated/parametrage/autres/'
     | '/_authenticated/parametrage/conventions/'
     | '/_authenticated/parametrage/dictionnaire-indicateurs/'
-    | '/_authenticated/parametrage/fonctions/'
     | '/_authenticated/parametrage/localites/'
     | '/_authenticated/parametrage/partenaire-financier/'
     | '/_authenticated/parametrage/plans-de-site/'
@@ -739,6 +738,7 @@ export interface FileRouteTypes {
     | '/_authenticated/rapport/decaissement/'
     | '/_authenticated/rapport/etat-des-activites/'
     | '/_authenticated/rapport/ptba/'
+    | '/_authenticated/parametrage/autres/fonction/'
     | '/_authenticated/parametrage/autres/system/'
     | '/_authenticated/parametrage/autres/type-zone/'
     | '/_authenticated/parametrage/autres/unites-indicateur/'
@@ -1083,13 +1083,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedParametrageLocalitesIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/parametrage/fonctions/': {
-      id: '/_authenticated/parametrage/fonctions/'
-      path: '/parametrage/fonctions'
-      fullPath: '/parametrage/fonctions/'
-      preLoaderRoute: typeof AuthenticatedParametrageFonctionsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/parametrage/dictionnaire-indicateurs/': {
       id: '/_authenticated/parametrage/dictionnaire-indicateurs/'
       path: '/parametrage/dictionnaire-indicateurs'
@@ -1160,6 +1153,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedParametrageAutresSystemIndexRouteImport
       parentRoute: typeof AuthenticatedParametrageAutresRouteRoute
     }
+    '/_authenticated/parametrage/autres/fonction/': {
+      id: '/_authenticated/parametrage/autres/fonction/'
+      path: '/fonction'
+      fullPath: '/parametrage/autres/fonction/'
+      preLoaderRoute: typeof AuthenticatedParametrageAutresFonctionIndexRouteImport
+      parentRoute: typeof AuthenticatedParametrageAutresRouteRoute
+    }
   }
 }
 
@@ -1188,6 +1188,7 @@ const AuthenticatedSettingsRouteRouteWithChildren =
 
 interface AuthenticatedParametrageAutresRouteRouteChildren {
   AuthenticatedParametrageAutresIndexRoute: typeof AuthenticatedParametrageAutresIndexRoute
+  AuthenticatedParametrageAutresFonctionIndexRoute: typeof AuthenticatedParametrageAutresFonctionIndexRoute
   AuthenticatedParametrageAutresSystemIndexRoute: typeof AuthenticatedParametrageAutresSystemIndexRoute
   AuthenticatedParametrageAutresTypeZoneIndexRoute: typeof AuthenticatedParametrageAutresTypeZoneIndexRoute
   AuthenticatedParametrageAutresUnitesIndicateurIndexRoute: typeof AuthenticatedParametrageAutresUnitesIndicateurIndexRoute
@@ -1197,6 +1198,8 @@ const AuthenticatedParametrageAutresRouteRouteChildren: AuthenticatedParametrage
   {
     AuthenticatedParametrageAutresIndexRoute:
       AuthenticatedParametrageAutresIndexRoute,
+    AuthenticatedParametrageAutresFonctionIndexRoute:
+      AuthenticatedParametrageAutresFonctionIndexRoute,
     AuthenticatedParametrageAutresSystemIndexRoute:
       AuthenticatedParametrageAutresSystemIndexRoute,
     AuthenticatedParametrageAutresTypeZoneIndexRoute:
@@ -1223,7 +1226,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedParametrageActeursIndexRoute: typeof AuthenticatedParametrageActeursIndexRoute
   AuthenticatedParametrageConventionsIndexRoute: typeof AuthenticatedParametrageConventionsIndexRoute
   AuthenticatedParametrageDictionnaireIndicateursIndexRoute: typeof AuthenticatedParametrageDictionnaireIndicateursIndexRoute
-  AuthenticatedParametrageFonctionsIndexRoute: typeof AuthenticatedParametrageFonctionsIndexRoute
   AuthenticatedParametrageLocalitesIndexRoute: typeof AuthenticatedParametrageLocalitesIndexRoute
   AuthenticatedParametragePartenaireFinancierIndexRoute: typeof AuthenticatedParametragePartenaireFinancierIndexRoute
   AuthenticatedParametragePlansDeSiteIndexRoute: typeof AuthenticatedParametragePlansDeSiteIndexRoute
@@ -1268,8 +1270,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedParametrageConventionsIndexRoute,
   AuthenticatedParametrageDictionnaireIndicateursIndexRoute:
     AuthenticatedParametrageDictionnaireIndicateursIndexRoute,
-  AuthenticatedParametrageFonctionsIndexRoute:
-    AuthenticatedParametrageFonctionsIndexRoute,
   AuthenticatedParametrageLocalitesIndexRoute:
     AuthenticatedParametrageLocalitesIndexRoute,
   AuthenticatedParametragePartenaireFinancierIndexRoute:
