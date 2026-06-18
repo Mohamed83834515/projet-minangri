@@ -12,7 +12,6 @@ import {
   User,
   SlidersHorizontal,
   Handshake,
-  Briefcase,
   MapPin,
   FileStack,
   BarChart2,
