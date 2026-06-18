@@ -160,7 +160,7 @@ export default function IndicateurPerformanceActiviteTable({
                   </tr>
                   <tr className='border-b last:border-b-0'>
                     <td className='border-r px-2 py-1.5 text-muted-foreground'>
-                      Budget
+                      Budget (GNF)
                     </td>
                     {years.map((year) => (
                       <td
