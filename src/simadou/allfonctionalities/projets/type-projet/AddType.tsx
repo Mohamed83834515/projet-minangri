@@ -21,9 +21,9 @@ export default function AddTypeProjet({
   const formConfig = getTypeProjetFormConfig()
 
   const defaultValues = {
-    code_cat: currentRow?.code_cat || "",
-    nom_categorie: currentRow?.nom_categorie || "",
-    id_categorie: currentRow?.id_categorie || 0,
+    code_type_projet: currentRow?.code_type_projet || "",
+    nom_type_projet: currentRow?.nom_type_projet || "",
+    id_type_projet: currentRow?.id_type_projet || 0,
   }
 
   const mutation = useSaveTypeProjet(isEdit, currentRow, onSuccess)
