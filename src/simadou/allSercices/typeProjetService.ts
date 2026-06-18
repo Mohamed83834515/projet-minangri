@@ -3,7 +3,7 @@ import { apiClient } from "@/axios/api";
 import { TypeProjet } from "../allTypes/typeProjet";
 import { TypeProjetFormData } from "../schemas/typeProjetSchema";
 
-const BASE_URL = "types-projets"
+const BASE_URL = "/types-projets/"
 
 export const TypeProjetService = {
   // Récupérer tous les types de  projet

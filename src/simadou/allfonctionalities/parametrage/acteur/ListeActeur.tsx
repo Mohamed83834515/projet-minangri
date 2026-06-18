@@ -84,16 +84,7 @@ export function ListeActeur() {
   return (
     <div className='space-y-2 px-2'>
       {/* En-tête */}
-      <div className='flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between'>
-        <div>
-          <h2 className='text-2xl font-bold tracking-tight'>Gestion des acteurs</h2>
-          <p className='text-sm text-muted-foreground'>
-            Gérez les acteurs institutionnels, techniques et partenaires
-          </p>
-        </div>
-      </div>
-
-      {/* Onglets des catégories avec style comme NiveauTabs */}
+    
       <div className='overflow-x-auto'>
         <Tabs
           orientation='vertical'
