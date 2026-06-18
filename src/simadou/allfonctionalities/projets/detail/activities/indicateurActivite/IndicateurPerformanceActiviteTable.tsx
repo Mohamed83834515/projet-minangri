@@ -68,7 +68,7 @@ export default function IndicateurPerformanceActiviteTable({
           <thead className='bg-muted/50'>
             <tr className='border-b'>
               <th className='sticky left-0 z-20 min-w-[140px] border-r bg-muted/50 px-3 py-2 text-left font-semibold'>
-                Tâches
+                Intitulé indicateur
               </th>
               <th className='sticky left-[140px] z-20 min-w-[110px] border-r bg-muted/50 px-3 py-2 text-center font-semibold'>
                 Unité
