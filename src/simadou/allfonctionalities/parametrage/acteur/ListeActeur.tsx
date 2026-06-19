@@ -94,7 +94,8 @@ export function ListeActeur() {
           onValueChange={(val) => setSelectedCategorieId(Number(val))}
         >
           <TabsList className='inline-flex w-full min-w-max gap-1 bg-transparent p-0'>
-            {sortedCategories.map((categorie) => (
+            {sortedCategories.length ?
+            sortedCategories.map((categorie) => (
               <TabsTrigger
                 key={categorie.id_categorie}
                 value={String(categorie.id_categorie)}
@@ -106,7 +107,11 @@ export function ListeActeur() {
                   ({countByCategorie.get(categorie.id_categorie) || 0})
                 </span>
               </TabsTrigger>
-            ))}
+            ))
+            : 
+            <span>Auncun categorie Acteur Trouvé</span>
+          
+          }
           </TabsList>
         </Tabs>
       </div>

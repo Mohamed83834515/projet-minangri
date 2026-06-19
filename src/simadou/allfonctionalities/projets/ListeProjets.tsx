@@ -51,10 +51,10 @@ export default function ListeProjets() {
   )
 
   const sortedTypes = useMemo(() => {
-    return [...typeProjets].sort((a, b) =>
-      a.nom_type_projet.localeCompare(b.nom_type_projet)
-    )
-  }, [typeProjets])
+  return (typeProjets || [])
+    .filter(item => item?.nom_type_projet) // Garde uniquement ceux qui ont un nom
+    .sort((a, b) => (a.nom_type_projet || '').localeCompare(b.nom_type_projet || ''))
+}, [typeProjets])
 
   // ✅ ID actif : store s'il est valide, sinon premier type disponible
   const activeTypeId = useMemo(() => {
