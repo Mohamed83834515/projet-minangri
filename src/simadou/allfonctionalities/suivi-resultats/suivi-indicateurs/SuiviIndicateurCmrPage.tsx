@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, getRouteApi } from '@tanstack/react-router'
 import { ArrowLeft, LineChart, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -6,9 +6,11 @@ import { Card } from '@/components/ui/card'
 import { useGetIndicateurCmr } from '@/simadou/allHooks/admin/indicateurCmrHooks'
 import { useGetPeriodesIndicateur } from '@/simadou/allHooks/admin/periodeIndicateurHooks'
 import SuiviIndicateurCmrAddPeriodeDialog from './periode/SuiviIndicateurCmrAddPeriodeDialog'
+import SuiviIndicateurCmrPeriodeHeader from './periode/SuiviIndicateurCmrPeriodeHeader'
 import SuiviIndicateurCmrPeriodeWorkspace, {
   type SuiviIndicateurCmrPeriodeWorkspaceHandle,
 } from './periode/SuiviIndicateurCmrPeriodeWorkspace'
+import { resolvePeriodeIndicateurSelectValue } from './periode/periodeIndicateurFormUtils'
 import SuiviIndicateurCmrSummary from './SuiviIndicateurCmrSummary'
 
 const route = getRouteApi('/_authenticated/suivi-resultats/suivi-indicateurs/$id')
@@ -27,9 +29,34 @@ export default function SuiviIndicateurCmrPage() {
 
   const workspaceRef = useRef<SuiviIndicateurCmrPeriodeWorkspaceHandle>(null)
   const [addDialogOpen, setAddDialogOpen] = useState(false)
+  const [selectedPeriodeKey, setSelectedPeriodeKey] = useState('')
+
+  useEffect(() => {
+    if (periodes.length === 0) {
+      setSelectedPeriodeKey('')
+      return
+    }
+
+    const stillExists = periodes.some(
+      (periode) => resolvePeriodeIndicateurSelectValue(periode) === selectedPeriodeKey
+    )
+
+    if (!selectedPeriodeKey || !stillExists) {
+      setSelectedPeriodeKey(resolvePeriodeIndicateurSelectValue(periodes[0]))
+    }
+  }, [periodes, selectedPeriodeKey])
+
+  const selectedPeriode = useMemo(
+    () =>
+      periodes.find(
+        (periode) =>
+          resolvePeriodeIndicateurSelectValue(periode) === selectedPeriodeKey
+      ) ?? null,
+    [periodes, selectedPeriodeKey]
+  )
 
   return (
-    <div className='space-y-4 px-4 py-2'>
+    <div className='space-y-2 px-4 py-2'>
       <div className='flex items-center justify-between gap-4'>
         <Button variant='outline' size='sm' asChild className='shrink-0'>
           <Link to='/suivi-resultats/suivi-indicateurs'>
@@ -80,25 +107,40 @@ export default function SuiviIndicateurCmrPage() {
         </Card>
       ) : (
         <>
-          <SuiviIndicateurCmrSummary indicateur={indicateur} />
-          <SuiviIndicateurCmrPeriodeWorkspace
-            key={indicateur.id_ref_ind_cmr}
-            ref={workspaceRef}
-            refIndicateur={indicateur.id_ref_ind_cmr}
-            indicateurCode={indicateur.code_ref_ind}
-            periodes={periodes}
-            isLoadingPeriodes={isLoadingPeriodes}
-            isPeriodesError={isPeriodesError}
-          />
+          <div className='grid gap-3 lg:grid-cols-[minmax(0,1.9fr)_minmax(0,1fr)] lg:items-start'>
+            <SuiviIndicateurCmrSummary indicateur={indicateur} />
+            <SuiviIndicateurCmrPeriodeHeader
+              periodes={periodes}
+              selectedPeriodeKey={selectedPeriodeKey}
+              onSelectedPeriodeKeyChange={(key) => {
+                setSelectedPeriodeKey(key)
+                workspaceRef.current?.setActiveTab('source')
+              }}
+              isLoading={isLoadingPeriodes}
+              isError={isPeriodesError}
+            />
+            <div className='min-w-0 lg:col-start-1'>
+              <SuiviIndicateurCmrPeriodeWorkspace
+                key={indicateur.id_ref_ind_cmr}
+                ref={workspaceRef}
+                refIndicateur={indicateur.id_ref_ind_cmr}
+                indicateurCode={indicateur.code_ref_ind}
+                selectedPeriode={selectedPeriode}
+                onPeriodeDeleted={() => setSelectedPeriodeKey('')}
+              />
+            </div>
+          </div>
+
           <SuiviIndicateurCmrAddPeriodeDialog
             key={indicateur.id_ref_ind_cmr}
             open={addDialogOpen}
             onOpenChange={setAddDialogOpen}
             refIndicateur={indicateur.id_ref_ind_cmr}
             indicateurCode={indicateur.code_ref_ind}
-            onCreated={(idPeriode) =>
+            onCreated={(idPeriode) => {
+              setSelectedPeriodeKey(String(idPeriode))
               workspaceRef.current?.selectPeriode(idPeriode)
-            }
+            }}
           />
         </>
       )}

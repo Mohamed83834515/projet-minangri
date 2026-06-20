@@ -3,6 +3,8 @@ export type PeriodeSousRessourceType =
   | 'fonds-carte'
   | 'tableaux-synthese'
 
+export const MAX_SOUS_RESSOURCE_DOCUMENTS = 3
+
 export interface TableauSyntheseEnregistrement {
   id_tableau_synthese?: number
   id?: number
@@ -20,6 +22,7 @@ export interface FondCarteEnregistrement {
   id?: number
   source_donnees?: string
   date_validation?: string
+  document?: string | string[]
   observation?: string
   etat?: string
   periode?: number
@@ -33,7 +36,7 @@ export interface DocumentationCmrEnregistrement {
   source_donnees?: string
   titre?: string
   date_validation?: string
-  document?: string
+  document?: string | string[]
   observation?: string
   etat?: string
   periode?: number
@@ -52,11 +55,21 @@ export interface SimpleSousRessourceFormData {
   observation: string
 }
 
-export interface DocumentationCmrFormData {
+export interface SousRessourceDocumentsFormData {
+  documentFiles: File[]
+  existingDocuments: string[]
+}
+
+export interface DocumentationCmrFormData extends SousRessourceDocumentsFormData {
   source_donnees: string
   titre: string
   date_validation: string
-  document: string
+  observation: string
+}
+
+export interface FondCarteFormData extends SousRessourceDocumentsFormData {
+  source_donnees: string
+  date_validation: string
   observation: string
 }
 
@@ -71,13 +84,21 @@ export interface SimpleSousRessourceWritePayload {
 }
 
 export type TableauSyntheseWritePayload = SimpleSousRessourceWritePayload
-export type FondCarteWritePayload = SimpleSousRessourceWritePayload
+
+export interface FondCarteWritePayload {
+  source_donnees: string
+  date_validation: string
+  observation: string
+  etat: string
+  periode: number
+  id_personnel: number
+  modifier_par: number
+}
 
 export interface DocumentationCmrWritePayload {
   source_donnees: string
   titre: string
   date_validation: string
-  document: string
   observation: string
   etat: string
   periode: number
@@ -97,4 +118,10 @@ export const PERIODE_SOUS_RESSOURCE_LABELS: Record<
   documentations: 'documentation',
   'fonds-carte': 'fonds de carte',
   'tableaux-synthese': 'tableau de synthèse',
+}
+
+export function isSousRessourceWithDocuments(
+  resource: PeriodeSousRessourceType
+): resource is 'documentations' | 'fonds-carte' {
+  return resource === 'documentations' || resource === 'fonds-carte'
 }

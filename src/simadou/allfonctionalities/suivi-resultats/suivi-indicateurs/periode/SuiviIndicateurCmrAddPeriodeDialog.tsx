@@ -90,7 +90,7 @@ export default function SuiviIndicateurCmrAddPeriodeDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className={cn(DIALOG_SIZES.form, 'gap-0 p-0')}
+        className={cn(DIALOG_SIZES.md, 'gap-0 p-0')}
         aria-describedby={undefined}
       >
         <DialogHeader className='border-b px-6 py-4 pr-12'>

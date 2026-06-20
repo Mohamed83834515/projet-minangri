@@ -103,15 +103,15 @@ export default function SuiviIndicateurCmrSousRessourcePanel({
 
   if (isLoading) {
     return (
-      <div className='flex justify-center py-12'>
-        <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' />
+      <div className='flex justify-center py-6'>
+        <Loader2 className='h-6 w-6 animate-spin text-muted-foreground' />
       </div>
     )
   }
 
   if (isError) {
     return (
-      <p className='py-8 text-center text-sm text-muted-foreground'>
+      <p className='py-4 text-center text-sm text-muted-foreground'>
         Impossible de charger les {resourceLabel}s pour cette période.
       </p>
     )
@@ -138,7 +138,8 @@ export default function SuiviIndicateurCmrSousRessourcePanel({
             Ajouter
           </DataTableToolbarOutlineButton>
         }
-        defaultPageSize={10}
+        defaultPageSize={5}
+        compactPagination
         showViewOptions={false}
         emptyMessage={`Aucun(e) ${resourceLabel} pour cette période.`}
       />

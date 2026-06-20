@@ -38,3 +38,17 @@ export function resolveDocumentFileName(document: string | undefined): string {
   const parts = document.split('/')
   return decodeURIComponent(parts[parts.length - 1] || 'Document')
 }
+
+export function resolveDocumentList(document: unknown): string[] {
+  if (document == null) return []
+  if (Array.isArray(document)) {
+    return document
+      .filter((item): item is string => typeof item === 'string')
+      .map((item) => item.trim())
+      .filter(Boolean)
+  }
+  if (typeof document === 'string' && document.trim()) {
+    return [document.trim()]
+  }
+  return []
+}
