@@ -1,26 +1,7 @@
-import type { DocumentProjet } from '@/simadou/allTypes/documentProjet'
-import { resolveRelationId } from '@/simadou/lib/resolveApiRelation'
-
 export type DocumentProjetApiPayload = {
   description_document?: string
   projet: number
-}
-
-export function resolveDocumentProjetId(
-  value: DocumentProjet['projet']
-): number | undefined {
-  const id =
-    resolveRelationId(value, 'id_projet') ?? resolveRelationId(value, 'id')
-  return id ?? undefined
-}
-
-export function filterDocumentsByProjet(
-  items: DocumentProjet[],
-  idProjet: number
-): DocumentProjet[] {
-  return items.filter(
-    (item) => resolveDocumentProjetId(item.projet) === idProjet
-  )
+  dossier: number
 }
 
 export function resolveDocumentUrl(document: string | undefined): string | null {

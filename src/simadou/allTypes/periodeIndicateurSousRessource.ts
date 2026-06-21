@@ -3,8 +3,6 @@ export type PeriodeSousRessourceType =
   | 'fonds-carte'
   | 'tableaux-synthese'
 
-export const MAX_SOUS_RESSOURCE_DOCUMENTS = 3
-
 export interface TableauSyntheseEnregistrement {
   id_tableau_synthese?: number
   id?: number
@@ -19,10 +17,11 @@ export interface TableauSyntheseEnregistrement {
 
 export interface FondCarteEnregistrement {
   id_fond_carte?: number
+  id_fonds_carte?: number
   id?: number
   source_donnees?: string
   date_validation?: string
-  document?: string | string[]
+  shape_file?: string | string[]
   observation?: string
   etat?: string
   periode?: number
@@ -56,8 +55,9 @@ export interface SimpleSousRessourceFormData {
 }
 
 export interface SousRessourceDocumentsFormData {
-  documentFiles: File[]
-  existingDocuments: string[]
+  documentFile: File | null
+  existingDocument: string
+  removeExistingDocument: boolean
 }
 
 export interface DocumentationCmrFormData extends SousRessourceDocumentsFormData {

@@ -6,6 +6,7 @@ import type {
   FondCarteFormData,
   FondCarteWritePayload,
   SimpleSousRessourceFormData,
+  SousRessourceDocumentsFormData,
   TableauSyntheseWritePayload,
 } from '@/simadou/allTypes/periodeIndicateurSousRessource'
 import { resolveDocumentList } from '@/simadou/lib/documentProjetUtils'
@@ -16,8 +17,9 @@ export function emptySimpleSousRessourceFormValues(): SimpleSousRessourceFormDat
 
 function emptyDocumentsFormValues() {
   return {
-    documentFiles: [] as File[],
-    existingDocuments: [] as string[],
+    documentFile: null as File | null,
+    existingDocument: '',
+    removeExistingDocument: false,
   }
 }
 
@@ -58,8 +60,9 @@ export function documentationCmrToFormValues(
     titre: row?.titre ?? '',
     date_validation: row?.date_validation ?? '',
     observation: row?.observation ?? '',
-    documentFiles: [],
-    existingDocuments: resolveDocumentList(row?.document),
+    documentFile: null,
+    existingDocument: resolveDocumentList(row?.document)[0] ?? '',
+    removeExistingDocument: false,
   }
 }
 
@@ -70,8 +73,9 @@ export function fondCarteToFormValues(
     source_donnees: row?.source_donnees ?? '',
     date_validation: row?.date_validation ?? '',
     observation: row?.observation ?? '',
-    documentFiles: [],
-    existingDocuments: resolveDocumentList(row?.document),
+    documentFile: null,
+    existingDocument: resolveDocumentList(row?.shape_file)[0] ?? '',
+    removeExistingDocument: false,
   }
 }
 
@@ -150,16 +154,41 @@ export function buildDocumentationCmrWritePayload({
   }
 }
 
+export function buildSousRessourceDocumentsInput(
+  documents: Pick<
+    SousRessourceDocumentsFormData,
+    'documentFile' | 'existingDocument' | 'removeExistingDocument'
+  >
+): { newFile?: File; existingDocument?: string; removeExisting?: boolean } {
+  if (documents.documentFile) {
+    return { newFile: documents.documentFile }
+  }
+
+  if (documents.removeExistingDocument) {
+    return { removeExisting: true }
+  }
+
+  if (documents.existingDocument.trim()) {
+    return { existingDocument: documents.existingDocument }
+  }
+
+  return {}
+}
+
 export function buildSousRessourceDocumentsFormData(
   payload: FondCarteWritePayload | DocumentationCmrWritePayload,
+  resource: 'documentations' | 'fonds-carte',
   {
-    newFiles,
-    existingDocuments,
+    newFile,
+    existingDocument,
+    removeExisting,
   }: {
-    newFiles: File[]
-    existingDocuments: string[]
+    newFile?: File
+    existingDocument?: string
+    removeExisting?: boolean
   }
 ): FormData {
+  const fileField = resource === 'fonds-carte' ? 'shape_file' : 'document'
   const fd = new FormData()
   fd.append('source_donnees', payload.source_donnees)
   fd.append('date_validation', payload.date_validation)
@@ -173,12 +202,14 @@ export function buildSousRessourceDocumentsFormData(
     fd.append('titre', payload.titre)
   }
 
-  for (const doc of existingDocuments) {
-    fd.append('document', doc)
+  if (removeExisting) {
+    fd.append(fileField, '')
+  } else if (existingDocument?.trim()) {
+    fd.append(fileField, existingDocument)
   }
 
-  for (const file of newFiles) {
-    fd.append('document', file, file.name)
+  if (newFile) {
+    fd.append(fileField, newFile, newFile.name)
   }
 
   return fd

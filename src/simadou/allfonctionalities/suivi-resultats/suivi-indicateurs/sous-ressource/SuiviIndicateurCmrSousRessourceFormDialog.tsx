@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -18,26 +18,28 @@ import {
   useCreatePeriodeSousRessource,
   useUpdatePeriodeSousRessource,
 } from '@/simadou/allHooks/admin/periodeIndicateurSousRessourceHooks'
-import type {
-  DocumentationCmrEnregistrement,
-  DocumentationCmrFormData,
-  FondCarteEnregistrement,
-  FondCarteFormData,
-  PeriodeSousRessourceEnregistrement,
-  PeriodeSousRessourceType,
-  SimpleSousRessourceFormData,
-  SousRessourceDocumentsFormData,
-  TableauSyntheseEnregistrement,
-} from '@/simadou/allTypes/periodeIndicateurSousRessource'
 import {
-  MAX_SOUS_RESSOURCE_DOCUMENTS,
   PERIODE_SOUS_RESSOURCE_LABELS,
+  type DocumentationCmrEnregistrement,
+  type DocumentationCmrFormData,
+  type DocumentationCmrWritePayload,
+  type FondCarteEnregistrement,
+  type FondCarteFormData,
+  type FondCarteWritePayload,
+  type PeriodeSousRessourceEnregistrement,
+  type PeriodeSousRessourceType,
+  type PeriodeSousRessourceWritePayload,
+  type SimpleSousRessourceFormData,
+  type SousRessourceDocumentsFormData,
+  type TableauSyntheseEnregistrement,
+  type TableauSyntheseWritePayload,
 } from '@/simadou/allTypes/periodeIndicateurSousRessource'
 import { resolvePeriodeEnregistrementId } from '@/simadou/lib/periodeSousRessourceUtils'
 import {
   buildDocumentationCmrWritePayload,
   buildFondCarteWritePayload,
   buildSimpleSousRessourceWritePayload,
+  buildSousRessourceDocumentsInput,
   documentationCmrToFormValues,
   emptyDocumentationCmrFormValues,
   emptyFondCarteFormValues,
@@ -55,32 +57,115 @@ type SuiviIndicateurCmrSousRessourceFormDialogProps = {
   currentRow?: PeriodeSousRessourceEnregistrement | null
 }
 
-function countDocuments(documents: SousRessourceDocumentsFormData) {
-  return documents.documentFiles.length + documents.existingDocuments.length
+type DocumentMutationInput = {
+  data: DocumentationCmrWritePayload | FondCarteWritePayload
+  documents: ReturnType<typeof buildSousRessourceDocumentsInput>
 }
 
-function validateDocuments(
+type SubmitInput = TableauSyntheseWritePayload | DocumentMutationInput
+
+type WriteContext = {
+  parentPeriodeId: number
+  personnelId: number
+  isEdit: boolean
+}
+
+function validateDocument(
   documents: SousRessourceDocumentsFormData,
-  isEditing: boolean
+  isEditing: boolean,
+  missingMessage = 'Sélectionnez un document à téléverser.',
+  newFileMessage = 'Sélectionnez un fichier à téléverser.'
 ): boolean {
-  const total = countDocuments(documents)
-
-  if (total === 0) {
-    toast.error('Sélectionnez au moins un document à téléverser.')
+  if (!isEditing && !documents.documentFile) {
+    toast.error(newFileMessage)
     return false
   }
 
-  if (total > MAX_SOUS_RESSOURCE_DOCUMENTS) {
-    toast.error(`Vous ne pouvez pas ajouter plus de ${MAX_SOUS_RESSOURCE_DOCUMENTS} documents.`)
-    return false
-  }
-
-  if (!isEditing && documents.documentFiles.length === 0) {
-    toast.error('Sélectionnez au moins un fichier à téléverser.')
+  if (isEditing) {
+    if (
+      documents.documentFile ||
+      documents.removeExistingDocument ||
+      documents.existingDocument.trim()
+    ) {
+      return true
+    }
+    toast.error(missingMessage)
     return false
   }
 
   return true
+}
+
+function buildDocumentMutationInput<TForm extends DocumentationCmrFormData | FondCarteFormData>(
+  form: TForm,
+  buildPayload: (args: WriteContext & { form: TForm }) => DocumentationCmrWritePayload | FondCarteWritePayload,
+  ctx: WriteContext
+): DocumentMutationInput {
+  return {
+    data: buildPayload({ form, ...ctx }),
+    documents: buildSousRessourceDocumentsInput(form),
+  }
+}
+
+function buildSubmitInput({
+  resource,
+  simpleForm,
+  documentationForm,
+  fondCarteForm,
+  ctx,
+}: {
+  resource: PeriodeSousRessourceType
+  simpleForm: SimpleSousRessourceFormData
+  documentationForm: DocumentationCmrFormData
+  fondCarteForm: FondCarteFormData
+  ctx: WriteContext
+}): SubmitInput | null {
+  switch (resource) {
+    case 'documentations':
+      if (!documentationForm.titre.trim()) {
+        toast.error('Le titre est obligatoire.')
+        return null
+      }
+      if (!validateDocument(documentationForm, ctx.isEdit)) return null
+      return buildDocumentMutationInput(
+        documentationForm,
+        buildDocumentationCmrWritePayload,
+        ctx
+      )
+    case 'fonds-carte':
+      if (!validateDocument(fondCarteForm, ctx.isEdit, 'Sélectionnez un fichier à téléverser.')) return null
+      return buildDocumentMutationInput(fondCarteForm, buildFondCarteWritePayload, ctx)
+    case 'tableaux-synthese':
+      return buildSimpleSousRessourceWritePayload({ form: simpleForm, ...ctx })
+  }
+}
+
+type SousRessourceMutationInput =
+  | PeriodeSousRessourceWritePayload
+  | {
+      data: PeriodeSousRessourceWritePayload
+      documents?: DocumentMutationInput['documents']
+    }
+
+type SousRessourceUpdateMutationInput = {
+  itemId: number
+} & SousRessourceMutationInput
+
+function toMutationArgs(input: SubmitInput): SousRessourceMutationInput
+function toMutationArgs(
+  input: SubmitInput,
+  itemId: number
+): SousRessourceUpdateMutationInput
+function toMutationArgs(
+  input: SubmitInput,
+  itemId?: number
+): SousRessourceMutationInput | SousRessourceUpdateMutationInput {
+  if ('documents' in input) {
+    const withDocuments = { data: input.data, documents: input.documents }
+    return itemId != null ? { itemId, ...withDocuments } : withDocuments
+  }
+
+  return itemId != null ? { itemId, data: input } : input
 }
 
 export default function SuiviIndicateurCmrSousRessourceFormDialog({
@@ -95,41 +180,23 @@ export default function SuiviIndicateurCmrSousRessourceFormDialog({
   const createMutation = useCreatePeriodeSousRessource(parentPeriodeId, resource)
   const updateMutation = useUpdatePeriodeSousRessource(parentPeriodeId, resource)
 
-  const [simpleForm, setSimpleForm] = useState<SimpleSousRessourceFormData>(
-    emptySimpleSousRessourceFormValues()
+  const [simpleForm, setSimpleForm] = useState<SimpleSousRessourceFormData>(() =>
+    resource === 'tableaux-synthese' && isEditing
+      ? simpleSousRessourceToFormValues(
+          currentRow as TableauSyntheseEnregistrement | null | undefined
+        )
+      : emptySimpleSousRessourceFormValues()
   )
-  const [documentationForm, setDocumentationForm] =
-    useState<DocumentationCmrFormData>(emptyDocumentationCmrFormValues())
-  const [fondCarteForm, setFondCarteForm] =
-    useState<FondCarteFormData>(emptyFondCarteFormValues())
-
-  useEffect(() => {
-    if (!open) return
-
-    if (resource === 'documentations') {
-      setDocumentationForm(
-        isEditing
-          ? documentationCmrToFormValues(currentRow as DocumentationCmrEnregistrement)
-          : emptyDocumentationCmrFormValues()
-      )
-      return
-    }
-
-    if (resource === 'fonds-carte') {
-      setFondCarteForm(
-        isEditing
-          ? fondCarteToFormValues(currentRow as FondCarteEnregistrement)
-          : emptyFondCarteFormValues()
-      )
-      return
-    }
-
-    const row = currentRow as TableauSyntheseEnregistrement | null | undefined
-
-    setSimpleForm(
-      isEditing ? simpleSousRessourceToFormValues(row) : emptySimpleSousRessourceFormValues()
-    )
-  }, [open, isEditing, currentRow, resource])
+  const [documentationForm, setDocumentationForm] = useState<DocumentationCmrFormData>(() =>
+    resource === 'documentations' && isEditing
+      ? documentationCmrToFormValues(currentRow as DocumentationCmrEnregistrement)
+      : emptyDocumentationCmrFormValues()
+  )
+  const [fondCarteForm, setFondCarteForm] = useState<FondCarteFormData>(() =>
+    resource === 'fonds-carte' && isEditing
+      ? fondCarteToFormValues(currentRow as FondCarteEnregistrement)
+      : emptyFondCarteFormValues()
+  )
 
   const isPending = createMutation.isPending || updateMutation.isPending
   const resourceLabel = PERIODE_SOUS_RESSOURCE_LABELS[resource]
@@ -141,68 +208,14 @@ export default function SuiviIndicateurCmrSousRessourceFormDialog({
       return
     }
 
-    let mutationInput:
-      | ReturnType<typeof buildSimpleSousRessourceWritePayload>
-      | {
-          data: ReturnType<typeof buildDocumentationCmrWritePayload>
-          documents: {
-            newFiles: File[]
-            existingDocuments: string[]
-          }
-        }
-      | {
-          data: ReturnType<typeof buildFondCarteWritePayload>
-          documents: {
-            newFiles: File[]
-            existingDocuments: string[]
-          }
-        }
-      | null = null
-
-    if (resource === 'documentations') {
-      if (!documentationForm.titre.trim()) {
-        toast.error('Le titre est obligatoire.')
-        return
-      }
-      if (!validateDocuments(documentationForm, isEditing)) return
-
-      mutationInput = {
-        data: buildDocumentationCmrWritePayload({
-          form: documentationForm,
-          parentPeriodeId,
-          personnelId,
-          isEdit: isEditing,
-        }),
-        documents: {
-          newFiles: documentationForm.documentFiles,
-          existingDocuments: documentationForm.existingDocuments,
-        },
-      }
-    } else if (resource === 'fonds-carte') {
-      if (!validateDocuments(fondCarteForm, isEditing)) return
-
-      mutationInput = {
-        data: buildFondCarteWritePayload({
-          form: fondCarteForm,
-          parentPeriodeId,
-          personnelId,
-          isEdit: isEditing,
-        }),
-        documents: {
-          newFiles: fondCarteForm.documentFiles,
-          existingDocuments: fondCarteForm.existingDocuments,
-        },
-      }
-    } else {
-      mutationInput = buildSimpleSousRessourceWritePayload({
-        form: simpleForm,
-        parentPeriodeId,
-        personnelId,
-        isEdit: isEditing,
-      })
-    }
-
-    if (!mutationInput) return
+    const submitInput = buildSubmitInput({
+      resource,
+      simpleForm,
+      documentationForm,
+      fondCarteForm,
+      ctx: { parentPeriodeId, personnelId, isEdit: isEditing },
+    })
+    if (!submitInput) return
 
     try {
       if (isEditing && currentRow) {
@@ -211,28 +224,10 @@ export default function SuiviIndicateurCmrSousRessourceFormDialog({
           toast.error('Enregistrement introuvable.')
           return
         }
-
-        if ('data' in mutationInput) {
-          await updateMutation.mutateAsync({
-            itemId,
-            data: mutationInput.data,
-            documents: mutationInput.documents,
-          })
-        } else {
-          await updateMutation.mutateAsync({ itemId, data: mutationInput })
-        }
-
+        await updateMutation.mutateAsync(toMutationArgs(submitInput, itemId))
         toast.success(`${resourceLabel} modifié(e)`)
       } else {
-        if ('data' in mutationInput) {
-          await createMutation.mutateAsync({
-            data: mutationInput.data,
-            documents: mutationInput.documents,
-          })
-        } else {
-          await createMutation.mutateAsync(mutationInput)
-        }
-
+        await createMutation.mutateAsync(toMutationArgs(submitInput))
         toast.success(`${resourceLabel} ajouté(e)`)
       }
 

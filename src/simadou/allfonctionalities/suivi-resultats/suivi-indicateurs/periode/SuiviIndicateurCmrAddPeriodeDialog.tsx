@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -42,12 +42,6 @@ export default function SuiviIndicateurCmrAddPeriodeDialog({
   const [form, setForm] = useState<PeriodeIndicateurFormData>(
     emptyPeriodeIndicateurFormValues()
   )
-
-  useEffect(() => {
-    if (open) {
-      setForm(emptyPeriodeIndicateurFormValues())
-    }
-  }, [open])
 
   const updateField = <K extends keyof PeriodeIndicateurFormData>(
     key: K,

@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import { forwardRef, useImperativeHandle, useRef, useState, type ReactNode } from 'react'
 import { Loader2, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent } from '@/components/ui/tabs'
@@ -23,6 +23,14 @@ const CONTENT_TABS = [
 
 type ContentTab = (typeof CONTENT_TABS)[number]['value']
 
+/**
+ * Same width as the summary column above (1.9fr of the 1.9fr + 1fr page grid).
+ * Keeps fields/tables at their original size while the bordered box spans full width.
+ */
+function TabPanelBody({ children }: { children: ReactNode }) {
+  return <div className='w-full lg:w-[calc((100%-0.75rem)*19/29)]'>{children}</div>
+}
+
 export type SuiviIndicateurCmrPeriodeWorkspaceHandle = {
   selectPeriode: (idPeriode: number) => void
   setActiveTab: (tab: ContentTab) => void
@@ -35,11 +43,21 @@ type SuiviIndicateurCmrPeriodeWorkspaceProps = {
   onPeriodeDeleted: () => void
 }
 
-const SuiviIndicateurCmrPeriodeWorkspace = forwardRef<
-  SuiviIndicateurCmrPeriodeWorkspaceHandle,
-  SuiviIndicateurCmrPeriodeWorkspaceProps
->(function SuiviIndicateurCmrPeriodeWorkspace(
-  { refIndicateur, indicateurCode, selectedPeriode, onPeriodeDeleted },
+type PeriodeWorkspaceTabsProps = {
+  refIndicateur: number
+  selectedPeriode: PeriodeIndicateur
+  onPeriodeDeleted: () => void
+}
+
+type PeriodeWorkspaceTabsHandle = {
+  setActiveTab: (tab: ContentTab) => void
+}
+
+const PeriodeWorkspaceTabs = forwardRef<
+  PeriodeWorkspaceTabsHandle,
+  PeriodeWorkspaceTabsProps
+>(function PeriodeWorkspaceTabs(
+  { refIndicateur, selectedPeriode, onPeriodeDeleted },
   ref
 ) {
   const [activeTab, setActiveTab] = useState<ContentTab>('source')
@@ -51,39 +69,13 @@ const SuiviIndicateurCmrPeriodeWorkspace = forwardRef<
   const { tabsStyle } = useNiveauTabsTheme()
   const sourcePanelRef = useRef<SuiviIndicateurCmrSourceResultatPanelHandle>(null)
 
-  useEffect(() => {
-    setActiveTab('source')
-  }, [selectedPeriode?.id_periode])
-
-  useImperativeHandle(ref, () => ({
-    selectPeriode: () => {
-      setActiveTab('source')
-    },
-    setActiveTab,
-  }))
-
-  if (!selectedPeriode) {
-    return (
-      <div className='w-full rounded-lg border border-dashed px-3 py-4 text-left text-sm text-muted-foreground'>
-        Aucune période enregistrée pour l&apos;indicateur{' '}
-        <span className='font-mono font-medium text-foreground'>
-          {indicateurCode}
-        </span>
-        . Utilisez le bouton{' '}
-        <span className='font-medium text-foreground'>
-          Suivi de l&apos;Indicateur ({indicateurCode})
-        </span>{' '}
-        pour en créer une.
-      </div>
-    )
-  }
+  useImperativeHandle(ref, () => ({ setActiveTab }))
 
   const showSourceActions = activeTab === 'source'
 
   return (
     <div className='w-full min-h-[340px] rounded-lg border bg-card px-4 py-4'>
       <Tabs
-        key={`${refIndicateur}-${selectedPeriode.id_periode}`}
         orientation='vertical'
         value={activeTab}
         onValueChange={(value) => setActiveTab(value as ContentTab)}
@@ -135,37 +127,90 @@ const SuiviIndicateurCmrPeriodeWorkspace = forwardRef<
         </div>
 
         <TabsContent value='source' className='mt-3 focus-visible:outline-none'>
-          <SuiviIndicateurCmrSourceResultatPanel
-            ref={sourcePanelRef}
-            refIndicateur={refIndicateur}
-            periode={selectedPeriode}
-            onDeleted={onPeriodeDeleted}
-            onActionsStateChange={setSourceActions}
-          />
+          <TabPanelBody>
+            <SuiviIndicateurCmrSourceResultatPanel
+              ref={sourcePanelRef}
+              refIndicateur={refIndicateur}
+              periode={selectedPeriode}
+              onDeleted={onPeriodeDeleted}
+              onActionsStateChange={setSourceActions}
+            />
+          </TabPanelBody>
         </TabsContent>
 
         <TabsContent value='synthese' className='mt-1 focus-visible:outline-none'>
-          <SuiviIndicateurCmrSousRessourcePanel
-            resource='tableaux-synthese'
-            parentPeriodeId={selectedPeriode.id_periode}
-          />
+          <TabPanelBody>
+            <SuiviIndicateurCmrSousRessourcePanel
+              resource='tableaux-synthese'
+              parentPeriodeId={selectedPeriode.id_periode}
+            />
+          </TabPanelBody>
         </TabsContent>
 
         <TabsContent value='carte' className='mt-1 focus-visible:outline-none'>
-          <SuiviIndicateurCmrSousRessourcePanel
-            resource='fonds-carte'
-            parentPeriodeId={selectedPeriode.id_periode}
-          />
+          <TabPanelBody>
+            <SuiviIndicateurCmrSousRessourcePanel
+              resource='fonds-carte'
+              parentPeriodeId={selectedPeriode.id_periode}
+            />
+          </TabPanelBody>
         </TabsContent>
 
         <TabsContent value='documentation' className='mt-1 focus-visible:outline-none'>
-          <SuiviIndicateurCmrSousRessourcePanel
-            resource='documentations'
-            parentPeriodeId={selectedPeriode.id_periode}
-          />
+          <TabPanelBody>
+            <SuiviIndicateurCmrSousRessourcePanel
+              resource='documentations'
+              parentPeriodeId={selectedPeriode.id_periode}
+            />
+          </TabPanelBody>
         </TabsContent>
       </Tabs>
     </div>
+  )
+})
+
+const SuiviIndicateurCmrPeriodeWorkspace = forwardRef<
+  SuiviIndicateurCmrPeriodeWorkspaceHandle,
+  SuiviIndicateurCmrPeriodeWorkspaceProps
+>(function SuiviIndicateurCmrPeriodeWorkspace(
+  { refIndicateur, indicateurCode, selectedPeriode, onPeriodeDeleted },
+  ref
+) {
+  const tabsRef = useRef<PeriodeWorkspaceTabsHandle>(null)
+
+  useImperativeHandle(ref, () => ({
+    selectPeriode: () => {
+      tabsRef.current?.setActiveTab('source')
+    },
+    setActiveTab: (tab) => {
+      tabsRef.current?.setActiveTab(tab)
+    },
+  }))
+
+  if (!selectedPeriode) {
+    return (
+      <div className='w-full rounded-lg border border-dashed px-3 py-4 text-left text-sm text-muted-foreground'>
+        Aucune période enregistrée pour l&apos;indicateur{' '}
+        <span className='font-mono font-medium text-foreground'>
+          {indicateurCode}
+        </span>
+        . Utilisez le bouton{' '}
+        <span className='font-medium text-foreground'>
+          Suivi de l&apos;Indicateur ({indicateurCode})
+        </span>{' '}
+        pour en créer une.
+      </div>
+    )
+  }
+
+  return (
+    <PeriodeWorkspaceTabs
+      ref={tabsRef}
+      key={selectedPeriode.id_periode}
+      refIndicateur={refIndicateur}
+      selectedPeriode={selectedPeriode}
+      onPeriodeDeleted={onPeriodeDeleted}
+    />
   )
 })
 

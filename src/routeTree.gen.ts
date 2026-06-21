@@ -64,10 +64,12 @@ import { Route as AuthenticatedSuiviResultatsSuiviIndicateursIdRouteImport } fro
 import { Route as AuthenticatedProjetProgrammeProjetsIdRouteImport } from './routes/_authenticated/projet-programme/projets/$id'
 import { Route as AuthenticatedProgrammationProjetsIdRouteImport } from './routes/_authenticated/programmation/projets/$id'
 import { Route as authSetPasswordUidTokenRouteImport } from './routes/(auth)/set-password/$uid/$token'
+import { Route as AuthenticatedProjetProgrammeProjetsIdIndexRouteImport } from './routes/_authenticated/projet-programme/projets/$id/index'
 import { Route as AuthenticatedParametrageAutresUnitesIndicateurIndexRouteImport } from './routes/_authenticated/parametrage/autres/unites-indicateur/index'
 import { Route as AuthenticatedParametrageAutresTypeZoneIndexRouteImport } from './routes/_authenticated/parametrage/autres/type-zone/index'
 import { Route as AuthenticatedParametrageAutresSystemIndexRouteImport } from './routes/_authenticated/parametrage/autres/system/index'
 import { Route as AuthenticatedParametrageAutresFonctionIndexRouteImport } from './routes/_authenticated/parametrage/autres/fonction/index'
+import { Route as AuthenticatedProjetProgrammeProjetsIdDossiersDossierIdRouteImport } from './routes/_authenticated/projet-programme/projets/$id/dossiers/$dossierId'
 
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
@@ -383,6 +385,12 @@ const authSetPasswordUidTokenRoute = authSetPasswordUidTokenRouteImport.update({
   path: '/set-password/$uid/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedProjetProgrammeProjetsIdIndexRoute =
+  AuthenticatedProjetProgrammeProjetsIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedProjetProgrammeProjetsIdRoute,
+  } as any)
 const AuthenticatedParametrageAutresUnitesIndicateurIndexRoute =
   AuthenticatedParametrageAutresUnitesIndicateurIndexRouteImport.update({
     id: '/unites-indicateur/',
@@ -406,6 +414,12 @@ const AuthenticatedParametrageAutresFonctionIndexRoute =
     id: '/fonction/',
     path: '/fonction/',
     getParentRoute: () => AuthenticatedParametrageAutresRouteRoute,
+  } as any)
+const AuthenticatedProjetProgrammeProjetsIdDossiersDossierIdRoute =
+  AuthenticatedProjetProgrammeProjetsIdDossiersDossierIdRouteImport.update({
+    id: '/dossiers/$dossierId',
+    path: '/dossiers/$dossierId',
+    getParentRoute: () => AuthenticatedProjetProgrammeProjetsIdRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -433,7 +447,7 @@ export interface FileRoutesByFullPath {
   '/users/': typeof AuthenticatedUsersIndexRoute
   '/set-password/$uid/$token': typeof authSetPasswordUidTokenRoute
   '/programmation/projets/$id': typeof AuthenticatedProgrammationProjetsIdRoute
-  '/projet-programme/projets/$id': typeof AuthenticatedProjetProgrammeProjetsIdRoute
+  '/projet-programme/projets/$id': typeof AuthenticatedProjetProgrammeProjetsIdRouteWithChildren
   '/suivi-resultats/suivi-indicateurs/$id': typeof AuthenticatedSuiviResultatsSuiviIndicateursIdRoute
   '/parametrage/acteurs/': typeof AuthenticatedParametrageActeursIndexRoute
   '/parametrage/autres/': typeof AuthenticatedParametrageAutresIndexRoute
@@ -467,6 +481,8 @@ export interface FileRoutesByFullPath {
   '/parametrage/autres/system/': typeof AuthenticatedParametrageAutresSystemIndexRoute
   '/parametrage/autres/type-zone/': typeof AuthenticatedParametrageAutresTypeZoneIndexRoute
   '/parametrage/autres/unites-indicateur/': typeof AuthenticatedParametrageAutresUnitesIndicateurIndexRoute
+  '/projet-programme/projets/$id/': typeof AuthenticatedProjetProgrammeProjetsIdIndexRoute
+  '/projet-programme/projets/$id/dossiers/$dossierId': typeof AuthenticatedProjetProgrammeProjetsIdDossiersDossierIdRoute
 }
 export interface FileRoutesByTo {
   '/forgot-password': typeof authForgotPasswordRoute
@@ -491,7 +507,6 @@ export interface FileRoutesByTo {
   '/users': typeof AuthenticatedUsersIndexRoute
   '/set-password/$uid/$token': typeof authSetPasswordUidTokenRoute
   '/programmation/projets/$id': typeof AuthenticatedProgrammationProjetsIdRoute
-  '/projet-programme/projets/$id': typeof AuthenticatedProjetProgrammeProjetsIdRoute
   '/suivi-resultats/suivi-indicateurs/$id': typeof AuthenticatedSuiviResultatsSuiviIndicateursIdRoute
   '/parametrage/acteurs': typeof AuthenticatedParametrageActeursIndexRoute
   '/parametrage/autres': typeof AuthenticatedParametrageAutresIndexRoute
@@ -525,6 +540,8 @@ export interface FileRoutesByTo {
   '/parametrage/autres/system': typeof AuthenticatedParametrageAutresSystemIndexRoute
   '/parametrage/autres/type-zone': typeof AuthenticatedParametrageAutresTypeZoneIndexRoute
   '/parametrage/autres/unites-indicateur': typeof AuthenticatedParametrageAutresUnitesIndicateurIndexRoute
+  '/projet-programme/projets/$id': typeof AuthenticatedProjetProgrammeProjetsIdIndexRoute
+  '/projet-programme/projets/$id/dossiers/$dossierId': typeof AuthenticatedProjetProgrammeProjetsIdDossiersDossierIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -553,7 +570,7 @@ export interface FileRoutesById {
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
   '/(auth)/set-password/$uid/$token': typeof authSetPasswordUidTokenRoute
   '/_authenticated/programmation/projets/$id': typeof AuthenticatedProgrammationProjetsIdRoute
-  '/_authenticated/projet-programme/projets/$id': typeof AuthenticatedProjetProgrammeProjetsIdRoute
+  '/_authenticated/projet-programme/projets/$id': typeof AuthenticatedProjetProgrammeProjetsIdRouteWithChildren
   '/_authenticated/suivi-resultats/suivi-indicateurs/$id': typeof AuthenticatedSuiviResultatsSuiviIndicateursIdRoute
   '/_authenticated/parametrage/acteurs/': typeof AuthenticatedParametrageActeursIndexRoute
   '/_authenticated/parametrage/autres/': typeof AuthenticatedParametrageAutresIndexRoute
@@ -587,6 +604,8 @@ export interface FileRoutesById {
   '/_authenticated/parametrage/autres/system/': typeof AuthenticatedParametrageAutresSystemIndexRoute
   '/_authenticated/parametrage/autres/type-zone/': typeof AuthenticatedParametrageAutresTypeZoneIndexRoute
   '/_authenticated/parametrage/autres/unites-indicateur/': typeof AuthenticatedParametrageAutresUnitesIndicateurIndexRoute
+  '/_authenticated/projet-programme/projets/$id/': typeof AuthenticatedProjetProgrammeProjetsIdIndexRoute
+  '/_authenticated/projet-programme/projets/$id/dossiers/$dossierId': typeof AuthenticatedProjetProgrammeProjetsIdDossiersDossierIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -649,6 +668,8 @@ export interface FileRouteTypes {
     | '/parametrage/autres/system/'
     | '/parametrage/autres/type-zone/'
     | '/parametrage/autres/unites-indicateur/'
+    | '/projet-programme/projets/$id/'
+    | '/projet-programme/projets/$id/dossiers/$dossierId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/forgot-password'
@@ -673,7 +694,6 @@ export interface FileRouteTypes {
     | '/users'
     | '/set-password/$uid/$token'
     | '/programmation/projets/$id'
-    | '/projet-programme/projets/$id'
     | '/suivi-resultats/suivi-indicateurs/$id'
     | '/parametrage/acteurs'
     | '/parametrage/autres'
@@ -707,6 +727,8 @@ export interface FileRouteTypes {
     | '/parametrage/autres/system'
     | '/parametrage/autres/type-zone'
     | '/parametrage/autres/unites-indicateur'
+    | '/projet-programme/projets/$id'
+    | '/projet-programme/projets/$id/dossiers/$dossierId'
   id:
     | '__root__'
     | '/_authenticated'
@@ -768,6 +790,8 @@ export interface FileRouteTypes {
     | '/_authenticated/parametrage/autres/system/'
     | '/_authenticated/parametrage/autres/type-zone/'
     | '/_authenticated/parametrage/autres/unites-indicateur/'
+    | '/_authenticated/projet-programme/projets/$id/'
+    | '/_authenticated/projet-programme/projets/$id/dossiers/$dossierId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1172,6 +1196,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authSetPasswordUidTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/projet-programme/projets/$id/': {
+      id: '/_authenticated/projet-programme/projets/$id/'
+      path: '/'
+      fullPath: '/projet-programme/projets/$id/'
+      preLoaderRoute: typeof AuthenticatedProjetProgrammeProjetsIdIndexRouteImport
+      parentRoute: typeof AuthenticatedProjetProgrammeProjetsIdRoute
+    }
     '/_authenticated/parametrage/autres/unites-indicateur/': {
       id: '/_authenticated/parametrage/autres/unites-indicateur/'
       path: '/unites-indicateur'
@@ -1199,6 +1230,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/parametrage/autres/fonction/'
       preLoaderRoute: typeof AuthenticatedParametrageAutresFonctionIndexRouteImport
       parentRoute: typeof AuthenticatedParametrageAutresRouteRoute
+    }
+    '/_authenticated/projet-programme/projets/$id/dossiers/$dossierId': {
+      id: '/_authenticated/projet-programme/projets/$id/dossiers/$dossierId'
+      path: '/dossiers/$dossierId'
+      fullPath: '/projet-programme/projets/$id/dossiers/$dossierId'
+      preLoaderRoute: typeof AuthenticatedProjetProgrammeProjetsIdDossiersDossierIdRouteImport
+      parentRoute: typeof AuthenticatedProjetProgrammeProjetsIdRoute
     }
   }
 }
@@ -1253,6 +1291,24 @@ const AuthenticatedParametrageAutresRouteRouteWithChildren =
     AuthenticatedParametrageAutresRouteRouteChildren,
   )
 
+interface AuthenticatedProjetProgrammeProjetsIdRouteChildren {
+  AuthenticatedProjetProgrammeProjetsIdIndexRoute: typeof AuthenticatedProjetProgrammeProjetsIdIndexRoute
+  AuthenticatedProjetProgrammeProjetsIdDossiersDossierIdRoute: typeof AuthenticatedProjetProgrammeProjetsIdDossiersDossierIdRoute
+}
+
+const AuthenticatedProjetProgrammeProjetsIdRouteChildren: AuthenticatedProjetProgrammeProjetsIdRouteChildren =
+  {
+    AuthenticatedProjetProgrammeProjetsIdIndexRoute:
+      AuthenticatedProjetProgrammeProjetsIdIndexRoute,
+    AuthenticatedProjetProgrammeProjetsIdDossiersDossierIdRoute:
+      AuthenticatedProjetProgrammeProjetsIdDossiersDossierIdRoute,
+  }
+
+const AuthenticatedProjetProgrammeProjetsIdRouteWithChildren =
+  AuthenticatedProjetProgrammeProjetsIdRoute._addFileChildren(
+    AuthenticatedProjetProgrammeProjetsIdRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
@@ -1262,7 +1318,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
   AuthenticatedProgrammationProjetsIdRoute: typeof AuthenticatedProgrammationProjetsIdRoute
-  AuthenticatedProjetProgrammeProjetsIdRoute: typeof AuthenticatedProjetProgrammeProjetsIdRoute
+  AuthenticatedProjetProgrammeProjetsIdRoute: typeof AuthenticatedProjetProgrammeProjetsIdRouteWithChildren
   AuthenticatedSuiviResultatsSuiviIndicateursIdRoute: typeof AuthenticatedSuiviResultatsSuiviIndicateursIdRoute
   AuthenticatedParametrageActeursIndexRoute: typeof AuthenticatedParametrageActeursIndexRoute
   AuthenticatedParametrageConventionsIndexRoute: typeof AuthenticatedParametrageConventionsIndexRoute
@@ -1305,7 +1361,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProgrammationProjetsIdRoute:
     AuthenticatedProgrammationProjetsIdRoute,
   AuthenticatedProjetProgrammeProjetsIdRoute:
-    AuthenticatedProjetProgrammeProjetsIdRoute,
+    AuthenticatedProjetProgrammeProjetsIdRouteWithChildren,
   AuthenticatedSuiviResultatsSuiviIndicateursIdRoute:
     AuthenticatedSuiviResultatsSuiviIndicateursIdRoute,
   AuthenticatedParametrageActeursIndexRoute:

@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { FileText, FileUp, Trash2, Upload, X } from 'lucide-react'
+import { ExternalLink, FileText, FileUp, Trash2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DateInput } from '@/components/ui/date-input'
 import { Input } from '@/components/ui/input'
@@ -13,7 +13,6 @@ import type {
   SimpleSousRessourceFormData,
   SousRessourceDocumentsFormData,
 } from '@/simadou/allTypes/periodeIndicateurSousRessource'
-import { MAX_SOUS_RESSOURCE_DOCUMENTS } from '@/simadou/allTypes/periodeIndicateurSousRessource'
 import {
   resolveDocumentFileName,
   resolveDocumentUrl,
@@ -47,196 +46,141 @@ type SousRessourceFormFieldsProps = {
   onFondCarteDocumentsChange?: (documents: SousRessourceDocumentsFormData) => void
 }
 
-function DocumentsFileField({
+function DocumentFileField({
   id,
+  label = 'Document',
   disabled,
   documents,
   onDocumentsChange,
 }: {
   id: string
+  label?: string
   disabled?: boolean
   documents: SousRessourceDocumentsFormData
   onDocumentsChange: (next: SousRessourceDocumentsFormData) => void
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
-  const totalCount =
-    documents.documentFiles.length + documents.existingDocuments.length
-  const canAddMore = totalCount < MAX_SOUS_RESSOURCE_DOCUMENTS
+  const existingHref = resolveDocumentUrl(documents.existingDocument)
+  const existingLabel = resolveDocumentFileName(documents.existingDocument)
 
-  const handleFilesSelected = (fileList: FileList | null) => {
-    if (!fileList?.length) return
-
-    const remaining = MAX_SOUS_RESSOURCE_DOCUMENTS - totalCount
-    const incoming = Array.from(fileList).slice(0, remaining)
-
-    onDocumentsChange({
-      ...documents,
-      documentFiles: [...documents.documentFiles, ...incoming],
-    })
-
-    if (inputRef.current) inputRef.current.value = ''
-  }
-
-  const removeNewFile = (index: number) => {
-    onDocumentsChange({
-      ...documents,
-      documentFiles: documents.documentFiles.filter((_, i) => i !== index),
-    })
-  }
-
-  const removeExistingDocument = (index: number) => {
-    onDocumentsChange({
-      ...documents,
-      existingDocuments: documents.existingDocuments.filter((_, i) => i !== index),
-    })
-  }
-
-  const clearAll = () => {
-    onDocumentsChange({ documentFiles: [], existingDocuments: [] })
+  const clearInput = () => {
     if (inputRef.current) inputRef.current.value = ''
   }
 
   return (
     <div className='space-y-2'>
-      <Label htmlFor={id}>Documents</Label>
+      <Label htmlFor={id}>{label}</Label>
       <input
         ref={inputRef}
         id={id}
         type='file'
         accept={DOCUMENT_ACCEPT}
-        multiple
         className='hidden'
-        disabled={disabled || !canAddMore}
-        onChange={(e) => handleFilesSelected(e.target.files)}
+        disabled={disabled}
+        onChange={(e) => {
+          const file = e.target.files?.[0] ?? null
+          onDocumentsChange({
+            ...documents,
+            documentFile: file,
+            removeExistingDocument: false,
+          })
+          clearInput()
+        }}
       />
 
-      <div
-        className={cn(
-          'rounded-lg border transition-colors',
-          totalCount > 0 ? 'border-border bg-muted/20 p-3' : 'border-dashed p-3'
-        )}
-      >
-        {totalCount > 0 ? (
-          <div className='space-y-2'>
-            <div className='flex items-center justify-between gap-2'>
-              <span className='text-xs text-muted-foreground'>
-                {totalCount} fichier{totalCount > 1 ? 's' : ''}
-                <span
-                  className={cn(
-                    'ms-1.5 rounded px-1.5 py-0.5 font-medium',
-                    totalCount >= MAX_SOUS_RESSOURCE_DOCUMENTS
-                      ? 'bg-orange-100 text-orange-700'
-                      : 'bg-muted text-muted-foreground'
-                  )}
-                >
-                  {totalCount}/{MAX_SOUS_RESSOURCE_DOCUMENTS}
-                </span>
-              </span>
-              <div className='flex shrink-0 items-center gap-0.5'>
-                {canAddMore && (
-                  <Button
-                    type='button'
-                    variant='ghost'
-                    size='sm'
-                    className='h-7 px-2 text-xs'
-                    onClick={() => inputRef.current?.click()}
-                    disabled={disabled}
-                  >
-                    <Upload className='me-1 h-3 w-3' />
-                    Ajouter
-                  </Button>
-                )}
-                <Button
-                  type='button'
-                  variant='ghost'
-                  size='sm'
-                  className='h-7 px-2 text-xs text-destructive hover:text-destructive'
-                  onClick={clearAll}
-                  disabled={disabled}
-                >
-                  <Trash2 className='me-1 h-3 w-3' />
-                  Tout effacer
-                </Button>
-              </div>
-            </div>
-
-            <div className='flex flex-col gap-1'>
-              {documents.existingDocuments.map((doc, index) => {
-                const href = resolveDocumentUrl(doc)
-                const label = resolveDocumentFileName(doc)
-                return (
-                  <div
-                    key={`existing-${doc}-${index}`}
-                    className='flex items-center gap-2 rounded-md border bg-background/80 px-2.5 py-1.5'
-                  >
-                    <FileText className='h-3.5 w-3.5 shrink-0 text-primary/70' />
-                    <div className='min-w-0 flex-1'>
-                      {href ? (
-                        <a
-                          href={href}
-                          target='_blank'
-                          rel='noopener noreferrer'
-                          className='block truncate text-xs font-medium text-primary hover:underline'
-                        >
-                          {label}
-                        </a>
-                      ) : (
-                        <p className='truncate text-xs font-medium text-foreground'>
-                          {label}
-                        </p>
-                      )}
-                    </div>
-                    <Button
-                      type='button'
-                      variant='ghost'
-                      size='icon'
-                      className='h-7 w-7 shrink-0'
-                      onClick={() => removeExistingDocument(index)}
-                      disabled={disabled}
-                      aria-label={`Retirer ${label}`}
-                    >
-                      <X className='h-4 w-4' />
-                    </Button>
-                  </div>
-                )
-              })}
-
-              {documents.documentFiles.map((file, index) => (
-                <div
-                  key={`new-${file.name}-${index}`}
-                  className='flex items-center gap-2 rounded-md border bg-background/80 px-2.5 py-1.5'
-                >
-                  <FileText className='h-3.5 w-3.5 shrink-0 text-primary/70' />
-                  <p className='min-w-0 flex-1 truncate text-xs font-medium text-foreground'>
-                    {file.name}
-                  </p>
-                  <Button
-                    type='button'
-                    variant='ghost'
-                    size='icon'
-                    className='h-7 w-7 shrink-0'
-                    onClick={() => removeNewFile(index)}
-                    disabled={disabled}
-                    aria-label={`Retirer ${file.name}`}
-                  >
-                    <X className='h-4 w-4' />
-                  </Button>
-                </div>
-              ))}
-            </div>
+      {documents.documentFile ? (
+        <div className='flex items-center justify-between gap-2 rounded-lg border bg-muted/20 px-3 py-2'>
+          <div className='flex min-w-0 items-center gap-2'>
+            <FileText className='h-3.5 w-3.5 shrink-0 text-primary/70' />
+            <span className='truncate text-sm font-medium'>
+              {documents.documentFile.name}
+            </span>
           </div>
-        ) : (
-          <button
+          <Button
             type='button'
-            className='flex w-full items-center justify-center gap-2 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50'
+            variant='ghost'
+            size='icon'
+            className='h-7 w-7 shrink-0'
+            onClick={() => {
+              onDocumentsChange({ ...documents, documentFile: null })
+              clearInput()
+            }}
+            disabled={disabled}
+            aria-label='Retirer le fichier'
+          >
+            <X className='h-4 w-4' />
+          </Button>
+        </div>
+      ) : existingHref ? (
+        <div className='flex items-center justify-between gap-2 rounded-lg border bg-muted/20 px-3 py-2'>
+          <a
+            href={existingHref}
+            target='_blank'
+            rel='noopener noreferrer'
+            className='inline-flex min-w-0 items-center gap-1.5 truncate text-sm font-medium text-primary hover:underline'
+          >
+            <ExternalLink className='h-3.5 w-3.5 shrink-0' />
+            <span className='truncate'>{existingLabel}</span>
+          </a>
+          <div className='flex shrink-0 items-center gap-1'>
+            <Button
+              type='button'
+              variant='ghost'
+              size='icon'
+              className='h-7 w-7'
+              onClick={() => inputRef.current?.click()}
+              disabled={disabled}
+              aria-label='Remplacer le fichier'
+            >
+              <FileUp className='h-4 w-4' />
+            </Button>
+            <Button
+              type='button'
+              variant='ghost'
+              size='icon'
+              className='h-7 w-7 text-destructive hover:bg-destructive/10 hover:text-destructive'
+              onClick={() =>
+                onDocumentsChange({
+                  documentFile: null,
+                  existingDocument: '',
+                  removeExistingDocument: true,
+                })
+              }
+              disabled={disabled}
+              aria-label='Supprimer le fichier'
+            >
+              <Trash2 className='h-4 w-4' />
+            </Button>
+          </div>
+        </div>
+      ) : documents.removeExistingDocument ? (
+        <div className='flex items-center justify-between gap-2 rounded-lg border border-dashed bg-muted/10 px-3 py-2'>
+          <span className='text-sm text-muted-foreground'>Fichier supprimé</span>
+          <Button
+            type='button'
+            variant='ghost'
+            size='icon'
+            className='h-7 w-7'
             onClick={() => inputRef.current?.click()}
             disabled={disabled}
+            aria-label='Ajouter un fichier'
           >
             <FileUp className='h-4 w-4' />
-            Sélectionner des fichiers (max. {MAX_SOUS_RESSOURCE_DOCUMENTS})
-          </button>
-        )}
-      </div>
+          </Button>
+        </div>
+      ) : (
+        <button
+          type='button'
+          className={cn(
+            'flex w-full items-center justify-center gap-2 rounded-lg border border-dashed px-3 py-4 text-sm text-muted-foreground transition-colors hover:border-primary/40 hover:bg-muted/30 disabled:cursor-not-allowed disabled:opacity-50'
+          )}
+          onClick={() => inputRef.current?.click()}
+          disabled={disabled}
+        >
+          <FileUp className='h-4 w-4' />
+          Sélectionner un fichier
+        </button>
+      )}
     </div>
   )
 }
@@ -356,15 +300,16 @@ export default function SousRessourceFormFields({
           onObservationChange={(value) => onDocumentationChange('observation', value)}
         />
 
-        <DocumentsFileField
-          id={id('documents')}
+        <DocumentFileField
+          id={id('document')}
           disabled={disabled}
           documents={documentationForm}
           onDocumentsChange={
             onDocumentationDocumentsChange ??
             ((next) => {
-              onDocumentationChange('documentFiles', next.documentFiles)
-              onDocumentationChange('existingDocuments', next.existingDocuments)
+              onDocumentationChange('documentFile', next.documentFile)
+              onDocumentationChange('existingDocument', next.existingDocument)
+              onDocumentationChange('removeExistingDocument', next.removeExistingDocument)
             })
           }
         />
@@ -391,15 +336,17 @@ export default function SousRessourceFormFields({
           onObservationChange={(value) => onFondCarteChange('observation', value)}
         />
 
-        <DocumentsFileField
-          id={id('documents')}
+        <DocumentFileField
+          id={id('shape-file')}
+          label='Document'
           disabled={disabled}
           documents={fondCarteForm}
           onDocumentsChange={
             onFondCarteDocumentsChange ??
             ((next) => {
-              onFondCarteChange('documentFiles', next.documentFiles)
-              onFondCarteChange('existingDocuments', next.existingDocuments)
+              onFondCarteChange('documentFile', next.documentFile)
+              onFondCarteChange('existingDocument', next.existingDocument)
+              onFondCarteChange('removeExistingDocument', next.removeExistingDocument)
             })
           }
         />

@@ -96,15 +96,11 @@ export function buildPeriodeIndicateurSousRessourceColumns({
   const documentColumn: ColumnDef<PeriodeSousRessourceEnregistrement> = {
     accessorKey: 'document',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Documents' />
+      <DataTableColumnHeader column={column} title='Document' />
     ),
     cell: ({ row }) => (
       <DocumentLinksCell
-        document={
-          resource === 'documentations'
-            ? (row.original as DocumentationCmrEnregistrement).document
-            : (row.original as FondCarteEnregistrement).document
-        }
+        document={(row.original as DocumentationCmrEnregistrement).document}
       />
     ),
   }
@@ -122,8 +118,20 @@ export function buildPeriodeIndicateurSousRessourceColumns({
       documentColumn,
     ]
 
+  const fondCarteFileColumn: ColumnDef<PeriodeSousRessourceEnregistrement> = {
+    accessorKey: 'shape_file',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='Document' />
+    ),
+    cell: ({ row }) => (
+      <DocumentLinksCell
+        document={(row.original as FondCarteEnregistrement).shape_file}
+      />
+    ),
+  }
+
   const fondCarteColumns: ColumnDef<PeriodeSousRessourceEnregistrement>[] = [
-    documentColumn,
+    fondCarteFileColumn,
   ]
 
   const columns =

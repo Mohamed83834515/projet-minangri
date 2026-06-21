@@ -12,11 +12,11 @@ import {
   useGetPeriodeSousRessources,
 } from '@/simadou/allHooks/admin/periodeIndicateurSousRessourceHooks'
 import { buildPeriodeIndicateurSousRessourceColumns } from '@/simadou/allColonnes/periode-indicateur-sous-ressource-columns'
-import type {
-  PeriodeSousRessourceEnregistrement,
-  PeriodeSousRessourceType,
+import {
+  PERIODE_SOUS_RESSOURCE_LABELS,
+  type PeriodeSousRessourceEnregistrement,
+  type PeriodeSousRessourceType,
 } from '@/simadou/allTypes/periodeIndicateurSousRessource'
-import { PERIODE_SOUS_RESSOURCE_LABELS } from '@/simadou/allTypes/periodeIndicateurSousRessource'
 import {
   resolvePeriodeEnregistrementId,
   resolvePeriodeEnregistrementLabel,
@@ -144,18 +144,25 @@ export default function SuiviIndicateurCmrSousRessourcePanel({
         emptyMessage={`Aucun(e) ${resourceLabel} pour cette période.`}
       />
 
-      <SuiviIndicateurCmrSousRessourceFormDialog
-        open={open === 'add' || open === 'edit'}
-        onOpenChange={(isOpen) => {
-          if (!isOpen) {
-            setOpen(null)
-            setCurrentRow(null)
+      {(open === 'add' || open === 'edit') && (
+        <SuiviIndicateurCmrSousRessourceFormDialog
+          key={
+            open === 'edit' && currentRow
+              ? `edit-${resolvePeriodeEnregistrementId(currentRow, resource)}`
+              : `add-${resource}`
           }
-        }}
-        resource={resource}
-        parentPeriodeId={parentPeriodeId}
-        currentRow={open === 'edit' ? currentRow : null}
-      />
+          open
+          onOpenChange={(isOpen) => {
+            if (!isOpen) {
+              setOpen(null)
+              setCurrentRow(null)
+            }
+          }}
+          resource={resource}
+          parentPeriodeId={parentPeriodeId}
+          currentRow={open === 'edit' ? currentRow : null}
+        />
+      )}
 
       {currentRow && (
         <GenericDeleteDialog<PeriodeSousRessourceEnregistrement>

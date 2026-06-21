@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { Link, getRouteApi } from '@tanstack/react-router'
 import { ArrowLeft, LineChart, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -29,22 +29,23 @@ export default function SuiviIndicateurCmrPage() {
 
   const workspaceRef = useRef<SuiviIndicateurCmrPeriodeWorkspaceHandle>(null)
   const [addDialogOpen, setAddDialogOpen] = useState(false)
-  const [selectedPeriodeKey, setSelectedPeriodeKey] = useState('')
+  const [preferredPeriodeKey, setPreferredPeriodeKey] = useState('')
 
-  useEffect(() => {
-    if (periodes.length === 0) {
-      setSelectedPeriodeKey('')
-      return
+  const selectedPeriodeKey = useMemo(() => {
+    if (periodes.length === 0) return ''
+
+    if (
+      preferredPeriodeKey &&
+      periodes.some(
+        (periode) =>
+          resolvePeriodeIndicateurSelectValue(periode) === preferredPeriodeKey
+      )
+    ) {
+      return preferredPeriodeKey
     }
 
-    const stillExists = periodes.some(
-      (periode) => resolvePeriodeIndicateurSelectValue(periode) === selectedPeriodeKey
-    )
-
-    if (!selectedPeriodeKey || !stillExists) {
-      setSelectedPeriodeKey(resolvePeriodeIndicateurSelectValue(periodes[0]))
-    }
-  }, [periodes, selectedPeriodeKey])
+    return resolvePeriodeIndicateurSelectValue(periodes[0])
+  }, [periodes, preferredPeriodeKey])
 
   const selectedPeriode = useMemo(
     () =>
@@ -113,35 +114,37 @@ export default function SuiviIndicateurCmrPage() {
               periodes={periodes}
               selectedPeriodeKey={selectedPeriodeKey}
               onSelectedPeriodeKeyChange={(key) => {
-                setSelectedPeriodeKey(key)
+                setPreferredPeriodeKey(key)
                 workspaceRef.current?.setActiveTab('source')
               }}
               isLoading={isLoadingPeriodes}
               isError={isPeriodesError}
             />
-            <div className='min-w-0 lg:col-start-1'>
+            <div className='min-w-0 lg:col-span-2'>
               <SuiviIndicateurCmrPeriodeWorkspace
                 key={indicateur.id_ref_ind_cmr}
                 ref={workspaceRef}
                 refIndicateur={indicateur.id_ref_ind_cmr}
                 indicateurCode={indicateur.code_ref_ind}
                 selectedPeriode={selectedPeriode}
-                onPeriodeDeleted={() => setSelectedPeriodeKey('')}
+                onPeriodeDeleted={() => setPreferredPeriodeKey('')}
               />
             </div>
           </div>
 
-          <SuiviIndicateurCmrAddPeriodeDialog
-            key={indicateur.id_ref_ind_cmr}
-            open={addDialogOpen}
-            onOpenChange={setAddDialogOpen}
-            refIndicateur={indicateur.id_ref_ind_cmr}
-            indicateurCode={indicateur.code_ref_ind}
-            onCreated={(idPeriode) => {
-              setSelectedPeriodeKey(String(idPeriode))
-              workspaceRef.current?.selectPeriode(idPeriode)
-            }}
-          />
+          {addDialogOpen ? (
+            <SuiviIndicateurCmrAddPeriodeDialog
+              key={indicateur.id_ref_ind_cmr}
+              open
+              onOpenChange={setAddDialogOpen}
+              refIndicateur={indicateur.id_ref_ind_cmr}
+              indicateurCode={indicateur.code_ref_ind}
+              onCreated={(idPeriode) => {
+                setPreferredPeriodeKey(String(idPeriode))
+                workspaceRef.current?.selectPeriode(idPeriode)
+              }}
+            />
+          ) : null}
         </>
       )}
     </div>

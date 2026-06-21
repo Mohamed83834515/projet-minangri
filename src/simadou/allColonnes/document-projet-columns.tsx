@@ -33,8 +33,7 @@ export function buildDocumentProjetColumns(
         return (
           <a
             href={href}
-            target='_blank'
-            rel='noopener noreferrer'
+            download={label}
             className='inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline'
           >
             <ExternalLink className='h-4 w-4 shrink-0' />
