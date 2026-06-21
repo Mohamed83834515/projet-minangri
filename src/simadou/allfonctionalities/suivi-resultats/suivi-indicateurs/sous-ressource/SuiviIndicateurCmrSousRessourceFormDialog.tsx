@@ -29,7 +29,10 @@ import type {
   SousRessourceDocumentsFormData,
   TableauSyntheseEnregistrement,
 } from '@/simadou/allTypes/periodeIndicateurSousRessource'
-import { PERIODE_SOUS_RESSOURCE_LABELS } from '@/simadou/allTypes/periodeIndicateurSousRessource'
+import {
+  MAX_SOUS_RESSOURCE_DOCUMENTS,
+  PERIODE_SOUS_RESSOURCE_LABELS,
+} from '@/simadou/allTypes/periodeIndicateurSousRessource'
 import { resolvePeriodeEnregistrementId } from '@/simadou/lib/periodeSousRessourceUtils'
 import {
   buildDocumentationCmrWritePayload,
@@ -208,10 +211,28 @@ export default function SuiviIndicateurCmrSousRessourceFormDialog({
           toast.error('Enregistrement introuvable.')
           return
         }
-        await updateMutation.mutateAsync({ itemId, data: payload })
+
+        if ('data' in mutationInput) {
+          await updateMutation.mutateAsync({
+            itemId,
+            data: mutationInput.data,
+            documents: mutationInput.documents,
+          })
+        } else {
+          await updateMutation.mutateAsync({ itemId, data: mutationInput })
+        }
+
         toast.success(`${resourceLabel} modifié(e)`)
       } else {
-        await createMutation.mutateAsync(payload)
+        if ('data' in mutationInput) {
+          await createMutation.mutateAsync({
+            data: mutationInput.data,
+            documents: mutationInput.documents,
+          })
+        } else {
+          await createMutation.mutateAsync(mutationInput)
+        }
+
         toast.success(`${resourceLabel} ajouté(e)`)
       }
 
