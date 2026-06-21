@@ -14,7 +14,7 @@ import {
   type DocumentProjetFormData,
 } from '@/simadou/schemas/documentProjetSchemas'
 
-type DocumentProjetFormDialogProps = {
+type DocumentFormDialogProps = {
   projet: Projet
   dossier: DossierProjet
   document?: DocumentProjet | null
@@ -28,13 +28,13 @@ function extractFile(value: unknown): File | undefined {
   return undefined
 }
 
-export default function DocumentProjetFormDialog({
+export default function DocumentFormDialog({
   projet,
   dossier,
   document,
   onClose,
   onSuccess,
-}: DocumentProjetFormDialogProps) {
+}: DocumentFormDialogProps) {
   const isEditing = !!document?.id_document
   const idProjet = projet.id_projet
   const idDossier = dossier.id_dossier

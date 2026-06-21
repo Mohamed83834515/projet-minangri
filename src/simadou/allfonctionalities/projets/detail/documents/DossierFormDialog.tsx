@@ -13,19 +13,19 @@ import {
   type DossierProjetFormData,
 } from '@/simadou/schemas/dossierProjetSchemas'
 
-type DossierProjetFormDialogProps = {
+type DossierFormDialogProps = {
   projet: Projet
   dossier?: DossierProjet | null
   onClose: () => void
   onSuccess: () => void
 }
 
-export default function DossierProjetFormDialog({
+export default function DossierFormDialog({
   projet,
   dossier,
   onClose,
   onSuccess,
-}: DossierProjetFormDialogProps) {
+}: DossierFormDialogProps) {
   const isEditing = !!dossier?.id_dossier
   const idProjet = projet.id_projet
 
