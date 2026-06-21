@@ -17,7 +17,6 @@ import {
   useDeleteDossierProjet,
   useGetDossiersProjet,
 } from '@/simadou/allHooks/admin/dossierProjetHooks'
-import { cn } from '@/lib/utils'
 import { DossierCard } from './DossierCard'
 import DossierFormDialog from './DossierFormDialog'
 // ✅ Importer le composant pour afficher les documents d'un dossier
