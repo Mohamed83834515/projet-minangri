@@ -51,10 +51,10 @@ export default function ListeProjets() {
   )
 
   const sortedTypes = useMemo(() => {
-  return (typeProjets || [])
-    .filter(item => item?.nom_type_projet) // Garde uniquement ceux qui ont un nom
-    .sort((a, b) => (a.nom_type_projet || '').localeCompare(b.nom_type_projet || ''))
-}, [typeProjets])
+    return [...typeProjets].sort((a, b) =>
+      a.nom_type_projet.localeCompare(b.nom_type_projet)
+    )
+  }, [typeProjets])
 
   // ✅ ID actif : store s'il est valide, sinon premier type disponible
   const activeTypeId = useMemo(() => {
@@ -121,13 +121,15 @@ export default function ListeProjets() {
           value={activeTypeId !== null ? String(activeTypeId) : undefined}
           onValueChange={(val) => setSelectedTypeProjetId(Number(val))}
         >
-          <TabsList className='inline-flex w-full min-w-max gap-1 bg-transparent p-0'>
+          <TabsList className='flex flex-wrap gap-1 '>
             {sortedTypes.map((type) => (
               <TabsTrigger
+
+                className='relative'
                 key={type.id_type_projet}
                 value={String(type.id_type_projet)}
               >
-                {type.nom_type_projet.length > 15
+                {type.nom_type_projet.length > 20
                   ? type.nom_type_projet.substring(0, 12) + '…'
                   : type.nom_type_projet}
                 <span className='ml-2 rounded-full bg-muted px-1.5 py-0.5 text-xs text-black'>
