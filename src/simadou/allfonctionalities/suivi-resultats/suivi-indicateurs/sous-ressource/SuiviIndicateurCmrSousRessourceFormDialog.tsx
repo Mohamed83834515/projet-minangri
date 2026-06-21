@@ -30,7 +30,6 @@ import type {
   TableauSyntheseEnregistrement,
 } from '@/simadou/allTypes/periodeIndicateurSousRessource'
 import {
-  isSousRessourceWithDocuments,
   MAX_SOUS_RESSOURCE_DOCUMENTS,
   PERIODE_SOUS_RESSOURCE_LABELS,
 } from '@/simadou/allTypes/periodeIndicateurSousRessource'
@@ -213,7 +212,7 @@ export default function SuiviIndicateurCmrSousRessourceFormDialog({
           return
         }
 
-        if (isSousRessourceWithDocuments(resource) && 'data' in mutationInput) {
+        if ('data' in mutationInput) {
           await updateMutation.mutateAsync({
             itemId,
             data: mutationInput.data,
@@ -225,7 +224,7 @@ export default function SuiviIndicateurCmrSousRessourceFormDialog({
 
         toast.success(`${resourceLabel} modifié(e)`)
       } else {
-        if (isSousRessourceWithDocuments(resource) && 'data' in mutationInput) {
+        if ('data' in mutationInput) {
           await createMutation.mutateAsync({
             data: mutationInput.data,
             documents: mutationInput.documents,
