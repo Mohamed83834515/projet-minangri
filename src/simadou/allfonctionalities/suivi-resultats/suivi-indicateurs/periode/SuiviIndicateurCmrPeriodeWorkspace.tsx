@@ -27,8 +27,11 @@ type ContentTab = (typeof CONTENT_TABS)[number]['value']
  * Same width as the summary column above (1.9fr of the 1.9fr + 1fr page grid).
  * Keeps fields/tables at their original size while the bordered box spans full width.
  */
-function TabPanelBody({ children }: { children: ReactNode }) {
+function TabPanelBodySource({ children }: { children: ReactNode }) {
   return <div className='w-full lg:w-[calc((100%-0.75rem)*19/29)]'>{children}</div>
+}
+function TabPanelBody({ children }: { children: ReactNode }) {
+  return <div className='w-full'>{children}</div>
 }
 
 export type SuiviIndicateurCmrPeriodeWorkspaceHandle = {
@@ -127,7 +130,7 @@ const PeriodeWorkspaceTabs = forwardRef<
         </div>
 
         <TabsContent value='source' className='mt-3 focus-visible:outline-none'>
-          <TabPanelBody>
+          <TabPanelBodySource>
             <SuiviIndicateurCmrSourceResultatPanel
               ref={sourcePanelRef}
               refIndicateur={refIndicateur}
@@ -135,7 +138,7 @@ const PeriodeWorkspaceTabs = forwardRef<
               onDeleted={onPeriodeDeleted}
               onActionsStateChange={setSourceActions}
             />
-          </TabPanelBody>
+          </TabPanelBodySource>
         </TabsContent>
 
         <TabsContent value='synthese' className='mt-1 focus-visible:outline-none'>
