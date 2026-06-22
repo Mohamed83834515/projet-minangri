@@ -1,7 +1,6 @@
 import { useMemo } from 'react'
 import { toast } from 'sonner'
 import { DynamicForm } from '@/Global/Forms/DynamicForm'
-import { getIndicateurTacheFormConfigForDialog } from '@/simadou/allfieldsConfig/indicateurTacheForm'
 import {
   indicateurTacheSchema,
   type IndicateurTacheFormData,
@@ -21,6 +20,7 @@ import {
   resolveUniteIndicateurFormValue,
 } from '@/simadou/lib/indicateurTacheUtils'
 import { useGetIndicateurPerformanceByActiviteProjet } from '@/simadou/allHooks/admin/indicateurPerformanceProjetHooks'
+import { getIndicateurTacheProjetFormConfigForDialog } from '@/simadou/allfieldsConfig/indicateurTacheFormProjet'
 
 interface IndicateurTacheFormProps {
   indicateur?: IndicateurTache
@@ -55,7 +55,7 @@ export default function IndicateurTacheProjetForm({
 
   const formConfig = useMemo(
     () =>
-      getIndicateurTacheFormConfigForDialog({
+      getIndicateurTacheProjetFormConfigForDialog({
         indicateurPerformanceOptions: buildIndicateurPerforamnceSelectOptions(indicateurPerformanceProjet || []),
         uniteIndicateurOptions: buildUniteIndicateurSelectOptions(unites),
         isLoadingUnites,
