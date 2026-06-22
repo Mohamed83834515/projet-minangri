@@ -96,6 +96,14 @@ export function useGetProjets() {
   })
 }
 
+export const useGetTauxGlobalActiviteProjet = (projetId: number | string | undefined) => {
+  return useQuery({
+    queryKey: ['taux-global-activite', projetId],
+    queryFn: () => projetStatsService.getTauxGlobalAct(projetId!),
+    enabled: !!projetId,
+  })
+}
+
 /** Tous les projets (sans filtre programme) — ex. sélecteurs de formulaires comme l'ancienne app. */
 export function useGetAllProjets() {
   return useQuery({
