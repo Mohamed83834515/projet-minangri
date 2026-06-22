@@ -28,6 +28,7 @@ function resolveCodeActiviteProgramme(
 export default function ActiviteProjetFormDialog({
   projet,
   niveau,
+  niveauNombre,
   niveaux,
   activite,
   parentOptions,
@@ -36,6 +37,7 @@ export default function ActiviteProjetFormDialog({
 }: {
   projet: Projet
   niveau: number
+  niveauNombre: number
   niveaux: NiveauActiviteProjet[]
   activite?: ActiviteProjet | null
   parentOptions: Array<{ value: number; label: string }>
@@ -43,7 +45,7 @@ export default function ActiviteProjetFormDialog({
   onSuccess: () => void
 }) {
   console.log('niveau', niveau)
-  console.log('niveau', niveau)
+  console.log('niveaux', niveaux)
   // ✅ Extraire le code_projet (peut être string ou objet)
  const codeProjet = projet.code_projet
 
@@ -68,10 +70,10 @@ export default function ActiviteProjetFormDialog({
 
   const parentNiveauLabel = useMemo(() => {
     const parentNiveau = niveaux.find(
-      (n) => Number(n.id_niveau_activite_projet) === niveau - 1
+      (n) => Number(n.nombre_niveau_activite_projet) === niveauNombre - 1
     )
     return parentNiveau?.libelle_niveau_activite_projet ?? 'Activité parent'
-  }, [niveaux, niveau])
+  }, [niveaux, niveauNombre])
 
   const activiteProgrammeOptions = useMemo(
     () =>
@@ -96,7 +98,7 @@ export default function ActiviteProjetFormDialog({
       getActiviteProjetFormConfigForDialog({
         fixedCodeLength,
         parentNiveauLabel,
-        showParent: niveau > 1,
+        showParent: niveauNombre > 1,
         parentOptions,
         activiteProgrammeOptions,
         projetOptions,
@@ -106,7 +108,7 @@ export default function ActiviteProjetFormDialog({
     [
       fixedCodeLength,
       parentNiveauLabel,
-      niveau,
+      niveauNombre,
       parentOptions,
       activiteProgrammeOptions,
       projetOptions,
@@ -119,10 +121,10 @@ export default function ActiviteProjetFormDialog({
     () =>
       getActiviteProjetFormSchema({
         fixedCodeLength,
-        niveau,
+        niveauNombre,
         parentNiveauLabel,
       }),
-    [fixedCodeLength, niveau, parentNiveauLabel]
+    [fixedCodeLength, niveauNombre, parentNiveauLabel]
   )
 
   // ✅ Extraire la valeur du code_projet de l'activité si c'est un objet

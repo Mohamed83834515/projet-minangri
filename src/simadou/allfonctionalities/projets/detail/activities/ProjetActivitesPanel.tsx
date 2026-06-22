@@ -83,21 +83,21 @@ function ActiviteProjetNiveauTable({
     (row: ActiviteProjet, targetNiveau: number): string => {
       let current = row
       let currentNiveau = niveauNum
-      
+
       while (currentNiveau > targetNiveau && current.parent_activite_projet) {
         const parentId = typeof current.parent_activite_projet === 'number'
           ? current.parent_activite_projet
           : current.parent_activite_projet?.id_activite_projet
-          
+
         if (!parentId) break
-        
+
         const parent = allActivites.find((p) => p.id_activite_projet === parentId)
         if (!parent) break
-        
+
         current = parent
         currentNiveau = Number(parent.niveau_activite_projet)
       }
-      
+
       if (currentNiveau === targetNiveau) {
         return `${current.code_activite_projet} — ${current.intitule_activite_projet}`
       }
@@ -235,7 +235,7 @@ export default function ProjetActivitesPanel({ projet }: { projet: Projet }) {
 
   // ✅ ID du niveau actif (utilisé pour les onglets)
   const currentNiveauId = Number(tabActive || sortedNiveaux[0]?.id_niveau_activite_projet || 0)
-  
+
   // ✅ Récupérer l'objet niveau complet pour avoir le nombre
   const currentNiveauObj = useMemo(() => {
     return sortedNiveaux.find(n => n.id_niveau_activite_projet === currentNiveauId)
@@ -249,12 +249,12 @@ export default function ProjetActivitesPanel({ projet }: { projet: Projet }) {
   // Donc correspondance directe : activite.niveau_activite_projet = niveau.id_niveau_activite_projet
   const countByNiveauId = useMemo(() => {
     const counts = new Map<number, number>()
-    
+
     for (const a of activites) {
       // Récupérer l'ID du niveau de l'activité (correspondance directe)
       const niveauId = Number(a.niveau_activite_projet)
       if (!Number.isFinite(niveauId)) continue
-      
+
       // Vérifier que cet ID existe dans sortedNiveaux
       const niveau = sortedNiveaux.find(n => n.id_niveau_activite_projet === niveauId)
       if (niveau) {
@@ -269,18 +269,29 @@ export default function ProjetActivitesPanel({ projet }: { projet: Projet }) {
     [allIndicateurs, activites]
   )
 
-  // ✅ Options parent basées sur le nombre du niveau actuel
+  // ✅ Options parent basées sur le niveau précédent
   const parentOptions = useMemo(() => {
+    // Si on est au niveau 1, pas de parent
     if (currentNiveauNumber <= 1) return []
-    const parents = activites.filter(
-      // ⚠️ Ici on compare les ID des niveaux
-      (a) => Number(a.niveau_activite_projet) === currentNiveauId
+
+    // 🔑 Trouver l'ID du niveau précédent (currentNiveauNumber - 1)
+    const previousNiveau = sortedNiveaux.find(
+      (n) => n.nombre_niveau_activite_projet === currentNiveauNumber - 1
     )
+
+    if (!previousNiveau) return []
+
+    // ✅ Filtrer les activités du niveau précédent par son ID
+    const parents = activites.filter(
+      (a) => Number(a.niveau_activite_projet) === previousNiveau.id_niveau_activite_projet
+    )
+
     return parents.map((p) => ({
       value: p.id_activite_projet,
       label: `${p.code_activite_projet} — ${p.intitule_activite_projet}`,
     }))
-  }, [activites, currentNiveauId, currentNiveauNumber])
+  }, [activites, currentNiveauNumber, sortedNiveaux])
+
 
   const handleAdd = () => {
     if (!hasNiveaux) {
@@ -458,6 +469,7 @@ export default function ProjetActivitesPanel({ projet }: { projet: Projet }) {
             projet={projet}
             // ✅ Passer l'ID du niveau (correspondance directe)
             niveau={currentNiveauId}
+            niveauNombre={currentNiveauNumber}
             niveaux={sortedNiveaux}
             activite={selectedActivite}
             parentOptions={parentOptions}
