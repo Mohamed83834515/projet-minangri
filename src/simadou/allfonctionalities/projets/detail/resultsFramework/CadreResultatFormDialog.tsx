@@ -44,7 +44,6 @@ export default function CadreResultatFormDialog({
   const createMutation = useCreateCadreResultat(codeProjet)
   const updateMutation = useUpdateCadreResultat()
   const { data: acteurs = [], isLoading: isLoadingActeurs } = useGetActeurs()
-  const { data: projets = [], isLoading: isLoadingProjets } = useGetProjets()
 
   const initialNiveauId =
     resolveNiveauCrId(cadre?.niveau_cr) ?? (cadre ? null : niveauId)
@@ -72,15 +71,6 @@ export default function CadreResultatFormDialog({
     [acteurs]
   )
 
-  const projetOptions = useMemo(
-    () =>
-      projets.map((p) => ({
-        value: p.code_projet,
-        label: `${p.code_projet} - ${p.intitule_projet}`,
-      })),
-    [projets]
-  )
-
   const parentOptions = useMemo(
     () =>
       buildCadreParentOptions({
@@ -100,13 +90,11 @@ export default function CadreResultatFormDialog({
         niveauOptions,
         parentOptions,
         acteurOptions,
-        projetOptions,
         isLoadingActeurs,
-        isLoadingProjets,
         showParent,
         showProjet: true,
       }),
-    [niveauOptions, parentOptions, acteurOptions, projetOptions, isLoadingActeurs, isLoadingProjets, showParent]
+    [niveauOptions, parentOptions, acteurOptions, isLoadingActeurs, showParent]
   )
 
   const defaultValues = useMemo(
