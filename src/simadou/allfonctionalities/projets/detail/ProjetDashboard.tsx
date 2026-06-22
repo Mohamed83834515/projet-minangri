@@ -19,7 +19,7 @@ import {
 import { useGetPtbasProjet } from '@/simadou/allHooks/admin/ptbaProjetHooks'
 import { formatNumber } from '@/simadou/allSercices/montantFormater'
 import { type Projet } from '@/simadou/allTypes'
-import { BarChart3, DollarSign, Wallet, Calendar, Activity, TrendingUp } from 'lucide-react'
+import { BarChart3, DollarSign, Wallet, Calendar, Gauge, Activity } from 'lucide-react'
 import { Bar, BarChart, XAxis, YAxis, CartesianGrid, LabelList } from 'recharts'
 import { cn } from '@/lib/utils'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -29,16 +29,15 @@ import {
 } from '@/components/ui/chart'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { KpiIndicateurs } from './KpiIndicateurs'
+import { buildDecaissementAnnuelFromPtbas } from '@/simadou/lib/ptbaProjetStatsUtils'
 
-interface ProjetDashboardProps {
-  projet: Projet
-}
+interface ProjetDashboardProps { projet: Projet }
 
 function getTauxColor(taux: number) {
   if (taux >= 80) return { bg: 'bg-emerald-500', bar: 'bg-emerald-500', text: 'text-emerald-600', badge: 'bg-emerald-50 text-emerald-700 border-emerald-200', label: 'Bon', stroke: '#10b981', light: 'bg-emerald-500/10', hex: '#10b981' }
-  if (taux >= 50) return { bg: 'bg-amber-500', bar: 'bg-amber-500', text: 'text-amber-600', badge: 'bg-amber-50 text-amber-700 border-amber-200', label: 'Moyen', stroke: '#f59e0b', light: 'bg-amber-500/10', hex: '#f59e0b' }
-  if (taux >= 20) return { bg: 'bg-orange-500', bar: 'bg-orange-500', text: 'text-orange-600', badge: 'bg-orange-50 text-orange-700 border-orange-200', label: 'Faible', stroke: '#f97316', light: 'bg-orange-500/10', hex: '#f97316' }
-  return { bg: 'bg-red-500', bar: 'bg-red-500', text: 'text-red-600', badge: 'bg-red-50 text-red-700 border-red-200', label: 'Critique', stroke: '#ef4444', light: 'bg-red-500/10', hex: '#ef4444' }
+  if (taux >= 50) return { bg: 'bg-amber-500',   bar: 'bg-amber-500',   text: 'text-amber-600',   badge: 'bg-amber-50 text-amber-700 border-amber-200',     label: 'Moyen',    stroke: '#f59e0b', light: 'bg-amber-500/10',   hex: '#f59e0b' }
+  if (taux >= 20) return { bg: 'bg-orange-500',  bar: 'bg-orange-500',  text: 'text-orange-600',  badge: 'bg-orange-50 text-orange-700 border-orange-200',   label: 'Faible',   stroke: '#f97316', light: 'bg-orange-500/10',  hex: '#f97316' }
+  return           { bg: 'bg-red-500',    bar: 'bg-red-500',    text: 'text-red-600',    badge: 'bg-red-50 text-red-700 border-red-200',           label: 'Critique', stroke: '#ef4444', light: 'bg-red-500/10',    hex: '#ef4444' }
 }
 
 // ─── Gauge circulaire ────────────────────────────────────────────────────────
@@ -63,41 +62,23 @@ function GaugeCircle({ value, size = 120, stroke = '#10B981', label = 'exécutio
 
 // ─── Card 1 : Taux exécution global ──────────────────────────────────────────
 
-// ─── Card 1 : Exécution physique globale ────────────────────────────────────
-
-// ─── Card 1 : Exécution physique globale ────────────────────────────────────
-
 function TauxGlobalCard({ taux, totalActivites, activitesRealisees }: {
   taux: number; totalActivites: number; activitesRealisees: number
 }) {
-  // ✅ Couleur : Rose/Saumon pour l'exécution globale
-  const col = {
-    bg: 'bg-rose-500',
-    text: 'text-rose-600 dark:text-rose-400',
-    badge: 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-800/30 dark:bg-rose-950/30 dark:text-rose-400',
-    bar: 'bg-rose-500',
-    hex: '#F43F5E',
-    label: taux >= 80 ? 'Élevé' : taux >= 50 ? 'Moyen' : 'Faible'
-  }
-
+  const col = getTauxColor(taux)
   const restantes = totalActivites - activitesRealisees
 
   return (
-    <Card className='relative overflow-hidden border-0 shadow-sm bg-gradient-to-br from-rose-50/50 to-transparent dark:from-rose-950/20'>
+    <Card className='relative overflow-hidden border-0 shadow-sm'>
       {/* Accent top */}
       <div className={cn('absolute inset-x-0 top-0 h-1', col.bg)} />
       {/* Icône fond décorative */}
-      <Activity className='absolute right-3 top-4 h-16 w-16 opacity-[0.06] text-rose-500' strokeWidth={1.5} />
+      <Activity className='absolute right-3 top-4 h-16 w-16 opacity-[0.04] text-foreground' strokeWidth={1.5} />
 
       <CardContent className='pt-5 pb-4 px-5'>
-        <div className='flex items-center gap-2 mb-3'>
-          <div className='rounded-full bg-rose-100 p-1 dark:bg-rose-900/30'>
-            <Activity className='h-3.5 w-3.5 text-rose-600 dark:text-rose-400' />
-          </div>
-          <p className='text-[11px] font-semibold tracking-widest text-muted-foreground uppercase'>
-            Exécution physique globale
-          </p>
-        </div>
+        <p className='text-[11px] font-semibold tracking-widest text-muted-foreground uppercase mb-3'>
+          Exécution physique globale
+        </p>
 
         <div className='flex items-center gap-4'>
           {/* Gauge */}
@@ -133,32 +114,18 @@ function TauxGlobalCard({ taux, totalActivites, activitesRealisees }: {
 function BudgetKpiCard({ budgetTotal, budgetDecaisse, budgetPct }: {
   budgetTotal: number; budgetDecaisse: number; budgetPct: number
 }) {
-  // ✅ Couleur : Cyan pour le budget
-  const col = {
-    bg: 'bg-cyan-500',
-    text: 'text-cyan-600 dark:text-cyan-400',
-    badge: 'border-cyan-200 bg-cyan-50 text-cyan-700 dark:border-cyan-800/30 dark:bg-cyan-950/30 dark:text-cyan-400',
-    bar: 'bg-cyan-500',
-    hex: '#06B6D4',
-    label: budgetPct >= 80 ? 'Élevé' : budgetPct >= 50 ? 'Moyen' : 'Faible'
-  }
-
+  const col = getTauxColor(budgetPct)
   const ecart = budgetTotal - budgetDecaisse
 
   return (
-    <Card className='relative overflow-hidden border-0 shadow-sm bg-gradient-to-br from-cyan-50/50 to-transparent dark:from-cyan-950/20'>
+    <Card className='relative overflow-hidden border-0 shadow-sm'>
       <div className={cn('absolute inset-x-0 top-0 h-1', col.bg)} />
-      <Wallet className='absolute right-3 top-4 h-16 w-16 opacity-[0.06] text-cyan-500' strokeWidth={1.5} />
+      <Wallet className='absolute right-3 top-4 h-16 w-16 opacity-[0.04] text-foreground' strokeWidth={1.5} />
 
       <CardContent className='pt-5 pb-4 px-5'>
-        <div className='flex items-center gap-2 mb-3'>
-          <div className='rounded-full bg-cyan-100 p-1 dark:bg-cyan-900/30'>
-            <Wallet className='h-3.5 w-3.5 text-cyan-600 dark:text-cyan-400' />
-          </div>
-          <p className='text-[11px] font-semibold tracking-widest text-muted-foreground uppercase'>
-            Budget global du projet
-          </p>
-        </div>
+        <p className='text-[11px] font-semibold tracking-widest text-muted-foreground uppercase mb-3'>
+          Budget global du projet
+        </p>
 
         <div className='space-y-2.5'>
           {/* Prévu */}
@@ -201,59 +168,54 @@ function BudgetKpiCard({ budgetTotal, budgetDecaisse, budgetPct }: {
   )
 }
 
-// ─── Card 3 : Taux exécution PTBA (Avancement) ─────────────────────────────
+// ─── Card 3 : Taux exécution PTBA ────────────────────────────────────────────
 
-function TauxExecutionPtbaCard({ taux, selectedYear, nbPtba }: {
-  taux: number; selectedYear: number; nbPtba: number;
+function TauxExecutionPtbaCard({ taux, selectedYear, nbPtba, montantPrevu, montantRealise }: {
+  taux: number; selectedYear: number; nbPtba: number; montantPrevu: number; montantRealise: number
 }) {
-  // ✅ Couleur fixe : Bleu pour l'avancement
-  const col = {
-    bg: 'bg-blue-500',
-    text: 'text-blue-600 dark:text-blue-400',
-    badge: 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800/30 dark:bg-blue-950/30 dark:text-blue-400',
-    bar: 'bg-blue-500',
-    label: 'Avancement'
-  }
-
+  const col = getTauxColor(taux)
   return (
-    <Card className='relative overflow-hidden border-0 shadow-sm bg-gradient-to-br from-blue-50/50 to-transparent dark:from-blue-950/20'>
+    <Card className='relative overflow-hidden border-0 shadow-sm'>
       <div className={cn('absolute inset-x-0 top-0 h-1', col.bg)} />
-
-      <TrendingUp className='absolute right-3 top-4 h-16 w-16 opacity-[0.06] text-blue-500' strokeWidth={1.5} />
+      <Gauge className='absolute right-3 top-4 h-16 w-16 opacity-[0.04] text-foreground' strokeWidth={1.5} />
 
       <CardContent className='pt-5 pb-4 px-5'>
         <div className='flex items-start justify-between mb-3'>
-          <div className='flex items-center gap-2'>
-            <div className='rounded-full bg-blue-100 p-1 dark:bg-blue-900/30'>
-              <TrendingUp className='h-3.5 w-3.5 text-blue-600 dark:text-blue-400' />
-            </div>
-            <p className='text-[11px] font-semibold tracking-widest text-muted-foreground uppercase'>
-              Avancement
-            </p>
-          </div>
+          <p className='text-[11px] font-semibold tracking-widest text-muted-foreground uppercase'>
+            Exécution PTBA
+          </p>
           <span className='text-[10px] font-semibold text-muted-foreground bg-muted px-2 py-0.5 rounded-full'>
             {selectedYear}
           </span>
         </div>
 
         <div className='space-y-2.5'>
+          {/* Taux principal */}
           <div className='flex items-end gap-2'>
-            <span className={cn('text-2xl font-bold leading-none', col.text)}>{taux}%</span>
-            <span className={cn('mb-0.5 inline-flex rounded-full border px-2 py-0.5 text-[8px] font-semibold', col.badge)}>
-              {taux >= 80 ? 'Élevé' : taux >= 50 ? 'Moyen' : 'Faible'}
+            <span className={cn('text-3xl font-bold leading-none', col.text)}>{taux}%</span>
+            <span className={cn('mb-0.5 inline-flex rounded-full border px-2 py-0.5 text-[10px] font-semibold', col.badge)}>
+              {col.label}
             </span>
           </div>
 
-          <div className='relative h-1.5 w-full overflow-hidden rounded-full bg-muted'>
+          {/* Barre */}
+          <div className='h-2 w-full overflow-hidden rounded-full bg-muted'>
             <div className={cn('h-full rounded-full transition-all duration-700', col.bar)} style={{ width: `${taux}%` }} />
-            <div className='absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-50' />
           </div>
 
+          {/* Nb PTBA + montants */}
           <div className='flex items-center justify-between pt-0.5'>
             <span className='text-xs text-muted-foreground'>{nbPtba} PTBA</span>
-            <span className='text-xs text-muted-foreground'>
-              {taux >= 80 ? '✅ Bonne avancement' : taux >= 50 ? '⚡ En cours' : '⏳ À accélérer'}
-            </span>
+          </div>
+          <div className='grid grid-cols-2 gap-2'>
+            <div className='rounded-lg bg-muted/40 px-2.5 py-1.5'>
+              <p className='text-[9px] text-muted-foreground uppercase tracking-wide'>Prévu</p>
+              <p className='text-xs font-bold break-all leading-tight'>{formatNumber(montantPrevu)} <span className='text-[9px] font-normal'>GNF</span></p>
+            </div>
+            <div className='rounded-lg bg-muted/40 px-2.5 py-1.5'>
+              <p className='text-[9px] text-muted-foreground uppercase tracking-wide'>Réalisé</p>
+              <p className={cn('text-xs font-bold break-all leading-tight', col.text)}>{formatNumber(montantRealise)} <span className='text-[9px] font-normal text-muted-foreground'>GNF</span></p>
+            </div>
           </div>
         </div>
       </CardContent>
@@ -266,71 +228,51 @@ function TauxExecutionPtbaCard({ taux, selectedYear, nbPtba }: {
 function TauxDecaissementPtbaCard({ taux, montantDecaisse, montantPrevu, selectedYear, nbPtba }: {
   taux: number; montantDecaisse: number; montantPrevu: number; selectedYear: number; nbPtba: number
 }) {
-  // ✅ Couleur fixe : Vert pour le décaissement
-  const col = {
-    bg: 'bg-emerald-500',
-    text: 'text-emerald-600 dark:text-emerald-400',
-    badge: 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800/30 dark:bg-emerald-950/30 dark:text-emerald-400',
-    bar: 'bg-emerald-500',
-    label: 'Décaissement'
-  }
+  const col = getTauxColor(taux)
+  const ecart = montantPrevu - montantDecaisse
 
   return (
-    <Card className='relative overflow-hidden border-0 shadow-sm bg-gradient-to-br from-emerald-50/50 to-transparent dark:from-emerald-950/20'>
+    <Card className='relative overflow-hidden border-0 shadow-sm'>
       <div className={cn('absolute inset-x-0 top-0 h-1', col.bg)} />
-
-      <DollarSign className='absolute right-3 top-4 h-16 w-16 opacity-[0.06] text-emerald-500' strokeWidth={1.5} />
+      <DollarSign className='absolute right-3 top-4 h-16 w-16 opacity-[0.04] text-foreground' strokeWidth={1.5} />
 
       <CardContent className='pt-5 pb-4 px-5'>
         <div className='flex items-start justify-between mb-3'>
-          <div className='flex items-center gap-2'>
-            <div className='rounded-full bg-emerald-100 p-1 dark:bg-emerald-900/30'>
-              <DollarSign className='h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400' />
-            </div>
-            <p className='text-[11px] font-semibold tracking-widest text-muted-foreground uppercase'>
-              Décaissement
-            </p>
-          </div>
+          <p className='text-[11px] font-semibold tracking-widest text-muted-foreground uppercase'>
+            Décaissement PTBA
+          </p>
           <span className='text-[10px] font-semibold text-muted-foreground bg-muted px-2 py-0.5 rounded-full'>
             {selectedYear}
           </span>
         </div>
 
         <div className='space-y-2.5'>
+          {/* Taux principal */}
           <div className='flex items-end gap-2'>
-            <span className={cn('text-2xl font-bold leading-none', col.text)}>{taux}%</span>
-            <span className={cn('mb-0.5 inline-flex rounded-full border px-2 py-0.5 text-[8px] font-semibold', col.badge)}>
-              {taux >= 80 ? 'Élevé' : taux >= 50 ? 'Moyen' : 'Faible'}
+            <span className={cn('text-3xl font-bold leading-none', col.text)}>{taux}%</span>
+            <span className={cn('mb-0.5 inline-flex rounded-full border px-2 py-0.5 text-[10px] font-semibold', col.badge)}>
+              {col.label}
             </span>
           </div>
 
-          <div className='relative h-1.5 w-full overflow-hidden rounded-full bg-muted'>
+          {/* Barre */}
+          <div className='h-2 w-full overflow-hidden rounded-full bg-muted'>
             <div className={cn('h-full rounded-full transition-all duration-700', col.bar)} style={{ width: `${taux}%` }} />
-            <div className='absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-50' />
           </div>
 
           <div className='flex items-center justify-between pt-0.5'>
             <span className='text-xs text-muted-foreground'>{nbPtba} PTBA</span>
-            <span className='text-xs text-muted-foreground'>
-              {taux >= 80 ? '💰 Bien décaissé' : taux >= 50 ? '💳 En cours' : '⏳ À décaisser'}
-            </span>
           </div>
 
-          {/* ✅ Montant prévu et décaissé uniquement */}
+          {/* Montant décaissé + écart */}
           <div className='grid grid-cols-2 gap-2'>
-            <div className='rounded-lg bg-emerald-50/70 px-2.5 py-1.5 dark:bg-emerald-950/20'>
-              <p className='text-[9px] text-muted-foreground uppercase tracking-wide'>Prévu</p>
-              <p className='text-xs font-bold break-all leading-tight text-muted-foreground'>
-                {formatNumber(montantPrevu)}
-                <span className='text-[9px] font-normal text-muted-foreground'> GNF</span>
-              </p>
-            </div>
-            <div className='rounded-lg bg-emerald-50/70 px-2.5 py-1.5 dark:bg-emerald-950/20'>
+            <div className='rounded-lg bg-muted/40 px-2.5 py-1.5'>
               <p className='text-[9px] text-muted-foreground uppercase tracking-wide'>Décaissé</p>
-              <p className={cn('text-xs font-bold break-all leading-tight', col.text)}>
-                {formatNumber(montantDecaisse)}
-                <span className='text-[9px] font-normal text-muted-foreground'> GNF</span>
-              </p>
+              <p className={cn('text-xs font-bold break-all leading-tight', col.text)}>{formatNumber(montantDecaisse)} <span className='text-[9px] font-normal text-muted-foreground'>GNF</span></p>
+            </div>
+            <div className='rounded-lg bg-muted/40 px-2.5 py-1.5'>
+              <p className='text-[9px] text-muted-foreground uppercase tracking-wide'>Écart</p>
+              <p className='text-xs font-bold text-red-500 break-all leading-tight'>{formatNumber(ecart)} <span className='text-[9px] font-normal text-muted-foreground'>GNF</span></p>
             </div>
           </div>
         </div>
@@ -338,29 +280,17 @@ function TauxDecaissementPtbaCard({ taux, montantDecaisse, montantPrevu, selecte
     </Card>
   )
 }
-// Remplace tes deux configs et les deux fonctions de graphiques par ceci
 
-// ─── Graphiques ───────────────────────────
+// ─── Graphiques ──────────────────────────────────────────────────────────────
+
 const avancementChartConfig = {
-  realise: {
-    label: 'Réalisé (Physique %)',
-    color: '#10b981', // vert
-  },
-  cible: {
-    label: 'Prévu (Physique %)',
-    color: '#818cf8', // violet
-  },
+  cible:   { label: 'Cible (Prévu %)',         color: '#818cf8' },
+  realise: { label: 'Réalisé (Physique %)',     color: '#10b981' },
 } satisfies ChartConfig
 
 const decaissementChartConfig = {
-  realise: {
-    label: 'Réalisé (GNF)',
-    color: '#3b82f6', // bleu
-  },
-  cible: {
-    label: 'Prévu (GNF)',
-    color: '#10b981', // vert
-  },
+  cible:   { label: 'Prévu (GNF)',   color: '#94a3b8' },
+  realise: { label: 'Réalisé (GNF)', color: '#3b82f6' },
 } satisfies ChartConfig
 
 function DecaissementComparatifCard({ data, isLoading }: {
@@ -372,7 +302,6 @@ function DecaissementComparatifCard({ data, isLoading }: {
     if (v >= 1_000) return `${(v / 1_000).toFixed(0)}k`
     return String(v)
   }
-
   return (
     <Card className='border-0 shadow-sm'>
       <CardHeader className='border-b pb-3'>
@@ -382,7 +311,7 @@ function DecaissementComparatifCard({ data, isLoading }: {
           </div>
           <div>
             <CardTitle className='text-sm font-semibold'>Décaissement par année</CardTitle>
-            <CardDescription className='text-xs'>Montant réalisé vs prévu (GNF) — toutes années</CardDescription>
+            <CardDescription className='text-xs'>Montant prévu vs décaissé (GNF) — toutes années</CardDescription>
           </div>
         </div>
       </CardHeader>
@@ -392,27 +321,21 @@ function DecaissementComparatifCard({ data, isLoading }: {
         ) : data.length === 0 ? (
           <div className='flex h-[240px] items-center justify-center text-sm text-muted-foreground'>Aucune donnée</div>
         ) : (
-          <div className='w-full overflow-x-auto'>
-            <div style={{ minWidth: '300px' }}>
-              <ChartContainer config={decaissementChartConfig} className='h-[240px] w-full'>
-                <BarChart accessibilityLayer data={data} margin={{ top: 28, right: 10, left: -10, bottom: 0 }}>
-                  <CartesianGrid vertical={false} strokeDasharray='3 3' className='stroke-muted/40' />
-                  <XAxis dataKey='annee' tickLine={false} tickMargin={10} axisLine={false} className='fill-muted-foreground text-xs' />
-                  <YAxis tickLine={false} axisLine={false} tickMargin={8} tickFormatter={fmt} className='fill-muted-foreground text-[10px]' />
-                  <ChartTooltip cursor={{ fill: 'rgba(0,0,0,0.04)' }} content={<ChartTooltipContent formatter={(v) => `${formatNumber(Number(v))} GNF`} />} />
-                  <ChartLegend content={<ChartLegendContent />} />
-                  {/* Réalisé en premier → barre gauche + premier dans légende */}
-                  <Bar dataKey='realise' fill='var(--color-realise)' radius={[4, 4, 0, 0]}>
-                    <LabelList dataKey='realise' position='top' className='fill-muted-foreground text-[9px] font-bold' formatter={(v: any) => fmt(Number(v))} />
-                  </Bar>
-                  {/* Prévu en second → barre droite + second dans légende */}
-                  <Bar dataKey='cible' fill='var(--color-cible)' radius={[4, 4, 0, 0]}>
-                    <LabelList dataKey='cible' position='top' className='fill-muted-foreground text-[9px] font-bold' formatter={(v: any) => fmt(Number(v))} />
-                  </Bar>
-                </BarChart>
-              </ChartContainer>
-            </div>
-          </div>
+          <ChartContainer config={decaissementChartConfig} className='h-[240px] w-full'>
+            <BarChart accessibilityLayer data={data} margin={{ top: 28, right: 10, left: -10, bottom: 0 }}>
+              <CartesianGrid vertical={false} strokeDasharray='3 3' className='stroke-muted/40' />
+              <XAxis dataKey='annee' tickLine={false} tickMargin={10} axisLine={false} className='fill-muted-foreground text-xs' />
+              <YAxis tickLine={false} axisLine={false} tickMargin={8} tickFormatter={fmt} className='fill-muted-foreground text-[10px]' />
+              <ChartTooltip cursor={{ fill: 'rgba(0,0,0,0.04)' }} content={<ChartTooltipContent formatter={(v) => `${formatNumber(Number(v))} GNF`} />} />
+              <ChartLegend content={<ChartLegendContent />} />
+              <Bar dataKey='cible' fill='var(--color-cible)' radius={[4, 4, 0, 0]}>
+                <LabelList dataKey='cible' position='top' className='fill-muted-foreground text-[9px] font-bold' formatter={(v: any) => fmt(Number(v))} />
+              </Bar>
+              <Bar dataKey='realise' fill='var(--color-realise)' radius={[4, 4, 0, 0]}>
+                <LabelList dataKey='realise' position='top' className='fill-muted-foreground text-[9px] font-bold' formatter={(v: any) => fmt(Number(v))} />
+              </Bar>
+            </BarChart>
+          </ChartContainer>
         )}
       </CardContent>
     </Card>
@@ -431,7 +354,7 @@ function ProjetAvancementAnnuelCard({ data, isLoading }: {
           </div>
           <div>
             <CardTitle className='text-sm font-semibold'>Avancement physique par année</CardTitle>
-            <CardDescription className='text-xs'>Taux réalisé vs cible (%) — toutes années</CardDescription>
+            <CardDescription className='text-xs'>Taux cible vs réalisé (%) — toutes années</CardDescription>
           </div>
         </div>
       </CardHeader>
@@ -441,27 +364,21 @@ function ProjetAvancementAnnuelCard({ data, isLoading }: {
         ) : data.length === 0 ? (
           <div className='flex h-[240px] items-center justify-center text-sm text-muted-foreground'>Aucune donnée</div>
         ) : (
-          <div className='w-full overflow-x-auto'>
-            <div style={{ minWidth: '300px' }}>
-              <ChartContainer config={avancementChartConfig} className='h-[240px] w-full'>
-                <BarChart accessibilityLayer data={data} margin={{ top: 30, right: 10, left: -10, bottom: 0 }}>
-                  <CartesianGrid vertical={false} strokeDasharray='3 3' className='stroke-muted/40' />
-                  <XAxis dataKey='annee' tickLine={false} tickMargin={10} axisLine={false} className='fill-muted-foreground text-xs' />
-                  <YAxis tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(v) => `${v}%`} className='fill-muted-foreground text-[10px]' />
-                  <ChartTooltip cursor={{ fill: 'rgba(0,0,0,0.05)' }} content={<ChartTooltipContent formatter={(v) => `${v}%`} />} />
-                  <ChartLegend content={<ChartLegendContent />} />
-                  {/* Réalisé en premier → barre gauche + premier dans légende */}
-                  <Bar dataKey='realise' fill='var(--color-realise)' radius={[4, 4, 0, 0]}>
-                    <LabelList dataKey='realise' position='top' className='fill-muted-foreground text-[10px] font-bold' formatter={(v: any) => `${v}%`} />
-                  </Bar>
-                  {/* Cible en second → barre droite + second dans légende */}
-                  <Bar dataKey='cible' fill='var(--color-cible)' radius={[4, 4, 0, 0]}>
-                    <LabelList dataKey='cible' position='top' className='fill-muted-foreground text-[10px] font-bold' formatter={(v: any) => `${v}%`} />
-                  </Bar>
-                </BarChart>
-              </ChartContainer>
-            </div>
-          </div>
+          <ChartContainer config={avancementChartConfig} className='h-[240px] w-full'>
+            <BarChart accessibilityLayer data={data} margin={{ top: 30, right: 10, left: -10, bottom: 0 }}>
+              <CartesianGrid vertical={false} strokeDasharray='3 3' className='stroke-muted/40' />
+              <XAxis dataKey='annee' tickLine={false} tickMargin={10} axisLine={false} className='fill-muted-foreground text-xs' />
+              <YAxis tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(v) => `${v}%`} className='fill-muted-foreground text-[10px]' />
+              <ChartTooltip cursor={{ fill: 'rgba(0,0,0,0.05)' }} content={<ChartTooltipContent formatter={(v) => `${v}%`} />} />
+              <ChartLegend content={<ChartLegendContent />} />
+              <Bar dataKey='cible' fill='var(--color-cible)' radius={[4, 4, 0, 0]}>
+                <LabelList dataKey='cible' position='top' className='fill-muted-foreground text-[10px] font-bold' formatter={(v: any) => `${v}%`} />
+              </Bar>
+              <Bar dataKey='realise' fill='var(--color-realise)' radius={[4, 4, 0, 0]}>
+                <LabelList dataKey='realise' position='top' className='fill-muted-foreground text-[10px] font-bold' formatter={(v: any) => `${v}%`} />
+              </Bar>
+            </BarChart>
+          </ChartContainer>
         )}
       </CardContent>
     </Card>
@@ -486,12 +403,8 @@ function BudgetDetailCard({
           <div className='flex items-center gap-2'>
             <div className='rounded-lg bg-primary/10 p-1.5'><Wallet className='h-4 w-4 text-primary' /></div>
             <div>
-              <CardTitle className='text-sm font-semibold'>
-                Détail budget
-              </CardTitle>
-              <CardDescription className='text-xs'>
-                Montants et écarts cumulés
-              </CardDescription>
+              <CardTitle className='text-sm font-semibold'>Détail budget</CardTitle>
+              <CardDescription className='text-xs'>Montants et écarts cumulés</CardDescription>
             </div>
           </div>
           <span className={cn('rounded-full border px-2.5 py-1 text-xs font-semibold', budgetColor.badge)}>{budgetColor.label}</span>
@@ -537,69 +450,7 @@ function BudgetDetailCard({
           <div className='h-2 w-full overflow-hidden rounded-full bg-muted'>
             <div className={cn('h-full rounded-full transition-all duration-700', decaissementColor.bar)} style={{ width: `${tauxDecaissement}%` }} />
           </div>
-        ) : (
-          <ChartContainer
-            config={avancementChartConfig}
-            className='h-[240px] w-full'
-          >
-            <BarChart
-              accessibilityLayer
-              data={data}
-              margin={{ top: 30, right: 10, left: -10, bottom: 0 }}
-            >
-              <CartesianGrid
-                vertical={false}
-                strokeDasharray='3 3'
-                className='stroke-muted/40'
-              />
-              <XAxis
-                dataKey='annee'
-                tickLine={false}
-                tickMargin={10}
-                axisLine={false}
-                className='fill-muted-foreground text-xs font-semibold'
-              />
-              <YAxis
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-                tickFormatter={(value) => `${value}%`}
-                className='fill-muted-foreground text-[10px] font-semibold'
-              />
-              <ChartTooltip
-                cursor={{ fill: 'rgba(0, 0, 0, 0.05)' }}
-                content={
-                  <ChartTooltipContent formatter={(value) => `${value}%`} />
-                }
-              />
-              <ChartLegend content={<ChartLegendContent />} />
-              <Bar
-                dataKey='realise'
-                fill='var(--color-chart-1)'
-                radius={[4, 4, 0, 0]}
-              >
-                <LabelList
-                  dataKey='realise'
-                  position='top'
-                  className='fill-muted-foreground text-[10px] font-bold'
-                  formatter={(value: any) => `${value}%`}
-                />
-              </Bar>
-              <Bar
-                dataKey='cible'
-                fill='var(--color-chart-2)'
-                radius={[4, 4, 0, 0]}
-              >
-                <LabelList
-                  dataKey='cible'
-                  position='top'
-                  className='fill-muted-foreground text-[10px] font-bold'
-                  formatter={(value: any) => `${value}%`}
-                />
-              </Bar>
-            </BarChart>
-          </ChartContainer>
-        )}
+        </div>
       </CardContent>
     </Card>
   )
@@ -611,8 +462,7 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
 
   // ── Années du projet (plage réelle uniquement) ────────────────────────────
   const projectYears = useMemo(() => {
-    if (!projet?.date_demarrage_projet || !projet?.duree_projet)
-      return [new Date().getFullYear()]
+    if (!projet?.date_demarrage_projet || !projet?.duree_projet) return [new Date().getFullYear()]
     const start = new Date(projet.date_demarrage_projet)
     const startYear = start.getFullYear()
     const endDate = new Date(start)
@@ -623,8 +473,7 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
     return years
   }, [projet])
 
-  const defaultYear =
-    projectYears[projectYears.length - 1] || new Date().getFullYear()
+  const defaultYear = projectYears[projectYears.length - 1] || new Date().getFullYear()
   const [selectedYear, setSelectedYear] = useState(defaultYear)
 
   const { data: activites = [] } = useGetActivitesProjet(projet?.code_projet)
@@ -663,22 +512,12 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
 
   const tauxRealisationMoyen = useMemo(() => {
     if (!ptbasFiltres.length) return 0
-    return Math.round(
-      ptbasFiltres.reduce(
-        (s, p) => s + (Number(p.taux_execution_ptba) || 0),
-        0
-      ) / ptbasFiltres.length
-    )
+    return Math.round(ptbasFiltres.reduce((s, p) => s + (Number(p.taux_execution_ptba) || 0), 0) / ptbasFiltres.length)
   }, [ptbasFiltres])
 
   const tauxDecaissementMoyen = useMemo(() => {
     if (!ptbasFiltres.length) return 0
-    return Math.round(
-      ptbasFiltres.reduce(
-        (s, p) => s + (Number(p.taux_decaissement_ptba) || 0),
-        0
-      ) / ptbasFiltres.length
-    )
+    return Math.round(ptbasFiltres.reduce((s, p) => s + (Number(p.taux_decaissement_ptba) || 0), 0) / ptbasFiltres.length)
   }, [ptbasFiltres])
 
   const montantDecaisseTotal = useMemo(
@@ -711,19 +550,16 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
     [avancementAnnuelRaw, projectYears]
   )
 
-  const decaissementParAnneeRaw = useMemo(
-    () => buildDecaissementAnnuelFromPtbas(ptbas),
-    [ptbas]
-  )
-
   // ✅ Filtrer aussi les décaissements sur les années du projet
   const decaissementParAnnee = useMemo(
-    () => decaissementParAnneeRaw.filter((d) => projectYears.includes(d.annee)),
-    [decaissementParAnneeRaw, projectYears]
-  )
+    () => buildDecaissementAnnuelFromPtbas(ptbas, budgetsAnnuels),
+    [budgetsAnnuels, ptbas])
 
+
+  
   return (
     <div className='space-y-6 p-1'>
+
       {/* ── En-tête ── */}
       <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
         <div>
@@ -761,6 +597,8 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
           taux={tauxRealisationMoyen}
           selectedYear={selectedYear}
           nbPtba={ptbasFiltres.length}
+          montantPrevu={montantPrevuPtba}
+          montantRealise={montantDecaisseTotal}
         />
         <TauxDecaissementPtbaCard
           taux={tauxDecaissementMoyen}
