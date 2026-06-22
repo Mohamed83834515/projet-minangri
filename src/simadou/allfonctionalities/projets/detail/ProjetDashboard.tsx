@@ -30,9 +30,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { KpiIndicateurs } from './KpiIndicateurs'
 
-interface ProjetDashboardProps {
-  projet: Projet
-}
+interface ProjetDashboardProps { projet: Projet }
 
 function getTauxColor(taux: number) {
   if (taux >= 80) return { bg: 'bg-emerald-500', bar: 'bg-emerald-500', text: 'text-emerald-600', badge: 'bg-emerald-50 text-emerald-700 border-emerald-200', label: 'Bon', stroke: '#10b981', light: 'bg-emerald-500/10', hex: '#10b981' }
@@ -338,16 +336,29 @@ function TauxDecaissementPtbaCard({ taux, montantDecaisse, montantPrevu, selecte
     </Card>
   )
 }
+// Remplace tes deux configs et les deux fonctions de graphiques par ceci
 
-// ─── Graphiques ──────────────────────────────────────────────────────────────
+// ─── Graphiques ───────────────────────────
 const avancementChartConfig = {
-  realise: { label: 'Réalisé (Physique %)', color: '#818cf8' }, // ✅ Réalisé à gauche (Indigo)
-  cible: { label: 'Cible (Prévu %)', color: '#10b981' },       // ✅ Prévu à droite (Vert)
+  realise: {
+    label: 'Réalisé (Physique %)',
+    color: '#10b981', // vert
+  },
+  cible: {
+    label: 'Prévu (Physique %)',
+    color: '#818cf8', // violet
+  },
 } satisfies ChartConfig
 
 const decaissementChartConfig = {
-  realise: { label: 'Réalisé (GNF)', color: '#3b82f6' },       // ✅ Réalisé à gauche (Bleu)
-  cible: { label: 'Prévu (GNF)', color: '#10b981' },           // ✅ Prévu à droite (Vert)
+  realise: {
+    label: 'Réalisé (GNF)',
+    color: '#3b82f6', // bleu
+  },
+  cible: {
+    label: 'Prévu (GNF)',
+    color: '#10b981', // vert
+  },
 } satisfies ChartConfig
 
 function DecaissementComparatifCard({ data, isLoading }: {
@@ -360,10 +371,6 @@ function DecaissementComparatifCard({ data, isLoading }: {
     return String(v)
   }
 
-  // ✅ Calculer la largeur dynamique en fonction du nombre d'années
-  const chartWidth = Math.max(100, Math.min(100, data.length * 20))
-  const chartHeight = 240
-
   return (
     <Card className='border-0 shadow-sm'>
       <CardHeader className='border-b pb-3'>
@@ -373,7 +380,7 @@ function DecaissementComparatifCard({ data, isLoading }: {
           </div>
           <div>
             <CardTitle className='text-sm font-semibold'>Décaissement par année</CardTitle>
-            <CardDescription className='text-xs'>Montant prévu vs décaissé (GNF) — toutes années</CardDescription>
+            <CardDescription className='text-xs'>Montant réalisé vs prévu (GNF) — toutes années</CardDescription>
           </div>
         </div>
       </CardHeader>
@@ -383,32 +390,20 @@ function DecaissementComparatifCard({ data, isLoading }: {
         ) : data.length === 0 ? (
           <div className='flex h-[240px] items-center justify-center text-sm text-muted-foreground'>Aucune donnée</div>
         ) : (
-          <div className='flex justify-center w-full overflow-x-auto'>
-            <div style={{ width: `${chartWidth}%`, minWidth: '300px', maxWidth: '100%' }}>
-              <ChartContainer config={decaissementChartConfig} className={`h-[${chartHeight}px] w-full`}>
+          <div className='w-full overflow-x-auto'>
+            <div style={{ minWidth: '300px' }}>
+              <ChartContainer config={decaissementChartConfig} className='h-[240px] w-full'>
                 <BarChart accessibilityLayer data={data} margin={{ top: 28, right: 10, left: -10, bottom: 0 }}>
                   <CartesianGrid vertical={false} strokeDasharray='3 3' className='stroke-muted/40' />
-                  <XAxis 
-                    dataKey='annee' 
-                    tickLine={false} 
-                    tickMargin={10} 
-                    axisLine={false} 
-                    className='fill-muted-foreground text-xs' 
-                  />
-                  <YAxis 
-                    tickLine={false} 
-                    axisLine={false} 
-                    tickMargin={8} 
-                    tickFormatter={fmt} 
-                    className='fill-muted-foreground text-[10px]' 
-                  />
+                  <XAxis dataKey='annee' tickLine={false} tickMargin={10} axisLine={false} className='fill-muted-foreground text-xs' />
+                  <YAxis tickLine={false} axisLine={false} tickMargin={8} tickFormatter={fmt} className='fill-muted-foreground text-[10px]' />
                   <ChartTooltip cursor={{ fill: 'rgba(0,0,0,0.04)' }} content={<ChartTooltipContent formatter={(v) => `${formatNumber(Number(v))} GNF`} />} />
                   <ChartLegend content={<ChartLegendContent />} />
-                  {/* ✅ Réalisé à gauche (premier) */}
+                  {/* Réalisé en premier → barre gauche + premier dans légende */}
                   <Bar dataKey='realise' fill='var(--color-realise)' radius={[4, 4, 0, 0]}>
                     <LabelList dataKey='realise' position='top' className='fill-muted-foreground text-[9px] font-bold' formatter={(v: any) => fmt(Number(v))} />
                   </Bar>
-                  {/* ✅ Prévu à droite (deuxième) */}
+                  {/* Prévu en second → barre droite + second dans légende */}
                   <Bar dataKey='cible' fill='var(--color-cible)' radius={[4, 4, 0, 0]}>
                     <LabelList dataKey='cible' position='top' className='fill-muted-foreground text-[9px] font-bold' formatter={(v: any) => fmt(Number(v))} />
                   </Bar>
@@ -425,10 +420,6 @@ function DecaissementComparatifCard({ data, isLoading }: {
 function ProjetAvancementAnnuelCard({ data, isLoading }: {
   data: { annee: number; cible: number; realise: number }[]; isLoading: boolean
 }) {
-  // ✅ Calculer la largeur dynamique en fonction du nombre d'années
-  const chartWidth = Math.max(100, Math.min(100, data.length * 20))
-  const chartHeight = 240
-
   return (
     <Card className='border-0 shadow-sm'>
       <CardHeader className='border-b pb-3'>
@@ -438,7 +429,7 @@ function ProjetAvancementAnnuelCard({ data, isLoading }: {
           </div>
           <div>
             <CardTitle className='text-sm font-semibold'>Avancement physique par année</CardTitle>
-            <CardDescription className='text-xs'>Taux cible vs réalisé (%) — toutes années</CardDescription>
+            <CardDescription className='text-xs'>Taux réalisé vs cible (%) — toutes années</CardDescription>
           </div>
         </div>
       </CardHeader>
@@ -448,32 +439,20 @@ function ProjetAvancementAnnuelCard({ data, isLoading }: {
         ) : data.length === 0 ? (
           <div className='flex h-[240px] items-center justify-center text-sm text-muted-foreground'>Aucune donnée</div>
         ) : (
-          <div className='flex justify-center w-full overflow-x-auto'>
-            <div style={{ width: `${chartWidth}%`, minWidth: '300px', maxWidth: '100%' }}>
-              <ChartContainer config={avancementChartConfig} className={`h-[${chartHeight}px] w-full`}>
+          <div className='w-full overflow-x-auto'>
+            <div style={{ minWidth: '300px' }}>
+              <ChartContainer config={avancementChartConfig} className='h-[240px] w-full'>
                 <BarChart accessibilityLayer data={data} margin={{ top: 30, right: 10, left: -10, bottom: 0 }}>
                   <CartesianGrid vertical={false} strokeDasharray='3 3' className='stroke-muted/40' />
-                  <XAxis 
-                    dataKey='annee' 
-                    tickLine={false} 
-                    tickMargin={10} 
-                    axisLine={false} 
-                    className='fill-muted-foreground text-xs' 
-                  />
-                  <YAxis 
-                    tickLine={false} 
-                    axisLine={false} 
-                    tickMargin={8} 
-                    tickFormatter={(v) => `${v}%`} 
-                    className='fill-muted-foreground text-[10px]' 
-                  />
+                  <XAxis dataKey='annee' tickLine={false} tickMargin={10} axisLine={false} className='fill-muted-foreground text-xs' />
+                  <YAxis tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(v) => `${v}%`} className='fill-muted-foreground text-[10px]' />
                   <ChartTooltip cursor={{ fill: 'rgba(0,0,0,0.05)' }} content={<ChartTooltipContent formatter={(v) => `${v}%`} />} />
                   <ChartLegend content={<ChartLegendContent />} />
-                  {/* ✅ Réalisé à gauche (premier) */}
+                  {/* Réalisé en premier → barre gauche + premier dans légende */}
                   <Bar dataKey='realise' fill='var(--color-realise)' radius={[4, 4, 0, 0]}>
                     <LabelList dataKey='realise' position='top' className='fill-muted-foreground text-[10px] font-bold' formatter={(v: any) => `${v}%`} />
                   </Bar>
-                  {/* ✅ Prévu à droite (deuxième) */}
+                  {/* Cible en second → barre droite + second dans légende */}
                   <Bar dataKey='cible' fill='var(--color-cible)' radius={[4, 4, 0, 0]}>
                     <LabelList dataKey='cible' position='top' className='fill-muted-foreground text-[10px] font-bold' formatter={(v: any) => `${v}%`} />
                   </Bar>
@@ -505,12 +484,8 @@ function BudgetDetailCard({
           <div className='flex items-center gap-2'>
             <div className='rounded-lg bg-primary/10 p-1.5'><Wallet className='h-4 w-4 text-primary' /></div>
             <div>
-              <CardTitle className='text-sm font-semibold'>
-                Détail budget
-              </CardTitle>
-              <CardDescription className='text-xs'>
-                Montants et écarts cumulés
-              </CardDescription>
+              <CardTitle className='text-sm font-semibold'>Détail budget</CardTitle>
+              <CardDescription className='text-xs'>Montants et écarts cumulés</CardDescription>
             </div>
           </div>
           <span className={cn('rounded-full border px-2.5 py-1 text-xs font-semibold', budgetColor.badge)}>{budgetColor.label}</span>
@@ -568,8 +543,7 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
 
   // ── Années du projet (plage réelle uniquement) ────────────────────────────
   const projectYears = useMemo(() => {
-    if (!projet?.date_demarrage_projet || !projet?.duree_projet)
-      return [new Date().getFullYear()]
+    if (!projet?.date_demarrage_projet || !projet?.duree_projet) return [new Date().getFullYear()]
     const start = new Date(projet.date_demarrage_projet)
     const startYear = start.getFullYear()
     const endDate = new Date(start)
@@ -580,8 +554,7 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
     return years
   }, [projet])
 
-  const defaultYear =
-    projectYears[projectYears.length - 1] || new Date().getFullYear()
+  const defaultYear = projectYears[projectYears.length - 1] || new Date().getFullYear()
   const [selectedYear, setSelectedYear] = useState(defaultYear)
 
   const { data: activites = [] } = useGetActivitesProjet(projet?.code_projet)
@@ -620,22 +593,12 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
 
   const tauxRealisationMoyen = useMemo(() => {
     if (!ptbasFiltres.length) return 0
-    return Math.round(
-      ptbasFiltres.reduce(
-        (s, p) => s + (Number(p.taux_execution_ptba) || 0),
-        0
-      ) / ptbasFiltres.length
-    )
+    return Math.round(ptbasFiltres.reduce((s, p) => s + (Number(p.taux_execution_ptba) || 0), 0) / ptbasFiltres.length)
   }, [ptbasFiltres])
 
   const tauxDecaissementMoyen = useMemo(() => {
     if (!ptbasFiltres.length) return 0
-    return Math.round(
-      ptbasFiltres.reduce(
-        (s, p) => s + (Number(p.taux_decaissement_ptba) || 0),
-        0
-      ) / ptbasFiltres.length
-    )
+    return Math.round(ptbasFiltres.reduce((s, p) => s + (Number(p.taux_decaissement_ptba) || 0), 0) / ptbasFiltres.length)
   }, [ptbasFiltres])
 
   const montantDecaisseTotal = useMemo(
@@ -680,6 +643,7 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
 
   return (
     <div className='space-y-6 p-1'>
+
       {/* ── En-tête ── */}
       <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
         <div>
