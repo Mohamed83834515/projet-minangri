@@ -30,7 +30,9 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { KpiIndicateurs } from './KpiIndicateurs'
 
-interface ProjetDashboardProps { projet: Projet }
+interface ProjetDashboardProps {
+  projet: Projet
+}
 
 function getTauxColor(taux: number) {
   if (taux >= 80) return { bg: 'bg-emerald-500', bar: 'bg-emerald-500', text: 'text-emerald-600', badge: 'bg-emerald-50 text-emerald-700 border-emerald-200', label: 'Bon', stroke: '#10b981', light: 'bg-emerald-500/10', hex: '#10b981' }
@@ -484,8 +486,12 @@ function BudgetDetailCard({
           <div className='flex items-center gap-2'>
             <div className='rounded-lg bg-primary/10 p-1.5'><Wallet className='h-4 w-4 text-primary' /></div>
             <div>
-              <CardTitle className='text-sm font-semibold'>Détail budget</CardTitle>
-              <CardDescription className='text-xs'>Montants et écarts cumulés</CardDescription>
+              <CardTitle className='text-sm font-semibold'>
+                Détail budget
+              </CardTitle>
+              <CardDescription className='text-xs'>
+                Montants et écarts cumulés
+              </CardDescription>
             </div>
           </div>
           <span className={cn('rounded-full border px-2.5 py-1 text-xs font-semibold', budgetColor.badge)}>{budgetColor.label}</span>
@@ -543,7 +549,8 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
 
   // ── Années du projet (plage réelle uniquement) ────────────────────────────
   const projectYears = useMemo(() => {
-    if (!projet?.date_demarrage_projet || !projet?.duree_projet) return [new Date().getFullYear()]
+    if (!projet?.date_demarrage_projet || !projet?.duree_projet)
+      return [new Date().getFullYear()]
     const start = new Date(projet.date_demarrage_projet)
     const startYear = start.getFullYear()
     const endDate = new Date(start)
@@ -554,7 +561,8 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
     return years
   }, [projet])
 
-  const defaultYear = projectYears[projectYears.length - 1] || new Date().getFullYear()
+  const defaultYear =
+    projectYears[projectYears.length - 1] || new Date().getFullYear()
   const [selectedYear, setSelectedYear] = useState(defaultYear)
 
   const { data: activites = [] } = useGetActivitesProjet(projet?.code_projet)
@@ -593,12 +601,22 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
 
   const tauxRealisationMoyen = useMemo(() => {
     if (!ptbasFiltres.length) return 0
-    return Math.round(ptbasFiltres.reduce((s, p) => s + (Number(p.taux_execution_ptba) || 0), 0) / ptbasFiltres.length)
+    return Math.round(
+      ptbasFiltres.reduce(
+        (s, p) => s + (Number(p.taux_execution_ptba) || 0),
+        0
+      ) / ptbasFiltres.length
+    )
   }, [ptbasFiltres])
 
   const tauxDecaissementMoyen = useMemo(() => {
     if (!ptbasFiltres.length) return 0
-    return Math.round(ptbasFiltres.reduce((s, p) => s + (Number(p.taux_decaissement_ptba) || 0), 0) / ptbasFiltres.length)
+    return Math.round(
+      ptbasFiltres.reduce(
+        (s, p) => s + (Number(p.taux_decaissement_ptba) || 0),
+        0
+      ) / ptbasFiltres.length
+    )
   }, [ptbasFiltres])
 
   const montantDecaisseTotal = useMemo(
@@ -643,7 +661,6 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
 
   return (
     <div className='space-y-6 p-1'>
-
       {/* ── En-tête ── */}
       <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
         <div>
