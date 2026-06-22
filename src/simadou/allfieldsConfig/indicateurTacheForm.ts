@@ -1,14 +1,12 @@
 import type { FormConfig, SelectOption } from '../../Global/types/formConfig'
 
 export function getIndicateurTacheFormConfigForDialog({
-  indicateurCmrOptions,
+  indicateurPerformanceOptions,
   uniteIndicateurOptions,
-  isLoadingIndicateurCmrs,
   isLoadingUnites,
 }: {
-  indicateurCmrOptions: SelectOption[]
+  indicateurPerformanceOptions: SelectOption[]
   uniteIndicateurOptions: SelectOption[]
-  isLoadingIndicateurCmrs?: boolean
   isLoadingUnites?: boolean
 }): FormConfig {
   return {
@@ -46,12 +44,11 @@ export function getIndicateurTacheFormConfigForDialog({
     },
     {
       name: 'indicateur_cmr',
-      label: 'Indicateur CMR',
+      label: 'Indicateur Performance',
       type: 'select',
-      placeholder: 'Sélectionner un indicateur CMR',
+      placeholder: 'Sélectionner un indicateur de Performance',
       required: true,
-      options: indicateurCmrOptions,
-      isLoading: isLoadingIndicateurCmrs,
+      options: indicateurPerformanceOptions,
       gridCols: 2,
     },
     {
