@@ -537,7 +537,69 @@ function BudgetDetailCard({
           <div className='h-2 w-full overflow-hidden rounded-full bg-muted'>
             <div className={cn('h-full rounded-full transition-all duration-700', decaissementColor.bar)} style={{ width: `${tauxDecaissement}%` }} />
           </div>
-        </div>
+        ) : (
+          <ChartContainer
+            config={avancementChartConfig}
+            className='h-[240px] w-full'
+          >
+            <BarChart
+              accessibilityLayer
+              data={data}
+              margin={{ top: 30, right: 10, left: -10, bottom: 0 }}
+            >
+              <CartesianGrid
+                vertical={false}
+                strokeDasharray='3 3'
+                className='stroke-muted/40'
+              />
+              <XAxis
+                dataKey='annee'
+                tickLine={false}
+                tickMargin={10}
+                axisLine={false}
+                className='fill-muted-foreground text-xs font-semibold'
+              />
+              <YAxis
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                tickFormatter={(value) => `${value}%`}
+                className='fill-muted-foreground text-[10px] font-semibold'
+              />
+              <ChartTooltip
+                cursor={{ fill: 'rgba(0, 0, 0, 0.05)' }}
+                content={
+                  <ChartTooltipContent formatter={(value) => `${value}%`} />
+                }
+              />
+              <ChartLegend content={<ChartLegendContent />} />
+              <Bar
+                dataKey='realise'
+                fill='var(--color-chart-1)'
+                radius={[4, 4, 0, 0]}
+              >
+                <LabelList
+                  dataKey='realise'
+                  position='top'
+                  className='fill-muted-foreground text-[10px] font-bold'
+                  formatter={(value: any) => `${value}%`}
+                />
+              </Bar>
+              <Bar
+                dataKey='cible'
+                fill='var(--color-chart-6)'
+                radius={[4, 4, 0, 0]}
+              >
+                <LabelList
+                  dataKey='cible'
+                  position='top'
+                  className='fill-muted-foreground text-[10px] font-bold'
+                  formatter={(value: any) => `${value}%`}
+                />
+              </Bar>
+            </BarChart>
+          </ChartContainer>
+        )}
       </CardContent>
     </Card>
   )
