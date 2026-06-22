@@ -18,6 +18,7 @@ export interface Projet {
   zone_projet: Localite[];
   budget_projet?: number,
   type_projet?: number,
+  is_cloture?: number,
 }
 
 export type ProjetFormData = Omit<Projet, "id_projet">;

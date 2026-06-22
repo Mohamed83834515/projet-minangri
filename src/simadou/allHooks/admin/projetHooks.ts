@@ -77,6 +77,8 @@ export const projetQueryKeys = {
   all: ['projets'] as const,
   byProgramme: (idProgramme: number | undefined) =>
     [...projetQueryKeys.all, idProgramme] as const,
+  // ✅ Ajouter byId pour les détails
+  byId: (id: number | string) => [...projetQueryKeys.all, 'detail', id] as const,
 }
 
 export function useGetProjets() {
@@ -130,34 +132,102 @@ export function useCreateProjet(idProgramme: number | undefined) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: projetQueryKeys.all })
+      toast.success('Projet créé avec succès ✅')
+    },
+    onError: (error: Error) => {
+      toast.error(`Erreur lors de la création: ${error.message}`)
     },
   })
 }
 
-export function useUpdateProjet(id:number) {
+// ✅ Hook pour basculer la clôture - CORRIGÉ
+export function useToggleProjetCloture() {
   const queryClient = useQueryClient()
+  const idProgramme = useActiveProgrammeId()
+
+  return useMutation({
+    mutationFn: ({ id, isCloture }: { id: string | number; isCloture: boolean }) =>
+      projetService.toggleCloture(id, isCloture),
+
+    onSuccess: (data) => {
+      // ✅ Invalider toutes les clés de projets
+      queryClient.invalidateQueries({ queryKey: projetQueryKeys.all })
+      queryClient.invalidateQueries({ queryKey: ['projets'] })
+      
+      // ✅ Invalider le cache par programme
+      if (idProgramme != null) {
+        queryClient.invalidateQueries({ 
+          queryKey: projetQueryKeys.byProgramme(idProgramme) 
+        })
+      }
+      
+      // ✅ Invalider le cache du projet spécifique
+      if (data.id_projet) {
+        queryClient.invalidateQueries({ 
+          queryKey: projetQueryKeys.byId(data.id_projet) 
+        })
+        queryClient.invalidateQueries({ 
+          queryKey: [...projetQueryKeys.all, 'detail', data.id_projet, idProgramme] 
+        })
+      }
+      
+      const message = data.is_cloture 
+        ? 'Projet clôturé avec succès ✅' 
+        : 'Projet déclôturé avec succès 🔓'
+      toast.success(message)
+    },
+
+    onError: (error: Error) => {
+      toast.error(`Erreur lors du changement de statut: ${error.message}`)
+    },
+  })
+}
+
+export function useUpdateProjet(id: number) {
+  const queryClient = useQueryClient()
+  const idProgramme = useActiveProgrammeId()
 
   return useMutation({
     mutationFn: (data: ProjectCreateData) => {
       return projetService.update(id, data)
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: projetQueryKeys.all })
+      if (idProgramme != null) {
+        queryClient.invalidateQueries({ 
+          queryKey: projetQueryKeys.byProgramme(idProgramme) 
+        })
+      }
+      if (data?.id_projet) {
+        queryClient.invalidateQueries({ 
+          queryKey: projetQueryKeys.byId(data.id_projet) 
+        })
+      }
+      toast.success('Projet modifié avec succès ✅')
+    },
+    onError: (error: Error) => {
+      toast.error(`Erreur lors de la modification: ${error.message}`)
     },
   })
 }
 
 export function useDeleteProjet() {
   const queryClient = useQueryClient()
+  const idProgramme = useActiveProgrammeId()
 
   return useMutation({
     mutationFn: (id: number) => projetService.delete(id),
     onSuccess: () => {
-      toast.success('Projet supprimée avec succès')
+      toast.success('Projet supprimé avec succès 🗑️')
       queryClient.invalidateQueries({ queryKey: projetQueryKeys.all })
+      if (idProgramme != null) {
+        queryClient.invalidateQueries({ 
+          queryKey: projetQueryKeys.byProgramme(idProgramme) 
+        })
+      }
     },
-    onError: () => {
-      toast.error("Erreur lors de la suppression du projet ")
+    onError: (error: Error) => {
+      toast.error(`Erreur lors de la suppression: ${error.message}`)
     },
   })
 }
