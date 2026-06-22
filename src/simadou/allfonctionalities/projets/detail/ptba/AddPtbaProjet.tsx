@@ -26,14 +26,7 @@ import {
 import { useGetActivitesProjet } from '@/simadou/allHooks/admin/activiteProjetHooks'
 import {
   useGetCadresAnalytique,
-  useGetNiveauxCadreAnalytique,
 } from '@/simadou/allHooks/admin/cadreAnalytiqueHooks'
-import {
-  buildCadreAnalytiqueSelectOptions,
-  filterNiveauxByProgramme,
-  getPtbaCadreAnalytiqueNiveauCode,
-  sortNiveauxCadreAnalytique,
-} from '@/simadou/lib/cadreAnalytiqueUtils'
 import {
   resolveCadreAnalytiqueFormValue,
   resolveCodeCrpFormValue,
@@ -79,23 +72,7 @@ export default function AddPtbaProjet({
   const reel_version = localStorage.getItem('selectedVersionId') ?? selectedVersionId
   const { data: activites = [] } = useGetActivitesProjet(codeProjet)
   const { data: cadresAnalytique = [] } = useGetCadresAnalytique(programmeId)
-  const { data: niveaux = [] } = useGetNiveauxCadreAnalytique()
 
-  const ptbaNiveauCode = useMemo(() => {
-    const sortedNiveaux = sortNiveauxCadreAnalytique(
-      filterNiveauxByProgramme(niveaux, codeProgramme, programmeId)
-    )
-    return getPtbaCadreAnalytiqueNiveauCode(sortedNiveaux)
-  }, [niveaux, codeProgramme, programmeId])
-
-  const selectedCadreId = useMemo(
-    () =>
-      resolveCadreAnalytiqueFormValue(
-        currentRow?.cadre_analytique,
-        cadresAnalytique
-      ),
-    [currentRow?.cadre_analytique, cadresAnalytique]
-  )
 
   const activiteOptions = useMemo((): SelectOption[] =>
     activites.map((activite: ActiviteProjet) => ({
@@ -105,18 +82,10 @@ export default function AddPtbaProjet({
     [activites]
   )
 
-  const cadreAnalytiqueOptions = useMemo(
-    () =>
-      buildCadreAnalytiqueSelectOptions(cadresAnalytique, {
-        niveauCodeNumber: ptbaNiveauCode,
-        includeCadreIds: selectedCadreId ? [selectedCadreId] : [],
-      }),
-    [cadresAnalytique, ptbaNiveauCode, selectedCadreId]
-  )
 
   const formConfig = useMemo(
-    () => getPtbaProjetFormConfig(activiteOptions, cadreAnalytiqueOptions),
-    [activiteOptions, cadreAnalytiqueOptions]
+    () => getPtbaProjetFormConfig(activiteOptions),
+    [activiteOptions]
   )
 
   const defaultValues = useMemo((): PtbaProjetFormData => {

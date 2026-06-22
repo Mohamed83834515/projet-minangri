@@ -8,7 +8,6 @@ import {
 } from '@/simadou/schemas/cadreResultatSchemas'
 import type { CadreResultat, NiveauCadreResultat } from '@/simadou/allTypes'
 import { useGetActeurs } from '@/simadou/allHooks/admin/acteurHooks'
-import { useGetProjets } from '@/simadou/allHooks/admin/projetHooks'
 import {
   useCreateCadreResultat,
   useUpdateCadreResultat,
