@@ -75,9 +75,15 @@ export function buildFinancementProjetColumns({
       id: 'montant',
       accessorKey: 'montant',
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Montant' />
+        <DataTableColumnHeader column={column} title='Montant(GNF)' />
       ),
-      cell: ({ row }) => formatMontant(row.original.montant),
+      cell: ({ row }) => (
+        <span className='text-end block'>{formatMontant(row.original.montant)}</span>
+      ),
+      meta: {
+        thClassName: 'text-end',
+        className: 'text-end'
+      },
     },
     {
       id: 'date_accord',
@@ -86,6 +92,10 @@ export function buildFinancementProjetColumns({
         <DataTableColumnHeader column={column} title="Date d'accord" />
       ),
       cell: ({ row }) => formatDate(row.original.date_accord),
+      meta: {
+        thClassName: 'text-center',
+        className: 'text-center'
+      },
     },
     {
       id: 'observation',
