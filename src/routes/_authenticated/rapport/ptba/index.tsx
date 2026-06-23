@@ -1,4 +1,4 @@
-import RapportPtbaPage from '@/simadou/allfonctionalities/rapport/ptba/RapportPtbaPage'
+import RapportPtbaPage from '@/simadou/allfonctionalities/rapport/ptba'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authenticated/rapport/ptba/')({
