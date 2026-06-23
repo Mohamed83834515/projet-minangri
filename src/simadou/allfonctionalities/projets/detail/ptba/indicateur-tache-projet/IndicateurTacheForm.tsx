@@ -37,17 +37,17 @@ export default function IndicateurTacheProjetForm({
 }: IndicateurTacheFormProps) {
   const isEditing = !!indicateur
   // Fonction utilitaire pour extraire le code_projet
-  const getCodeProjet = (codeProjet: string | { code_projet: string } | any): string => {
-    if (!codeProjet) return ''
-    if (typeof codeProjet === 'string') return codeProjet
-    if (typeof codeProjet === 'object' && codeProjet?.code_projet) {
-      return codeProjet.code_projet
+  const getCodeProjet = (codeProjet: number | { code_projet: number } | any): number => {
+    if (!codeProjet) return 0
+    if (typeof codeProjet === 'number') return codeProjet
+    if (typeof codeProjet === 'object' && codeProjet?.id_activite_projet) {
+      return codeProjet.id_activite_projet
     }
-    return ''
+    return 0
   }
 
   // Utilisation
-  const codeProjet = getCodeProjet(activite.code_projet)
+  const codeProjet = getCodeProjet(activite.code_actvite_projet)
   const { data: indicateurPerformanceProjet } = useGetIndicateurPerformanceByActiviteProjet(
     codeProjet
   )

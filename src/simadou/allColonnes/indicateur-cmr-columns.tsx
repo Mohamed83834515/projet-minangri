@@ -164,7 +164,7 @@ export function buildIndicateurCmrColumns<T extends IndicateurCmrTableRow>({
           id: 'cible_cmr',
           accessorKey: 'cible_cmr',
           header: ({ column }) => (
-            <DataTableColumnHeader column={column} title='Cible' />
+            <DataTableColumnHeader column={column} title='Valeur Cible' />
           ),
           cell: ({ row }) => (
             <span className='text-sm'>{displayValue(row.original.cible_cmr)}</span>
@@ -193,7 +193,7 @@ export function buildIndicateurCmrColumns<T extends IndicateurCmrTableRow>({
           header: ({ column }) => (
             <DataTableColumnHeader
               column={column}
-              title='Cibles'
+              title='Valeur Cibles'
               className='flex w-full justify-center'
             />
           ),

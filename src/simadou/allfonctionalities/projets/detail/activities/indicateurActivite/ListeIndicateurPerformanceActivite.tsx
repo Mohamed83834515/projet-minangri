@@ -12,7 +12,7 @@ import IndicateurPerformanceActiviteTable from './IndicateurPerformanceActiviteT
 
 type ListeIndicateurPerformanceProps = {
   indicateurs: IndicateurPerformanceProjet[]
-  idActivite: string
+  idActivite: number
   onEdit: (row: IndicateurPerformanceProjet) => void
   onAdd: () => void
 }

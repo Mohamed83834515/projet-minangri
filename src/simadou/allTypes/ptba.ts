@@ -1,4 +1,5 @@
 import { Acteur } from "./acteur";
+import { ActiviteProjet } from "./activiteProjet";
 import { CadreAnalytique } from "./cadreAnalytique";
 import { Localite } from "./localite";
 import { Personnel } from "./personnel";
@@ -46,6 +47,7 @@ export interface PtbaProjet extends Record<string, unknown> {
   type_activite: string; // Relation vers TypeActivite
   created_at?: string;
   updated_at?: string;
+  code_actvite_projet?:number | ActiviteProjet | null;
   cout_ptba?:number;
   cout_total_ptba?:number;
   taux_execution_ptba?:number

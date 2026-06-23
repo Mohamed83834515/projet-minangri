@@ -12,7 +12,7 @@ export const indicateurPerformanceProjetQueryKeys = {
   all: ['indicateurs-performance-projet'] as const,
   byProjet: (codeProjet: string | undefined) =>
     [...indicateurPerformanceProjetQueryKeys.all, 'by-projet', codeProjet] as const,
-  byActivite: (codeActivite: string | undefined) =>
+  byActivite: (codeActivite: number | undefined) =>
     [...indicateurPerformanceProjetQueryKeys.all, 'by-activite', codeActivite] as const,
 }
 
@@ -139,14 +139,14 @@ export function useCreateIndicateurPerformanceProjet() {
   })
 }
 
-export function useGetIndicateurPerformanceByActiviteProjet(codeActivite: string) {
+export function useGetIndicateurPerformanceByActiviteProjet(idActivite: number) {
   return useQuery({
-    queryKey: indicateurPerformanceProjetQueryKeys.byActivite(codeActivite),
+    queryKey: indicateurPerformanceProjetQueryKeys.byActivite(idActivite),
     queryFn: async () => {
-      const response = await indicateurPerformanceProjetService.getByActiviteProjet(codeActivite)
+      const response = await indicateurPerformanceProjetService.getByActiviteProjet(idActivite)
       return response
     },
-    enabled: !!codeActivite,
+    enabled: !!idActivite,
   })
 }
 

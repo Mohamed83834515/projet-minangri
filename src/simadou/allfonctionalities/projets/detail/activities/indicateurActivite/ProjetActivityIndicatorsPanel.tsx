@@ -28,7 +28,7 @@ export default function IndicateurPerformanceActiviteManager({
   const [editing, setEditing] = useState<IndicateurPerformanceProjet | undefined>()
 
   const { data, isLoading } = useGetIndicateurPerformanceByActiviteProjet(
-    activite.code_activite_projet
+    activite.id_activite_projet
   )
 
   const indicateurs = data ?? []
@@ -52,7 +52,7 @@ export default function IndicateurPerformanceActiviteManager({
     setShowForm(false)
     setEditing(undefined)
     queryClient.invalidateQueries({
-      queryKey: indicateurPerformanceProjetQueryKeys.byActivite(activite.code_activite_projet),
+      queryKey: indicateurPerformanceProjetQueryKeys.byActivite(activite.id_activite_projet),
     })
   }
 
@@ -106,7 +106,7 @@ export default function IndicateurPerformanceActiviteManager({
             ) : (
               <ListeIndicateurPerformance
                 indicateurs={indicateurs}
-                idActivite={activite.code_activite_projet}
+                idActivite={activite.id_activite_projet}
                 onEdit={handleEdit}
                 onAdd={handleAdd}
               />

@@ -118,7 +118,7 @@ export default function IndicateurPerformanceActiviteTable({
                       {formatIndicateurUniteLabel(indicateur, unites)}
                     </td>
                     <td className='border-r px-2 py-1.5 text-muted-foreground'>
-                      Cible
+                     Valeur Cible
                     </td>
                     {years.map((year) => (
                       <td

@@ -95,8 +95,8 @@ export default function CiblesAnnuelles({
           <TableHeader>
             <TableRow>
               <TableHead className='w-28'>Année</TableHead>
-              <TableHead>Cible</TableHead>
-              <TableHead>Budget</TableHead>
+              <TableHead>Valeur Cible</TableHead>
+              <TableHead>Budget(GNF)</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
