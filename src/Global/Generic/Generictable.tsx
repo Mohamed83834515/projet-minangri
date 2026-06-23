@@ -184,23 +184,32 @@ export function GenericTable<TData>({
     onExportContext({ filteredData, visibleColumnIds })
   }, [onExportContext, data, columnFilters, columnVisibility, sorting])
 
+  const showToolbar =
+    showSearch ||
+    showViewOptions ||
+    !!toolbarEndSlot ||
+    facetedFilters.length > 0
+
   return (
     <div
       className={cn(
         'max-sm:has-[div[role="toolbar"]]:mb-16',
-        'flex flex-1 flex-col gap-4',
+        'flex flex-1 flex-col',
+        showToolbar ? 'gap-4' : 'gap-0',
         tableContainerClassName && 'min-h-0'
       )}
     >
-      <DataTableToolbar
-        table={table}
-        searchPlaceholder={searchPlaceholder}
-        searchKey={searchKey}
-        filters={facetedFilters}
-        showViewOptions={showViewOptions}
-        showSearch={showSearch}
-        toolbarEndSlot={toolbarEndSlot}
-      />
+      {showToolbar ? (
+        <DataTableToolbar
+          table={table}
+          searchPlaceholder={searchPlaceholder}
+          searchKey={searchKey}
+          filters={facetedFilters}
+          showViewOptions={showViewOptions}
+          showSearch={showSearch}
+          toolbarEndSlot={toolbarEndSlot}
+        />
+      ) : null}
 
       {/* ── Wrapper unique — overflow-x-auto pour scroll horizontal si nécessaire ── */}
       <div

@@ -21,6 +21,7 @@ import { PtbaVersionSelect } from '@/simadou/allfonctionalities/ptba/PtbaVersion
 import AddPtbaProjet from './AddPtbaProjet'
 import TacheActiviteProjetManager from './tache-activite-projet/TacheActiviteManager'
 import IndicateurTacheProjetManager from './indicateur-tache-projet/IndicateurTacheManager'
+import CoutActivitePtbaGridPanel from './cout-activite/CoutActivitePtbaGridPanel'
 import { useGeneralParamsQuery } from '@/simadou/allHooks/generalParams/queries'
 import { buildPtbasProjetColumns } from '@/simadou/allColonnes/ptbas-projet-columns'
 
@@ -38,8 +39,28 @@ export default function ProjetPtbaPanel({ projet }: ProjetPtbaPanelProps) {
       : activeProgrammeCode
   
   // ✅ Récupérer les versionOptions
-  const { selectedVersionId, handleChangeVersion, versionOptions } =
-    usePtbaVersionSelection(codeProgramme)
+  const {
+    selectedVersionId,
+    handleChangeVersion,
+    versionOptions,
+    versionsForProgramme,
+  } = usePtbaVersionSelection(codeProgramme)
+
+  const selectedVersion = useMemo(() => {
+    if (!selectedVersionId) return null
+    return (
+      versionsForProgramme.find(
+        (v) => v.id_version_ptba.toString() === selectedVersionId
+      ) ?? null
+    )
+  }, [selectedVersionId, versionsForProgramme])
+
+  const selectedVersionPtbaId = useMemo(() => {
+    if (selectedVersion?.id_version_ptba != null) {
+      return selectedVersion.id_version_ptba
+    }
+    return selectedVersionId ? Number(selectedVersionId) : 0
+  }, [selectedVersion, selectedVersionId])
   
   const { search, navigate } = useEmbeddedTableState()
   const { data: ptbas = [] } = useGetPtbasProjet(codeProjet)
@@ -204,6 +225,21 @@ export default function ProjetPtbaPanel({ projet }: ProjetPtbaPanelProps) {
                 label: 'Planification des indicateurs',
                 content: (
                   <IndicateurTacheProjetManager activite={planifierActivite} />
+                ),
+              },
+              {
+                value: 'cout-activite',
+                label: 'Coût activité PTBA',
+                content: (
+                  <CoutActivitePtbaGridPanel
+                    activite={planifierActivite}
+                    projet={projet}
+                    versionPtbaId={
+                      Number(planifierActivite.version_ptba) ||
+                      selectedVersionPtbaId
+                    }
+                    anneePtbaYear={selectedVersion?.annee_ptba}
+                  />
                 ),
               },
             ]

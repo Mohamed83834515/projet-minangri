@@ -194,6 +194,7 @@ export default function ProjetSuiviPtbaPanel({ projet }: ProjetSuiviPtbaPanelPro
                   content: (
                     <SuiviDecaissementPtbaProjetManager
                       key={suiviActivite.id_ptba}
+                      projet={projet}
                       activite={suiviActivite}
                     />
                   ),
