@@ -341,31 +341,30 @@ function TauxDecaissementPtbaCard({ taux, montantDecaisse, montantPrevu, selecte
 }
 // Remplace tes deux configs et les deux fonctions de graphiques par ceci
 
-// ─── Graphiques ───────────────────────────
 const avancementChartConfig = {
   realise: {
-    label: 'Réalisé (Physique %)',
-    color: '#10b981', // vert
+    label: 'Taux Réalisé (Physique)',
+    color: 'var(--color-chart-1)',
   },
   cible: {
-    label: 'Prévu (Physique %)',
-    color: '#818cf8', // violet
+    label: 'Taux Cible (Prévu)',
+    color: 'var(--color-chart-2)',
   },
 } satisfies ChartConfig
 
 const decaissementChartConfig = {
   realise: {
     label: 'Réalisé (GNF)',
-    color: '#3b82f6', // bleu
+    color: 'var(--color-chart-1)',
   },
   cible: {
     label: 'Prévu (GNF)',
-    color: '#10b981', // vert
+    color: 'var(--color-chart-2)',
   },
 } satisfies ChartConfig
 
 function DecaissementComparatifCard({ data, isLoading }: {
-  data: { annee: number; cible: number; realise: number }[]; isLoading: boolean
+  data: { annee: number;  realise: number ;cible: number;}[]; isLoading: boolean
 }) {
   const fmt = (v: number) => {
     if (v >= 1_000_000_000) return `${(v / 1_000_000_000).toFixed(1)}Md`

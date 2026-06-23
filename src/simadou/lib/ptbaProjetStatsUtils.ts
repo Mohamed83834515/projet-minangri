@@ -41,11 +41,11 @@ export function buildDecaissementAnnuelFromPtbas(
 
       return {
         annee,
-        cible: filtered.reduce(
-          (sum, ptba) => sum + (Number(ptba.cout_ptba) || 0),
+        realise: filtered.reduce(
+          (sum, ptba) => sum + (Number(ptba.montant_decaisse_ptba) || 0),
           0
         ),
-        realise:
+        cible:
           budgetsAnnuels.find((ba) => ba.annee == annee)?.budget_annuel || 0,
       }
     })
