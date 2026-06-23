@@ -715,8 +715,6 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
     () => buildDecaissementAnnuelFromPtbas(ptbas),
     [ptbas]
   )
-  console.log('avancementAnnuelData', avancementAnnuelData)
-  console.log('decaissementParAnnee', decaissementParAnnee)
 
   // ✅ Filtrer aussi les décaissements sur les années du projet
   const decaissementParAnnee = useMemo(

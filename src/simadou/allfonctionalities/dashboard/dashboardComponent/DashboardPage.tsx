@@ -1,16 +1,12 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import { object } from 'zod'
+import React, { useMemo, useState } from 'react'
 import { useGetProjets } from '@/simadou/allHooks/admin/projetHooks'
-import { projetService } from '@/simadou/allSercices/projetService'
-// import { useQuery } from "@tanstack/react-query";
+import { useCountProjectsPerType } from '@/simadou/allHooks/admin/typeProjetHooks'
 import {
-  PlanSite,
-  Projet,
-  Ptba,
-  TacheActivitePtba,
-  VersionPtba,
+  type PlanSite,
+  type Ptba,
+  type TacheActivitePtba,
+  type VersionPtba,
 } from '@/simadou/allTypes'
-import { TypeProjet } from '@/simadou/allTypes/typeProjet'
 import {
   useActiveProgrammeCode,
   useActiveProgrammeId,
@@ -19,11 +15,10 @@ import AvancementServiceChart from './AvancementServiceChart'
 import DashboardHeader from './DashboardHeader'
 import DecaissementCharts from './DecaissementCharts'
 import PTBAComposanteChart from './PTBAComposanteChart'
-import ProjectTable, { ProjetRow } from './ProjectTable'
+import ProjectTable, { type ProjetRow } from './ProjectTable'
 import RealisationCiblesChart from './RealisationCiblesChart'
 import RecapitulatifTable from './RecapitulatifTable'
 import StatCard from './StatCard'
-import { useCountProjectsPerType } from '@/simadou/allHooks/admin/typeProjetHooks'
 
 // import { projetService } from "@/simadou/allSercices/projetService";
 // import tacheActivitePtbaService from "@/simadou/allSercices/tacheActivitePtbaService";
@@ -875,14 +870,14 @@ const DashboardPage: React.FC = () => {
           title='Projets et Programmes'
           color='blue'
           rows={[
+            ...projectsPerType.map((ppt) => ({
+              label: ppt.nom_type_projet,
+              value: ppt.nombre_projets,
+            })),
             {
               label: 'Nombre total du projet',
               value: projetProgrammeStats.total,
             },
-            ...projectsPerType.map((ppt)=>({
-                label: ppt.nom_type_projet,
-                value: ppt.nombre_projets
-            })),
             {
               label: 'Nombre de projet en retard',
               value: projetProgrammeStats.enRetard,
