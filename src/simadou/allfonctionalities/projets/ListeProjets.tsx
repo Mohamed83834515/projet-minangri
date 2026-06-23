@@ -25,8 +25,17 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 const route = getRouteApi('/_authenticated/projet-programme/projets/')
+
+type FiltreCloture = 'en_cours' | 'cloturer'
 
 export default function ListeProjets() {
   const search = route.useSearch()
@@ -36,6 +45,9 @@ export default function ListeProjets() {
   const { tabsStyle } = useNiveauTabsTheme()
   const [open, setOpen] = useDialogState<'add' | 'edit' | 'delete' | 'cloture'>(null)
   const [currentRow, setCurrentRow] = useState<Projet | null>(null)
+
+  // ✅ État pour le filtre de clôture (par défaut "en_cours")
+  const [filtreCloture, setFiltreCloture] = useState<FiltreCloture>('en_cours')
 
   const { data: projets = [], isLoading } = useGetProjets()
   const { data: typeProjets = [], isLoading: isLoadingTypes } = useGetTypeProjet()
@@ -101,7 +113,8 @@ export default function ListeProjets() {
     [setOpen, setCurrentRow, goToDetail, handleClotureConfirm, currencyCode]
   )
 
-  const filteredProjets = useMemo(() => {
+  // ✅ Filtrer par type de projet
+  const filteredByType = useMemo(() => {
     if (!activeTypeId) return projets
     return projets.filter((projet) => {
       if (!projet.type_projet) return false
@@ -111,6 +124,19 @@ export default function ListeProjets() {
       return id === activeTypeId
     })
   }, [projets, activeTypeId])
+
+  // ✅ Filtrer par statut de clôture (sans l'option "tous")
+  const filteredProjets = useMemo(() => {
+    return filteredByType.filter((projet) => {
+      if (filtreCloture === 'en_cours') {
+        return !projet.is_cloture
+      }
+      if (filtreCloture === 'cloturer') {
+        return projet.is_cloture === true
+      }
+      return true
+    })
+  }, [filteredByType, filtreCloture])
 
   const countByType = useMemo(() => {
     const map = new Map<number, number>()
@@ -123,13 +149,37 @@ export default function ListeProjets() {
     })
     return map
   }, [projets])
+
+  // ✅ Compter par type en fonction du filtre actif
+  const countByTypeFiltered = useMemo(() => {
+    const map = new Map<number, number>()
+    filteredByType.forEach((projet) => {
+      if (!projet.type_projet) return
+      const id = typeof projet.type_projet === 'number'
+        ? projet.type_projet
+        : (projet.type_projet as any)?.id_type_projet
+      if (id) map.set(id, (map.get(id) || 0) + 1)
+    })
+    return map
+  }, [filteredByType])
+
   const sortedTypesByCount = useMemo(() => {
     return [...sortedTypes].sort((a, b) => {
       const countA = countByType.get(a.id_type_projet) || 0
       const countB = countByType.get(b.id_type_projet) || 0
-      return countB - countA // Décroissant (du plus grand au plus petit)
+      return countB - countA
     })
   }, [sortedTypes, countByType])
+
+  // ✅ Nombre de projets par statut pour le filtre
+  const nbProjetsEnCours = useMemo(() => {
+    return projets.filter(p => !p.is_cloture).length
+  }, [projets])
+
+  const nbProjetsCloturer = useMemo(() => {
+    return projets.filter(p => p.is_cloture === true).length
+  }, [projets])
+
   if (!activeProgramme) {
     return (
       <p className='py-8 text-center text-sm text-muted-foreground'>
@@ -148,32 +198,56 @@ export default function ListeProjets() {
 
   return (
     <div className='space-y-2 px-2'>
-      {/* Tabs des types de projets */}
-      <div className='overflow-x-auto'>
-        <Tabs
-          orientation='vertical'
-          className='gap-1 space-y-1'
-          style={tabsStyle}
-          value={activeTypeId !== null ? String(activeTypeId) : undefined}
-          onValueChange={(val) => setSelectedTypeProjetId(Number(val))}
+      {/* ✅ Filtre devant les onglets */}
+      <div className='flex flex-wrap items-center gap-3'>
+        {/* Tabs des types de projets */}
+        <div className='overflow-x-auto flex-1'>
+          <Tabs
+            orientation='vertical'
+            className='gap-1 space-y-1'
+            style={tabsStyle}
+            value={activeTypeId !== null ? String(activeTypeId) : undefined}
+            onValueChange={(val) => setSelectedTypeProjetId(Number(val))}
+          >
+            <TabsList className='flex flex-wrap gap-1'>
+              {sortedTypesByCount.map((type) => {
+                // ✅ Utiliser le compteur filtré
+                const count = countByTypeFiltered.get(type.id_type_projet) || 0
+                return (
+                  <TabsTrigger
+                    className='relative'
+                    key={type.id_type_projet}
+                    value={String(type.id_type_projet)}
+                  >
+                    {type.nom_type_projet.length > 20
+                      ? type.nom_type_projet.substring(0, 12) + '…'
+                      : type.nom_type_projet}
+                    <span className='rounded-full bg-muted px-1.5 py-0.5 text-xs text-black'>
+                      ({count})
+                    </span>
+                  </TabsTrigger>
+                )
+              })}
+            </TabsList>
+          </Tabs>
+        </div>
+        <Select
+          value={filtreCloture}
+          onValueChange={(value) => setFiltreCloture(value as FiltreCloture)}
         >
-          <TabsList className='flex flex-wrap gap-1'>
-            {sortedTypesByCount.map((type) => (
-              <TabsTrigger
-                className='relative'
-                key={type.id_type_projet}
-                value={String(type.id_type_projet)}
-              >
-                {type.nom_type_projet.length > 20
-                  ? type.nom_type_projet.substring(0, 12) + '…'
-                  : type.nom_type_projet}
-                <span className='rounded-full bg-muted px-1.5 py-0.5 text-xs text-black'>
-                  ({countByType.get(type.id_type_projet) || 0})
-                </span>
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
+          <SelectTrigger className='w-[160px] h-9 shrink-0'>
+            <SelectValue placeholder='Statut' />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value='en_cours'>
+              📋 En cours ({nbProjetsEnCours})
+            </SelectItem>
+            <SelectItem value='cloturer'>
+              ✅ Clôturés ({nbProjetsCloturer})
+            </SelectItem>
+          </SelectContent>
+        </Select>
+
       </div>
 
       <div className='space-y-2'>
@@ -192,7 +266,7 @@ export default function ListeProjets() {
           showViewOptions={false}
           emptyMessage={
             activeTypeId
-              ? `Aucun projet dans le type ${sortedTypes.find(t => t.id_type_projet === activeTypeId)?.nom_type_projet || ''}`
+              ? `Aucun projet ${filtreCloture === 'en_cours' ? 'en cours' : 'clôturé'} dans le type ${sortedTypes.find(t => t.id_type_projet === activeTypeId)?.nom_type_projet || ''}`
               : 'Aucun projet trouvé.'
           }
         />
@@ -234,7 +308,7 @@ export default function ListeProjets() {
       </AlertDialog>
 
       {/* Dialogues génériques (edit, delete) */}
-      <GenericDialogs<Projet, 'add' | 'edit' | 'delete' | "cloture">
+      <GenericDialogs<Projet, 'add' | 'edit' | 'delete' | 'cloture'>
         open={open}
         setOpen={setOpen}
         currentRow={currentRow}

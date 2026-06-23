@@ -44,7 +44,7 @@ import {
   type PartBailleurGridRow,
 } from '@/simadou/lib/partBailleurGridUtils'
 
-const DEFAULT_PAGE_SIZE = 5
+const DEFAULT_PAGE_SIZE = 10
 const COLUMN_SCROLL_THRESHOLD = 6
 const ZONE_COLUMN_MIN_PX = 120
 const FINANCEMENT_COLUMN_MIN_PX = 100

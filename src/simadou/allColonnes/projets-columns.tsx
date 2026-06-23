@@ -80,7 +80,7 @@ export function buildProjetsColumns(
           <div className='flex flex-row gap-0.5'>
             {partenaires.map((partenaire, idx) => (
               <span key={idx} className='text-sm text-muted-foreground'>
-                {partenaire.code_acteur?.trim()} / 
+                {partenaire.code_acteur?.trim()}, 
               </span>
             ))}
           </div>
@@ -102,8 +102,8 @@ export function buildProjetsColumns(
         return (
           <div className='flex flex-row gap-0.5'>
             {partenaires.map((partenaire, idx) => (
-              <span key={idx} className='text-sm text-muted-foreground'>
-                {partenaire.code_acteur?.trim()} / 
+              <span key={idx} className='text-sm text-muted-foreground bg-blue'>
+                {partenaire.code_acteur?.trim()}, 
               </span>
             ))}
           </div>
@@ -134,27 +134,6 @@ export function buildProjetsColumns(
               {new Intl.NumberFormat('fr-FR').format(budget)}
             </span>
           </div>
-        )
-      },
-      enableSorting: true,
-      enableHiding: false,
-    },
-    {
-      id: 'status',
-      accessorKey: 'is_cloture',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Statut' />
-      ),
-      cell: ({ row }) => {
-        const isCloture = row.original.is_cloture
-        return (
-          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-            isCloture 
-              ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' 
-              : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-          }`}>
-            {isCloture ? 'Clôturé' : 'Actif'}
-          </span>
         )
       },
       enableSorting: true,

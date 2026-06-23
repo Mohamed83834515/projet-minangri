@@ -19,7 +19,7 @@ export interface Projet {
   zone_projet: Localite[];
   budget_projet?: number,
   type_projet?: number | TypeProjet,
-  is_cloture?: number,
+  is_cloture?: boolean,
 }
 
 export type ProjetFormData = Omit<Projet, "id_projet">;
