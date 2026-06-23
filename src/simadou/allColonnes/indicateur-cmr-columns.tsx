@@ -177,7 +177,7 @@ export function buildIndicateurCmrColumns<T extends IndicateurCmrTableRow>({
       id: 'reference_cmr',
       accessorKey: 'reference_cmr',
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Référence' />
+        <DataTableColumnHeader column={column} title='Valeur Ref.' />
       ),
       cell: ({ row }) => (
         <LongText className='max-w-xs text-sm'>

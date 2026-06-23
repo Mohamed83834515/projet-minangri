@@ -11,7 +11,9 @@ export const TYPE_FINANCEMENT_OPTIONS: {
 }[] = [
   { value: 'pret', label: 'Prêt' },
   { value: 'don', label: 'Don' },
-  { value: 'contrepartie', label: 'Contrepartie' },
+  { value: 'contribution_etat', label: 'Contribution Etat' },
+  { value: 'contrepartie_etat', label: 'Contrepartie Etat' },
+  { value: 'contrepartie_beneficiaires', label: 'Contrepartie Beneficiaire' },
 ]
 
 export function formatTypeFinancementLabel(

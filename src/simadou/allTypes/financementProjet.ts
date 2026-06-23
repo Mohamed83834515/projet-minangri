@@ -1,7 +1,7 @@
 import type { Acteur } from './acteur'
 import type { Projet } from './projet'
 
-export type TypeFinancement = 'pret' | 'don' | 'contrepartie'
+export type TypeFinancement = 'pret' | 'don' | 'contribution_etat' | 'contrepartie_etat' | 'contrepartie_beneficiaires'
 
 export interface FinancementProjet {
   id_part: number

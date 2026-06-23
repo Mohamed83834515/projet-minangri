@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const TYPE_FINANCEMENT_VALUES = ['pret', 'don', 'contrepartie'] as const
+export const TYPE_FINANCEMENT_VALUES = ['pret', 'don', 'contrepartie_beneficiaires', 'contrepartie_etat', 'contribution_etat'] as const
 
 export const financementProjetSchema = z.object({
   code_type: z

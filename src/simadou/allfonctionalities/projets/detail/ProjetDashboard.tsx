@@ -10,7 +10,7 @@
 
 // ProjetDashboard.tsx
 import { useMemo, useState } from 'react'
-import { useGetActivitesProjet } from '@/simadou/allHooks/admin/activiteProjetHooks'
+// import { useGetActivitesProjet } from '@/simadou/allHooks/admin/activiteProjetHooks'
 import {
   useGetBudgetAnnuel,
   useGetProjetAvancementAnnuelStats,
@@ -180,7 +180,7 @@ function BudgetKpiCard({ budgetTotal, budgetDecaisse, budgetPct }: {
           </div>
           {/* Écart */}
           <div className='flex items-start justify-between gap-2'>
-            <span className='text-xs text-muted-foreground shrink-0'>Écart</span>
+            <span className='text-xs text-muted-foreground shrink-0'>Reste à décaisser</span>
             <span className='text-sm font-bold text-right break-all leading-tight text-red-500'>
               {formatNumber(ecart)}
               <span className='ml-1 text-[10px] font-normal text-muted-foreground'>GNF</span>
@@ -189,7 +189,7 @@ function BudgetKpiCard({ budgetTotal, budgetDecaisse, budgetPct }: {
           {/* Barre + taux */}
           <div className='pt-1 space-y-1'>
             <div className='flex justify-between items-center'>
-              <span className='text-[10px] text-muted-foreground'>Taux consommation</span>
+              <span className='text-[10px] text-muted-foreground'>Taux de décaissement</span>
               <span className={cn('text-xs font-bold', col.text)}>{budgetPct}%</span>
             </div>
             <div className='h-1.5 w-full overflow-hidden rounded-full bg-muted'>
@@ -203,9 +203,8 @@ function BudgetKpiCard({ budgetTotal, budgetDecaisse, budgetPct }: {
 }
 
 // ─── Card 3 : Taux exécution PTBA (Avancement) ─────────────────────────────
-
-function TauxExecutionPtbaCard({ taux, selectedYear, nbPtba }: {
-  taux: number; selectedYear: number; nbPtba: number;
+function TauxExecutionPtbaCard({ taux, nbrePtbaEnCours, nbrePtbaRealise, nbrePtbaEchus, selectedYear, nbPtba }: {
+  taux: number; nbrePtbaEnCours: number; nbrePtbaRealise: number; nbrePtbaEchus: number; selectedYear: number; nbPtba: number;
 }) {
   // ✅ Couleur fixe : Bleu pour l'avancement
   const col = {
@@ -229,7 +228,7 @@ function TauxExecutionPtbaCard({ taux, selectedYear, nbPtba }: {
               <TrendingUp className='h-3.5 w-3.5 text-blue-600 dark:text-blue-400' />
             </div>
             <p className='text-[11px] font-semibold tracking-widest text-muted-foreground uppercase'>
-              Avancement
+              Avancement PTBA
             </p>
           </div>
           <span className='text-[10px] font-semibold text-muted-foreground bg-muted px-2 py-0.5 rounded-full'>
@@ -251,10 +250,33 @@ function TauxExecutionPtbaCard({ taux, selectedYear, nbPtba }: {
           </div>
 
           <div className='flex items-center justify-between pt-0.5'>
-            <span className='text-xs text-muted-foreground'>{nbPtba} PTBA</span>
+            <span className='text-xs text-muted-foreground'>{nbPtba} Activités PTBA</span>
             <span className='text-xs text-muted-foreground'>
               {taux >= 80 ? '✅ Bonne avancement' : taux >= 50 ? '⚡ En cours' : '⏳ À accélérer'}
             </span>
+          </div>
+          {/* ✅ Montant prévu et décaissé uniquement */}
+          <div className='grid grid-cols-3 gap-2'>
+            {/* Réalisés */}
+            <div className='relative overflow-hidden rounded-xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-emerald-100/60 px-2 py-2 text-center dark:border-emerald-900 dark:from-emerald-950/40'>
+              <div className='absolute -right-1 -top-1 h-7 w-7 rounded-full bg-emerald-200/40' />
+              <p className='text-[9px] font-bold uppercase tracking-widest text-emerald-600'>Réalisés</p>
+              <p className='text-xl font-black text-emerald-700 tabular-nums'>{nbrePtbaRealise}</p>
+            </div>
+
+            {/* En cours */}
+            <div className='relative overflow-hidden rounded-xl border border-blue-100 bg-gradient-to-br from-blue-50 to-blue-100/60 px-2 py-2 text-center dark:border-blue-900 dark:from-blue-950/40'>
+              <div className='absolute -right-1 -top-1 h-7 w-7 rounded-full bg-blue-200/40' />
+              <p className='text-[9px] font-bold uppercase tracking-widest text-blue-600'>En cours</p>
+              <p className='text-xl font-black text-blue-700 tabular-nums'>{nbrePtbaEnCours}</p>
+            </div>
+
+            {/* Échues */}
+            <div className='relative overflow-hidden rounded-xl border border-rose-100 bg-gradient-to-br from-rose-50 to-rose-100/60 px-2 py-2 text-center dark:border-rose-900 dark:from-rose-950/40'>
+              <div className='absolute -right-1 -top-1 h-7 w-7 rounded-full bg-rose-200/40' />
+              <p className='text-[9px] font-bold uppercase tracking-widest text-rose-600'>Échues</p>
+              <p className='text-xl font-black text-rose-700 tabular-nums'>{nbrePtbaEchus}</p>
+            </div>
           </div>
         </div>
       </CardContent>
@@ -289,7 +311,7 @@ function TauxDecaissementPtbaCard({ taux, montantDecaisse, montantPrevu, selecte
               <DollarSign className='h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400' />
             </div>
             <p className='text-[11px] font-semibold tracking-widest text-muted-foreground uppercase'>
-              Décaissement
+              Décaissement PTBA
             </p>
           </div>
           <span className='text-[10px] font-semibold text-muted-foreground bg-muted px-2 py-0.5 rounded-full'>
@@ -311,7 +333,7 @@ function TauxDecaissementPtbaCard({ taux, montantDecaisse, montantPrevu, selecte
           </div>
 
           <div className='flex items-center justify-between pt-0.5'>
-            <span className='text-xs text-muted-foreground'>{nbPtba} PTBA</span>
+            <span className='text-xs text-muted-foreground'>{nbPtba} Activités PTBA</span>
             <span className='text-xs text-muted-foreground'>
               {taux >= 80 ? '💰 Bien décaissé' : taux >= 50 ? '💳 En cours' : '⏳ À décaisser'}
             </span>
@@ -415,7 +437,7 @@ function DecaissementComparatifCard({ data, isLoading }: {
                   <ChartTooltip cursor={{ fill: 'rgba(0,0,0,0.04)' }} content={<ChartTooltipContent formatter={(v) => `${formatNumber(Number(v))} GNF`} />} />
                   {/* <ChartLegend content={<ChartLegendContent />} /> */}
                   {/* Réalisé en premier → barre gauche + premier dans légende */}
-                  <Bar dataKey='realise' fill='#ef4444' radius={[4, 4, 0, 0]}>
+                  <Bar dataKey='realise' fill='#FCD116' radius={[4, 4, 0, 0]}>
                     <LabelList dataKey='realise' position='top' className='fill-muted-foreground text-[9px] font-bold' formatter={(v: any) => fmt(Number(v))} />
                   </Bar>
                   {/* Prévu en second → barre droite + second dans légende */}
@@ -425,7 +447,7 @@ function DecaissementComparatifCard({ data, isLoading }: {
                 </BarChart>
               </ChartContainer>
               <CustomLegend items={[
-                { color: '#ef4444', label: 'Réalisé (GNF)' },
+                { color:'#FCD116', label: 'Réalisé (GNF)' },
                 { color: '#10b981', label: 'Prévu (GNF)' },
               ]} />
             </div>
@@ -468,7 +490,7 @@ function ProjetAvancementAnnuelCard({ data, isLoading }: {
                   <ChartTooltip cursor={{ fill: 'rgba(0,0,0,0.05)' }} content={<ChartTooltipContent formatter={(v) => `${v}%`} />} />
                   {/* <ChartLegend content={<ChartLegendContent />} /> */}
                   {/* Réalisé en premier → barre gauche + premier dans légende */}
-                  <Bar dataKey='realise' fill='#ef4444' radius={[4, 4, 0, 0]}>
+                  <Bar dataKey='realise' fill='#FCD116' radius={[4, 4, 0, 0]}>
                     <LabelList dataKey='realise' position='top' className='fill-muted-foreground text-[10px] font-bold' formatter={(v: any) => `${v}%`} />
                   </Bar>
                   {/* Cible en second → barre droite + second dans légende */}
@@ -478,7 +500,7 @@ function ProjetAvancementAnnuelCard({ data, isLoading }: {
                 </BarChart>
               </ChartContainer>
               <CustomLegend items={[
-                { color: '#ef4444', label: 'Taux Réalisé (Physique)' },
+                { color:'#FCD116', label: 'Taux Réalisé (Physique)' },
                 { color: '#10b981', label: 'Taux Cible (Prévu)' },
               ]} />
             </div>
@@ -540,7 +562,7 @@ function BudgetDetailCard({
             <p className='mt-0.5 text-[10px] text-muted-foreground/70'>GNF</p>
           </div>
           <div className='rounded-xl border border-red-100 bg-red-50 p-3 dark:border-red-900 dark:bg-red-950/30'>
-            <p className='mb-1 text-[10px] tracking-widest text-red-500 uppercase'>Écart</p>
+            <p className='mb-1 text-[10px] tracking-widest text-red-500 uppercase'>Reste à décaisser </p>
             <p className='text-sm leading-tight font-bold text-red-600 break-all'>{formatNumber(ecart)}</p>
             <p className='mt-0.5 text-[10px] text-red-500/70'>GNF</p>
           </div>
@@ -586,7 +608,7 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
     projectYears[projectYears.length - 1] || new Date().getFullYear()
   const [selectedYear, setSelectedYear] = useState(defaultYear)
 
-  const { data: activites = [] } = useGetActivitesProjet(projet?.code_projet)
+  // const { data: activites = [] } = useGetActivitesProjet(projet?.code_projet)
   const { data: ptbas = [], isLoading: isLoadingPtbas } = useGetPtbasProjet(projet?.code_projet)
 
   // ── Taux global (vue taux_an_activite → moyenne par projet) ──────────────
@@ -604,15 +626,20 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
 
   // ── Budget global ─────────────────────────────────────────────────────────
   const budget_total = useMemo(
-    () => activites.reduce((s, a) => s + (Number(a.budget) || 0), 0), [activites]
+    () => projet.budget_projet, [projet]
   )
   const budget_decaisse = useMemo(
     () => ptbas.reduce((s, p) => s + (Number(p.montant_decaisse_ptba) || 0), 0), [ptbas]
   )
-  const budgetPct = useMemo(
-    () => budget_total === 0 ? 0 : Math.round((budget_decaisse / budget_total) * 100),
-    [budget_total, budget_decaisse]
-  )
+  const budgetPct = useMemo(() => {
+    // ✅ Convertir en nombres avec Number()
+    const total = Number(budget_total) || 0
+    const decaisse = Number(budget_decaisse) || 0
+
+    if (total === 0) return 0
+
+    return Math.round((decaisse / total) * 100)
+  }, [budget_total, budget_decaisse])
 
   // ── PTBA filtrés par année sélectionnée ──────────────────────────────────
   const ptbasFiltres = useMemo(
@@ -630,6 +657,71 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
     )
   }, [ptbasFiltres])
 
+  // 📌 PTBA en cours : taux entre 1 et 99
+  const NbrePtbaEnCours = useMemo(() => {
+    if (!ptbasFiltres.length) return 0
+
+    return ptbasFiltres.filter((p) => {
+      const taux = Number(p.taux_execution_ptba) || 0
+      return taux >= 1 && taux < 100
+    }).length
+  }, [ptbasFiltres])
+
+  // 📌 PTBA réalisés : taux = 100
+  const NbrePtbaRealise = useMemo(() => {
+    if (!ptbasFiltres.length) return 0
+
+    return ptbasFiltres.filter((p) => {
+      const taux = Number(p.taux_execution_ptba) || 0
+      return taux >= 100
+    }).length
+  }, [ptbasFiltres])
+  const isTimestamp = (value: any): boolean => {
+    return typeof value === 'number' && !isNaN(value) && value > 0
+  }
+  // 📌 Fonction pour obtenir l'objet Date à partir de delais
+  const getDateFromDelais = (delais: any): Date | null => {
+    if (!delais) return null
+
+    // Si c'est un nombre (timestamp), créer une date
+    if (isTimestamp(delais)) {
+      const date = new Date(delais)
+      return !isNaN(date.getTime()) ? date : null
+    }
+
+    // Si c'est une string de date, essayer de la parser
+    if (typeof delais === 'string') {
+      const date = new Date(delais)
+      return !isNaN(date.getTime()) ? date : null
+    }
+
+    // Si c'est déjà un objet Date
+    if (delais instanceof Date) {
+      return !isNaN(delais.getTime()) ? delais : null
+    }
+
+    return null
+  }
+  // 📌 PTBA échus : taux = 0 (et délai dépassé ou date fin = 0)
+  const NbrePtbaEchus = useMemo(() => {
+    if (!ptbasFiltres.length) return 0
+
+    const now = new Date()
+    return ptbasFiltres.filter((p) => {
+      const taux = Number(p.taux_execution_ptba) || 0
+      const dateFin = getDateFromDelais(p.delais)
+
+      // Taux = 0
+      if (taux > 0) return false
+
+      // Si date de fin existe et est dépassée
+      if (dateFin && dateFin < now) return true
+
+      // Si pas de date de fin, considérer comme non échu
+      return false
+    }).length
+  }, [ptbasFiltres])
+
   const tauxDecaissementMoyen = useMemo(() => {
     if (!ptbasFiltres.length) return 0
     return Math.round(
@@ -641,6 +733,10 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
   }, [ptbasFiltres])
 
   const montantDecaisseTotal = useMemo(
+    () => ptbas.reduce((s, p) => s + (Number(p.montant_decaisse_ptba) || 0), 0),
+    [ptbas]
+  )
+  const montantDecaisseTotalAnnuel = useMemo(
     () => ptbasFiltres.reduce((s, p) => s + (Number(p.montant_decaisse_ptba) || 0), 0),
     [ptbasFiltres]
   )
@@ -652,7 +748,7 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
   )
 
   const tauxDecaissement = useMemo(
-    () => budget_total === 0 ? 0 : Math.round((montantDecaisseTotal / budget_total) * 100),
+    () => budget_total === 0 ? 0 : Math.round((montantDecaisseTotal / (budget_total || 0)) * 100),
     [budget_total, montantDecaisseTotal]
   )
 
@@ -669,8 +765,8 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
     () => avancementAnnuelRaw.filter((d) => projectYears.includes(d.annee)),
     [avancementAnnuelRaw, projectYears]
   )
-  console.log('budgetsAnnuels',budgetsAnnuels)
-  console.log('ptbas',ptbas)
+  console.log('budgetsAnnuels', budgetsAnnuels)
+  console.log('ptbas', ptbas)
 
   // ✅ Filtrer aussi les décaissements sur les années du projet
   const decaissementParAnnee = useMemo(
@@ -678,7 +774,7 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
     [budgetsAnnuels, ptbas])
 
 
-  console.log('decaissementParAnnee',decaissementParAnnee)
+  console.log('decaissementParAnnee', decaissementParAnnee)
 
   return (
     <div className='space-y-6 p-1'>
@@ -711,18 +807,21 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
           activitesRealisees={activitesRealisees}
         />
         <BudgetKpiCard
-          budgetTotal={budget_total}
+          budgetTotal={budget_total || 0}
           budgetDecaisse={budget_decaisse}
           budgetPct={budgetPct}
         />
         <TauxExecutionPtbaCard
           taux={tauxRealisationMoyen}
+          nbrePtbaEnCours={NbrePtbaEnCours}
+          nbrePtbaRealise={NbrePtbaRealise}
+          nbrePtbaEchus={NbrePtbaEchus}
           selectedYear={selectedYear}
           nbPtba={ptbasFiltres.length}
         />
         <TauxDecaissementPtbaCard
           taux={tauxDecaissementMoyen}
-          montantDecaisse={montantDecaisseTotal}
+          montantDecaisse={montantDecaisseTotalAnnuel}
           montantPrevu={montantPrevuPtba}
           selectedYear={selectedYear}
           nbPtba={ptbasFiltres.length}
@@ -744,7 +843,7 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
       {/* ── Budget détail ── */}
       <BudgetDetailCard
         montantDecaisseTotal={montantDecaisseTotal}
-        budget_total={budget_total}
+        budget_total={budget_total || 0}
         budgetPct={budgetPct}
         tauxDecaissement={tauxDecaissement}
         budgetColor={budgetColor}

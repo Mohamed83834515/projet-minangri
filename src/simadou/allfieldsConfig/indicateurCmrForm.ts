@@ -54,7 +54,7 @@ export const getIndicateurCmrFormConfigForDialog = ({
     },
     {
       name: "resultat_cmr",
-      label: "Résultat CMR",
+      label: "Résultat",
       type: indicateurStrategiqueOptions ? "select" : "text",
       placeholder: indicateurStrategiqueOptions
         ? "Sélectionner un indicateur stratégique…"
@@ -67,7 +67,7 @@ export const getIndicateurCmrFormConfigForDialog = ({
     },
     {
       name: "reference_cmr",
-      label: "Référence CMR",
+      label: "Valeur Référence",
       type: "text",
       placeholder: "Référence du cadre de mesure de résultats",
       required: true,
@@ -76,7 +76,7 @@ export const getIndicateurCmrFormConfigForDialog = ({
     },
     {
       name: "referentiel_cmr",
-      label: "Référentiel",
+      label: "Dictionnaire des indicateurs",
       type: "select",
       placeholder: "Sélectionner un indicateur du dictionnaire…",
       required: false,
@@ -86,7 +86,7 @@ export const getIndicateurCmrFormConfigForDialog = ({
     },
     {
       name: "cible_cmr",
-      label: "Cible CMR",
+      label: "Valeur Cible",
       type: "text",
       placeholder: "Valeur cible à atteindre",
       required: true,
