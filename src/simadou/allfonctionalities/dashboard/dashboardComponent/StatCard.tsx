@@ -18,6 +18,7 @@ interface StatCardProps {
     value: string;
     positive: boolean;
   };
+  tags?: { label: string; value: number }[]
 }
 
 const colorMap: Record<
@@ -92,6 +93,8 @@ export default function StatCard({
   progressValue,
   progressColor,
   trend,
+  tags,
+  
 }: StatCardProps) {
   const theme = colorMap[color] || colorMap.blue;
   const progressTheme = colorMap[progressColor || color]?.progress || "bg-emerald-500";
@@ -126,15 +129,27 @@ export default function StatCard({
         <div className="relative mb-4">
           <span
             className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${trend.positive
-                ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-                : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+              ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+              : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
               }`}
           >
             {trend.positive ? "↑" : "↓"} {trend.value}
           </span>
         </div>
       )}
-
+      {tags && tags.length > 0 && (
+        <div className='relative mb-4 flex flex-wrap gap-1.5'>
+          {tags.map((tag) => (
+            <span
+              key={tag.label}
+              className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium ${theme.border} ${theme.bgLight} ${theme.text}`}
+            >
+              {tag.label}
+              <span className='font-bold'>({tag.value})</span>
+            </span>
+          ))}
+        </div>
+      )}
       {/* Stats */}
       <div className="relative space-y-1">
         {rows.map((row, index) => (

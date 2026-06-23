@@ -27,12 +27,13 @@ export const useCountProjectsPerType = () => {
 export const useSaveTypeProjet= (isEdit: boolean, currentRow?: any, onSuccess?: () => void) => {
   const queryClient = useQueryClient()
 
+      console.log(currentRow);
   return useMutation({
     mutationFn: (data: TypeProjetFormData) =>
-      isEdit && currentRow?.id_categorie
+      isEdit && currentRow?.id_type_projet
         ? TypeProjetService.update(currentRow?.id_type_projet, data)
         : TypeProjetService.create(data),
-
+      
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: typeProjetQueryKeys.list(),
