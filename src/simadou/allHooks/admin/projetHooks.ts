@@ -1,14 +1,22 @@
-import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
-import { useActiveProgrammeId } from '@/hooks/use-active-programme'
-import type { Projet } from '@/simadou/allTypes/projet'
-import { projetBelongsToProgramme } from '@/simadou/allTypes/projet'
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  type QueryClient,
+} from '@tanstack/react-query'
 import { projetService } from '@/simadou/allSercices/projetService'
 import { projetStatsService } from '@/simadou/allSercices/projetStatsService'
-import { toast } from 'sonner'
+import type { Projet } from '@/simadou/allTypes/projet'
+import { projetBelongsToProgramme } from '@/simadou/allTypes/projet'
 import { ProjectCreateData } from '@/simadou/schemas/projetSchema'
+import { toast } from 'sonner'
+import { useActiveProgrammeId } from '@/hooks/use-active-programme'
 
-function findProjetByRouteId(projets: Projet[], id: number | string): Projet | undefined {
+function findProjetByRouteId(
+  projets: Projet[],
+  id: number | string
+): Projet | undefined {
   const idStr = String(id)
   const numericId = Number(id)
 
@@ -27,17 +35,23 @@ function findProjetInCache(
 ): Projet | undefined {
   const programmeKey = projetQueryKeys.byProgramme(idProgramme)
   const fromProgramme = queryClient.getQueryData<Projet[]>(programmeKey)
-  const inProgramme = fromProgramme ? findProjetByRouteId(fromProgramme, id) : undefined
+  const inProgramme = fromProgramme
+    ? findProjetByRouteId(fromProgramme, id)
+    : undefined
   if (inProgramme) return inProgramme
 
   const unfiltered = queryClient.getQueryData<Projet[]>([
     ...projetQueryKeys.all,
     'unfiltered',
   ])
-  const inUnfiltered = unfiltered ? findProjetByRouteId(unfiltered, id) : undefined
+  const inUnfiltered = unfiltered
+    ? findProjetByRouteId(unfiltered, id)
+    : undefined
   if (inUnfiltered) return inUnfiltered
 
-  for (const query of queryClient.getQueryCache().findAll({ queryKey: projetQueryKeys.all })) {
+  for (const query of queryClient
+    .getQueryCache()
+    .findAll({ queryKey: projetQueryKeys.all })) {
     const data = query.state.data
     if (Array.isArray(data)) {
       const found = findProjetByRouteId(data as Projet[], id)
@@ -109,6 +123,14 @@ export function useGetAllProjets() {
   return useQuery({
     queryKey: [...projetQueryKeys.all, 'unfiltered'] as const,
     queryFn: () => projetService.getAll(),
+  })
+}
+
+/** Tous les projets (sans filtre programme) — ex. sélecteurs de formulaires comme l'ancienne app. */
+export function useGetBudgetAnnuel(idProjet: number) {
+  return useQuery({
+    queryKey: [...projetQueryKeys.all, idProjet, 'budgets-annuels'] as const,
+    queryFn: () => projetService.getBudgetAnnuel(idProjet),
   })
 }
 

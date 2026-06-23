@@ -12,12 +12,12 @@
 import { useMemo, useState } from 'react'
 import { useGetActivitesProjet } from '@/simadou/allHooks/admin/activiteProjetHooks'
 import {
+  useGetBudgetAnnuel,
   useGetProjetAvancementAnnuelStats,
   useGetTauxGlobalActiviteProjet,
 } from '@/simadou/allHooks/admin/projetHooks'
 import { useGetPtbasProjet } from '@/simadou/allHooks/admin/ptbaProjetHooks'
 import { formatNumber } from '@/simadou/allSercices/montantFormater'
-import { buildDecaissementAnnuelFromPtbas } from '@/simadou/lib/ptbaProjetStatsUtils'
 import { type Projet } from '@/simadou/allTypes'
 import { BarChart3, DollarSign, Wallet, Calendar, Activity, TrendingUp } from 'lucide-react'
 import { Bar, BarChart, XAxis, YAxis, CartesianGrid, LabelList } from 'recharts'
@@ -587,7 +587,7 @@ function BudgetDetailCard({
               </Bar>
               <Bar
                 dataKey='cible'
-                fill='var(--color-chart-6)'
+                fill='var(--color-chart-2)'
                 radius={[4, 4, 0, 0]}
               >
                 <LabelList
@@ -703,6 +703,7 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
   // ── Graphiques — données filtrées sur les années du projet uniquement ─────
   const { data: avancementAnnuelRaw = [], isLoading: isLoadingAvancement } =
     useGetProjetAvancementAnnuelStats(projet?.id_projet, projectYears)
+  const { data: budgetsAnnuels = [] } = useGetBudgetAnnuel(projet.id_projet)
 
   // Filtrer sur les années réelles du projet
   const avancementAnnuelData = useMemo(
@@ -714,6 +715,8 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
     () => buildDecaissementAnnuelFromPtbas(ptbas),
     [ptbas]
   )
+  console.log('avancementAnnuelData', avancementAnnuelData)
+  console.log('decaissementParAnnee', decaissementParAnnee)
 
   // ✅ Filtrer aussi les décaissements sur les années du projet
   const decaissementParAnnee = useMemo(
