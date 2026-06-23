@@ -25,7 +25,7 @@ import { cn } from '@/lib/utils'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   type ChartConfig, ChartContainer, ChartTooltip,
-  ChartTooltipContent, ChartLegend, ChartLegendContent,
+  ChartTooltipContent,
 } from '@/components/ui/chart'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { KpiIndicateurs } from './KpiIndicateurs'
@@ -339,6 +339,19 @@ function TauxDecaissementPtbaCard({ taux, montantDecaisse, montantPrevu, selecte
     </Card>
   )
 }
+// Légende custom — ordre et couleurs forcés
+function CustomLegend({ items }: { items: { color: string; label: string }[] }) {
+  return (
+    <div className='flex items-center justify-center gap-4 pt-2'>
+      {items.map((item) => (
+        <div key={item.label} className='flex items-center gap-1.5'>
+          <div className='h-2.5 w-2.5 rounded-sm flex-shrink-0' style={{ backgroundColor: item.color }} />
+          <span className='text-xs text-muted-foreground'>{item.label}</span>
+        </div>
+      ))}
+    </div>
+  )
+}
 // Remplace tes deux configs et les deux fonctions de graphiques par ceci
 
 const avancementChartConfig = {
@@ -364,7 +377,7 @@ const decaissementChartConfig = {
 } satisfies ChartConfig
 
 function DecaissementComparatifCard({ data, isLoading }: {
-  data: { annee: number;  realise: number ;cible: number;}[]; isLoading: boolean
+  data: { annee: number; realise: number; cible: number; }[]; isLoading: boolean
 }) {
   const fmt = (v: number) => {
     if (v >= 1_000_000_000) return `${(v / 1_000_000_000).toFixed(1)}Md`
@@ -400,17 +413,21 @@ function DecaissementComparatifCard({ data, isLoading }: {
                   <XAxis dataKey='annee' tickLine={false} tickMargin={10} axisLine={false} className='fill-muted-foreground text-xs' />
                   <YAxis tickLine={false} axisLine={false} tickMargin={8} tickFormatter={fmt} className='fill-muted-foreground text-[10px]' />
                   <ChartTooltip cursor={{ fill: 'rgba(0,0,0,0.04)' }} content={<ChartTooltipContent formatter={(v) => `${formatNumber(Number(v))} GNF`} />} />
-                  <ChartLegend content={<ChartLegendContent />} />
+                  {/* <ChartLegend content={<ChartLegendContent />} /> */}
                   {/* Réalisé en premier → barre gauche + premier dans légende */}
-                  <Bar dataKey='realise' fill='var(--color-realise)' radius={[4, 4, 0, 0]}>
+                  <Bar dataKey='realise' fill='#ef4444' radius={[4, 4, 0, 0]}>
                     <LabelList dataKey='realise' position='top' className='fill-muted-foreground text-[9px] font-bold' formatter={(v: any) => fmt(Number(v))} />
                   </Bar>
                   {/* Prévu en second → barre droite + second dans légende */}
-                  <Bar dataKey='cible' fill='var(--color-cible)' radius={[4, 4, 0, 0]}>
+                  <Bar dataKey='cible' fill='#10b981' radius={[4, 4, 0, 0]}>
                     <LabelList dataKey='cible' position='top' className='fill-muted-foreground text-[9px] font-bold' formatter={(v: any) => fmt(Number(v))} />
                   </Bar>
                 </BarChart>
               </ChartContainer>
+              <CustomLegend items={[
+                { color: '#ef4444', label: 'Réalisé (GNF)' },
+                { color: '#10b981', label: 'Prévu (GNF)' },
+              ]} />
             </div>
           </div>
         )}
@@ -449,17 +466,21 @@ function ProjetAvancementAnnuelCard({ data, isLoading }: {
                   <XAxis dataKey='annee' tickLine={false} tickMargin={10} axisLine={false} className='fill-muted-foreground text-xs' />
                   <YAxis tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(v) => `${v}%`} className='fill-muted-foreground text-[10px]' />
                   <ChartTooltip cursor={{ fill: 'rgba(0,0,0,0.05)' }} content={<ChartTooltipContent formatter={(v) => `${v}%`} />} />
-                  <ChartLegend content={<ChartLegendContent />} />
+                  {/* <ChartLegend content={<ChartLegendContent />} /> */}
                   {/* Réalisé en premier → barre gauche + premier dans légende */}
-                  <Bar dataKey='realise' fill='var(--color-realise)' radius={[4, 4, 0, 0]}>
+                  <Bar dataKey='realise' fill='#ef4444' radius={[4, 4, 0, 0]}>
                     <LabelList dataKey='realise' position='top' className='fill-muted-foreground text-[10px] font-bold' formatter={(v: any) => `${v}%`} />
                   </Bar>
                   {/* Cible en second → barre droite + second dans légende */}
-                  <Bar dataKey='cible' fill='var(--color-cible)' radius={[4, 4, 0, 0]}>
+                  <Bar dataKey='cible' fill='#10b981' radius={[4, 4, 0, 0]}>
                     <LabelList dataKey='cible' position='top' className='fill-muted-foreground text-[10px] font-bold' formatter={(v: any) => `${v}%`} />
                   </Bar>
                 </BarChart>
               </ChartContainer>
+              <CustomLegend items={[
+                { color: '#ef4444', label: 'Taux Réalisé (Physique)' },
+                { color: '#10b981', label: 'Taux Cible (Prévu)' },
+              ]} />
             </div>
           </div>
         )}
@@ -648,6 +669,8 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
     () => avancementAnnuelRaw.filter((d) => projectYears.includes(d.annee)),
     [avancementAnnuelRaw, projectYears]
   )
+  console.log('budgetsAnnuels',budgetsAnnuels)
+  console.log('ptbas',ptbas)
 
   // ✅ Filtrer aussi les décaissements sur les années du projet
   const decaissementParAnnee = useMemo(
@@ -655,7 +678,8 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
     [budgetsAnnuels, ptbas])
 
 
-  
+  console.log('decaissementParAnnee',decaissementParAnnee)
+
   return (
     <div className='space-y-6 p-1'>
       {/* ── En-tête ── */}
