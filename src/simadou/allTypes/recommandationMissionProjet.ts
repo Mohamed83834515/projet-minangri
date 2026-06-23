@@ -1,6 +1,5 @@
 import type { Acteur } from './acteur'
 import type { MissionSupervisionProjet } from './missionSupervisionProjet'
-import type { Personnel } from './personnel'
 import type { Projet } from './projet'
 
 export type RecommandationMissionProjet = {
@@ -19,8 +18,8 @@ export type RecommandationMissionProjet = {
   modifier_le?: string | null
   modifier_par?: number
   mission?: number | MissionSupervisionProjet
-  responsable?: number | Personnel
-  responsable_interne?: number | Personnel
+  responsable?: string
+  responsable_interne?: string
   projet?: number | Projet
   structure?: number | Acteur
   id_personnel?: number
@@ -40,8 +39,8 @@ export type RecommandationMissionProjetApiPayload = {
   modifier_le: string
   modifier_par: number
   mission: number
-  responsable: number
-  responsable_interne: number
+  responsable: string
+  responsable_interne: string
   projet: number
   structure: number
   id_personnel: number

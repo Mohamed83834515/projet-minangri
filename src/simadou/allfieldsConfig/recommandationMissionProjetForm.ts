@@ -1,7 +1,6 @@
 import type { FormConfig, SelectOption } from '@/Global/types/formConfig'
 import { typeMissionRecommandationOptions } from '../schemas/missionRecommandationSchemas'
 export function getRecommandationMissionProjetFormConfig(
-  personnelOptions: SelectOption[],
   acteurOptions: SelectOption[],
 ): FormConfig {
   return {
@@ -62,18 +61,14 @@ export function getRecommandationMissionProjetFormConfig(
       {
         name: 'responsable',
         label: 'Autre Responsable',
-        type: 'select',
-        placeholder: 'Sélectionner une personne',
-        options: personnelOptions,
+        type: 'text',
         gridCols: 2,
         formStep: 1,
       },
       {
         name: 'responsable_interne',
         label: 'Responsable interne',
-        type: 'select',
-        placeholder: 'Sélectionner une personne',
-        options: personnelOptions,
+        type: 'text',
         gridCols: 2,
         formStep: 1,
       },

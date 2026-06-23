@@ -12,7 +12,6 @@ import {
   useGetRecommandationsMissionProjet,
 } from '@/simadou/allHooks/admin/recommandationMissionProjetHooks'
 import { useMissionSupervisionSelection } from '@/simadou/allHooks/admin/missionSupervisionProjetHooks'
-import { useGetPersonnels } from '@/simadou/allHooks/admin/personnelHooks'
 import type { Projet } from '@/simadou/allTypes'
 import type { RecommandationMissionProjet } from '@/simadou/allTypes/recommandationMissionProjet'
 import { filterRecommandationsByMission, filterRecommandationsByProjet } from '@/simadou/lib/missionRecommandationUtils'
@@ -37,17 +36,7 @@ export default function ProjetPointsBlocagePanel({
     handleChangeMission,
     missionOptions,
   } = useMissionSupervisionSelection(idProjet)
-  const { data: personnels = [] } = useGetPersonnels()
 
-  const personnelsById = useMemo(
-    () =>
-      new Map(
-        personnels
-          .filter((p) => p.n_personnel != null)
-          .map((p) => [p.n_personnel!, p])
-      ),
-    [personnels]
-  )
 
   const [open, setOpen] = useDialogState<'add' | 'edit' | 'delete'>(null)
   const [currentRow, setCurrentRow] =
@@ -79,9 +68,8 @@ export default function ProjetPointsBlocagePanel({
           if (dialog === 'delete') setOpen('delete')
         },
         setCurrentRow,
-        personnelsById,
       }),
-    [setOpen, personnelsById]
+    [setOpen]
   )
 
   return (

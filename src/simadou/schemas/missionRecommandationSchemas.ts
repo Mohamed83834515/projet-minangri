@@ -79,8 +79,8 @@ export const recommandationMissionProjetSchema = z.object({
       message: 'Sélectionnez une mission de supervision',
     })
     .min(1, 'Sélectionnez une mission de supervision'),
-  responsable: z.coerce.number().optional(),
-  responsable_interne: z.coerce.number().optional(),
+  responsable: z.string().optional(),
+  responsable_interne: z.string().optional(),
   structure: z.coerce.number().optional(),
 })
 

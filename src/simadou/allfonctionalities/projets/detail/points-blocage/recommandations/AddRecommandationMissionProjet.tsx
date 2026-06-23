@@ -12,7 +12,6 @@ import { StepDynamicForm } from '@/Global/Forms/StepDynamicForm'
 import type { SelectOption } from '@/Global/types/formConfig'
 import { getRecommandationMissionProjetFormConfig } from '@/simadou/allfieldsConfig/recommandationMissionProjetForm'
 import { useGetActeurs } from '@/simadou/allHooks/admin/acteurHooks'
-import { useGetPersonnels } from '@/simadou/allHooks/admin/personnelHooks'
 import { useMe } from '@/simadou/allHooks/auth/authHooks'
 import {
   useCreateRecommandationMissionProjet,
@@ -45,21 +44,6 @@ function extractFile(value: unknown): File | undefined {
   return undefined
 }
 
-function buildPersonnelOptions(
-  personnels: {
-    n_personnel?: number
-    prenom_perso?: string
-    nom_perso?: string
-  }[]
-): SelectOption[] {
-  return personnels
-    .filter((p) => p.n_personnel != null)
-    .map((p) => ({
-      value: p.n_personnel!,
-      label: `${p.prenom_perso ?? ''} ${p.nom_perso ?? ''}`.trim(),
-    }))
-}
-
 export default function AddRecommandationMissionProjet({
   projet,
   currentRow,
@@ -71,13 +55,7 @@ export default function AddRecommandationMissionProjet({
   const isEdit = !!currentRow?.id_recommandation
   const idProjet = projet.id_projet
   const { data: acteurs = [] } = useGetActeurs()
-  const { data: personnels = [] } = useGetPersonnels()
   const { data: user } = useMe()
-
-  const personnelOptions = useMemo(
-    () => buildPersonnelOptions(personnels),
-    [personnels]
-  )
 
   const acteurOptions: SelectOption[] = useMemo(
     () =>
@@ -91,10 +69,9 @@ export default function AddRecommandationMissionProjet({
   const formConfig = useMemo(
     () =>
       getRecommandationMissionProjetFormConfig(
-        personnelOptions,
         acteurOptions
       ),
-    [personnelOptions, acteurOptions]
+    [acteurOptions]
   )
 
   const createMutation = useCreateRecommandationMissionProjet(idProjet)
@@ -118,11 +95,8 @@ export default function AddRecommandationMissionProjet({
       rapport: typeof currentRow?.rapport === 'string' ? currentRow.rapport : '',
       etat: isEdit ? 'modifier' : "Ajouter",
       mission: missionFromRow ? missionFromRow : missionFromFilter ? missionFromFilter : 0,
-      responsable:
-        resolveRelationId(currentRow?.responsable, 'n_personnel') ?? undefined,
-      responsable_interne:
-        resolveRelationId(currentRow?.responsable_interne, 'n_personnel') ??
-        undefined,
+      responsable: currentRow?.responsable ?? '',
+      responsable_interne: currentRow?.responsable_interne ?? '',
       structure:
         resolveRelationId(currentRow?.structure, 'id_acteur') ?? undefined,
     }

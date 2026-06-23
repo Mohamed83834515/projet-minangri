@@ -4,7 +4,6 @@ import { DataTableColumnHeader } from '@/components/data-table/column-header'
 import { GenericRowActions } from '@/Global/Tableaux/GenericRowActions'
 import type { RecommandationMissionProjet } from '@/simadou/allTypes/recommandationMissionProjet'
 import {  formatTypeRecommandation } from '@/simadou/lib/missionRecommandationUtils'
-import { resolvePersonnelLabel } from '@/simadou/lib/resolveApiRelation'
 
 type RecommandationDialogType = 'edit' | 'delete'
 
@@ -22,7 +21,6 @@ type BuildRecommandationMissionProjetColumnsProps = {
 export function buildRecommandationMissionProjetColumns({
   setOpen,
   setCurrentRow,
-  personnelsById,
 }: BuildRecommandationMissionProjetColumnsProps): ColumnDef<RecommandationMissionProjet>[] {
   return [
     {
@@ -90,7 +88,7 @@ export function buildRecommandationMissionProjetColumns({
         <DataTableColumnHeader column={column} title='Responsable' />
       ),
       cell: ({ row }) =>
-        resolvePersonnelLabel(row.original.responsable, personnelsById) || '—',
+        row.original.responsable || '—',
     },
     // {
     //   id: 'rapport',
