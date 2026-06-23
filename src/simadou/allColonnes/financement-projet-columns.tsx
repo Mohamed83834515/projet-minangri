@@ -39,20 +39,9 @@ export function buildFinancementProjetColumns({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title='Code' />
       ),
-      cell: ({ row }) => row.original.code_type || '—',
+      cell: ({ row }) => row.original.code_type + ':' + row.original.intitule || '—',
     },
-    {
-      id: 'intitule',
-      accessorKey: 'intitule',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Intitulé' />
-      ),
-      cell: ({ row }) => (
-        <span className='line-clamp-1 max-w-[14rem] text-sm'>
-          {row.original.intitule || '—'}
-        </span>
-      ),
-    },
+   
     {
       id: 'type_financement',
       accessorKey: 'type_financement',
@@ -97,18 +86,7 @@ export function buildFinancementProjetColumns({
         className: 'text-center'
       },
     },
-    {
-      id: 'observation',
-      accessorKey: 'observation',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Observation' />
-      ),
-      cell: ({ row }) => (
-        <span className='line-clamp-1 max-w-[12rem] text-sm text-muted-foreground'>
-          {row.original.observation?.trim() || '—'}
-        </span>
-      ),
-    },
+    
     buildEditDeleteActionsColumn<FinancementProjet>({
       onEdit,
       onDeleteRequest,

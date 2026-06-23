@@ -36,16 +36,16 @@ export const projetDetailTabs: ProjetDetailTab[] = [
     description: 'Synthèse du projet (indicateurs et avancement).',
   },
   {
-    key: 'activities',
-    name: 'Plan Analitique',
-    icon: Briefcase,
-    description: 'Liste et suivi des activités rattachées au projet.',
-  },
-  {
     key: 'financement',
     name: 'Financement',
     icon: Coins,
     description: 'Financements du projet (prêt, don, contrepartie).',
+  },
+  {
+    key: 'activities',
+    name: 'Plan Analitique',
+    icon: Briefcase,
+    description: 'Liste et suivi des activités rattachées au projet.',
   },
   {
     key: 'ptba',

@@ -123,7 +123,13 @@ export default function ListeProjets() {
     })
     return map
   }, [projets])
-
+  const sortedTypesByCount = useMemo(() => {
+    return [...sortedTypes].sort((a, b) => {
+      const countA = countByType.get(a.id_type_projet) || 0
+      const countB = countByType.get(b.id_type_projet) || 0
+      return countB - countA // Décroissant (du plus grand au plus petit)
+    })
+  }, [sortedTypes, countByType])
   if (!activeProgramme) {
     return (
       <p className='py-8 text-center text-sm text-muted-foreground'>
@@ -152,7 +158,7 @@ export default function ListeProjets() {
           onValueChange={(val) => setSelectedTypeProjetId(Number(val))}
         >
           <TabsList className='flex flex-wrap gap-1'>
-            {sortedTypes.map((type) => (
+            {sortedTypesByCount.map((type) => (
               <TabsTrigger
                 className='relative'
                 key={type.id_type_projet}
@@ -161,7 +167,7 @@ export default function ListeProjets() {
                 {type.nom_type_projet.length > 20
                   ? type.nom_type_projet.substring(0, 12) + '…'
                   : type.nom_type_projet}
-                <span className='ml-2 rounded-full bg-muted px-1.5 py-0.5 text-xs text-black'>
+                <span className='rounded-full bg-muted px-1.5 py-0.5 text-xs text-black'>
                   ({countByType.get(type.id_type_projet) || 0})
                 </span>
               </TabsTrigger>
@@ -193,8 +199,8 @@ export default function ListeProjets() {
       </div>
 
       {/* Dialogue de clôture */}
-      <AlertDialog 
-        open={open === 'cloture'} 
+      <AlertDialog
+        open={open === 'cloture'}
         onOpenChange={(isOpen) => {
           if (!isOpen) {
             setOpen(null)

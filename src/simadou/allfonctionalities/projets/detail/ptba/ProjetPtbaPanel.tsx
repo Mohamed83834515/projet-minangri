@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState, useEffect } from 'react'
 import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { GenericDialogs } from '@/Global/Generic/Genericdialogs'
@@ -36,12 +36,55 @@ export default function ProjetPtbaPanel({ projet }: ProjetPtbaPanelProps) {
       projet.programme_projet?.code_programme
       ? projet.programme_projet.code_programme
       : activeProgrammeCode
+  
+  // ✅ Récupérer les versionOptions
   const { selectedVersionId, handleChangeVersion, versionOptions } =
     usePtbaVersionSelection(codeProgramme)
+  
   const { search, navigate } = useEmbeddedTableState()
   const { data: ptbas = [] } = useGetPtbasProjet(codeProjet)
   const { data: personnels = [] } = useGetPersonnels()
   const deleteMutation = useDeletePtbaProjet(codeProjet)
+
+  // ✅ Calculer les années de la durée du projet
+  const projectYears = useMemo(() => {
+    if (!projet.date_demarrage_projet || !projet.duree_projet) {
+      return []
+    }
+
+    const startDate = new Date(projet.date_demarrage_projet)
+    const startYear = startDate.getFullYear()
+    const durationInMonths = projet.duree_projet
+    const durationInYears = Math.ceil(durationInMonths / 12)
+    
+    return Array.from({ length: durationInYears }, (_, i) => startYear + i)
+  }, [projet.date_demarrage_projet, projet.duree_projet])
+
+  // ✅ Filtrer les versionOptions par durée du projet
+  const filteredVersionOptions = useMemo(() => {
+    const years = new Set(projectYears)
+    
+    return versionOptions.filter((option) => {
+      // ✅ Extraire l'année du label (ex: "2025" ou "Version 2025")
+      const yearMatch = option.label.match(/\d{4}/)
+      if (!yearMatch) return false
+      const year = Number(yearMatch[0])
+      return years.has(year)
+    })
+  }, [versionOptions, projectYears])
+
+  // ✅ Mettre à jour selectedVersionId si la version sélectionnée n'est plus valide
+  useEffect(() => {
+    if (filteredVersionOptions.length === 0) return
+    
+    const isSelectedValid = filteredVersionOptions.some(
+      (opt) => opt.value === selectedVersionId
+    )
+    
+    if (!isSelectedValid) {
+      handleChangeVersion(filteredVersionOptions[0].value)
+    }
+  }, [filteredVersionOptions, selectedVersionId, handleChangeVersion])
 
   const personnelsById = useMemo(
     () =>
@@ -59,6 +102,7 @@ export default function ProjetPtbaPanel({ projet }: ProjetPtbaPanelProps) {
     [personnelsById]
   )
 
+  // ✅ Filtrer les PTBA par version sélectionnée
   const filteredPtbas = useMemo(() => {
     if (!selectedVersionId) return ptbas
     return ptbas.filter(
@@ -119,11 +163,14 @@ export default function ProjetPtbaPanel({ projet }: ProjetPtbaPanelProps) {
           },
         ]}
         toolbarEndSlot={
-          <PtbaVersionSelect
-            options={versionOptions}
-            value={selectedVersionId}
-            onChange={handleChangeVersion}
-          />
+          // ✅ Utiliser filteredVersionOptions à la place de versionOptions
+          filteredVersionOptions.length > 0 ? (
+            <PtbaVersionSelect
+              options={filteredVersionOptions}
+              value={selectedVersionId}
+              onChange={handleChangeVersion}
+            />
+          ) : null
         }
         showViewOptions={false}
         initialState={{

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -48,6 +48,46 @@ export default function ProjetSuiviPtbaPanel({ projet }: ProjetSuiviPtbaPanelPro
   const [observationActivite, setObservationActivite] =
     useState<PtbaProjet | null>(null)
 
+  // ✅ Calculer les années de la durée du projet
+  const projectYears = useMemo(() => {
+    if (!projet.date_demarrage_projet || !projet.duree_projet) {
+      return []
+    }
+
+    const startDate = new Date(projet.date_demarrage_projet)
+    const startYear = startDate.getFullYear()
+    const durationInMonths = projet.duree_projet
+    const durationInYears = Math.ceil(durationInMonths / 12)
+    
+    return Array.from({ length: durationInYears }, (_, i) => startYear + i)
+  }, [projet.date_demarrage_projet, projet.duree_projet])
+
+  // ✅ Filtrer les versionOptions par durée du projet
+  const filteredVersionOptions = useMemo(() => {
+    const years = new Set(projectYears)
+    
+    return versionOptions.filter((option) => {
+      // ✅ Extraire l'année du label (ex: "2025" ou "Version 2025")
+      const yearMatch = option.label.match(/\d{4}/)
+      if (!yearMatch) return false
+      const year = Number(yearMatch[0])
+      return years.has(year)
+    })
+  }, [versionOptions, projectYears])
+
+  // ✅ Mettre à jour selectedVersionId si la version sélectionnée n'est plus valide
+  useEffect(() => {
+    if (filteredVersionOptions.length === 0) return
+    
+    const isSelectedValid = filteredVersionOptions.some(
+      (opt) => opt.value === selectedVersionId
+    )
+    
+    if (!isSelectedValid) {
+      handleChangeVersion(filteredVersionOptions[0].value)
+    }
+  }, [filteredVersionOptions, selectedVersionId, handleChangeVersion])
+
   // 📌 Filtrer les PTBA par version (année) sélectionnée
   const filteredPtbas = useMemo(() => {
     if (!selectedVersionId) return ptbas
@@ -95,12 +135,14 @@ export default function ProjetSuiviPtbaPanel({ projet }: ProjetSuiviPtbaPanelPro
         <p className='text-sm text-muted-foreground'>
           Suivi d&apos;avancement des activités PTBA rattachées à ce projet.
         </p>
-        {/* 📌 Sélecteur de version (année) */}
-        <PtbaVersionSelect
-          options={versionOptions}
-          value={selectedVersionId}
-          onChange={handleChangeVersion}
-        />
+        {/* 📌 Sélecteur de version (année) filtré */}
+        {filteredVersionOptions.length > 0 ? (
+          <PtbaVersionSelect
+            options={filteredVersionOptions}
+            value={selectedVersionId}
+            onChange={handleChangeVersion}
+          />
+        ) : null}
       </div>
 
       <GenericTable<PtbaProjet>

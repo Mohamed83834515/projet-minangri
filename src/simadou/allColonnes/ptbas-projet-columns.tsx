@@ -59,7 +59,7 @@ export function ChronogrammeMonthCell({ value, month }: Props) {
     return (
         <div className="flex justify-center">
             {isActive ? (
-                <div className="h-2.5 w-2.5 rounded-full bg-green-500 shadow-sm shadow-green-200" />
+                <div className="h-2 w-2 rounded-full bg-green-500 shadow-sm shadow-green-200" />
             ) : (
                 <div className="h-2 w-2 rounded-full bg-gray-200 dark:bg-gray-700" />
             )}
@@ -134,7 +134,7 @@ export const buildPtbasProjetColumns = (
     const coutColumns: ColumnDef<PtbaProjet> = {
         id: 'cout_row',
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title={`Cout Activites (${currencyCode})`}  />
+            <DataTableColumnHeader column={column} title={`Cout (${currencyCode})`}  />
         ),
         cell: ({ row }) => {
             const budget = row.original.cout_ptba 

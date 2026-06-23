@@ -108,7 +108,7 @@ export function ListeActeur() {
                     value={String(categorie.id_categorie)}
                   >
                     {displayNom}
-                    <span className='ml-2 rounded-full bg-muted px-1.5 py-0.5 text-xs text-black'>
+                    <span className='rounded-full bg-muted px-1.5 py-0.5 text-xs text-black'>
                       ({count})
                     </span>
                   </TabsTrigger>

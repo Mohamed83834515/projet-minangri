@@ -146,7 +146,9 @@ export default function ProjetDetail() {
                     {projet.sigle_projet}
                   </CardTitle>
                   <CardDescription className='font-mono text-[9px] font-bold uppercase'>
-                    {projet.code_projet}
+                    {projet.intitule_projet?.length > 70
+                      ? projet.intitule_projet.substring(0, 70) + '…'
+                      : projet.intitule_projet}
                   </CardDescription>
                 </div>
               </div>

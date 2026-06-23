@@ -69,10 +69,33 @@ export function buildProjetsColumns(
     {
       id: 'signataires_projet',
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Partenaires d'exécution" />
+        <DataTableColumnHeader column={column} title="Partenaires Financier" />
       ),
       cell: ({ row }) => {
         const partenaires = row.original.signataires_projet
+        if (!partenaires || partenaires.length === 0) {
+          return <span className='text-muted-foreground'>—</span>
+        }
+        return (
+          <div className='flex flex-row gap-0.5'>
+            {partenaires.map((partenaire, idx) => (
+              <span key={idx} className='text-sm text-muted-foreground'>
+                {partenaire.code_acteur?.trim()} / 
+              </span>
+            ))}
+          </div>
+        )
+      },
+      enableSorting: false,
+      enableHiding: false,
+    },
+    {
+      id: 'signataires_projet',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Partenaires d'exécution" />
+      ),
+      cell: ({ row }) => {
+        const partenaires = row.original.partenaires_execution_projet
         if (!partenaires || partenaires.length === 0) {
           return <span className='text-muted-foreground'>—</span>
         }

@@ -18,8 +18,8 @@ type TabPanelRenderer = (projet: Projet) => ReactNode
 
 const TAB_PANEL_RENDERERS: Record<ProjetDetailTabKey, TabPanelRenderer> = {
   dashboard: (projet) => <ProjetDashboard projet={projet} />,
-  activities: (projet) => <ProjetActivitesPanel projet={projet} />,
   financement: (projet) => <ProjetFinancementPanel projet={projet} />,
+  activities: (projet) => <ProjetActivitesPanel projet={projet} />,
   ptba: (projet) => <ProjetPtbaPanel projet={projet} />,
   suivi_ptba: (projet) => <ProjetSuiviPtbaPanel projet={projet} />,
   results_framework: (projet) => <ProjetCadreResultatsPanel projet={projet} />,

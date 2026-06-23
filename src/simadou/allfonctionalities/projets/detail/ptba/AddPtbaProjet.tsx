@@ -99,7 +99,6 @@ export default function AddPtbaProjet({
       ugl_ptba: resolveUglPtbaFormValue(currentRow ?? undefined),
       code_projet: codeProjet,
       statut_activite: currentRow?.statut_activite || 'Planifiée',
-      cout_ptba: currentRow?.cout_ptba || 0,
       version_ptba:
         resolveVersionPtbaFormValue(currentRow ?? undefined, reel_version) ??
         0,

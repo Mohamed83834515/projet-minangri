@@ -851,7 +851,18 @@ const DashboardPage: React.FC = () => {
     //         </div>
     //     );
     // }
-
+    const TAG_COLORS = [
+        { bg: 'bg-cyan-100', text: 'text-cyan-700', border: 'border-cyan-200' },
+        { bg: 'bg-rose-100', text: 'text-rose-700', border: 'border-rose-200' },
+        { bg: 'bg-indigo-100', text: 'text-indigo-700', border: 'border-indigo-200' },
+        { bg: 'bg-emerald-100', text: 'text-emerald-700', border: 'border-emerald-200' },
+        { bg: 'bg-amber-100', text: 'text-amber-700', border: 'border-amber-200' },
+        { bg: 'bg-slate-100', text: 'text-slate-700', border: 'border-slate-200' },
+    ]
+    const projetsEnCours = projetProgrammeStats.total - (projetProgrammeStats.critiques + projetProgrammeStats.enRetard)
+    const pourcentageEnCours = projetProgrammeStats.total > 0
+        ? Math.round((projetsEnCours / projetProgrammeStats.total) * 100)
+        : 0
     // ── Render ────────────────────────────────────────────────────────────────────
     return (
         <div className='min-h-screen space-y-3 bg-gray-50 p-2 dark:bg-gray-950'>
@@ -875,6 +886,12 @@ const DashboardPage: React.FC = () => {
                             value: projetProgrammeStats.total,
                         },
                         {
+                            label: 'Projets en cours',
+                            value: projetsEnCours,
+                            suffix: `(${pourcentageEnCours}%)`,
+                            valueColor: 'emerald',
+                        },
+                        {
                             label: 'Projets en retard',
                             value: projetProgrammeStats.enRetard,
                             suffix: `(${projetProgrammeStats.pourcentageRetard}%)`,
@@ -888,9 +905,10 @@ const DashboardPage: React.FC = () => {
                         },
                     ]}
                     // Ajoute une prop extra pour afficher les types en pills compacts
-                    tags={projectsPerType.map((ppt) => ({
+                    tags={projectsPerType.map((ppt, index) => ({
                         label: ppt.code_type_projet,
                         value: ppt.nombre_projets,
+                        color: TAG_COLORS[index % TAG_COLORS.length],
                     }))}
                 />
 
