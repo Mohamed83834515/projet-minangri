@@ -203,8 +203,10 @@ const DashboardPage: React.FC = () => {
                     rows={[
                         { label: 'Nombre total de projets', value: projetProgrammeStats.total },
                         { label: 'Projets en cours', value: projetsEnCours, suffix: `(${pourcentageEnCours}%)`, valueColor: 'emerald' },
-                        { label: 'Projets en retard', value: projetProgrammeStats.enRetard, suffix: `(${projetProgrammeStats.pourcentageRetard}%)`, valueColor: 'orange' },
-                        { label: 'Projets critiques', value: projetProgrammeStats.critiques, suffix: `(${projetProgrammeStats.pourcentageCritique}%)`, valueColor: 'red' },
+                        {
+                            label: 'Retard / Critique',
+                            value: `${projetProgrammeStats.enRetard} (${projetProgrammeStats.pourcentageRetard}%) / ${projetProgrammeStats.critiques} (${projetProgrammeStats.pourcentageCritique}%)`
+                        },
                     ]}
                     tags={projectsPerType.map((ppt, index) => ({
                         label: ppt.code_type_projet,

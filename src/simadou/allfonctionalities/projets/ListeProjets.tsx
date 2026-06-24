@@ -121,34 +121,25 @@ export default function ListeProjets() {
       onDetail: goToDetail,
       handleClotureConfirm,
       currencyCode,
-      userLevel, // ✅ Passer le niveau d'accès
+      userLevel,
     }),
     [setOpen, setCurrentRow, goToDetail, handleClotureConfirm, currencyCode, userLevel]
   )
 
   // ✅ Filtrer par responsable (niveau 3 uniquement)
   const filteredByResponsable = useMemo(() => {
-    // Si l'utilisateur est niveau 3, filtrer par n_personnel
     if (userLevel === 3 && nPersonnel) {
       return projets.filter((projet) => {
-        // Vérifier si le projet a un responsable
         if (!projet.responsable_projet) return false
-        
-        // Si responsable_projet est un nombre, comparer directement
         if (typeof projet.responsable_projet === 'number') {
           return projet.responsable_projet === nPersonnel
         }
-        
-        // Si responsable_projet est un objet, comparer son n_personnel
         if (typeof projet.responsable_projet === 'object' && projet.responsable_projet !== null) {
           return projet.responsable_projet.n_personnel === nPersonnel
         }
-        
         return false
       })
     }
-    
-    // Pour les autres niveaux, retourner tous les projets
     return projets
   }, [projets, userLevel, nPersonnel])
 
@@ -177,9 +168,10 @@ export default function ListeProjets() {
     })
   }, [filteredByType, filtreCloture])
 
+  // ✅ Comptage par type (pour les badges)
   const countByType = useMemo(() => {
     const map = new Map<number, number>()
-    projets.forEach((projet) => {
+    filteredByType.forEach((projet) => {
       if (!projet.type_projet) return
       const id = typeof projet.type_projet === 'number'
         ? projet.type_projet
@@ -187,8 +179,9 @@ export default function ListeProjets() {
       if (id) map.set(id, (map.get(id) || 0) + 1)
     })
     return map
-  }, [projets])
+  }, [filteredByType])
 
+  // ✅ Tri des types par count
   const sortedTypesByCount = useMemo(() => {
     return [...sortedTypes].sort((a, b) => {
       const countA = countByType.get(a.id_type_projet) || 0
@@ -215,9 +208,7 @@ export default function ListeProjets() {
 
   return (
     <div className='space-y-2 px-2'>
-      {/* ✅ Filtre devant les onglets */}
       <div className='flex flex-wrap items-center gap-3'>
-        {/* Tabs des types de projets */}
         <div className='overflow-x-auto flex-1'>
           <Tabs
             orientation='vertical'
@@ -228,7 +219,7 @@ export default function ListeProjets() {
           >
             <TabsList className='flex flex-wrap gap-1'>
               {sortedTypesByCount.map((type) => {
-                // ✅ Utiliser le compteur filtré
+                const count = countByType.get(type.id_type_projet) || 0
                 return (
                   <TabsTrigger
                     className='relative'
@@ -238,9 +229,10 @@ export default function ListeProjets() {
                     {type.nom_type_projet.length > 20
                       ? type.nom_type_projet.substring(0, 12) + '…'
                       : type.nom_type_projet}
-                    {/* <span className='rounded-full bg-muted px-1.5 py-0.5 text-xs text-black'>
+                    {/* ✅ Afficher le compteur */}
+                    <span className='rounded-full bg-muted px-1.5 py-0.5 text-xs text-black'>
                       ({count})
-                    </span> */}
+                    </span>
                   </TabsTrigger>
                 )
               })}
@@ -255,12 +247,8 @@ export default function ListeProjets() {
             <SelectValue placeholder='Statut' />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value='en_cours'>
-              📋 En cours 
-            </SelectItem>
-            <SelectItem value='cloturer'>
-              ✅ Clôturés 
-            </SelectItem>
+            <SelectItem value='en_cours'>📋 En cours</SelectItem>
+            <SelectItem value='cloturer'>✅ Clôturés</SelectItem>
           </SelectContent>
         </Select>
       </div>
