@@ -9,7 +9,7 @@
 // }
 
 // ProjetDashboard.tsx
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 // import { useGetActivitesProjet } from '@/simadou/allHooks/admin/activiteProjetHooks'
 import {
   useGetBudgetAnnuel,
@@ -17,6 +17,8 @@ import {
   useGetTauxGlobalActiviteProjet,
 } from '@/simadou/allHooks/admin/projetHooks'
 import { useGetPtbasProjet } from '@/simadou/allHooks/admin/ptbaProjetHooks'
+import { usePtbaVersionSelection } from '@/simadou/allHooks/admin/versionHooks'
+import { useActiveProgrammeCode } from '@/hooks/use-active-programme'
 import { formatNumber } from '@/simadou/allSercices/montantFormater'
 import { type Projet } from '@/simadou/allTypes'
 import { BarChart3, DollarSign, Wallet, Calendar, Activity, TrendingUp } from 'lucide-react'
@@ -62,16 +64,11 @@ function GaugeCircle({ value, size = 120, stroke = '#10B981', label = 'exécutio
   )
 }
 
-// ─── Card 1 : Taux exécution global ──────────────────────────────────────────
-
-// ─── Card 1 : Exécution physique globale ────────────────────────────────────
-
 // ─── Card 1 : Exécution physique globale ────────────────────────────────────
 
 function TauxGlobalCard({ taux, totalActivites, activitesRealisees }: {
   taux: number; totalActivites: number; activitesRealisees: number
 }) {
-  // ✅ Couleur : Rose/Saumon pour l'exécution globale
   const col = {
     bg: 'bg-rose-500',
     text: 'text-rose-600 dark:text-rose-400',
@@ -85,11 +82,8 @@ function TauxGlobalCard({ taux, totalActivites, activitesRealisees }: {
 
   return (
     <Card className='relative overflow-hidden border-0 shadow-sm bg-gradient-to-br from-rose-50/50 to-transparent dark:from-rose-950/20'>
-      {/* Accent top */}
       <div className={cn('absolute inset-x-0 top-0 h-1', col.bg)} />
-      {/* Icône fond décorative */}
       <Activity className='absolute right-3 top-4 h-16 w-16 opacity-[0.06] text-rose-500' strokeWidth={1.5} />
-
       <CardContent className='pt-5 pb-4 px-5'>
         <div className='flex items-center gap-2 mb-3'>
           <div className='rounded-full bg-rose-100 p-1 dark:bg-rose-900/30'>
@@ -99,12 +93,8 @@ function TauxGlobalCard({ taux, totalActivites, activitesRealisees }: {
             Exécution physique globale
           </p>
         </div>
-
         <div className='flex items-center gap-4'>
-          {/* Gauge */}
           <GaugeCircle value={taux} size={90} stroke={col.hex} label='global' />
-
-          {/* Stats droite */}
           <div className='flex-1 space-y-2.5 min-w-0'>
             <div className='flex items-center justify-between gap-2'>
               <span className='text-xs text-muted-foreground'>Réalisées</span>
@@ -118,7 +108,6 @@ function TauxGlobalCard({ taux, totalActivites, activitesRealisees }: {
               <span className='text-xs text-muted-foreground'>Total</span>
               <span className='text-sm font-bold'>{totalActivites}</span>
             </div>
-            {/* Badge statut */}
             <span className={cn('inline-flex rounded-full border px-2 py-0.5 text-[10px] font-semibold', col.badge)}>
               {col.label}
             </span>
@@ -134,7 +123,6 @@ function TauxGlobalCard({ taux, totalActivites, activitesRealisees }: {
 function BudgetKpiCard({ budgetTotal, budgetDecaisse, budgetPct }: {
   budgetTotal: number; budgetDecaisse: number; budgetPct: number
 }) {
-  // ✅ Couleur : Cyan pour le budget
   const col = {
     bg: 'bg-cyan-500',
     text: 'text-cyan-600 dark:text-cyan-400',
@@ -150,7 +138,6 @@ function BudgetKpiCard({ budgetTotal, budgetDecaisse, budgetPct }: {
     <Card className='relative overflow-hidden border-0 shadow-sm bg-gradient-to-br from-cyan-50/50 to-transparent dark:from-cyan-950/20'>
       <div className={cn('absolute inset-x-0 top-0 h-1', col.bg)} />
       <Wallet className='absolute right-3 top-4 h-16 w-16 opacity-[0.06] text-cyan-500' strokeWidth={1.5} />
-
       <CardContent className='pt-5 pb-4 px-5'>
         <div className='flex items-center gap-2 mb-3'>
           <div className='rounded-full bg-cyan-100 p-1 dark:bg-cyan-900/30'>
@@ -160,9 +147,7 @@ function BudgetKpiCard({ budgetTotal, budgetDecaisse, budgetPct }: {
             Budget global du projet
           </p>
         </div>
-
         <div className='space-y-2.5'>
-          {/* Prévu */}
           <div className='flex items-start justify-between gap-2'>
             <span className='text-xs text-muted-foreground shrink-0'>Prévu</span>
             <span className='text-sm font-bold text-right break-all leading-tight'>
@@ -170,7 +155,6 @@ function BudgetKpiCard({ budgetTotal, budgetDecaisse, budgetPct }: {
               <span className='ml-1 text-[10px] font-normal text-muted-foreground'>GNF</span>
             </span>
           </div>
-          {/* Décaissé */}
           <div className='flex items-start justify-between gap-2'>
             <span className='text-xs text-muted-foreground shrink-0'>Décaissé</span>
             <span className={cn('text-sm font-bold text-right break-all leading-tight', col.text)}>
@@ -178,7 +162,6 @@ function BudgetKpiCard({ budgetTotal, budgetDecaisse, budgetPct }: {
               <span className='ml-1 text-[10px] font-normal text-muted-foreground'>GNF</span>
             </span>
           </div>
-          {/* Écart */}
           <div className='flex items-start justify-between gap-2'>
             <span className='text-xs text-muted-foreground shrink-0'>Reste à décaisser</span>
             <span className='text-sm font-bold text-right break-all leading-tight text-red-500'>
@@ -186,7 +169,6 @@ function BudgetKpiCard({ budgetTotal, budgetDecaisse, budgetPct }: {
               <span className='ml-1 text-[10px] font-normal text-muted-foreground'>GNF</span>
             </span>
           </div>
-          {/* Barre + taux */}
           <div className='pt-1 space-y-1'>
             <div className='flex justify-between items-center'>
               <span className='text-[10px] text-muted-foreground'>Taux de décaissement</span>
@@ -203,10 +185,10 @@ function BudgetKpiCard({ budgetTotal, budgetDecaisse, budgetPct }: {
 }
 
 // ─── Card 3 : Taux exécution PTBA (Avancement) ─────────────────────────────
+
 function TauxExecutionPtbaCard({ taux, nbrePtbaEnCours, nbrePtbaRealise, nbrePtbaEchus, selectedYear, nbPtba }: {
   taux: number; nbrePtbaEnCours: number; nbrePtbaRealise: number; nbrePtbaEchus: number; selectedYear: number; nbPtba: number;
 }) {
-  // ✅ Couleur fixe : Bleu pour l'avancement
   const col = {
     bg: 'bg-blue-500',
     text: 'text-blue-600 dark:text-blue-400',
@@ -218,9 +200,7 @@ function TauxExecutionPtbaCard({ taux, nbrePtbaEnCours, nbrePtbaRealise, nbrePtb
   return (
     <Card className='relative overflow-hidden border-0 shadow-sm bg-gradient-to-br from-blue-50/50 to-transparent dark:from-blue-950/20'>
       <div className={cn('absolute inset-x-0 top-0 h-1', col.bg)} />
-
       <TrendingUp className='absolute right-3 top-4 h-16 w-16 opacity-[0.06] text-blue-500' strokeWidth={1.5} />
-
       <CardContent className='pt-5 pb-4 px-5'>
         <div className='flex items-start justify-between mb-3'>
           <div className='flex items-center gap-2'>
@@ -235,7 +215,6 @@ function TauxExecutionPtbaCard({ taux, nbrePtbaEnCours, nbrePtbaRealise, nbrePtb
             {selectedYear}
           </span>
         </div>
-
         <div className='space-y-2.5'>
           <div className='flex items-end gap-2'>
             <span className={cn('text-2xl font-bold leading-none', col.text)}>{taux}%</span>
@@ -243,37 +222,26 @@ function TauxExecutionPtbaCard({ taux, nbrePtbaEnCours, nbrePtbaRealise, nbrePtb
               {taux >= 80 ? 'Élevé' : taux >= 50 ? 'Moyen' : 'Faible'}
             </span>
           </div>
-
           <div className='relative h-1.5 w-full overflow-hidden rounded-full bg-muted'>
             <div className={cn('h-full rounded-full transition-all duration-700', col.bar)} style={{ width: `${taux}%` }} />
             <div className='absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-50' />
           </div>
-
           <div className='flex items-center justify-between pt-0.5'>
             <span className='text-xs text-muted-foreground'>{nbPtba} Activités PTBA</span>
             <span className='text-xs text-muted-foreground'>
               {taux >= 80 ? '✅ Bonne avancement' : taux >= 50 ? '⚡ En cours' : '⏳ À accélérer'}
             </span>
           </div>
-          {/* ✅ Montant prévu et décaissé uniquement */}
           <div className='grid grid-cols-3 gap-2'>
-            {/* Réalisés */}
             <div className='relative overflow-hidden rounded-xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-emerald-100/60 px-2 py-2 text-center dark:border-emerald-900 dark:from-emerald-950/40'>
-              <div className='absolute -right-1 -top-1 h-7 w-7 rounded-full bg-emerald-200/40' />
               <p className='text-[9px] font-bold uppercase tracking-widest text-emerald-600'>Réalisés</p>
               <p className='text-xl font-black text-emerald-700 tabular-nums'>{nbrePtbaRealise}</p>
             </div>
-
-            {/* En cours */}
             <div className='relative overflow-hidden rounded-xl border border-blue-100 bg-gradient-to-br from-blue-50 to-blue-100/60 px-2 py-2 text-center dark:border-blue-900 dark:from-blue-950/40'>
-              <div className='absolute -right-1 -top-1 h-7 w-7 rounded-full bg-blue-200/40' />
               <p className='text-[9px] font-bold uppercase tracking-widest text-blue-600'>En cours</p>
               <p className='text-xl font-black text-blue-700 tabular-nums'>{nbrePtbaEnCours}</p>
             </div>
-
-            {/* Échues */}
             <div className='relative overflow-hidden rounded-xl border border-rose-100 bg-gradient-to-br from-rose-50 to-rose-100/60 px-2 py-2 text-center dark:border-rose-900 dark:from-rose-950/40'>
-              <div className='absolute -right-1 -top-1 h-7 w-7 rounded-full bg-rose-200/40' />
               <p className='text-[9px] font-bold uppercase tracking-widest text-rose-600'>Échues</p>
               <p className='text-xl font-black text-rose-700 tabular-nums'>{nbrePtbaEchus}</p>
             </div>
@@ -289,7 +257,6 @@ function TauxExecutionPtbaCard({ taux, nbrePtbaEnCours, nbrePtbaRealise, nbrePtb
 function TauxDecaissementPtbaCard({ taux, montantDecaisse, montantPrevu, selectedYear, nbPtba }: {
   taux: number; montantDecaisse: number; montantPrevu: number; selectedYear: number; nbPtba: number
 }) {
-  // ✅ Couleur fixe : Vert pour le décaissement
   const col = {
     bg: 'bg-emerald-500',
     text: 'text-emerald-600 dark:text-emerald-400',
@@ -301,9 +268,7 @@ function TauxDecaissementPtbaCard({ taux, montantDecaisse, montantPrevu, selecte
   return (
     <Card className='relative overflow-hidden border-0 shadow-sm bg-gradient-to-br from-emerald-50/50 to-transparent dark:from-emerald-950/20'>
       <div className={cn('absolute inset-x-0 top-0 h-1', col.bg)} />
-
       <DollarSign className='absolute right-3 top-4 h-16 w-16 opacity-[0.06] text-emerald-500' strokeWidth={1.5} />
-
       <CardContent className='pt-5 pb-4 px-5'>
         <div className='flex items-start justify-between mb-3'>
           <div className='flex items-center gap-2'>
@@ -318,7 +283,6 @@ function TauxDecaissementPtbaCard({ taux, montantDecaisse, montantPrevu, selecte
             {selectedYear}
           </span>
         </div>
-
         <div className='space-y-2.5'>
           <div className='flex items-end gap-2'>
             <span className={cn('text-2xl font-bold leading-none', col.text)}>{taux}%</span>
@@ -326,20 +290,16 @@ function TauxDecaissementPtbaCard({ taux, montantDecaisse, montantPrevu, selecte
               {taux >= 80 ? 'Élevé' : taux >= 50 ? 'Moyen' : 'Faible'}
             </span>
           </div>
-
           <div className='relative h-1.5 w-full overflow-hidden rounded-full bg-muted'>
             <div className={cn('h-full rounded-full transition-all duration-700', col.bar)} style={{ width: `${taux}%` }} />
             <div className='absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-50' />
           </div>
-
           <div className='flex items-center justify-between pt-0.5'>
             <span className='text-xs text-muted-foreground'>{nbPtba} Activités PTBA</span>
             <span className='text-xs text-muted-foreground'>
               {taux >= 80 ? '💰 Bien décaissé' : taux >= 50 ? '💳 En cours' : '⏳ À décaisser'}
             </span>
           </div>
-
-          {/* ✅ Montant prévu et décaissé uniquement */}
           <div className='grid grid-cols-2 gap-2'>
             <div className='rounded-lg bg-emerald-50/70 px-2.5 py-1.5 dark:bg-emerald-950/20'>
               <p className='text-[9px] text-muted-foreground uppercase tracking-wide'>Prévu</p>
@@ -361,7 +321,9 @@ function TauxDecaissementPtbaCard({ taux, montantDecaisse, montantPrevu, selecte
     </Card>
   )
 }
-// Légende custom — ordre et couleurs forcés
+
+// ─── Légende custom ───────────────────────────────────────────────────────────
+
 function CustomLegend({ items }: { items: { color: string; label: string }[] }) {
   return (
     <div className='flex items-center justify-center gap-4 pt-2'>
@@ -374,29 +336,20 @@ function CustomLegend({ items }: { items: { color: string; label: string }[] }) 
     </div>
   )
 }
-// Remplace tes deux configs et les deux fonctions de graphiques par ceci
+
+// ─── Configs graphiques ──────────────────────────────────────────────────────
 
 const avancementChartConfig = {
-  realise: {
-    label: 'Taux Réalisé (Physique)',
-    color: 'var(--color-chart-1)',
-  },
-  cible: {
-    label: 'Taux Cible (Prévu)',
-    color: 'var(--color-chart-2)',
-  },
+  realise: { label: 'Taux Réalisé (Physique)', color: 'var(--color-chart-1)' },
+  cible: { label: 'Taux Cible (Prévu)', color: 'var(--color-chart-2)' },
 } satisfies ChartConfig
 
 const decaissementChartConfig = {
-  realise: {
-    label: 'Réalisé (GNF)',
-    color: 'var(--color-chart-1)',
-  },
-  cible: {
-    label: 'Prévu (GNF)',
-    color: 'var(--color-chart-2)',
-  },
+  realise: { label: 'Réalisé (GNF)', color: 'var(--color-chart-1)' },
+  cible: { label: 'Prévu (GNF)', color: 'var(--color-chart-2)' },
 } satisfies ChartConfig
+
+// ─── Graphiques ──────────────────────────────────────────────────────────────
 
 function DecaissementComparatifCard({ data, isLoading }: {
   data: { annee: number; realise: number; cible: number; }[]; isLoading: boolean
@@ -435,13 +388,9 @@ function DecaissementComparatifCard({ data, isLoading }: {
                   <XAxis dataKey='annee' tickLine={false} tickMargin={10} axisLine={false} className='fill-muted-foreground text-xs' />
                   <YAxis tickLine={false} axisLine={false} tickMargin={8} tickFormatter={fmt} className='fill-muted-foreground text-[10px]' />
                   <ChartTooltip cursor={{ fill: 'rgba(0,0,0,0.04)' }} content={<ChartTooltipContent formatter={(v) => `${formatNumber(Number(v))} GNF`} />} />
-                  {/* <ChartLegend content={<ChartLegendContent />} /> */}
-                  {/* Réalisé en premier → barre gauche + premier dans légende */}
-                  {/* Prévu en second → barre droite + second dans légende */}
                   <Bar dataKey='cible' fill='#FCD116' radius={[4, 4, 0, 0]}>
                     <LabelList dataKey='cible' position='top' className='fill-muted-foreground text-[9px] font-bold' formatter={(v: any) => fmt(Number(v))} />
                   </Bar>
-
                   <Bar dataKey='realise' fill='#10b981' radius={[4, 4, 0, 0]}>
                     <LabelList dataKey='realise' position='top' className='fill-muted-foreground text-[9px] font-bold' formatter={(v: any) => fmt(Number(v))} />
                   </Bar>
@@ -489,16 +438,12 @@ function ProjetAvancementAnnuelCard({ data, isLoading }: {
                   <XAxis dataKey='annee' tickLine={false} tickMargin={10} axisLine={false} className='fill-muted-foreground text-xs' />
                   <YAxis tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(v) => `${v}%`} className='fill-muted-foreground text-[10px]' />
                   <ChartTooltip cursor={{ fill: 'rgba(0,0,0,0.05)' }} content={<ChartTooltipContent formatter={(v) => `${v}%`} />} />
-                  {/* <ChartLegend content={<ChartLegendContent />} /> */}
-                  {/* Cible en second → barre droite + second dans légende */}
                   <Bar dataKey='cible' fill='#FCD116' radius={[4, 4, 0, 0]}>
                     <LabelList dataKey='cible' position='top' className='fill-muted-foreground text-[10px] font-bold' formatter={(v: any) => `${v}%`} />
                   </Bar>
-                  {/* Réalisé en premier → barre gauche + premier dans légende */}
                   <Bar dataKey='realise' fill='#10b981' radius={[4, 4, 0, 0]}>
                     <LabelList dataKey='realise' position='top' className='fill-muted-foreground text-[10px] font-bold' formatter={(v: any) => `${v}%`} />
                   </Bar>
-
                 </BarChart>
               </ChartContainer>
               <CustomLegend items={[
@@ -531,12 +476,8 @@ function BudgetDetailCard({
           <div className='flex items-center gap-2'>
             <div className='rounded-lg bg-primary/10 p-1.5'><Wallet className='h-4 w-4 text-primary' /></div>
             <div>
-              <CardTitle className='text-sm font-semibold'>
-                Détail budget
-              </CardTitle>
-              <CardDescription className='text-xs'>
-                Montants et écarts cumulés
-              </CardDescription>
+              <CardTitle className='text-sm font-semibold'>Détail budget</CardTitle>
+              <CardDescription className='text-xs'>Montants et écarts cumulés</CardDescription>
             </div>
           </div>
           <span className={cn('rounded-full border px-2.5 py-1 text-xs font-semibold', budgetColor.badge)}>{budgetColor.label}</span>
@@ -564,7 +505,7 @@ function BudgetDetailCard({
             <p className='mt-0.5 text-[10px] text-muted-foreground/70'>GNF</p>
           </div>
           <div className='rounded-xl border border-red-100 bg-red-50 p-3 dark:border-red-900 dark:bg-red-950/30'>
-            <p className='mb-1 text-[10px] tracking-widest text-red-500 uppercase'>Reste à décaisser </p>
+            <p className='mb-1 text-[10px] tracking-widest text-red-500 uppercase'>Reste à décaisser</p>
             <p className='text-sm leading-tight font-bold text-red-600 break-all'>{formatNumber(ecart)}</p>
             <p className='mt-0.5 text-[10px] text-red-500/70'>GNF</p>
           </div>
@@ -592,7 +533,12 @@ function BudgetDetailCard({
 
 export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
 
-  // ── Années du projet (plage réelle uniquement) ────────────────────────────
+  const codeProgramme = useActiveProgrammeCode()
+
+  // ── Récupérer les versions PTBA ────────────────────────────────────────────
+  const { versionOptions } = usePtbaVersionSelection(codeProgramme)
+
+  // ── Années du projet (date début → date fin) ──────────────────────────────
   const projectYears = useMemo(() => {
     if (!projet?.date_demarrage_projet || !projet?.duree_projet)
       return [new Date().getFullYear()]
@@ -606,9 +552,32 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
     return years
   }, [projet])
 
-  const defaultYear =
-    projectYears[projectYears.length - 1] || new Date().getFullYear()
+  // ── Années disponibles dans les versions PTBA ──────────────────────────────
+  const versionYears = useMemo(() => {
+    return versionOptions
+      .map((opt) => {
+        const match = opt.label.match(/\d{4}/)
+        return match ? Number(match[0]) : null
+      })
+      .filter((y): y is number => y !== null)
+  }, [versionOptions])
+
+  // ── Années disponibles (intersection entre projet et versions) ─────────────
+  const availableYears = useMemo(() => {
+    if (versionYears.length === 0) return projectYears
+
+    const versionSet = new Set(versionYears)
+    const intersection = projectYears.filter((y) => versionSet.has(y))
+
+    return intersection.length > 0 ? intersection : projectYears
+  }, [projectYears, versionYears])
+
+  const defaultYear = availableYears[availableYears.length - 1] || new Date().getFullYear()
   const [selectedYear, setSelectedYear] = useState(defaultYear)
+
+  useEffect(() => {
+    setSelectedYear(defaultYear)
+  }, [defaultYear])
 
   // const { data: activites = [] } = useGetActivitesProjet(projet?.code_projet)
   const { data: ptbas = [], isLoading: isLoadingPtbas } = useGetPtbasProjet(projet?.code_projet)
@@ -634,12 +603,9 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
     () => ptbas.reduce((s, p) => s + (Number(p.montant_decaisse_ptba) || 0), 0), [ptbas]
   )
   const budgetPct = useMemo(() => {
-    // ✅ Convertir en nombres avec Number()
     const total = Number(budget_total) || 0
     const decaisse = Number(budget_decaisse) || 0
-
     if (total === 0) return 0
-
     return Math.round((decaisse / total) * 100)
   }, [budget_total, budget_decaisse])
 
@@ -659,67 +625,50 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
     )
   }, [ptbasFiltres])
 
-  // 📌 PTBA en cours : taux entre 1 et 99
   const NbrePtbaEnCours = useMemo(() => {
     if (!ptbasFiltres.length) return 0
-
     return ptbasFiltres.filter((p) => {
       const taux = Number(p.taux_execution_ptba) || 0
       return taux >= 1 && taux < 100
     }).length
   }, [ptbasFiltres])
 
-  // 📌 PTBA réalisés : taux = 100
   const NbrePtbaRealise = useMemo(() => {
     if (!ptbasFiltres.length) return 0
-
     return ptbasFiltres.filter((p) => {
       const taux = Number(p.taux_execution_ptba) || 0
       return taux >= 100
     }).length
   }, [ptbasFiltres])
+
   const isTimestamp = (value: any): boolean => {
     return typeof value === 'number' && !isNaN(value) && value > 0
   }
-  // 📌 Fonction pour obtenir l'objet Date à partir de delais
+
   const getDateFromDelais = (delais: any): Date | null => {
     if (!delais) return null
-
-    // Si c'est un nombre (timestamp), créer une date
     if (isTimestamp(delais)) {
       const date = new Date(delais)
       return !isNaN(date.getTime()) ? date : null
     }
-
-    // Si c'est une string de date, essayer de la parser
     if (typeof delais === 'string') {
       const date = new Date(delais)
       return !isNaN(date.getTime()) ? date : null
     }
-
-    // Si c'est déjà un objet Date
     if (delais instanceof Date) {
       return !isNaN(delais.getTime()) ? delais : null
     }
-
     return null
   }
-  // 📌 PTBA échus : taux = 0 (et délai dépassé ou date fin = 0)
+
   const NbrePtbaEchus = useMemo(() => {
     if (!ptbasFiltres.length) return 0
-
     const now = new Date()
     return ptbasFiltres.filter((p) => {
       const taux = Number(p.taux_execution_ptba) || 0
       const dateFin = getDateFromDelais(p.delais)
-
-      // Taux = 0
       if (taux > 0) return false
-
-      // Si date de fin existe et est dépassée
       if (dateFin && dateFin < now) return true
-
-      // Si pas de date de fin, considérer comme non échu
       return false
     }).length
   }, [ptbasFiltres])
@@ -743,7 +692,6 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
     [ptbasFiltres]
   )
 
-  // Montant prévu PTBA (cout_ptba)
   const montantPrevuPtba = useMemo(
     () => ptbasFiltres.reduce((s, p) => s + (Number(p.cout_ptba) || 0), 0),
     [ptbasFiltres]
@@ -764,32 +712,22 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
 
   // Filtrer sur les années réelles du projet
   const avancementAnnuelData = useMemo(() => {
-    // ✅ Filtrer les années du projet
     const filtered = avancementAnnuelRaw.filter((d) => projectYears.includes(d.annee))
-
-    // ✅ Trier par année croissante
     const sorted = [...filtered].sort((a, b) => a.annee - b.annee)
-
-    // ✅ Année actuelle
     const currentYear = new Date().getFullYear()
-
     let cumulCible = 0
     let cumulRealise = 0
 
     return sorted.map(({ annee, cible, realise }) => {
-      // ✅ Si l'année est future (>= 2026), on cumule
       if (annee >= currentYear) {
         cumulCible += cible
         cumulRealise += realise
-
         return {
           annee,
           cible: Math.round(cumulCible * 100) / 100,
           realise: Math.round(cumulRealise * 100) / 100,
         }
       }
-
-      // ✅ Pour les années passées ou actuelles, on garde les valeurs normales
       return {
         annee,
         cible: Math.round(cible * 100) / 100,
@@ -798,16 +736,11 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
     })
   }, [avancementAnnuelRaw, projectYears])
 
-  console.log('avancementAnnuelData', avancementAnnuelData)
-
-  // ✅ Filtrer aussi les décaissements sur les années du projet
-  // ✅ Données brutes
   const decaissementParAnneeBrut = useMemo(
     () => buildDecaissementAnnuelFromPtbas(ptbas, budgetsAnnuels),
     [budgetsAnnuels, ptbas]
   )
 
-  // ✅ Appliquer le cumul avec report des valeurs
   const decaissementParAnnee = useMemo(() => {
     const currentYear = new Date().getFullYear()
     let cumulCible = 0
@@ -815,41 +748,37 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
     let lastRealise = 0
     let lastCible = 0
 
-    return decaissementParAnneeBrut.map(({ annee, cible, realise }) => {
-      // ✅ Pour les années futures (strictement supérieures à currentYear)
+    // ✅ Créer un Map des données existantes par année
+    const dataMap = new Map(decaissementParAnneeBrut.map(item => [item.annee, item]))
+
+    // ✅ Parcourir toutes les années du projet
+    return projectYears.map((annee) => {
+      const existing = dataMap.get(annee)
+      const cible = existing?.cible ?? 0
+      const realise = existing?.realise ?? 0
+
       if (annee > currentYear) {
         cumulCible += cible
         cumulRealise += realise
-
-        // ✅ Si le cumul est 0, on prend la dernière valeur non nulle
         const finalRealise = cumulRealise === 0 ? lastRealise : cumulRealise
         const finalCible = cumulCible === 0 ? lastCible : cumulCible
-
-        // ✅ Mettre à jour les dernières valeurs non nulles
         if (cumulRealise !== 0) lastRealise = cumulRealise
         if (cumulCible !== 0) lastCible = cumulCible
-
         return {
           annee,
           cible: Math.round(finalCible * 100) / 100,
           realise: Math.round(finalRealise * 100) / 100,
         }
       }
-
-      // ✅ Pour les années passées ou actuelles, on garde les valeurs normales
       if (realise !== 0) lastRealise = realise
       if (cible !== 0) lastCible = cible
-
       return {
         annee,
         cible: Math.round(cible * 100) / 100,
         realise: Math.round(realise * 100) / 100,
       }
     })
-  }, [decaissementParAnneeBrut])
-
-  console.log('decaissementParAnnee (brut)', decaissementParAnneeBrut)
-  console.log('decaissementParAnnee (cumulé)', decaissementParAnnee)
+  }, [decaissementParAnneeBrut, projectYears])
 
   return (
     <div className='space-y-6 p-1'>
@@ -866,7 +795,7 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {projectYears.map((y) => (
+              {availableYears.map((y) => (
                 <SelectItem key={y} value={String(y)}>PTBA {y}</SelectItem>
               ))}
             </SelectContent>
@@ -903,7 +832,7 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
         />
       </div>
 
-      {/* ── Graphiques comparatifs (données globales, pas liées à selectedYear) ── */}
+      {/* ── Graphiques comparatifs ── */}
       <div className='grid gap-4 lg:grid-cols-2'>
         <ProjetAvancementAnnuelCard
           data={avancementAnnuelData}
