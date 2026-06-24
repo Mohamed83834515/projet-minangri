@@ -50,7 +50,7 @@ const versionPtbaService = {
     data: Partial<VersionPtbaFormData>,
     file?: File,
   ): Promise<VersionPtba> {
-    if (file) {
+    if (typeof file !== 'string'&& file instanceof File) {
       // Si un fichier est fourni, utiliser FormData
       const formData = new FormData();
 

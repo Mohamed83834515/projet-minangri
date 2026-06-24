@@ -24,8 +24,8 @@ export const useSaveVersion = (
 
   return useMutation({
     mutationFn: ({ data, file }: { data: any; file?: File }) =>
-      isEdit && currentRow?.id_version  // ✅ Utiliser id_version au lieu de id_type
-        ? versionPtbaService.update(currentRow.id_version, data, file)
+      isEdit && currentRow?.id_version_ptba  // ✅ Utiliser id_version au lieu de id_type
+        ? versionPtbaService.update(currentRow.id_version_ptba, data, file)
         : versionPtbaService.create(data, file),
 
     onSuccess: async () => {
@@ -42,6 +42,7 @@ export const useSaveVersion = (
       onSuccess?.()
     },
 
+      // Ajouter tous les champs du formulaire
     onError: (error: any) => {
       console.error("Erreur version PTBA:", error)
       toast.error(
