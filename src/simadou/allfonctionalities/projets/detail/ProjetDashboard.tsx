@@ -437,18 +437,19 @@ function DecaissementComparatifCard({ data, isLoading }: {
                   <ChartTooltip cursor={{ fill: 'rgba(0,0,0,0.04)' }} content={<ChartTooltipContent formatter={(v) => `${formatNumber(Number(v))} GNF`} />} />
                   {/* <ChartLegend content={<ChartLegendContent />} /> */}
                   {/* Réalisé en premier → barre gauche + premier dans légende */}
-                  <Bar dataKey='realise' fill='#FCD116' radius={[4, 4, 0, 0]}>
-                    <LabelList dataKey='realise' position='top' className='fill-muted-foreground text-[9px] font-bold' formatter={(v: any) => fmt(Number(v))} />
-                  </Bar>
                   {/* Prévu en second → barre droite + second dans légende */}
-                  <Bar dataKey='cible' fill='#10b981' radius={[4, 4, 0, 0]}>
+                  <Bar dataKey='cible' fill='#FCD116' radius={[4, 4, 0, 0]}>
                     <LabelList dataKey='cible' position='top' className='fill-muted-foreground text-[9px] font-bold' formatter={(v: any) => fmt(Number(v))} />
+                  </Bar>
+
+                  <Bar dataKey='realise' fill='#10b981' radius={[4, 4, 0, 0]}>
+                    <LabelList dataKey='realise' position='top' className='fill-muted-foreground text-[9px] font-bold' formatter={(v: any) => fmt(Number(v))} />
                   </Bar>
                 </BarChart>
               </ChartContainer>
               <CustomLegend items={[
-                { color:'#FCD116', label: 'Réalisé (GNF)' },
-                { color: '#10b981', label: 'Prévu (GNF)' },
+                { color: '#FCD116', label: 'Prévu (GNF)' },
+                { color: '#10b981', label: 'Réalisé (GNF) ' },
               ]} />
             </div>
           </div>
@@ -489,19 +490,20 @@ function ProjetAvancementAnnuelCard({ data, isLoading }: {
                   <YAxis tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(v) => `${v}%`} className='fill-muted-foreground text-[10px]' />
                   <ChartTooltip cursor={{ fill: 'rgba(0,0,0,0.05)' }} content={<ChartTooltipContent formatter={(v) => `${v}%`} />} />
                   {/* <ChartLegend content={<ChartLegendContent />} /> */}
-                  {/* Réalisé en premier → barre gauche + premier dans légende */}
-                  <Bar dataKey='realise' fill='#FCD116' radius={[4, 4, 0, 0]}>
-                    <LabelList dataKey='realise' position='top' className='fill-muted-foreground text-[10px] font-bold' formatter={(v: any) => `${v}%`} />
-                  </Bar>
                   {/* Cible en second → barre droite + second dans légende */}
-                  <Bar dataKey='cible' fill='#10b981' radius={[4, 4, 0, 0]}>
+                  <Bar dataKey='cible' fill='#FCD116' radius={[4, 4, 0, 0]}>
                     <LabelList dataKey='cible' position='top' className='fill-muted-foreground text-[10px] font-bold' formatter={(v: any) => `${v}%`} />
                   </Bar>
+                  {/* Réalisé en premier → barre gauche + premier dans légende */}
+                  <Bar dataKey='realise' fill='#10b981' radius={[4, 4, 0, 0]}>
+                    <LabelList dataKey='realise' position='top' className='fill-muted-foreground text-[10px] font-bold' formatter={(v: any) => `${v}%`} />
+                  </Bar>
+
                 </BarChart>
               </ChartContainer>
               <CustomLegend items={[
-                { color:'#FCD116', label: 'Taux Réalisé (Physique)' },
-                { color: '#10b981', label: 'Taux Cible (Prévu)' },
+                { color: '#FCD116', label: 'Taux Cible (Prévu)' },
+                { color: '#10b981', label: 'Taux Réalisé (Physique)' },
               ]} />
             </div>
           </div>
@@ -761,20 +763,93 @@ export default function ProjetDashboard({ projet }: ProjetDashboardProps) {
   const { data: budgetsAnnuels = [] } = useGetBudgetAnnuel(projet.id_projet)
 
   // Filtrer sur les années réelles du projet
-  const avancementAnnuelData = useMemo(
-    () => avancementAnnuelRaw.filter((d) => projectYears.includes(d.annee)),
-    [avancementAnnuelRaw, projectYears]
-  )
-  console.log('budgetsAnnuels', budgetsAnnuels)
-  console.log('ptbas', ptbas)
+  const avancementAnnuelData = useMemo(() => {
+    // ✅ Filtrer les années du projet
+    const filtered = avancementAnnuelRaw.filter((d) => projectYears.includes(d.annee))
+
+    // ✅ Trier par année croissante
+    const sorted = [...filtered].sort((a, b) => a.annee - b.annee)
+
+    // ✅ Année actuelle
+    const currentYear = new Date().getFullYear()
+
+    let cumulCible = 0
+    let cumulRealise = 0
+
+    return sorted.map(({ annee, cible, realise }) => {
+      // ✅ Si l'année est future (>= 2026), on cumule
+      if (annee >= currentYear) {
+        cumulCible += cible
+        cumulRealise += realise
+
+        return {
+          annee,
+          cible: Math.round(cumulCible * 100) / 100,
+          realise: Math.round(cumulRealise * 100) / 100,
+        }
+      }
+
+      // ✅ Pour les années passées ou actuelles, on garde les valeurs normales
+      return {
+        annee,
+        cible: Math.round(cible * 100) / 100,
+        realise: Math.round(realise * 100) / 100,
+      }
+    })
+  }, [avancementAnnuelRaw, projectYears])
+
+  console.log('avancementAnnuelData', avancementAnnuelData)
 
   // ✅ Filtrer aussi les décaissements sur les années du projet
-  const decaissementParAnnee = useMemo(
+  // ✅ Données brutes
+  const decaissementParAnneeBrut = useMemo(
     () => buildDecaissementAnnuelFromPtbas(ptbas, budgetsAnnuels),
-    [budgetsAnnuels, ptbas])
+    [budgetsAnnuels, ptbas]
+  )
 
+  // ✅ Appliquer le cumul avec report des valeurs
+  const decaissementParAnnee = useMemo(() => {
+    const currentYear = new Date().getFullYear()
+    let cumulCible = 0
+    let cumulRealise = 0
+    let lastRealise = 0
+    let lastCible = 0
 
-  console.log('decaissementParAnnee', decaissementParAnnee)
+    return decaissementParAnneeBrut.map(({ annee, cible, realise }) => {
+      // ✅ Pour les années futures (strictement supérieures à currentYear)
+      if (annee > currentYear) {
+        cumulCible += cible
+        cumulRealise += realise
+
+        // ✅ Si le cumul est 0, on prend la dernière valeur non nulle
+        const finalRealise = cumulRealise === 0 ? lastRealise : cumulRealise
+        const finalCible = cumulCible === 0 ? lastCible : cumulCible
+
+        // ✅ Mettre à jour les dernières valeurs non nulles
+        if (cumulRealise !== 0) lastRealise = cumulRealise
+        if (cumulCible !== 0) lastCible = cumulCible
+
+        return {
+          annee,
+          cible: Math.round(finalCible * 100) / 100,
+          realise: Math.round(finalRealise * 100) / 100,
+        }
+      }
+
+      // ✅ Pour les années passées ou actuelles, on garde les valeurs normales
+      if (realise !== 0) lastRealise = realise
+      if (cible !== 0) lastCible = cible
+
+      return {
+        annee,
+        cible: Math.round(cible * 100) / 100,
+        realise: Math.round(realise * 100) / 100,
+      }
+    })
+  }, [decaissementParAnneeBrut])
+
+  console.log('decaissementParAnnee (brut)', decaissementParAnneeBrut)
+  console.log('decaissementParAnnee (cumulé)', decaissementParAnnee)
 
   return (
     <div className='space-y-6 p-1'>
