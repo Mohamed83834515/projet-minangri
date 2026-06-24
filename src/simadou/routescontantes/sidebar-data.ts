@@ -48,18 +48,6 @@ export const sidebarData: SidebarData = {
           url: '/',
           icon: LayoutDashboard,
         },
-        // {
-        //   title: 'Apps',
-        //   url: '/apps',
-        //   icon: Package,
-        // },
-        // {
-        //   title: 'Users',
-        //   url: '/users',
-        //   icon: Users,
-        // },
-
-        // ── Paramétrage ──────────────────────────────────────
         {
           title: 'Paramétrage',
           icon: Settings,
@@ -90,11 +78,6 @@ export const sidebarData: SidebarData = {
               url: '/parametrage/zone-de-collecte',
               icon: MapPin,
             },
-            // {
-            //   title: 'Conventions',
-            //   url: '/parametrage/conventions',
-            //   icon: FileText,
-            // },
             {
               title: 'Cadre Organique du MINAGRI',
               url: '/parametrage/plans-de-site',

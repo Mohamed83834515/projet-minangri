@@ -782,13 +782,13 @@ import { SidebarTrigger } from '@/components/ui/sidebar'
 import { type NavCollapsible, type NavItem, type NavLink } from './types'
 import { HEADER_COLORS, useColorStore } from '@/stores/others/color-store'
 import { useLayout } from '@/stores/others/layout-store'
-import { sidebarData } from '../../../simadou/routescontantes/sidebar-data'
 import { ProgrammeSwitcher } from './programme-switcher'
 import { SignOutDialog } from '@/components/others/sign-out-dialog'
 import useDialogState from '@/hooks/use-dialog-state'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useGeneralParamsQuery } from '@/simadou/allHooks/generalParams/queries'
+import { useFilteredSidebar } from '@/simadou/allHooks/admin/use-filtered-sidebar'
 
 const t = (key: string) => key
 
@@ -1086,6 +1086,7 @@ type UserProps = {
 // ─── AppTopbar ────────────────────────────────────────────────────────────────
 export function AppTopbar({ user }: UserProps) {
   const href = useLocation({ select: (l) => l.href })
+  const sidebarData = useFilteredSidebar()
   const firstTeam = sidebarData.teams[0]
   const subNavMode = useLayout((s) => s.subNavMode)
 

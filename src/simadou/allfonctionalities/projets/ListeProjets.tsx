@@ -32,6 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { useMe } from '@/simadou/allHooks/auth/authHooks'
 
 const route = getRouteApi('/_authenticated/projet-programme/projets/')
 
@@ -48,6 +49,11 @@ export default function ListeProjets() {
 
   // ✅ État pour le filtre de clôture (par défaut "en_cours")
   const [filtreCloture, setFiltreCloture] = useState<FiltreCloture>('en_cours')
+
+  // ✅ Récupérer l'utilisateur connecté
+  const { data: user } = useMe()
+  const userLevel = user?.niveau_perso || 1
+  const nPersonnel = user?.n_personnel
 
   const { data: projets = [], isLoading } = useGetProjets()
   const { data: typeProjets = [], isLoading: isLoadingTypes } = useGetTypeProjet()
@@ -109,23 +115,56 @@ export default function ListeProjets() {
   }, [currentRow, toggleCloture, setOpen])
 
   const columns = useMemo(
-    () => buildProjetsColumns(setOpen, setCurrentRow, goToDetail, handleClotureConfirm, currencyCode),
-    [setOpen, setCurrentRow, goToDetail, handleClotureConfirm, currencyCode]
+    () => buildProjetsColumns({
+      setOpen,
+      setCurrentRow,
+      onDetail: goToDetail,
+      handleClotureConfirm,
+      currencyCode,
+      userLevel, // ✅ Passer le niveau d'accès
+    }),
+    [setOpen, setCurrentRow, goToDetail, handleClotureConfirm, currencyCode, userLevel]
   )
+
+  // ✅ Filtrer par responsable (niveau 3 uniquement)
+  const filteredByResponsable = useMemo(() => {
+    // Si l'utilisateur est niveau 3, filtrer par n_personnel
+    if (userLevel === 3 && nPersonnel) {
+      return projets.filter((projet) => {
+        // Vérifier si le projet a un responsable
+        if (!projet.responsable_projet) return false
+        
+        // Si responsable_projet est un nombre, comparer directement
+        if (typeof projet.responsable_projet === 'number') {
+          return projet.responsable_projet === nPersonnel
+        }
+        
+        // Si responsable_projet est un objet, comparer son n_personnel
+        if (typeof projet.responsable_projet === 'object' && projet.responsable_projet !== null) {
+          return projet.responsable_projet.n_personnel === nPersonnel
+        }
+        
+        return false
+      })
+    }
+    
+    // Pour les autres niveaux, retourner tous les projets
+    return projets
+  }, [projets, userLevel, nPersonnel])
 
   // ✅ Filtrer par type de projet
   const filteredByType = useMemo(() => {
-    if (!activeTypeId) return projets
-    return projets.filter((projet) => {
+    if (!activeTypeId) return filteredByResponsable
+    return filteredByResponsable.filter((projet) => {
       if (!projet.type_projet) return false
       const id = typeof projet.type_projet === 'number'
         ? projet.type_projet
         : (projet.type_projet as any)?.id_type_projet
       return id === activeTypeId
     })
-  }, [projets, activeTypeId])
+  }, [filteredByResponsable, activeTypeId])
 
-  // ✅ Filtrer par statut de clôture (sans l'option "tous")
+  // ✅ Filtrer par statut de clôture
   const filteredProjets = useMemo(() => {
     return filteredByType.filter((projet) => {
       if (filtreCloture === 'en_cours') {
@@ -150,19 +189,6 @@ export default function ListeProjets() {
     return map
   }, [projets])
 
-  // ✅ Compter par type en fonction du filtre actif
-  const countByTypeFiltered = useMemo(() => {
-    const map = new Map<number, number>()
-    filteredByType.forEach((projet) => {
-      if (!projet.type_projet) return
-      const id = typeof projet.type_projet === 'number'
-        ? projet.type_projet
-        : (projet.type_projet as any)?.id_type_projet
-      if (id) map.set(id, (map.get(id) || 0) + 1)
-    })
-    return map
-  }, [filteredByType])
-
   const sortedTypesByCount = useMemo(() => {
     return [...sortedTypes].sort((a, b) => {
       const countA = countByType.get(a.id_type_projet) || 0
@@ -170,15 +196,6 @@ export default function ListeProjets() {
       return countB - countA
     })
   }, [sortedTypes, countByType])
-
-  // ✅ Nombre de projets par statut pour le filtre
-  const nbProjetsEnCours = useMemo(() => {
-    return projets.filter(p => !p.is_cloture).length
-  }, [projets])
-
-  const nbProjetsCloturer = useMemo(() => {
-    return projets.filter(p => p.is_cloture === true).length
-  }, [projets])
 
   if (!activeProgramme) {
     return (
@@ -212,7 +229,6 @@ export default function ListeProjets() {
             <TabsList className='flex flex-wrap gap-1'>
               {sortedTypesByCount.map((type) => {
                 // ✅ Utiliser le compteur filtré
-                const count = countByTypeFiltered.get(type.id_type_projet) || 0
                 return (
                   <TabsTrigger
                     className='relative'
@@ -222,9 +238,9 @@ export default function ListeProjets() {
                     {type.nom_type_projet.length > 20
                       ? type.nom_type_projet.substring(0, 12) + '…'
                       : type.nom_type_projet}
-                    <span className='rounded-full bg-muted px-1.5 py-0.5 text-xs text-black'>
+                    {/* <span className='rounded-full bg-muted px-1.5 py-0.5 text-xs text-black'>
                       ({count})
-                    </span>
+                    </span> */}
                   </TabsTrigger>
                 )
               })}
@@ -240,14 +256,13 @@ export default function ListeProjets() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value='en_cours'>
-              📋 En cours ({nbProjetsEnCours})
+              📋 En cours 
             </SelectItem>
             <SelectItem value='cloturer'>
-              ✅ Clôturés ({nbProjetsCloturer})
+              ✅ Clôturés 
             </SelectItem>
           </SelectContent>
         </Select>
-
       </div>
 
       <div className='space-y-2'>

@@ -7,13 +7,26 @@ import { GenericRowActions } from '@/Global/Tableaux/GenericRowActions'
 
 type ProjetDialogType = 'add' | 'edit' | 'delete'
 
-export function buildProjetsColumns(
-  setOpen: (dialog: ProjetDialogType | null) => void,
-  setCurrentRow: React.Dispatch<React.SetStateAction<Projet | null>>,
-  onDetail: (projet: Projet) => void,
-  handleClotureConfirm: (projet: Projet) => void,
+type BuildProjetsColumnsOptions = {
+  setOpen: (dialog: ProjetDialogType | null) => void
+  setCurrentRow: React.Dispatch<React.SetStateAction<Projet | null>>
+  onDetail: (projet: Projet) => void
+  handleClotureConfirm: (projet: Projet) => void
   currencyCode?: string
-): ColumnDef<Projet>[] {
+  userLevel?: number // ✅ Ajout du niveau d'accès
+}
+
+export function buildProjetsColumns({
+  setOpen,
+  setCurrentRow,
+  onDetail,
+  handleClotureConfirm,
+  currencyCode,
+  userLevel = 1, // Par défaut admin
+}: BuildProjetsColumnsOptions): ColumnDef<Projet>[] {
+  // ✅ Vérifier si l'utilisateur est niveau 3 (Consultant)
+  const isLevel3 = userLevel === 3
+
   return [
     {
       id: 'code_projet',
@@ -90,7 +103,7 @@ export function buildProjetsColumns(
       enableHiding: false,
     },
     {
-      id: 'signataires_projet',
+      id: 'partenaires_execution_projet',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Partenaires d'exécution" />
       ),
@@ -148,6 +161,25 @@ export function buildProjetsColumns(
         const projet = row.original
         const isCloture = projet.is_cloture
 
+        // ✅ Si niveau 3, seulement l'action "Détail"
+        if (isLevel3) {
+          return (
+            <GenericRowActions
+              row={row}
+              actions={[
+                {
+                  label: 'Détail',
+                  icon: <Eye size={16} />,
+                  onClick: () => {
+                    onDetail(row.original)
+                  }
+                },
+              ]}
+            />
+          )
+        }
+
+        // ✅ Pour les autres niveaux, toutes les actions
         return (
           <GenericRowActions
             row={row}

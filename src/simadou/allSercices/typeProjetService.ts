@@ -18,7 +18,7 @@ export const TypeProjetService = {
   },
 
   // Compter les projets par type
-  async countProjectsPerType(): Promise<
+  async countProjectsPerType(idProgramme: number): Promise<
     {
       id_type_projet: number
       code_type_projet: string
@@ -34,7 +34,7 @@ export const TypeProjetService = {
           nom_type_projet: string
           nombre_projets: number
         }[]
-      >(`${BASE_URL}projets-count/`)
+      >(`${BASE_URL}projets-count/?programme=${idProgramme}`)
       return response || []
     } catch (error) {
       toast.error('Erreur lors de la récupération des types de  projet')

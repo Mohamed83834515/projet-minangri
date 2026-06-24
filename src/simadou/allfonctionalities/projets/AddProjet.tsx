@@ -18,6 +18,7 @@ import { StepDynamicForm } from '@/Global/Forms/StepDynamicForm'
 import { useGetUgls } from '@/simadou/allHooks/admin/uglHooks'
 import { useGetProgrammes } from '@/simadou/allHooks/admin/programmeHooks'
 import { useGetTypeProjet } from '@/simadou/allHooks/admin/typeProjetHooks'
+import { useGetPersonnels } from '@/simadou/allHooks/admin/personnelHooks'
 
 interface OpenPropsProjet {
   currentRow?: any | null
@@ -35,10 +36,11 @@ export default function AddProjet({ open, onOpenChange, currentRow }: OpenPropsP
   const { data: ugls = [] } = useGetUgls()
   const { data: programmes = [] } = useGetProgrammes()
   const { data: type_projets = [] } = useGetTypeProjet()
+  const { data: personnels = [] } = useGetPersonnels()
   // ── Config du formulaire (options injectées ici, pas dans le fichier config) ──
   const formConfig = useMemo(
-    () => getProjetFormConfig(acteurs, localites, ugls, programmes, type_projets),
-    [acteurs, localites, ugls, programmes, type_projets]
+    () => getProjetFormConfig(acteurs, localites, ugls, programmes, type_projets, personnels),
+    [acteurs, localites, ugls, programmes, type_projets, personnels]
   )
 
   // ── Mutations ──
@@ -63,6 +65,11 @@ export default function AddProjet({ open, onOpenChange, currentRow }: OpenPropsP
     if (item && typeof item === 'object') return item.id_programme || item.nom_programme || 0
     return 0
   }
+  const extracPersonnelId = (item: any): number => {
+    if (typeof item === 'number') return item
+    if (item && typeof item === 'object') return item.n_personnel || item.id_personnel_perso || 0
+    return 0
+  }
   const extracTypeId = (item: any): number => {
     if (typeof item === 'number') return item
     if (item && typeof item === 'object') return item.id_type_projet || item.nom_type_projet || 0
@@ -84,6 +91,7 @@ export default function AddProjet({ open, onOpenChange, currentRow }: OpenPropsP
     duree_projet: currentRow?.duree_projet ?? 0,
     type_projet: extracTypeId(currentRow?.type_projet ?? 0),
 
+    responsable_projet: extracPersonnelId(currentRow?.responsable_projet ?? 0),
     programme_projet: extracProgrammId(currentRow?.programme_projet ?? 0),
     structure_projet: extractUniteId(currentRow?.structure_projet ?? 0),
     signataires_projet: extractIds(currentRow?.signataires_projet),

@@ -1,5 +1,6 @@
 import { Acteur } from "./acteur";
 import { Localite } from "./localite";
+import { Personnel } from "./personnel";
 import { Programme } from "./programme";
 import { TypeProjet } from "./typeProjet";
 
@@ -18,6 +19,7 @@ export interface Projet {
   partenaires_execution_projet: Acteur[];
   zone_projet: Localite[];
   budget_projet?: number,
+  responsable_projet?: number | Personnel,
   type_projet?: number | TypeProjet,
   is_cloture?: boolean,
 }

@@ -1,5 +1,5 @@
 import type { FormConfig, SelectOption } from '../../Global/types/formConfig'
-import { Programme, UGL } from '../allTypes'
+import { Personnel, Programme, UGL } from '../allTypes'
 import type { Acteur } from '../allTypes/acteur'
 import type { CategorieActeur } from '../allTypes/categorieActeur'
 import type { Localite } from '../allTypes/localite'
@@ -37,6 +37,10 @@ function ProgrammeOptions(programmes: Programme[]): SelectOption[] {
   return programmes
     .map((z) => ({ value: z.id_programme, label: z.nom_programme }))
 }
+function PersonnelOptions(personnels: Personnel[]): SelectOption[] {
+  return personnels
+    .map((z) => ({ value: z.n_personnel || 0, label: z.nom_perso + ' ' + z.prenom_perso }))
+}
 function TypeOptions(types: TypeProjet[]): SelectOption[] {
   return types
     .map((z) => ({ value: z.id_type_projet, label: z.nom_type_projet }))
@@ -52,6 +56,7 @@ export const getProjetFormConfig = (
   ugls: UGL[],
   programmes:Programme[],
   type_projets:TypeProjet[],
+  personnels:Personnel[],
 ): FormConfig => ({
   // ── Étapes déclarées une seule fois ──
   steps: [
@@ -113,6 +118,16 @@ export const getProjetFormConfig = (
       placeholder: 'Ex : 36',
       required: true,
       min: 1,
+      gridCols: 2,
+      formStep: 1,
+    },
+    {
+      name: 'responsable_projet',
+      label: 'Responsable',
+      type: 'select',
+      placeholder: 'Sélectionner un responsable',
+      required: true,
+      options: PersonnelOptions(personnels),
       gridCols: 2,
       formStep: 1,
     },

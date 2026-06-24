@@ -3,11 +3,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { TypeProjetService } from '@/simadou/allSercices/typeProjetService'
 import { TypeProjetFormData } from '@/simadou/schemas/typeProjetSchema'
-
 export const typeProjetQueryKeys = {
   all: ['types-projets'] as const,
   list: () => [...typeProjetQueryKeys.all, 'list'] as const,
-  countProjectsPerType: () => [...typeProjetQueryKeys.all, 'countProjectsPerType'] as const,
+  // ✅ Correction : ajouter id dans la clé pour éviter les conflits de cache
+  countProjectsPerType: (id: number) => 
+    [...typeProjetQueryKeys.all, 'countProjectsPerType', id] as const,
 }
 
 export const useGetTypeProjet = () => {
@@ -17,13 +18,14 @@ export const useGetTypeProjet = () => {
   })
 }
 
-export const useCountProjectsPerType = () => {
+export const useCountProjectsPerType = (idProgramme: number) => {
   return useQuery({
-    queryKey: typeProjetQueryKeys.countProjectsPerType(),
-    queryFn: () => TypeProjetService.countProjectsPerType(),
+    queryKey: typeProjetQueryKeys.countProjectsPerType(idProgramme),
+    queryFn: () => TypeProjetService.countProjectsPerType(idProgramme),
+    // ✅ Optionnel : ne pas exécuter si idProgramme est undefined ou 0
+    enabled: !!idProgramme && idProgramme > 0,
   })
 }
-
 export const useSaveTypeProjet= (isEdit: boolean, currentRow?: any, onSuccess?: () => void) => {
   const queryClient = useQueryClient()
 

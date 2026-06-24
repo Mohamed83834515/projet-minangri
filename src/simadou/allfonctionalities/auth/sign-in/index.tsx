@@ -1,11 +1,11 @@
-import { Link, useSearch } from '@tanstack/react-router'
+import {  useSearch } from '@tanstack/react-router'
 import { AuthLayout } from '../auth-layout'
 import { UserAuthForm } from './components/user-auth-form'
 import { Logo } from '@/assets/logo'
 import pilier1Img from '@/assets/images/pilier1_simandou.png'
 
 
-import {ArrowRight, KeyRound } from 'lucide-react'
+import { KeyRound } from 'lucide-react'
 
 
 
@@ -169,7 +169,7 @@ export function SignIn() {
                   className="mt-0.5 size-4 shrink-0 text-amber-600 dark:text-amber-400"
                   aria-hidden
                 />
-                <div className="space-y-1.5">
+                {/* <div className="space-y-1.5">
                   <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
                     Première connexion ?
                   </p>
@@ -186,7 +186,7 @@ export function SignIn() {
                     Définir mon mot de passe
                     <ArrowRight className="size-3" aria-hidden />
                   </Link>
-                </div>
+                </div> */}
               </div>
             </div>
 

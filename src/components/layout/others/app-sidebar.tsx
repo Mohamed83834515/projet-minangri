@@ -6,7 +6,6 @@ import {
   SidebarHeader,
   SidebarRail,
 } from '@/components/ui/sidebar'
-import { sidebarData } from '../../../simadou/routescontantes/sidebar-data'
 import { NavGroup } from './nav-group'
 import { NavUser } from './nav-user'
 
@@ -15,13 +14,14 @@ import { CHART_COLORS, useColor } from '@/stores/others/color-store'
 import { useMe } from '@/simadou/allHooks/auth/authHooks'
 import simadouLogo from '@/assets/images/SimandouImg.png'
 import { useGeneralParamsQuery } from '@/simadou/allHooks/generalParams/queries'
+import { useFilteredSidebar } from '@/simadou/allHooks/admin/use-filtered-sidebar'
 export function AppSidebar() {
   const { collapsible, variant } = useLayout()
   const { color } = useColor()
   const { stroke } = CHART_COLORS[color]
   const { data: user } = useMe()
   const { data: config } = useGeneralParamsQuery()
-
+  const sidebarData = useFilteredSidebar()
   return (
     <Sidebar
       collapsible={collapsible}

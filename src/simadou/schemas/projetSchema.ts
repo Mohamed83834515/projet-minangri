@@ -16,6 +16,9 @@ export const projectCreateSchema = z.object({
   structure_projet: z
     .number("Unité de gestion requise")
     .min(1, "Unité de gestion requise"),
+  responsable_projet: z
+    .number("Responsable de projet est requise")
+    .min(1, "Responsable de projet est requise"),
   signataires_projet: z.array(z.number()).min(1, "Partenaire Financier requise"),
   partenaires_execution_projet: z
     .array(z.number())

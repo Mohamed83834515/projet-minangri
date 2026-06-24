@@ -47,6 +47,7 @@ export function formatPersonnelNom(personnel: Personnel): string {
 export function formatNiveauAcces(niveau?: number): string {
   if (niveau === 1) return 'Éditeur'
   if (niveau === 2) return 'Visiteur'
+  if (niveau === 3) return 'Point focal Projet'
   return '—'
 }
 
