@@ -14,7 +14,7 @@ export interface TacheActivitePtba extends Record<string, unknown> {
   observation_gt?: string; // max 200 chars
   livrable_gt: string; // max 100 chars
   id_personnel_gt: number | Personnel;
-  responsable_gt?: number | Personnel; // max 100 chars
+  responsable_gt?: number | Personnel | string; // max 100 chars
   id_activite: number | Ptba; // relation vers Ptba
   created_at?: string;
   updated_at?: string;

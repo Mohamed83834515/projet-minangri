@@ -1,5 +1,4 @@
 import { useState, useMemo, useCallback } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
 import type { Ptba, TacheActivitePtba } from '@/simadou/allTypes'
 import { DataTableToolbarOutlineButton } from '@/components/data-table/toolbar-outline-button'
@@ -11,10 +10,7 @@ import {
 import ActiviteTabbedFormPanel from '@/simadou/allfonctionalities/suivi-ptba/ActiviteTabbedFormPanel'
 import TacheActiviteProjetForm from './TacheActiviteForm'
 import TacheActiviteProjetList from './TacheActiviteList'
-import {
-  useGetTachesByActiviteProjet,
-  suiviPtbaQueryKeys,
-} from '@/simadou/allHooks/admin/tacheActiviteProjetHooks'
+import { useGetTachesByActiviteProjet } from '@/simadou/allHooks/admin/tacheActiviteProjetHooks'
 
 type TacheActivitePtbaManagerProps = {
   activite: Ptba
@@ -23,7 +19,6 @@ type TacheActivitePtbaManagerProps = {
 export default function TacheActiviteProjetManager({
   activite,
 }: TacheActivitePtbaManagerProps) {
-  const queryClient = useQueryClient()
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState<TacheActivitePtba | undefined>()
 
@@ -62,9 +57,6 @@ export default function TacheActiviteProjetManager({
   const handleSuccess = () => {
     setShowForm(false)
     setEditing(undefined)
-    queryClient.invalidateQueries({
-      queryKey: suiviPtbaQueryKeys.tachesActivite(activite.id_ptba),
-    })
   }
 
   if (isLoading) {

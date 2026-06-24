@@ -60,7 +60,7 @@ export default function AddIndicateurPerformance({
     () => ({
       code_indicateur_performance: currentRow?.code_indicateur_performance ?? '',
       intitule_indicateur_tache: currentRow?.intitule_indicateur_tache ?? '',
-      type_ind: currentRow?.type_ind ?? 1,
+      type_ind: currentRow?.type_ind === 0 ? 0 : 1,
       activite_projet: activite.id_activite_projet,
       unite_indicateur_performance:
         resolveUniteId(currentRow?.unite_indicateur_performance) ?? 1,

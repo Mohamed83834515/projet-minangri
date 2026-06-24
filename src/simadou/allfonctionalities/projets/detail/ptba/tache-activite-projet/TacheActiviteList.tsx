@@ -39,8 +39,11 @@ export default function TacheActiviteProjetList({
   )
 
   const getResponsableLabel = useCallback(
-    (tache: TacheActivitePtba) =>
-      resolvePersonnelLabel(tache.responsable_gt, personnelsById) ?? '',
+    (tache: TacheActivitePtba) => {
+      const responsable = tache.responsable_gt
+      if (typeof responsable === 'string') return responsable
+      return resolvePersonnelLabel(responsable, personnelsById) ?? ''
+    },
     [personnelsById]
   )
 
