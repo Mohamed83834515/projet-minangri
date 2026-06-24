@@ -2,7 +2,7 @@ import { LucideIcon } from "lucide-react";
 
 interface StatRow {
   label: string;
-  value: string | number;
+  value?: string | number;
   valueColor?: string;
   suffix?: string;
 }
