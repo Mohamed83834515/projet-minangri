@@ -219,7 +219,7 @@ export default function ListeProjets() {
           >
             <TabsList className='flex flex-wrap gap-1'>
               {sortedTypesByCount.map((type) => {
-                const count = countByType.get(type.id_type_projet) || 0
+                // const count = countByType.get(type.id_type_projet) || 0
                 return (
                   <TabsTrigger
                     className='relative'
@@ -230,9 +230,9 @@ export default function ListeProjets() {
                       ? type.nom_type_projet.substring(0, 12) + '…'
                       : type.nom_type_projet}
                     {/* ✅ Afficher le compteur */}
-                    <span className='rounded-full bg-muted px-1.5 py-0.5 text-xs text-black'>
+                    {/* <span className='rounded-full bg-muted px-1.5 py-0.5 text-xs text-black'>
                       ({count})
-                    </span>
+                    </span> */}
                   </TabsTrigger>
                 )
               })}
