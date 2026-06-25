@@ -1,8 +1,8 @@
 import { type ColumnDef } from '@tanstack/react-table'
 import { buildColumns } from '@/Global/Tableaux/column-builder'
-import { DataTableColumnHeader } from '@/components/data-table/column-header'
 import { RapportMontantCell } from '@/simadou/allColonnes/RapportMontantCell'
 import { resolvePtbaActiviteId } from '@/simadou/allfonctionalities/rapport/rapportTableUtils'
+import { DataTableColumnHeader } from '@/components/data-table/column-header'
 import type { Ptba } from '../allTypes'
 
 type RapportPtbasColumnsProps = {
@@ -13,22 +13,14 @@ type RapportPtbasColumnsProps = {
   currencyCode?: string
 }
 
-function CountCell({
-  value,
-  loading,
-}: {
-  value: number
-  loading?: boolean
-}) {
+function CountCell({ value, loading }: { value: number; loading?: boolean }) {
   if (loading) {
-    return (
-      <div className='mx-auto h-4 w-6 animate-pulse rounded bg-muted' />
-    )
+    return <div className='mx-auto h-4 w-6 animate-pulse rounded bg-muted' />
   }
 
   return (
     <div className='flex justify-center'>
-      <span className='inline-flex min-w-8 items-center justify-center rounded-full bg-slate-100 px-2.5 py-0.5 text-sm font-semibold tabular-nums text-slate-700 dark:bg-slate-800 dark:text-slate-200'>
+      <span className='inline-flex min-w-8 items-center justify-center rounded-full bg-slate-100 px-2.5 py-0.5 text-sm font-semibold text-slate-700 tabular-nums dark:bg-slate-800 dark:text-slate-200'>
         {value}
       </span>
     </div>
@@ -60,7 +52,11 @@ export function buildRapportPtbasColumns({
       const activiteId = resolvePtbaActiviteId(row.original)
       return (
         <CountCell
-          value={activiteId != null ? (tachesCountByActivite.get(activiteId) ?? 0) : 0}
+          value={
+            activiteId != null
+              ? (tachesCountByActivite.get(activiteId) ?? 0)
+              : 0
+          }
           loading={countsLoading}
         />
       )
@@ -120,13 +116,13 @@ export function buildRapportPtbasColumns({
       <DataTableColumnHeader
         column={column}
         title={
-          currencyCode
-            ? `Cout Activites (${currencyCode})`
-            : 'Cout Activites'
+          currencyCode ? `Cout Activites (${currencyCode})` : 'Cout Activites'
         }
       />
     ),
-    cell: ({ row }) => <RapportMontantCell value={row.original.cout_total_ptba} />,
+    cell: ({ row }) => (
+      <RapportMontantCell value={row.original.cout_total_ptba} />
+    ),
     meta: { thClassName: 'text-center', className: 'text-center' },
     enableSorting: true,
     sortDescFirst: true,

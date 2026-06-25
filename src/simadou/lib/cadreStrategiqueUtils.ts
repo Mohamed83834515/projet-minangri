@@ -37,29 +37,27 @@ export function sortNiveauxCadreStrategique(
   niveaux: NiveauCadreStrategique[]
 ): NiveauCadreStrategique[] {
   return [...niveaux].sort(
-    (a, b) => Number(a.code_number_nsc) - Number(b.code_number_nsc)
+    (a, b) => Number(a.nombre_nsc) - Number(b.nombre_nsc)
   )
 }
 
 export function getNextNiveauCadreStrategique(
   niveaux: NiveauCadreStrategique[],
-  currentNiveauCodeNumber: number
+  currentNiveauId: number
 ): NiveauCadreStrategique | null {
   const sorted = sortNiveauxCadreStrategique(niveaux)
-  const index = sorted.findIndex(
-    (n) => Number(n.code_number_nsc) === currentNiveauCodeNumber
-  )
+  const index = sorted.findIndex((n) => n.id_nsc === currentNiveauId)
   if (index < 0 || index >= sorted.length - 1) return null
   return sorted[index + 1] ?? null
 }
 
 export function buildChildCountByParentCsId(
   cadres: CadreStrategique[],
-  nextNiveauCodeNumber: number
+  nextNiveauId: number
 ): Map<number, number> {
   const counts = new Map<number, number>()
   for (const cadre of cadres) {
-    if (resolveNiveauCsNumber(cadre.niveau_cs) !== nextNiveauCodeNumber) continue
+    if (Number(cadre.id_cs) !== nextNiveauId) continue
     const parentId = resolveParentCsId(cadre.parent_cs)
     if (parentId == null) continue
     counts.set(parentId, (counts.get(parentId) ?? 0) + 1)
@@ -104,11 +102,11 @@ export function toPartenaireCsFormValue(
 
 export function buildCadreStrategiqueParentOptions({
   cadres,
-  niveauCodeNumber,
+  parentId,
   excludeCadreId,
 }: {
   cadres: CadreStrategique[]
-  niveauCodeNumber: number
+  parentId?: number
   excludeCadreId?: number
 }) {
   return cadres
@@ -116,7 +114,7 @@ export function buildCadreStrategiqueParentOptions({
       const cadreNiveau = resolveNiveauCsNumber(cadre.niveau_cs)
       return (
         cadreNiveau != null &&
-        cadreNiveau === niveauCodeNumber - 1 &&
+        cadreNiveau === parentId &&
         cadre.id_cs !== excludeCadreId
       )
     })
@@ -128,30 +126,16 @@ export function buildCadreStrategiqueParentOptions({
 
 export function getFixedCodeLengthForNiveauCs(
   niveaux: NiveauCadreStrategique[],
-  niveauCodeNumber: number,
-  codeProgramme?: string
+  niveauId: number
 ): number {
-  const scoped = codeProgramme?.trim()
-    ? filterNiveauxByProgramme(niveaux, codeProgramme)
-    : niveaux
-
-  const niveauConfig = scoped.find(
-    (n) => Number(n.code_number_nsc) === niveauCodeNumber
-  )
-  return Number(niveauConfig?.nombre_nsc) || 2
+  const niveauConfig = niveaux.find((n) => n.id_nsc === niveauId)
+  return Number(niveauConfig?.code_number_nsc) || 2
 }
 
 export function getNiveauCadreStrategiqueLibelle(
   niveaux: NiveauCadreStrategique[],
-  niveauCodeNumber: number,
-  codeProgramme?: string
+  niveauId: number
 ): string {
-  const scoped = codeProgramme?.trim()
-    ? filterNiveauxByProgramme(niveaux, codeProgramme)
-    : niveaux
-
-  const niveauConfig = scoped.find(
-    (n) => Number(n.code_number_nsc) === niveauCodeNumber
-  )
+  const niveauConfig = niveaux.find((n) => n.id_nsc === niveauId)
   return niveauConfig?.libelle_nsc ?? ''
 }

@@ -1,21 +1,21 @@
 import { useMemo } from 'react'
 import { AxiosError } from 'axios'
-import { toast } from 'sonner'
 import { DynamicForm } from '@/Global/Forms/DynamicForm'
-import { getIndicateurStrategiqueFormConfigForDialog } from '@/simadou/allfieldsConfig/indicateurStrategiqueForm'
-import type { IndicateurStrategique } from '@/simadou/allTypes/indicateurStrategique'
-import {
-  indicateurStrategiqueWriteSchema,
-  type IndicateurStrategiqueWriteData,
-} from '@/simadou/schemas/indicateurStrategiqueSchemas'
 import { useGetActeurs } from '@/simadou/allHooks/admin/acteurHooks'
+import { useGetCadresStrategique } from '@/simadou/allHooks/admin/cadreStrategiqueHooks'
 import {
   useCreateIndicateurStrategique,
   useUpdateIndicateurStrategique,
 } from '@/simadou/allHooks/admin/indicateurStrategiqueHooks'
-import { useGetCadresStrategique } from '@/simadou/allHooks/admin/cadreStrategiqueHooks'
 import { useGetPersonnels } from '@/simadou/allHooks/admin/personnelHooks'
+import type { IndicateurStrategique } from '@/simadou/allTypes/indicateurStrategique'
+import { getIndicateurStrategiqueFormConfigForDialog } from '@/simadou/allfieldsConfig/indicateurStrategiqueForm'
 import { resolveNiveauCsNumber } from '@/simadou/lib/cadreStrategiqueUtils'
+import {
+  indicateurStrategiqueWriteSchema,
+  type IndicateurStrategiqueWriteData,
+} from '@/simadou/schemas/indicateurStrategiqueSchemas'
+import { toast } from 'sonner'
 import {
   buildIndicateurStrategiquePayload,
   indicateurStrategiqueToFormValues,
@@ -35,14 +35,12 @@ function formatSaveError(error: unknown): string {
 }
 
 export default function IndicateurStrategiqueFormPanel({
-  programmeId,
   codeProgramme,
   niveauCodeNumber,
   indicateur,
   onClose,
   onSuccess,
 }: {
-  programmeId: number
   codeProgramme: string
   niveauCodeNumber: number
   indicateur?: IndicateurStrategique | null
@@ -53,7 +51,7 @@ export default function IndicateurStrategiqueFormPanel({
   const createMutation = useCreateIndicateurStrategique()
   const updateMutation = useUpdateIndicateurStrategique()
   const { data: cadres = [], isLoading: isLoadingCadres } =
-    useGetCadresStrategique(programmeId)
+    useGetCadresStrategique()
   const { data: acteurs = [], isLoading: isLoadingActeurs } = useGetActeurs()
   const { data: personnels = [], isLoading: isLoadingPersonnels } =
     useGetPersonnels()
@@ -61,9 +59,7 @@ export default function IndicateurStrategiqueFormPanel({
   const cadreOptions = useMemo(
     () =>
       cadres
-        .filter(
-          (c) => resolveNiveauCsNumber(c.niveau_cs) === niveauCodeNumber
-        )
+        .filter((c) => resolveNiveauCsNumber(c.niveau_cs) === niveauCodeNumber)
         .map((c) => ({
           value: String(c.id_cs),
           label: `${c.code_cs} — ${c.intutile_cs}`,
@@ -132,9 +128,7 @@ export default function IndicateurStrategiqueFormPanel({
 
     const callbacks = {
       onSuccess: () => {
-        toast.success(
-          isEditing ? 'Indicateur mis à jour' : 'Indicateur ajouté'
-        )
+        toast.success(isEditing ? 'Indicateur mis à jour' : 'Indicateur ajouté')
         onSuccess()
       },
       onError: (error: unknown) => toast.error(formatSaveError(error)),

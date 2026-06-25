@@ -1,5 +1,5 @@
 import { IndicateursTable } from './Components/IndicateursTable'
-import { RapportPtbaData } from './types'
+import { type RapportPtbaData } from './types'
 
 export function IndicateursPtbaReport({ ptbas, indicateurs, isLoading }: RapportPtbaData) {
   return (

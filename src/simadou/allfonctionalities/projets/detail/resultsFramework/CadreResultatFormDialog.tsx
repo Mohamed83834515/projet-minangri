@@ -1,30 +1,29 @@
-import { useMemo, useState } from 'react'
-import { toast } from 'sonner'
+import { useMemo } from 'react'
+import z from 'zod'
 import { DynamicForm } from '@/Global/Forms/DynamicForm'
-import { getCadreResultatFormConfigForDialog } from '@/simadou/allfieldsConfig/cadreResultatForm'
-import {
-  cadreResultatCreateSchema,
-  type CadreResultatCreateData,
-} from '@/simadou/schemas/cadreResultatSchemas'
-import type { CadreResultat, NiveauCadreResultat } from '@/simadou/allTypes'
 import { useGetActeurs } from '@/simadou/allHooks/admin/acteurHooks'
 import {
   useCreateCadreResultat,
   useUpdateCadreResultat,
 } from '@/simadou/allHooks/admin/cadreResultatHooks'
+import type { CadreResultat, NiveauCadreResultat } from '@/simadou/allTypes'
+import { getCadreResultatFormConfigForDialog } from '@/simadou/allfieldsConfig/cadreResultatForm'
 import {
   buildCadreParentOptions,
   resolveNiveauCrId,
   resolveParentCrCode,
   resolvePartenaireCode,
   resolveProjetCr,
-  sortNiveauxCadreResultat,
 } from '@/simadou/lib/cadreResultatUtils'
-import { parseOptionalNumber } from '@/simadou/lib/resolveApiRelation'
+import {
+  cadreResultatCreateSchema,
+  type CadreResultatCreateData,
+} from '@/simadou/schemas/cadreResultatSchemas'
+import { toast } from 'sonner'
 
 export default function CadreResultatFormDialog({
   codeProjet,
-  niveauId,
+  niveau,
   niveaux,
   cadres,
   cadre,
@@ -32,7 +31,7 @@ export default function CadreResultatFormDialog({
   onSuccess,
 }: {
   codeProjet: string
-  niveauId: number
+  niveau: NiveauCadreResultat
   niveaux: NiveauCadreResultat[]
   cadres: CadreResultat[]
   cadre?: CadreResultat | null
@@ -44,21 +43,27 @@ export default function CadreResultatFormDialog({
   const updateMutation = useUpdateCadreResultat()
   const { data: acteurs = [], isLoading: isLoadingActeurs } = useGetActeurs()
 
-  const initialNiveauId =
-    resolveNiveauCrId(cadre?.niveau_cr) ?? (cadre ? null : niveauId)
-  const [selectedNiveauId, setSelectedNiveauId] = useState<number | null>(
-    initialNiveauId
+  const codeLength = Number(niveau?.code_number_ncr) || 2
+
+  const schema = useMemo(
+    () =>
+      cadreResultatCreateSchema.extend({
+        code_cr: z
+          .string()
+          .min(1, 'Le code est obligatoire')
+          .length(
+            codeLength,
+            `Le code doit contenir exactement ${codeLength} caractère(s) selon la configuration du niveau ${niveau.nombre_ncr}`
+          ),
+      }),
+    [codeLength, niveau.nombre_ncr]
   )
 
-  const sortedNiveaux = useMemo(() => sortNiveauxCadreResultat(niveaux), [niveaux])
+  const initialNiveauId =
+    resolveNiveauCrId(cadre?.niveau_cr) ?? (cadre ? null : niveau?.id_ncr)
 
-  const niveauOptions = useMemo(
-    () =>
-      sortedNiveaux.map((n) => ({
-        value: n.id_ncr,
-        label: `${n.nombre_ncr} - ${n.libelle_ncr}`,
-      })),
-    [sortedNiveaux]
+  const parent = niveaux.find(
+    (n) => Number(n.nombre_ncr) == Number(niveau?.nombre_ncr) - 1
   )
 
   const acteurOptions = useMemo(
@@ -74,26 +79,32 @@ export default function CadreResultatFormDialog({
     () =>
       buildCadreParentOptions({
         cadres,
-        niveaux: sortedNiveaux,
-        selectedNiveauId,
+        parentId: parent?.id_ncr,
         excludeCadreId: cadre?.id_cr,
       }),
-    [cadres, sortedNiveaux, selectedNiveauId, cadre?.id_cr]
+    [cadres, parent?.id_ncr, cadre?.id_cr]
   )
-
-  const showParent = selectedNiveauId != null && parentOptions.length > 0
+  const showParent = niveau?.nombre_ncr > 1
 
   const config = useMemo(
     () =>
       getCadreResultatFormConfigForDialog({
-        niveauOptions,
         parentOptions,
         acteurOptions,
         isLoadingActeurs,
+        parentLabel: parent?.libelle_ncr || 'Parent',
         showParent,
         showProjet: true,
+        codeLength,
       }),
-    [niveauOptions, parentOptions, acteurOptions, isLoadingActeurs, showParent]
+    [
+      parentOptions,
+      acteurOptions,
+      isLoadingActeurs,
+      parent?.libelle_ncr,
+      showParent,
+      codeLength,
+    ]
   )
 
   const defaultValues = useMemo(
@@ -106,7 +117,8 @@ export default function CadreResultatFormDialog({
       niveau_cr: initialNiveauId,
       partenaire_cr: resolvePartenaireCode(cadre?.partenaire_cr),
       parent_cr: resolveParentCrCode(cadre?.parent_cr),
-      projet_cr: resolveProjetCr(cadre?.projet_cr) ?? (cadre ? null : codeProjet),
+      projet_cr:
+        resolveProjetCr(cadre?.projet_cr) ?? (cadre ? null : codeProjet),
     }),
     [cadre, initialNiveauId, codeProjet]
   )
@@ -114,7 +126,7 @@ export default function CadreResultatFormDialog({
   const onSubmit = (data: CadreResultatCreateData) => {
     const payload: CadreResultatCreateData = {
       ...data,
-      niveau_cr: data.niveau_cr ?? selectedNiveauId ?? niveauId ?? null,
+      niveau_cr: data.niveau_cr ?? niveau.id_ncr ?? null,
       parent_cr: data.parent_cr || null,
       partenaire_cr: data.partenaire_cr || null,
       projet_cr: data.projet_cr || (isEditing ? null : codeProjet) || null,
@@ -128,7 +140,9 @@ export default function CadreResultatFormDialog({
       },
       onError: () =>
         toast.error(
-          isEditing ? 'Erreur lors de la mise à jour' : 'Erreur lors de la création'
+          isEditing
+            ? 'Erreur lors de la mise à jour'
+            : 'Erreur lors de la création'
         ),
     }
 
@@ -142,9 +156,9 @@ export default function CadreResultatFormDialog({
 
   return (
     <DynamicForm
-      key={cadre?.id_cr ?? `new-${niveauId}`}
+      key={cadre?.id_cr ?? `new-${niveau}`}
       config={config}
-      schema={cadreResultatCreateSchema}
+      schema={schema}
       defaultValues={defaultValues}
       onSubmit={onSubmit}
       submitText={isEditing ? 'Modifier' : 'Créer'}
@@ -152,10 +166,6 @@ export default function CadreResultatFormDialog({
       isLoading={createMutation.isPending || updateMutation.isPending}
       onCancel={onClose}
       cancelText='Annuler'
-      onFieldChange={(fieldName, value) => {
-        if (fieldName !== 'niveau_cr') return
-        setSelectedNiveauId(parseOptionalNumber(value))
-      }}
     />
   )
 }

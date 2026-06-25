@@ -1,73 +1,66 @@
-import type { FormConfig, SelectOption } from "../../Global/types/formConfig";
+import type { FormConfig, SelectOption } from '../../Global/types/formConfig'
 
 export const getCadreResultatFormConfigForDialog = ({
-  niveauOptions,
+  parentLabel,
   parentOptions,
   acteurOptions,
   isLoadingActeurs,
   showParent,
+  codeLength,
 }: {
-  niveauOptions: SelectOption[];
-  parentOptions: SelectOption[];
-  acteurOptions: SelectOption[];
-  isLoadingActeurs?: boolean;
-  showParent: boolean;
-  showProjet?: boolean;
+  parentLabel: string
+  parentOptions: SelectOption[]
+  acteurOptions: SelectOption[]
+  isLoadingActeurs?: boolean
+  showProjet?: boolean
+  showParent: boolean
+  codeLength: number
 }): FormConfig => ({
   fields: [
     {
-      name: "code_cr",
-      label: "Code du cadre",
-      type: "text",
-      placeholder: "ex: CR001, RES001",
+      name: 'code_cr',
+      label: `Code du cadre (exactement ${codeLength} caractères)`,
+      type: 'text',
+      placeholder: `Code de ${codeLength} caractères`,
       required: true,
-      maxLength: 50,
+      maxLength: codeLength,
       gridCols: 2,
     },
     {
-      name: "cout_axe",
+      name: 'cout_axe',
       label: "Coût de l'axe",
-      type: "number",
-      placeholder: "Entrez le coût",
+      type: 'number',
+      placeholder: 'Entrez le coût',
       required: true,
       min: 0,
       step: 1,
       gridCols: 2,
     },
     {
-      name: "intutile_cr",
-      label: "Intitulé du cadre",
-      type: "text",
-      placeholder: "Intitulé complet du cadre de résultat",
+      name: 'intutile_cr',
+      label: 'Intitulé du cadre',
+      type: 'text',
+      placeholder: 'Intitulé complet du cadre de résultat',
       required: true,
       maxLength: 200,
       gridCols: 1,
     },
     {
-      name: "abgrege_cr",
-      label: "Abrégé",
-      type: "text",
-      placeholder: "Abrégé du cadre",
+      name: 'abgrege_cr',
+      label: 'Abrégé',
+      type: 'text',
+      placeholder: 'Abrégé du cadre',
       required: true,
       maxLength: 50,
-      gridCols: 2,
-    },
-    {
-      name: "niveau_cr",
-      label: "Niveau",
-      type: "select",
-      placeholder: "Sélectionnez un niveau",
-      required: false,
-      options: niveauOptions,
       gridCols: 2,
     },
     ...(showParent
       ? [
           {
-            name: "parent_cr",
-            label: "Cadre parent",
-            type: "select" as const,
-            placeholder: "Sélectionnez un cadre parent",
+            name: 'parent_cr',
+            label: parentLabel || 'Parent',
+            type: 'select' as const,
+            placeholder: `Sélectionnez un ${parentLabel}`,
             required: false,
             options: parentOptions,
             gridCols: 2 as const,
@@ -75,14 +68,14 @@ export const getCadreResultatFormConfigForDialog = ({
         ]
       : []),
     {
-      name: "partenaire_cr",
-      label: "Partenaire",
-      type: "select",
-      placeholder: "Sélectionnez un partenaire",
+      name: 'partenaire_cr',
+      label: 'Partenaire',
+      type: 'select',
+      placeholder: 'Sélectionnez un partenaire',
       required: false,
       options: acteurOptions,
       isLoading: isLoadingActeurs,
       gridCols: 2,
-    }
+    },
   ],
-});
+})

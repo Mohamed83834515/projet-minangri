@@ -1,13 +1,14 @@
 import { useMemo } from 'react'
 import { GenericTable } from '@/Global/Generic/Generictable'
-import { useEmbeddedTableState } from '@/hooks/use-embedded-table-state'
-import type { IndicateurTache } from '@/simadou/allTypes/indicateurTache'
-import type { SuiviIndicateurActivite } from '@/simadou/allTypes/suiviIndicateurActivite'
-import type { SuiviIndicateurTacheProjet } from '@/simadou/allTypes/suiviIndicateurTacheProjet'
 import {
   buildSuiviIndicateurColumns,
   type SuiviIndicateurTableRow,
 } from '@/simadou/allColonnes/suivi-indicateur-columns'
+import { useGetUnitesIndicateur } from '@/simadou/allHooks/admin/uniteIndicateurHooks'
+import type { IndicateurTache } from '@/simadou/allTypes/indicateurTache'
+import type { SuiviIndicateurActivite } from '@/simadou/allTypes/suiviIndicateurActivite'
+import type { SuiviIndicateurTacheProjet } from '@/simadou/allTypes/suiviIndicateurTacheProjet'
+import { useEmbeddedTableState } from '@/hooks/use-embedded-table-state'
 
 type SuiviIndicateurActiviteTableProps = {
   indicateurs: IndicateurTache[]
@@ -22,7 +23,9 @@ function groupSuivisByIndicateur(suivis: SuiviIndicateurTacheProjet[]) {
     if (id == null || !Number.isFinite(id)) continue
     const key = String(id)
     const list = map.get(key) ?? []
-    list.push({ id_suivi_indicateur: suivi.id_suivi_sit } as SuiviIndicateurActivite)
+    list.push({
+      id_suivi_indicateur: suivi.id_suivi_sit,
+    } as SuiviIndicateurActivite)
     map.set(key, list)
   }
   return map
@@ -34,7 +37,7 @@ export default function SuiviIndicateurActiviteProjetTable({
   onSuivre,
 }: SuiviIndicateurActiviteTableProps) {
   const { search, navigate } = useEmbeddedTableState()
-
+  const { data: unites = [] } = useGetUnitesIndicateur()
   const suivisByIndicateur = useMemo(
     () => groupSuivisByIndicateur(suivis),
     [suivis]
@@ -43,12 +46,13 @@ export default function SuiviIndicateurActiviteProjetTable({
   const columns = useMemo(
     () =>
       buildSuiviIndicateurColumns({
+        unites,
         onSuivre,
         suivisByIndicateur,
         resolveIndicateurKey: (indicateur) =>
           String(indicateur.id_indicateur_tache),
       }),
-    [onSuivre, suivisByIndicateur]
+    [onSuivre, suivisByIndicateur, unites]
   )
 
   return (

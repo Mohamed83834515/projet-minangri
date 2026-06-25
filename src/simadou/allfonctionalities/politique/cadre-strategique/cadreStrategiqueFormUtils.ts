@@ -10,12 +10,12 @@ import {
 export function cadreStrategiqueToFormValues({
   cadre,
   programmeId,
-  niveauCodeNumber,
+  niveauCs,
   acteurs,
 }: {
   cadre?: CadreStrategique | null
   programmeId: number
-  niveauCodeNumber: number
+  niveauCs: number
   acteurs: Pick<Acteur, 'id_acteur'>[]
 }): CadreStrategiqueWriteData {
   return {
@@ -25,7 +25,7 @@ export function cadreStrategiqueToFormValues({
     parent_cs: resolveParentCsId(cadre?.parent_cs ?? null),
     partenaire_cs: toPartenaireCsFormValue(cadre?.partenaire_cs, acteurs),
     niveau_cs:
-      (cadre ? resolveNiveauCsNumber(cadre.niveau_cs) : null) ?? niveauCodeNumber,
+      (cadre ? resolveNiveauCsNumber(cadre.niveau_cs) : null) ?? niveauCs,
     programme_cs: programmeId,
   }
 }

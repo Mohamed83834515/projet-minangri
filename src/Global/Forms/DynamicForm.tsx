@@ -41,7 +41,7 @@ interface DynamicFormProps {
   className?: string
   hideFormFooter?: boolean
   formId?: string
-  renderAfter?: React.ReactNode  // ← Ajoute cette ligne
+  renderAfter?: React.ReactNode // ← Ajoute cette ligne
 }
 
 export interface DynamicFormHandle {
@@ -69,7 +69,7 @@ export const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps>(
       className,
       hideFormFooter,
       formId,
-      renderAfter
+      renderAfter,
     },
     ref
   ) => {
@@ -87,7 +87,7 @@ export const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps>(
       watch,
       trigger,
       setValue,
-      reset
+      reset,
     } = form
 
     const defaultValuesKeyRef = useRef<string | null>(null)
@@ -126,8 +126,12 @@ export const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps>(
     const visibleFields = config.fields.filter(
       (field) => field.type !== 'hidden' && shouldShowField(field)
     )
-    const hiddenFields = config.fields.filter((field) => field.type === 'hidden')
-    const useThreeColumnGrid = visibleFields.some((field) => field.gridCols === 3)
+    const hiddenFields = config.fields.filter(
+      (field) => field.type === 'hidden'
+    )
+    const useThreeColumnGrid = visibleFields.some(
+      (field) => field.gridCols === 3
+    )
     const hasErrors = Object.keys(errors).length > 0
     const errorCount = Object.keys(errors).length
 
@@ -135,24 +139,24 @@ export const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps>(
 
     const status = hasErrors
       ? {
-        icon: <AlertCircle className='h-3.5 w-3.5' />,
-        label: `${errorCount} erreur${errorCount > 1 ? 's' : ''} à corriger`,
-        variant: 'destructive' as const,
-        dot: 'bg-destructive',
-      }
+          icon: <AlertCircle className='h-3.5 w-3.5' />,
+          label: `${errorCount} erreur${errorCount > 1 ? 's' : ''} à corriger`,
+          variant: 'destructive' as const,
+          dot: 'bg-destructive',
+        }
       : isDirty
         ? {
-          icon: <PenLine className='h-3.5 w-3.5' />,
-          label: 'Modifications en attente',
-          variant: 'secondary' as const,
-          dot: 'bg-amber-400',
-        }
+            icon: <PenLine className='h-3.5 w-3.5' />,
+            label: 'Modifications en attente',
+            variant: 'secondary' as const,
+            dot: 'bg-amber-400',
+          }
         : {
-          icon: <CheckCircle2 className='h-3.5 w-3.5' />,
-          label: 'Formulaire prêt',
-          variant: 'outline' as const,
-          dot: 'bg-emerald-400',
-        }
+            icon: <CheckCircle2 className='h-3.5 w-3.5' />,
+            label: 'Formulaire prêt',
+            variant: 'outline' as const,
+            dot: 'bg-emerald-400',
+          }
 
     return (
       <div
@@ -165,7 +169,7 @@ export const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps>(
       >
         {/* ── Corps du formulaire ── */}
         <Form {...form}>
-          <form onSubmit={handleSubmit(onSubmit as any)} id={formId}  >
+          <form onSubmit={handleSubmit(onSubmit as any)} id={formId}>
             {hiddenFields.map((field) => (
               <input key={field.name} type='hidden' {...register(field.name)} />
             ))}
@@ -181,7 +185,7 @@ export const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps>(
                   <div
                     key={field.name}
                     className={cn(
-                      'animate-in duration-300 fade-in-0 fill-mode-both slide-in-from-bottom-2 min-w-0',
+                      'min-w-0 animate-in duration-300 fade-in-0 fill-mode-both slide-in-from-bottom-2',
                       useThreeColumnGrid
                         ? field.gridCols === 1
                           ? 'col-span-1 sm:col-span-3'
@@ -203,11 +207,7 @@ export const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps>(
                   </div>
                 ))}
               </div>
-              {renderAfter && (
-                <div className="mt-6">
-                  {renderAfter}
-                </div>
-              )}
+              {renderAfter && <div className='mt-6'>{renderAfter}</div>}
             </div>
 
             <div
@@ -222,8 +222,7 @@ export const DynamicForm = forwardRef<DynamicFormHandle, DynamicFormProps>(
               <div
                 className={cn(
                   'flex items-center gap-4',
-                  embedded ? 'justify-end pt-3' : 'justify-between px-2 pt-3',
-
+                  embedded ? 'justify-end pt-3' : 'justify-between px-2 pt-3'
                 )}
               >
                 {/* Indicateur de statut (masqué en modal embarqué sauf erreurs) */}

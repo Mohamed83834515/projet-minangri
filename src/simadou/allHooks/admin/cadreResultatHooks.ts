@@ -1,13 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { invalidateAndRefetch } from '@/simadou/allHooks/admin/queryInvalidation'
+import { cadreResultatService } from '@/simadou/allSercices/cadreResultatService'
+import { niveauCadreResultatService } from '@/simadou/allSercices/niveauCadreResultatService'
 import type { NiveauCadreResultat } from '@/simadou/allTypes'
 import type {
   CadreResultatCreateData,
   CadreResultatUpdateData,
   NiveauCadreResultatCreateData,
 } from '@/simadou/schemas/cadreResultatSchemas'
-import { cadreResultatService } from '@/simadou/allSercices/cadreResultatService'
-import { niveauCadreResultatService } from '@/simadou/allSercices/niveauCadreResultatService'
-import { invalidateAndRefetch } from '@/simadou/allHooks/admin/queryInvalidation'
 
 export const niveauCadreResultatQueryKeys = {
   all: ['niveaux-cadre-resultat'] as const,
@@ -39,8 +39,13 @@ export function useCreateNiveauCadreResultat() {
 export function useUpdateNiveauCadreResultat() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, data }: { id: number; data: Partial<NiveauCadreResultat> }) =>
-      niveauCadreResultatService.update(id, data),
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: number
+      data: Partial<NiveauCadreResultat>
+    }) => niveauCadreResultatService.update(id, data),
     meta: { suppressGlobalErrorToast: true },
     onSuccess: async () => {
       await invalidateAndRefetch(queryClient, niveauCadreResultatQueryKeys.all)
@@ -61,7 +66,7 @@ export function useDeleteNiveauCadreResultat() {
 
 export function useGetCadresResultat(codeProjet: string) {
   return useQuery({
-    queryKey: cadreResultatQueryKeys.all,
+    queryKey: [cadreResultatQueryKeys.all, codeProjet],
     queryFn: () => cadreResultatService.getbyProjet(codeProjet),
   })
 }

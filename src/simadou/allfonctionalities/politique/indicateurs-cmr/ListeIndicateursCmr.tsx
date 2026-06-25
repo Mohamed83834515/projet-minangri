@@ -1,8 +1,29 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import { GenericTable } from '@/Global/Generic/Generictable'
+import { GenericDeleteDialog } from '@/Global/Tableaux/GenericDeleteDialog'
+import { buildIndicateurCmrColumns } from '@/simadou/allColonnes/indicateur-cmr-columns'
+import { useGetNiveauxCadreStrategique } from '@/simadou/allHooks/admin/cadreStrategiqueHooks'
+import {
+  useDeleteIndicateurCmr,
+  useGetIndicateursCmr,
+} from '@/simadou/allHooks/admin/indicateurCmrHooks'
+import { useGetIndicateursStrategique } from '@/simadou/allHooks/admin/indicateurStrategiqueHooks'
+import type { IndicateurCmr } from '@/simadou/allTypes'
+import IndicateurCmrDetailView from '@/simadou/allfonctionalities/projets/detail/cmrIndicators/IndicateurCmrDetailView'
 import { toast } from 'sonner'
+import {
+  useActiveProgramme,
+  useActiveProgrammeId,
+} from '@/hooks/use-active-programme'
+import useDialogState from '@/hooks/use-dialog-state'
+import { useEmbeddedTableState } from '@/hooks/use-embedded-table-state'
+import {
+  NiveauTabTrigger,
+  NiveauTabsList,
+  useNiveauTabsTheme,
+} from '@/components/ui/NiveauTabs'
 import { Card } from '@/components/ui/card'
-import { DataTableToolbarOutlineButton } from '@/components/data-table/toolbar-outline-button'
 import {
   Dialog,
   DialogContent,
@@ -11,35 +32,10 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Tabs } from '@/components/ui/tabs'
-import { GenericTable } from '@/Global/Generic/Generictable'
-import { GenericDeleteDialog } from '@/Global/Tableaux/GenericDeleteDialog'
-import useDialogState from '@/hooks/use-dialog-state'
-import { useEmbeddedTableState } from '@/hooks/use-embedded-table-state'
-import {
-  useActiveProgramme,
-  useActiveProgrammeId,
-} from '@/hooks/use-active-programme'
-import type { IndicateurCmr } from '@/simadou/allTypes'
-import { buildIndicateurCmrColumns } from '@/simadou/allColonnes/indicateur-cmr-columns'
-import {
-  useDeleteIndicateurCmr,
-  useGetIndicateursCmr,
-} from '@/simadou/allHooks/admin/indicateurCmrHooks'
-import { useGetIndicateursStrategique } from '@/simadou/allHooks/admin/indicateurStrategiqueHooks'
-import { useGetNiveauxCadreStrategique } from '@/simadou/allHooks/admin/cadreStrategiqueHooks'
-import {
-  NiveauTabTrigger,
-  NiveauTabsList,
-  useNiveauTabsTheme,
-} from '@/components/ui/NiveauTabs'
-import {
-  filterNiveauxByProgramme,
-  sortNiveauxCadreStrategique,
-} from '@/simadou/lib/cadreStrategiqueUtils'
-import IndicateurCmrDetailView from '@/simadou/allfonctionalities/projets/detail/cmrIndicators/IndicateurCmrDetailView'
+import { DataTableToolbarOutlineButton } from '@/components/data-table/toolbar-outline-button'
 import CiblesCmrDialog from './CiblesCmrDialog'
-import { filterIndicateursStrategiqueByNiveau } from './indicateurCmrFormUtils'
 import IndicateurCmrFormPanel from './IndicateurCmrFormPanel'
+import { filterIndicateursStrategiqueByNiveau } from './indicateurCmrFormUtils'
 
 type ModalState = 'indicateur' | 'indicateurView'
 
@@ -64,15 +60,7 @@ export default function ListeIndicateursCmr({
   const deleteMutation = useDeleteIndicateurCmr()
   const { search, navigate } = useEmbeddedTableState()
 
-  const sortedNiveaux = useMemo(
-    () =>
-      sortNiveauxCadreStrategique(
-        filterNiveauxByProgramme(niveaux, codeProgramme, programmeId)
-      ),
-    [niveaux, codeProgramme, programmeId]
-  )
-
-  const hasNiveaux = sortedNiveaux.length > 0
+  const hasNiveaux = niveaux.length > 0
   const { tabsStyle } = useNiveauTabsTheme()
 
   const [activeNiveauCode, setActiveNiveauCode] = useState('')
@@ -80,32 +68,31 @@ export default function ListeIndicateursCmr({
   const [ciblesOpen, setCiblesOpen] = useState(false)
   const [indicateurForCibles, setIndicateurForCibles] =
     useState<IndicateurCmr | null>(null)
-  const [selectedIndicateurId, setSelectedIndicateurId] = useState<number | null>(
-    null
-  )
-  const [selectedIndicateur, setSelectedIndicateur] = useState<IndicateurCmr | null>(
-    null
-  )
+  const [selectedIndicateurId, setSelectedIndicateurId] = useState<
+    number | null
+  >(null)
+  const [selectedIndicateur, setSelectedIndicateur] =
+    useState<IndicateurCmr | null>(null)
 
   const [deleteOpen, setDeleteOpen] = useDialogState<'delete'>(null)
   const [rowToDelete, setRowToDelete] = useState<IndicateurCmr | null>(null)
 
   useEffect(() => {
-    if (sortedNiveaux.length > 0 && activeNiveauCode === '') {
-      setActiveNiveauCode(String(sortedNiveaux[0].code_number_nsc))
+    if (niveaux.length > 0 && activeNiveauCode === '') {
+      setActiveNiveauCode(String(niveaux[0].code_number_nsc))
     }
-  }, [sortedNiveaux, activeNiveauCode])
+  }, [niveaux, activeNiveauCode])
 
   const currentNiveauCode = Number(
-    activeNiveauCode || sortedNiveaux[0]?.code_number_nsc || 0
+    activeNiveauCode || niveaux[0]?.code_number_nsc || 0
   )
 
   const currentNiveauLibelle = useMemo(() => {
-    const n = sortedNiveaux.find(
+    const n = niveaux.find(
       (x) => Number(x.code_number_nsc) === currentNiveauCode
     )
     return n?.libelle_nsc ?? 'niveau'
-  }, [sortedNiveaux, currentNiveauCode])
+  }, [niveaux, currentNiveauCode])
 
   const closeAll = useCallback(() => {
     setModal(null)
@@ -214,8 +201,8 @@ export default function ListeIndicateursCmr({
     return (
       <Card className='border-dashed p-6 text-center'>
         <p className='text-sm text-muted-foreground'>
-          Sélectionnez un programme dans l&apos;en-tête pour gérer les indicateurs
-          CMR.
+          Sélectionnez un programme dans l&apos;en-tête pour gérer les
+          indicateurs CMR.
         </p>
       </Card>
     )
@@ -249,7 +236,7 @@ export default function ListeIndicateursCmr({
       >
         <div className='overflow-x-auto'>
           <NiveauTabsList>
-            {sortedNiveaux.map((n) => (
+            {niveaux.map((n) => (
               <NiveauTabTrigger
                 key={n.id_nsc}
                 value={String(n.code_number_nsc)}
@@ -311,7 +298,10 @@ export default function ListeIndicateursCmr({
         indicateur={indicateurForCibles}
       />
 
-      <Dialog open={modal === 'indicateur'} onOpenChange={(o) => !o && closeAll()}>
+      <Dialog
+        open={modal === 'indicateur'}
+        onOpenChange={(o) => !o && closeAll()}
+      >
         <DialogContent
           className='flex max-h-[90vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-3xl'
           aria-describedby={undefined}
@@ -331,7 +321,8 @@ export default function ListeIndicateursCmr({
             {modal === 'indicateur' ? (
               <IndicateurCmrFormPanel
                 key={
-                  selectedIndicateur?.id_ref_ind_cmr ?? `new-${currentNiveauCode}`
+                  selectedIndicateur?.id_ref_ind_cmr ??
+                  `new-${currentNiveauCode}`
                 }
                 indicateur={selectedIndicateur}
                 niveauCodeNumber={currentNiveauCode}

@@ -1,19 +1,24 @@
 import { useCallback, useMemo, useRef } from 'react'
 import { getRouteApi } from '@tanstack/react-router'
 import { GenericTable } from '@/Global/Generic/Generictable'
-import { useActiveProgrammeCode } from '@/hooks/use-active-programme'
-import type { Ptba } from '@/simadou/allTypes'
-import { resolveIdActivite } from '@/simadou/allTypes/tacheActivitePtba'
 import { buildRapportPtbasColumns } from '@/simadou/allColonnes/rapport-ptbas-columns'
 import { useGetAllIndicateursTache } from '@/simadou/allHooks/admin/indicateurTacheHooks'
-import { useGetPtbas } from '@/simadou/allHooks/admin/ptbaHooks'
 import { useGetPersonnels } from '@/simadou/allHooks/admin/personnelHooks'
+import { useGetPtbas } from '@/simadou/allHooks/admin/ptbaHooks'
 import { useGetAllTachesActivite } from '@/simadou/allHooks/admin/suiviPtbaHooks'
 import { usePtbaVersionSelection } from '@/simadou/allHooks/admin/versionHooks'
 import { useGeneralParamsQuery } from '@/simadou/allHooks/generalParams/queries'
-import { normalizeIndicateurTache } from '@/simadou/lib/indicateurTacheUtils'
-import { resolvePersonnelLabel } from '@/simadou/lib/resolveApiRelation'
+import type { Ptba } from '@/simadou/allTypes'
+import { resolveIdActivite } from '@/simadou/allTypes/tacheActivitePtba'
 import { PtbaVersionSelect } from '@/simadou/allfonctionalities/ptba/PtbaVersionSelect'
+import {
+  mapTableColumnsToExportIds,
+  RAPPORT_PTBA_COLUMN_MAP,
+} from '@/simadou/allfonctionalities/rapport/export/rapportExportColumnMap'
+import {
+  buildRapportPtbaExportRows,
+  getRapportPtbaExportColumns,
+} from '@/simadou/allfonctionalities/rapport/export/rapportExportRowBuilders'
 import {
   EMPTY_PTBA_LIST,
   RAPPORT_PTBA_TABLE_INITIAL_STATE,
@@ -21,16 +26,11 @@ import {
   filterPtbasByVersion,
   resolvePtbaActiviteId,
 } from '@/simadou/allfonctionalities/rapport/rapportTableUtils'
-import {
-  buildRapportPtbaExportRows,
-  getRapportPtbaExportColumns,
-} from '@/simadou/allfonctionalities/rapport/export/rapportExportRowBuilders'
-import {
-  mapTableColumnsToExportIds,
-  RAPPORT_PTBA_COLUMN_MAP,
-} from '@/simadou/allfonctionalities/rapport/export/rapportExportColumnMap'
 import { useExportTableContextRef } from '@/simadou/allfonctionalities/rapport/useExportTableContextRef'
 import { useRapportExportRegistration } from '@/simadou/allfonctionalities/rapport/useRapportExportRegistration'
+import { normalizeIndicateurTache } from '@/simadou/lib/indicateurTacheUtils'
+import { resolvePersonnelLabel } from '@/simadou/lib/resolveApiRelation'
+import { useActiveProgrammeCode } from '@/hooks/use-active-programme'
 
 const route = getRouteApi('/_authenticated/rapport/ptba/')
 

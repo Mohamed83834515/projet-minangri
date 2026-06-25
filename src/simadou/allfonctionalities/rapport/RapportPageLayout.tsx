@@ -8,7 +8,11 @@ type Props = {
   children: React.ReactNode
 }
 
-export default function RapportPageLayout({ title, icon: Icon, children }: Props) {
+export default function RapportPageLayout({
+  title,
+  icon: Icon,
+  children,
+}: Props) {
   return (
     <RapportExportProvider pageTitle={title}>
       <div>
