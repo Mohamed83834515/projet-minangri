@@ -28,7 +28,7 @@ export const getCadreResultatFormConfigForDialog = ({
       type: 'text',
       placeholder: 'Abrégé du cadre',
       required: true,
-      maxLength: 50,
+      maxLength: codeLength,
       gridCols: 2,
     },
     {

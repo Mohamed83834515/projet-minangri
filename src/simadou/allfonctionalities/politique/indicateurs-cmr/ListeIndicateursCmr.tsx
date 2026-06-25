@@ -3,7 +3,6 @@ import { useNavigate } from '@tanstack/react-router'
 import { GenericTable } from '@/Global/Generic/Generictable'
 import { GenericDeleteDialog } from '@/Global/Tableaux/GenericDeleteDialog'
 import { buildIndicateurCmrColumns } from '@/simadou/allColonnes/indicateur-cmr-columns'
-import { useGetNiveauxCadreStrategique, useGetCadresStrategique } from '@/simadou/allHooks/admin/cadreStrategiqueHooks'
 import {
   useDeleteIndicateurCmr,
   useGetIndicateursCmr,
@@ -34,12 +33,8 @@ import {
 import { Tabs } from '@/components/ui/tabs'
 import { DataTableToolbarOutlineButton } from '@/components/data-table/toolbar-outline-button'
 import CiblesCmrDialog from './CiblesCmrDialog'
+import { filterIndicateursStrategiqueByNiveau } from './indicateurCmrFormUtils'
 import IndicateurCmrFormPanel from './IndicateurCmrFormPanel'
-import { filterCadresStrategiqueByNiveau } from '@/simadou/lib/cadreStrategiqueUtils'
-import {
-  countIndicateursCmrByNiveau,
-  filterIndicateursCmrByNiveau,
-} from './indicateurCmrFormUtils'
 
 type ModalState = 'indicateur' | 'indicateurView'
 
@@ -83,25 +78,21 @@ export default function ListeIndicateursCmr({
   const [rowToDelete, setRowToDelete] = useState<IndicateurCmr | null>(null)
 
   useEffect(() => {
-    if (niveaux.length > 0 && activeNiveauCode === '') {
-      setActiveNiveauCode(String(niveaux[0].id_nsc))
+    if (sortedNiveaux.length > 0 && activeNiveauCode === '') {
+      setActiveNiveauCode(String(sortedNiveaux[0].code_number_nsc))
     }
   }, [niveaux, activeNiveauCode])
 
   const currentNiveauCode = Number(
-    activeNiveauCode || niveaux[0]?.id_nsc || 0
+    activeNiveauCode || sortedNiveaux[0]?.code_number_nsc || 0
   )
 
-  const currentNiveau = useMemo(
-    () =>
-      niveaux.find((x) => Number(x.id_nsc) === currentNiveauCode) ??
-      niveaux[0],
-    [niveaux, currentNiveauCode]
-  )
-
-  const currentNiveauId = Number(currentNiveau?.id_nsc ?? 0)
-
-  const currentNiveauLibelle = currentNiveau?.libelle_nsc ?? 'niveau'
+  const currentNiveauLibelle = useMemo(() => {
+    const n = sortedNiveaux.find(
+      (x) => Number(x.code_number_nsc) === currentNiveauCode
+    )
+    return n?.libelle_nsc ?? 'niveau'
+  }, [sortedNiveaux, currentNiveauCode])
 
   const closeAll = useCallback(() => {
     setModal(null)
@@ -335,8 +326,7 @@ export default function ListeIndicateursCmr({
             {modal === 'indicateur' ? (
               <IndicateurCmrFormPanel
                 key={
-                  selectedIndicateur?.id_ref_ind_cmr ??
-                  `new-${currentNiveauId}`
+                  selectedIndicateur?.id_ref_ind_cmr ?? `new-${currentNiveauCode}`
                 }
                 indicateur={selectedIndicateur}
                 codeProgramme={codeProgramme}
