@@ -38,7 +38,6 @@ export function IndicateursTable({
   isLoading,
 }: IndicateursTableProps) {
   const { data: unites = [] } = useGetUnitesIndicateur()
-
   const indicateursByActivite = useMemo(() => {
     const map = new Map<number, IndicateurTache[]>()
 

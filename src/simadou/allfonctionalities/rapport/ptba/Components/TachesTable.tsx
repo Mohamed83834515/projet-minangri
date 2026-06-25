@@ -22,7 +22,9 @@ import { type RapportExportRowMeta } from '../../export/rapportExportTypes'
 interface Props {
   cadresAnalytiques: CadreAnalytique[]
   ptbas: Ptba[]
+
   taches: TacheActivitePtba[]
+
   isLoading: boolean
 }
 

@@ -9,6 +9,7 @@ import {
 import { useGetPersonnels } from '@/simadou/allHooks/admin/personnelHooks'
 import type { IndicateurStrategique } from '@/simadou/allTypes/indicateurStrategique'
 import { getIndicateurStrategiqueFormConfigForDialog } from '@/simadou/allfieldsConfig/indicateurStrategiqueForm'
+
 import {
   indicateurStrategiqueWriteSchema,
   type IndicateurStrategiqueWriteData,
