@@ -168,27 +168,6 @@ export default function ListeProjets() {
     })
   }, [filteredByType, filtreCloture])
 
-  // ✅ Comptage par type (pour les badges)
-  const countByType = useMemo(() => {
-    const map = new Map<number, number>()
-    filteredByType.forEach((projet) => {
-      if (!projet.type_projet) return
-      const id = typeof projet.type_projet === 'number'
-        ? projet.type_projet
-        : (projet.type_projet as any)?.id_type_projet
-      if (id) map.set(id, (map.get(id) || 0) + 1)
-    })
-    return map
-  }, [filteredByType])
-
-  // ✅ Tri des types par count
-  const sortedTypesByCount = useMemo(() => {
-    return [...sortedTypes].sort((a, b) => {
-      const countA = countByType.get(a.id_type_projet) || 0
-      const countB = countByType.get(b.id_type_projet) || 0
-      return countB - countA
-    })
-  }, [sortedTypes, countByType])
 
   if (!activeProgramme) {
     return (
@@ -218,7 +197,7 @@ export default function ListeProjets() {
             onValueChange={(val) => setSelectedTypeProjetId(Number(val))}
           >
             <TabsList className='flex flex-wrap gap-1'>
-              {sortedTypesByCount.map((type) => {
+              {sortedTypes.map((type) => {
                 // const count = countByType.get(type.id_type_projet) || 0
                 return (
                   <TabsTrigger
