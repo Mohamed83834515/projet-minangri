@@ -202,8 +202,6 @@ const DashboardPage: React.FC = () => {
 
         return map
     }, [versions])
-    console.log('version', versionsParAnnee)
-    console.log('avancement_directions', avancement_directions)
     
     // ✅ Récupérer la version la plus récente pour une année donnée
     const getVersionByAnnee = useCallback((annee: number) => {
