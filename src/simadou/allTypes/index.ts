@@ -50,6 +50,8 @@ export * from "./versionPtba";
 export * from "./ugl";
 export * from "./cibleCmr";
 export * from "./cibleCmrProjet";
+export * from "./cibleIndicateurPerformanceProgramme";
+export * from "./indicateurPerformanceProgramme";
 export * from "./zoneCollecte";
 export * from "./niveauLocalite";
 export * from "./niveauStructure";

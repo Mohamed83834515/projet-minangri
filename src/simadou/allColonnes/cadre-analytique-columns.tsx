@@ -1,4 +1,6 @@
 import { type ColumnDef } from '@tanstack/react-table'
+import { List } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { DataTableColumnHeader } from '@/components/data-table'
 import { LongText } from '@/components/others/long-text'
 import { buildEditDeleteActionsColumn } from '@/Global/Tableaux/buildEditDeleteActionsColumn'
@@ -20,6 +22,9 @@ export function buildCadreAnalytiqueColumns({
   niveaux = [],
   currentNiveauCodeNumber,
   acteurs = [],
+  isLastLevel = false,
+  onOpenIndicateurs,
+  getIndicateurCount,
   onEdit,
   onDeleteRequest,
 }: {
@@ -27,6 +32,9 @@ export function buildCadreAnalytiqueColumns({
   niveaux?: NiveauCadreAnalytique[]
   currentNiveauCodeNumber: number
   acteurs?: Pick<Acteur, 'id_acteur' | 'nom_acteur' | 'code_acteur'>[]
+  isLastLevel?: boolean
+  onOpenIndicateurs?: (row: CadreAnalytique) => void
+  getIndicateurCount?: (row: CadreAnalytique) => number
   onEdit: (row: CadreAnalytique) => void
   onDeleteRequest: (row: CadreAnalytique) => void
 }): ColumnDef<CadreAnalytique>[] {
@@ -73,6 +81,63 @@ export function buildCadreAnalytiqueColumns({
         ]
       : []
 
+  const budgetColumn: ColumnDef<CadreAnalytique>[] =
+    currentNiveauCodeNumber === 1
+      ? [
+          {
+            id: 'cout_axe',
+            accessorKey: 'cout_axe',
+            header: ({ column }) => (
+              <DataTableColumnHeader column={column} title='Budget GNF' />
+            ),
+            cell: ({ row }) => (
+              <span className='whitespace-nowrap tabular-nums text-sm'>
+                {formatNumber(row.original.cout_axe)}
+              </span>
+            ),
+            enableHiding: false,
+          },
+        ]
+      : []
+
+  const indicateursColumn: ColumnDef<CadreAnalytique>[] =
+    isLastLevel && onOpenIndicateurs
+      ? [
+          {
+            id: 'planification_indicateur',
+            header: ({ column }) => (
+              <DataTableColumnHeader
+                column={column}
+                title='Indicateurs'
+                className='text-center'
+              />
+            ),
+            cell: ({ row }) => {
+              const count = getIndicateurCount?.(row.original) ?? 0
+
+              return (
+                <div className='flex justify-center'>
+                  <Button
+                    type='button'
+                    variant='outline'
+                    size='sm'
+                    className='gap-2 border-green-200 bg-green-50 text-green-700 hover:bg-green-100'
+                    onClick={() => onOpenIndicateurs(row.original)}
+                  >
+                    <List className='h-4 w-4' />
+                    Indicateurs ({count})
+                  </Button>
+                </div>
+              )
+            },
+            meta: { thClassName: 'text-center', className: 'text-center' },
+            size: 100,
+            enableSorting: false,
+            enableHiding: false,
+          },
+        ]
+      : []
+
   return [
     {
       id: 'code_ca',
@@ -103,20 +168,7 @@ export function buildCadreAnalytiqueColumns({
       ),
       enableHiding: false,
     },
-    {
-      id: 'cout_axe',
-      accessorKey: 'cout_axe',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Budget GNF' />
-      ),
-      cell: ({ row }) => (
-        <span className='whitespace-nowrap tabular-nums text-sm'>
-          {formatNumber(row.original.cout_axe)}
-        </span>
-      ),
-      enableHiding: false,
-    },
-    
+    ...budgetColumn,
     {
       id: 'partenaire_ca',
       header: ({ column }) => (
@@ -164,6 +216,7 @@ export function buildCadreAnalytiqueColumns({
       enableHiding: false,
     },
     ...childCountColumn,
+    ...indicateursColumn,
     actionsColumn,
   ]
 }

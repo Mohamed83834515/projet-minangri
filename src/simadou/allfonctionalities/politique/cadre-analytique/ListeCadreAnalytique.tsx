@@ -29,6 +29,7 @@ import {
   useGetCadresAnalytique,
   useGetNiveauxCadreAnalytique,
 } from '@/simadou/allHooks/admin/cadreAnalytiqueHooks'
+import { useGetAllIndicateursPerformanceProgramme } from '@/simadou/allHooks/admin/indicateurPerformanceProgrammeHooks'
 import { useGetActeurs } from '@/simadou/allHooks/admin/acteurHooks'
 import {
   NiveauTabTrigger,
@@ -41,8 +42,10 @@ import {
   resolveNiveauCaNumber,
   sortNiveauxCadreAnalytique,
 } from '@/simadou/lib/cadreAnalytiqueUtils'
+import { buildIndicateurCountByCadreAnalytiqueId } from '@/simadou/lib/indicateurPerformanceProgrammeUtils'
 import CadreAnalytiqueFormPanel from './CadreAnalytiqueFormPanel'
 import NiveauCadreAnalytiqueDialog from './NiveauCadreAnalytiqueDialog'
+import CadreAnalytiqueIndicateursDialog from './indicateur-performance/CadreAnalytiqueIndicateursDialog'
 
 function CadreAnalytiqueNiveauTable({
   niveauCodeNumber,
@@ -51,6 +54,9 @@ function CadreAnalytiqueNiveauTable({
   acteurs,
   searchTerm,
   tableKey,
+  isLastLevel,
+  onOpenIndicateurs,
+  getIndicateurCount,
   onEdit,
   onDeleteRequest,
 }: {
@@ -60,6 +66,9 @@ function CadreAnalytiqueNiveauTable({
   acteurs: { id_acteur: number; nom_acteur: string; code_acteur: string }[]
   searchTerm: string
   tableKey: string
+  isLastLevel: boolean
+  onOpenIndicateurs: (row: CadreAnalytique) => void
+  getIndicateurCount: (row: CadreAnalytique) => number
   onEdit: (row: CadreAnalytique) => void
   onDeleteRequest: (row: CadreAnalytique) => void
 }) {
@@ -72,10 +81,23 @@ function CadreAnalytiqueNiveauTable({
         niveaux,
         currentNiveauCodeNumber: niveauCodeNumber,
         acteurs,
+        isLastLevel,
+        onOpenIndicateurs,
+        getIndicateurCount,
         onEdit,
         onDeleteRequest,
       }),
-    [cadres, niveaux, niveauCodeNumber, acteurs, onEdit, onDeleteRequest]
+    [
+      cadres,
+      niveaux,
+      niveauCodeNumber,
+      acteurs,
+      isLastLevel,
+      onOpenIndicateurs,
+      getIndicateurCount,
+      onEdit,
+      onDeleteRequest,
+    ]
   )
 
   const rows = useMemo(() => {
@@ -130,6 +152,9 @@ export default function ListeCadreAnalytique() {
   )
 
   const hasNiveaux = sortedNiveaux.length > 0
+  const { data: allIndicateurs = [] } = useGetAllIndicateursPerformanceProgramme(
+    hasNiveaux
+  )
   const { tabsStyle } = useNiveauTabsTheme()
 
   const [activeNiveauCode, setActiveNiveauCode] = useState<string>('')
@@ -139,6 +164,9 @@ export default function ListeCadreAnalytique() {
   const [selectedCadre, setSelectedCadre] = useState<CadreAnalytique | null>(null)
   const [deleteOpen, setDeleteOpen] = useDialogState<'delete'>(null)
   const [cadreToDelete, setCadreToDelete] = useState<CadreAnalytique | null>(null)
+  const [cadreForIndicateurs, setCadreForIndicateurs] =
+    useState<CadreAnalytique | null>(null)
+  const [showIndicateursDialog, setShowIndicateursDialog] = useState(false)
 
   useEffect(() => {
     if (sortedNiveaux.length > 0 && activeNiveauCode === '') {
@@ -168,6 +196,29 @@ export default function ListeCadreAnalytique() {
     }
     return counts
   }, [cadres])
+
+  const maxNiveauCodeNumber = useMemo(
+    () =>
+      sortedNiveaux.length > 0
+        ? Number(sortedNiveaux[sortedNiveaux.length - 1].code_number_nca)
+        : 0,
+    [sortedNiveaux]
+  )
+
+  const indicateurCountByCadreId = useMemo(
+    () => buildIndicateurCountByCadreAnalytiqueId(allIndicateurs, cadres),
+    [allIndicateurs, cadres]
+  )
+
+  const getIndicateurCount = useCallback(
+    (cadre: CadreAnalytique) => indicateurCountByCadreId.get(cadre.id_ca) ?? 0,
+    [indicateurCountByCadreId]
+  )
+
+  const handleOpenIndicateurs = useCallback((cadre: CadreAnalytique) => {
+    setCadreForIndicateurs(cadre)
+    setShowIndicateursDialog(true)
+  }, [])
 
   const handleTabChange = useCallback((value: string) => {
     setActiveNiveauCode(value)
@@ -298,7 +349,10 @@ export default function ListeCadreAnalytique() {
                 cadres={cadres}
                 acteurs={acteurs}
                 searchTerm={searchTerm}
-                tableKey={`cadres-ca-${n.id_nca}-${dataUpdatedAt}-${cadres.length}-${searchTerm}`}
+                tableKey={`cadres-ca-${n.id_nca}-${dataUpdatedAt}-${cadres.length}-${searchTerm}-${allIndicateurs.length}`}
+                isLastLevel={Number(n.code_number_nca) === maxNiveauCodeNumber}
+                onOpenIndicateurs={handleOpenIndicateurs}
+                getIndicateurCount={getIndicateurCount}
                 onEdit={handleEdit}
                 onDeleteRequest={handleDeleteRequest}
               />
@@ -356,6 +410,18 @@ export default function ListeCadreAnalytique() {
         open={showNiveauxDialog}
         onOpenChange={setShowNiveauxDialog}
       />
+
+      {cadreForIndicateurs && programmeId ? (
+        <CadreAnalytiqueIndicateursDialog
+          cadre={cadreForIndicateurs}
+          programmeId={programmeId}
+          open={showIndicateursDialog}
+          onOpenChange={(open) => {
+            setShowIndicateursDialog(open)
+            if (!open) setCadreForIndicateurs(null)
+          }}
+        />
+      ) : null}
     </div>
   )
 }
