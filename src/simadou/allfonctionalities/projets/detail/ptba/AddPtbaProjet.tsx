@@ -61,8 +61,7 @@ export default function AddPtbaProjet({
   const {  selectedVersionId} = usePtbaVersionSelection(codeProgramme)
   const reel_version = localStorage.getItem('selectedVersionId') ?? selectedVersionId 
   const { data: activites = [] } = useGetActivitesProjetLastNiveau(codeProjet)
-
-
+console.log('last', activites)
   const activiteOptions = useMemo((): SelectOption[] =>
     activites?.map((activite: ActiviteProjet) => ({
       value: activite.id_activite_projet,
