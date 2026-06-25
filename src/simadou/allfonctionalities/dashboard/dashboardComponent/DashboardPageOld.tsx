@@ -749,6 +749,7 @@ const DashboardPageOld: React.FC = () => {
         }
     }, [projets])
 
+    
     // Données pour la carte 2 : PAO Programme (avec données fictives pour montants)
     const ptbaProgrammeStats = useMemo(() => {
         const versionIds = versions
@@ -1015,7 +1016,7 @@ const DashboardPageOld: React.FC = () => {
                 />
             </div>
 
-            {/* ── Graphiques ligne 2 : Avancement par service ── */}
+            {/* ── Graphiques ligne 2 : Avancement par direction ── */}
             <div className='grid grid-cols-1 gap-2 lg:grid-cols-2'>
                 <AvancementServiceChart
                     data={avancementTaches}
