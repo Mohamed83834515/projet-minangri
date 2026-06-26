@@ -16,11 +16,13 @@ export const getIndicateurCmrFormConfigForDialog = ({
   isLoadingReferentiels,
   indicateurStrategiqueOptions,
   isLoadingIndicateursStrategiques,
+  resultatFieldLabel = 'Résultat',
 }: {
   referentielOptions: SelectOption[];
   isLoadingReferentiels?: boolean;
   indicateurStrategiqueOptions?: SelectOption[];
   isLoadingIndicateursStrategiques?: boolean;
+  resultatFieldLabel?: string;
 }): FormConfig => ({
   fields: [
     {
@@ -54,10 +56,10 @@ export const getIndicateurCmrFormConfigForDialog = ({
     },
     {
       name: "resultat_cmr",
-      label: "Résultat",
+      label: resultatFieldLabel,
       type: indicateurStrategiqueOptions ? "select" : "text",
       placeholder: indicateurStrategiqueOptions
-        ? "Sélectionner un indicateur stratégique…"
+        ? `Sélectionner un ${resultatFieldLabel.toLowerCase()}…`
         : "Résultat attendu du cadre de mesure de résultats",
       required: true,
       maxLength: indicateurStrategiqueOptions ? undefined : 200,
@@ -113,3 +115,49 @@ export const getIndicateurCmrFormConfigForDialog = ({
     },
   ],
 });
+
+export const getIndicateurCmrProjetFormConfigForDialog = ({
+  referentielOptions,
+  isLoadingReferentiels,
+  cadreResultatOptions,
+  indicateurCadreResultatOptions,
+  isLoadingIndicateursCadreResultat,
+  resultatFieldLabel = 'Résultat',
+  indicateurFieldDisabled = false,
+}: {
+  referentielOptions: SelectOption[];
+  isLoadingReferentiels?: boolean;
+  cadreResultatOptions: SelectOption[];
+  indicateurCadreResultatOptions: SelectOption[];
+  isLoadingIndicateursCadreResultat?: boolean;
+  resultatFieldLabel?: string;
+  indicateurFieldDisabled?: boolean;
+}): FormConfig => {
+  const base = getIndicateurCmrFormConfigForDialog({
+    referentielOptions,
+    isLoadingReferentiels,
+    indicateurStrategiqueOptions: cadreResultatOptions,
+    resultatFieldLabel,
+  });
+
+  const resultatIndex = base.fields.findIndex((field) => field.name === 'resultat_cmr');
+  const indicateurField = {
+    name: 'indicateur_iop',
+    label: 'Indicateur',
+    type: 'select' as const,
+    placeholder: indicateurFieldDisabled
+      ? "Sélectionnez d'abord un cadre"
+      : 'Sélectionner un indicateur…',
+    required: true,
+    options: indicateurCadreResultatOptions,
+    isLoading: isLoadingIndicateursCadreResultat,
+    disabled: indicateurFieldDisabled,
+    dependsOn: 'resultat_cmr',
+    gridCols: 2 as const,
+  };
+
+  const fields = [...base.fields];
+  fields.splice(resultatIndex + 1, 0, indicateurField);
+
+  return { ...base, fields };
+};

@@ -1,6 +1,5 @@
 import type { CadreResultat, NiveauCadreResultat } from '@/simadou/allTypes'
 import {
-  resolveActeurLabel,
   resolveRelationCode,
   resolveRelationId,
 } from '@/simadou/lib/resolveApiRelation'
@@ -30,18 +29,6 @@ export function resolveParentCrCode(
   value: CadreResultat['parent_cr']
 ): string | null {
   return resolveRelationCode(value, 'code_cr')
-}
-
-export function resolvePartenaireCode(
-  value: CadreResultat['partenaire_cr']
-): string | null {
-  return resolveRelationCode(value, 'code_acteur')
-}
-
-export function resolvePartenaireLabel(
-  value: CadreResultat['partenaire_cr']
-): string {
-  return resolveActeurLabel(value) ?? 'Non défini'
 }
 
 export function buildCadreParentOptions({

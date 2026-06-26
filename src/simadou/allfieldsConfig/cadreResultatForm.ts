@@ -3,15 +3,11 @@ import type { FormConfig, SelectOption } from '../../Global/types/formConfig'
 export const getCadreResultatFormConfigForDialog = ({
   parentLabel,
   parentOptions,
-  acteurOptions,
-  isLoadingActeurs,
   showParent,
   codeLength,
 }: {
   parentLabel: string
   parentOptions: SelectOption[]
-  acteurOptions: SelectOption[]
-  isLoadingActeurs?: boolean
   showProjet?: boolean
   showParent: boolean
   codeLength: number
@@ -27,13 +23,12 @@ export const getCadreResultatFormConfigForDialog = ({
       gridCols: 2,
     },
     {
-      name: 'cout_axe',
-      label: "Coût de l'axe",
-      type: 'number',
-      placeholder: 'Entrez le coût',
+      name: 'abgrege_cr',
+      label: 'Abrégé',
+      type: 'text',
+      placeholder: 'Abrégé du cadre',
       required: true,
-      min: 0,
-      step: 1,
+      maxLength: 50,
       gridCols: 2,
     },
     {
@@ -44,15 +39,6 @@ export const getCadreResultatFormConfigForDialog = ({
       required: true,
       maxLength: 200,
       gridCols: 1,
-    },
-    {
-      name: 'abgrege_cr',
-      label: 'Abrégé',
-      type: 'text',
-      placeholder: 'Abrégé du cadre',
-      required: true,
-      maxLength: 50,
-      gridCols: 2,
     },
     ...(showParent
       ? [
@@ -67,15 +53,5 @@ export const getCadreResultatFormConfigForDialog = ({
           },
         ]
       : []),
-    {
-      name: 'partenaire_cr',
-      label: 'Partenaire',
-      type: 'select',
-      placeholder: 'Sélectionnez un partenaire',
-      required: false,
-      options: acteurOptions,
-      isLoading: isLoadingActeurs,
-      gridCols: 2,
-    },
   ],
 })

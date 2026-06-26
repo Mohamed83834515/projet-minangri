@@ -64,7 +64,7 @@ export default function IndicateurCadreResultatFormDialog({
   const niveauOptions = useMemo(
     () =>
       sortNiveauxCadreResultat(niveaux).map((n) => ({
-        value: n.nombre_ncr,
+        value: n.id_ncr,
         label: `${n.nombre_ncr} - ${n.libelle_ncr}`,
       })),
     [niveaux]
@@ -129,8 +129,6 @@ export default function IndicateurCadreResultatFormDialog({
       }),
     [ idProjet, indicateur, fixedCadreCrCode, fixedNiveauIop]
   )
-  console.log('defaultValues', defaultValues)
-
   const onSubmit = (data: IndicateurCadreResultatCreateData) => {
     const payload = buildIndicateurCadreResultatPayload({
       data,

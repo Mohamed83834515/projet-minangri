@@ -1,24 +1,28 @@
-import { useMemo } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { DynamicForm } from '@/Global/Forms/DynamicForm'
+import { DynamicForm, type DynamicFormHandle } from '@/Global/Forms/DynamicForm'
 import { getApiErrorMessage } from '@/lib/api-error-message'
-import { getIndicateurCmrFormConfigForDialog } from '@/simadou/allfieldsConfig/indicateurCmrForm'
-import type { IndicateurCadreResultat } from '@/simadou/allTypes'
+import { getIndicateurCmrProjetFormConfigForDialog } from '@/simadou/allfieldsConfig/indicateurCmrForm'
+import type { CadreResultat, IndicateurCadreResultat } from '@/simadou/allTypes'
 import type { IndicateurCmrProjet } from '@/simadou/allTypes/indicateurCmrProjet'
 import {
-  indicateurCmrCreateSchema,
-  type IndicateurCmrCreateData,
-} from '@/simadou/schemas/indicateursSchemas'
+  indicateurCmrProjetCreateSchema,
+  type IndicateurCmrProjetCreateData,
+} from '@/simadou/schemas/indicateurCmrProjetSchemas'
 import {
   useCreateIndicateurCmrProjet,
   useUpdateIndicateurCmrProjet,
 } from '@/simadou/allHooks/admin/indicateurCmrHooks'
 import { useGetDictionnaireIndicateurs } from '@/simadou/allHooks/admin/dictionnaireIndicateurHooks'
 import {
+  buildCadreResultatSelectOptions,
   buildDictionnaireIndicateurSelectOptions,
   buildIndicateurCadreResultatSelectOptions,
-  filterIndicateursCadreResultatByNiveau,
+  filterCadresResultatByNiveau,
+  filterIndicateursForCadreResultat,
   indicateurCmrProjetToFormValues,
+  resolveCadreResultatById,
+  resolveIndicateurIopId,
   resolveReferentielCmrId,
   resolveResultatCmrProjetId,
 } from './indicateurCmrProjetFormUtils'
@@ -26,32 +30,53 @@ import {
 export default function IndicateurCmrProjetFormPanel({
   indicateur,
   codeProjet,
-  niveauNombre,
+  niveauId,
+  niveauLibelle,
+  cadresResultat,
   indicateursCadreResultat,
   onClose,
   onSuccess,
 }: {
   indicateur?: IndicateurCmrProjet | null
   codeProjet: string
-  niveauNombre: number
+  niveauId: number
+  niveauLibelle: string
+  cadresResultat: CadreResultat[]
   indicateursCadreResultat: IndicateurCadreResultat[]
   onClose: () => void
   onSuccess: () => void
 }) {
   const isEditing = !!indicateur
+  const formRef = useRef<DynamicFormHandle>(null)
   const createMutation = useCreateIndicateurCmrProjet(codeProjet)
   const updateMutation = useUpdateIndicateurCmrProjet()
   const { data: dictionnaires = [], isLoading: isLoadingReferentiels } =
     useGetDictionnaireIndicateurs()
 
-  const indicateursCadreResultatForNiveau = useMemo(
+  const [selectedCadreId, setSelectedCadreId] = useState<number | null>(() =>
+    resolveResultatCmrProjetId(indicateur)
+  )
+
+  const cadresResultatForNiveau = useMemo(
+    () => filterCadresResultatByNiveau(cadresResultat, niveauId),
+    [cadresResultat, niveauId]
+  )
+
+  const selectedCadre = useMemo(
+    () => resolveCadreResultatById(cadresResultat, selectedCadreId),
+    [cadresResultat, selectedCadreId]
+  )
+
+  const indicateursForCadre = useMemo(
     () =>
-      filterIndicateursCadreResultatByNiveau(
-        indicateursCadreResultat,
-        niveauNombre,
-        codeProjet
-      ),
-    [indicateursCadreResultat, niveauNombre, codeProjet]
+      selectedCadre
+        ? filterIndicateursForCadreResultat(
+            indicateursCadreResultat,
+            selectedCadre,
+            codeProjet
+          )
+        : [],
+    [indicateursCadreResultat, selectedCadre, codeProjet]
   )
 
   const referentielOptions = useMemo(
@@ -63,23 +88,42 @@ export default function IndicateurCmrProjetFormPanel({
     [dictionnaires, indicateur]
   )
 
-  const resultatCmrOptions = useMemo(
+  const cadreResultatOptions = useMemo(
     () =>
-      buildIndicateurCadreResultatSelectOptions(
-        indicateursCadreResultatForNiveau,
+      buildCadreResultatSelectOptions(
+        cadresResultatForNiveau,
         resolveResultatCmrProjetId(indicateur)
       ),
-    [indicateursCadreResultatForNiveau, indicateur]
+    [cadresResultatForNiveau, indicateur]
+  )
+
+  const indicateurCadreResultatOptions = useMemo(
+    () =>
+      buildIndicateurCadreResultatSelectOptions(
+        indicateursForCadre,
+        resolveIndicateurIopId(indicateur)
+      ),
+    [indicateursForCadre, indicateur]
   )
 
   const formConfig = useMemo(
     () =>
-      getIndicateurCmrFormConfigForDialog({
+      getIndicateurCmrProjetFormConfigForDialog({
         referentielOptions,
         isLoadingReferentiels,
-        indicateurStrategiqueOptions: resultatCmrOptions,
+        cadreResultatOptions,
+        indicateurCadreResultatOptions,
+        resultatFieldLabel: niveauLibelle,
+        indicateurFieldDisabled: selectedCadreId == null,
       }),
-    [referentielOptions, isLoadingReferentiels, resultatCmrOptions]
+    [
+      referentielOptions,
+      isLoadingReferentiels,
+      cadreResultatOptions,
+      indicateurCadreResultatOptions,
+      niveauLibelle,
+      selectedCadreId,
+    ]
   )
 
   const defaultValues = useMemo(
@@ -87,7 +131,17 @@ export default function IndicateurCmrProjetFormPanel({
     [indicateur]
   )
 
-  const onSubmit = (data: IndicateurCmrCreateData) => {
+  const handleFieldChange = (fieldName: string, value: unknown) => {
+    if (fieldName !== 'resultat_cmr') return
+
+    const nextCadreId =
+      value === '' || value == null || value === 0 ? null : Number(value)
+
+    setSelectedCadreId(Number.isFinite(nextCadreId) ? nextCadreId : null)
+    formRef.current?.setValue('indicateur_iop', null)
+  }
+
+  const onSubmit = (data: IndicateurCmrProjetCreateData) => {
     const payload = {
       ...data,
       referentiel_cmr: data.referentiel_cmr ?? null,
@@ -123,11 +177,13 @@ export default function IndicateurCmrProjetFormPanel({
 
   return (
     <DynamicForm
-      key={`${indicateur?.id_ref_ind_cmr ?? 'new'}-${niveauNombre}`}
+      ref={formRef}
+      key={`${indicateur?.id_ref_ind_cmr ?? 'new'}-${niveauId}`}
       config={formConfig}
-      schema={indicateurCmrCreateSchema}
+      schema={indicateurCmrProjetCreateSchema}
       defaultValues={defaultValues}
       onSubmit={onSubmit}
+      onFieldChange={handleFieldChange}
       submitText={isEditing ? 'Modifier' : 'Créer'}
       loadingText='Enregistrement…'
       isLoading={createMutation.isPending || updateMutation.isPending}

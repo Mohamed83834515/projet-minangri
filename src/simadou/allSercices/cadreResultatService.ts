@@ -33,13 +33,6 @@ export const cadreResultatService = {
     return normalizeApiList<CadreResultat>(response);
   },
 
-  getByPartenaire: async (partenaireId: number): Promise<CadreResultat[]> => {
-    const response = await apiClient.request<unknown>(
-      `/cadres-resultats/?partenaire_cr=${partenaireId}`,
-    );
-    return normalizeApiList<CadreResultat>(response);
-  },
-
   search: async (query: string): Promise<CadreResultat[]> => {
     const response = await apiClient.request<unknown>(
       `/cadres-resultats/?search=${encodeURIComponent(query)}`,

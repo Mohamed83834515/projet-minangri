@@ -39,6 +39,18 @@ function resolveReferentielLabel(value: unknown): string {
   return String(value)
 }
 
+function resolveResultatFieldLabel(value: unknown): string {
+  if (value != null && typeof value === 'object') {
+    const record = value as Record<string, unknown>
+    const niveau = record.niveau_cr ?? record.niveau
+    if (niveau && typeof niveau === 'object' && 'libelle_ncr' in niveau) {
+      const libelle = (niveau as { libelle_ncr?: string }).libelle_ncr
+      if (libelle) return libelle
+    }
+  }
+  return 'Résultat'
+}
+
 export function buildIndicateurCmrColumns<T extends IndicateurCmrTableRow>({
   onView,
   onEdit,
@@ -122,7 +134,8 @@ export function buildIndicateurCmrColumns<T extends IndicateurCmrTableRow>({
               className='mt-1 truncate text-xs text-muted-foreground'
               title={resolveResultatCmrLabel(row.original.resultat_cmr)}
             >
-              Résultat: {resolveResultatCmrLabel(row.original.resultat_cmr)}
+              {resolveResultatFieldLabel(row.original.resultat_cmr)}:{' '}
+              {resolveResultatCmrLabel(row.original.resultat_cmr)}
             </p>
           ) : null}
         </div>

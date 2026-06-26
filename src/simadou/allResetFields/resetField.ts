@@ -83,10 +83,8 @@ export const CADRE_RESULTAT = {
   code_cr: "",
   intutile_cr: "",
   abgrege_cr: "",
-  cout_axe: "",
   etat: null,
   niveau_cr: null,
-  partenaire_cr: null,
   parent_cr: null,
   projet_cr: null,
 };
@@ -151,6 +149,7 @@ export const UNITE_INDICATEUR = {
 export const INDICATEUR_CMR = {
   code_ref_ind: "",
   resultat_cmr: null,
+  indicateur_iop: null,
   intitule_ref_ind: "",
   reference_cmr: "",
   annee_reference: "",

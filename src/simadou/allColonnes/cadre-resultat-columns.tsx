@@ -2,17 +2,12 @@ import { type ColumnDef } from '@tanstack/react-table'
 import { buildEditDeleteActionsColumn } from '@/Global/Tableaux/buildEditDeleteActionsColumn'
 import type { CadreResultat } from '@/simadou/allTypes'
 import type { NiveauCadreResultat } from '@/simadou/allTypes/niveauCadreResultat'
-import {
-  resolvePartenaireLabel,
-  resolveProjetCr,
-} from '@/simadou/lib/cadreResultatUtils'
+import { resolveProjetCr } from '@/simadou/lib/cadreResultatUtils'
 import { resolveRelationId } from '@/simadou/lib/resolveApiRelation'
 import { BarChart3 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DataTableColumnHeader } from '@/components/data-table'
 import { LongText } from '@/components/others/long-text'
-import { formatNumber } from '../allSercices/montantFormater'
-
 function resolveParentCadre(
   row: CadreResultat,
   cadres: CadreResultat[]
@@ -178,49 +173,10 @@ export function buildCadreResultatColumns({
       enableHiding: false,
     },
 
-    {
-      id: 'cout_axe',
-
-      accessorKey: 'cout_axe',
-
-      header: ({ column }) => (
-        <DataTableColumnHeader
-          column={column}
-          title='Coût Axe(GNF)'
-          className='text-right'
-        />
-      ),
-
-      cell: ({ row }) => (
-        <span className='block text-right text-sm whitespace-nowrap tabular-nums'>
-          {formatNumber(row.original.cout_axe)}
-        </span>
-      ),
-
-      enableHiding: false,
-    },
-
     /**
      * Parents dynamiques
      */
     ...parentColumns,
-
-    {
-      id: 'partenaire_cr',
-
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title='Partenaire' />
-      ),
-
-      cell: ({ row }) => (
-        <LongText className='max-w-xs font-medium'>
-          {resolvePartenaireLabel(row.original.partenaire_cr)}
-        </LongText>
-      ),
-
-      enableSorting: false,
-      enableHiding: false,
-    },
 
     ...(hideProjetColumn
       ? []

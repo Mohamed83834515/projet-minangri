@@ -17,20 +17,14 @@ export function resolveFixedCodeCrFromCadre(cadre: CadreResultat): string {
 
 export function resolveNiveauIopFromCadre(
   cadre: CadreResultat,
-  niveaux: NiveauCadreResultat[]
+  _niveaux: NiveauCadreResultat[] = []
 ): number | null {
-  const populated = cadre.niveau?.id_ncr
-  if (populated != null && Number.isFinite(Number(populated))) {
-    return Number(populated)
+  const populatedId = cadre.niveau?.id_ncr
+  if (populatedId != null && Number.isFinite(Number(populatedId))) {
+    return Number(populatedId)
   }
 
-  const niveauId = resolveNiveauCrId(cadre.niveau_cr)
-  if (niveauId == null) return null
-
-  const niveau = niveaux.find((n) => n.id_ncr === niveauId)
-  if (niveau?.nombre_ncr == null) return null
-
-  return Number(niveau.nombre_ncr)
+  return resolveNiveauCrId(cadre.niveau_cr)
 }
 
 export function resolveNiveauCrLabel(

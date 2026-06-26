@@ -32,14 +32,16 @@ export function resolveResultatCmrLabel(value: unknown): string {
         : null) ??
       (typeof record.code_indicateur_cr_iop === 'string'
         ? record.code_indicateur_cr_iop
-        : null)
+        : null) ??
+      (typeof record.code_cr === 'string' ? record.code_cr : null)
     const intitule =
       (typeof record.intitule_indicateur_istr === 'string'
         ? record.intitule_indicateur_istr
         : null) ??
       (typeof record.intitule_indicateur_cr_iop === 'string'
         ? record.intitule_indicateur_cr_iop
-        : null)
+        : null) ??
+      (typeof record.intutile_cr === 'string' ? record.intutile_cr : null)
     if (code && intitule) return `${code} — ${intitule}`
     return intitule ?? code ?? ''
   }

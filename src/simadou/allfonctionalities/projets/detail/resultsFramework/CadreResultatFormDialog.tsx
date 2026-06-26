@@ -1,7 +1,6 @@
 import { useMemo } from 'react'
 import z from 'zod'
 import { DynamicForm } from '@/Global/Forms/DynamicForm'
-import { useGetActeurs } from '@/simadou/allHooks/admin/acteurHooks'
 import {
   useCreateCadreResultat,
   useUpdateCadreResultat,
@@ -12,7 +11,6 @@ import {
   buildCadreParentOptions,
   resolveNiveauCrId,
   resolveParentCrCode,
-  resolvePartenaireCode,
   resolveProjetCr,
 } from '@/simadou/lib/cadreResultatUtils'
 import {
@@ -41,7 +39,6 @@ export default function CadreResultatFormDialog({
   const isEditing = !!cadre
   const createMutation = useCreateCadreResultat(codeProjet)
   const updateMutation = useUpdateCadreResultat()
-  const { data: acteurs = [], isLoading: isLoadingActeurs } = useGetActeurs()
 
   const codeLength = Number(niveau?.code_number_ncr) || 2
 
@@ -66,15 +63,6 @@ export default function CadreResultatFormDialog({
     (n) => Number(n.nombre_ncr) == Number(niveau?.nombre_ncr) - 1
   )
 
-  const acteurOptions = useMemo(
-    () =>
-      acteurs.map((a) => ({
-        value: a.code_acteur,
-        label: `${a.code_acteur} - ${a.nom_acteur}`,
-      })),
-    [acteurs]
-  )
-
   const parentOptions = useMemo(
     () =>
       buildCadreParentOptions({
@@ -90,21 +78,12 @@ export default function CadreResultatFormDialog({
     () =>
       getCadreResultatFormConfigForDialog({
         parentOptions,
-        acteurOptions,
-        isLoadingActeurs,
         parentLabel: parent?.libelle_ncr || 'Parent',
         showParent,
         showProjet: true,
         codeLength,
       }),
-    [
-      parentOptions,
-      acteurOptions,
-      isLoadingActeurs,
-      parent?.libelle_ncr,
-      showParent,
-      codeLength,
-    ]
+    [parentOptions, parent?.libelle_ncr, showParent, codeLength]
   )
 
   const defaultValues = useMemo(
@@ -112,10 +91,8 @@ export default function CadreResultatFormDialog({
       code_cr: cadre?.code_cr ?? '',
       intutile_cr: cadre?.intutile_cr ?? '',
       abgrege_cr: cadre?.abgrege_cr ?? '',
-      cout_axe: cadre?.cout_axe ?? 0,
       etat: cadre?.etat ?? 'Actif',
       niveau_cr: initialNiveauId,
-      partenaire_cr: resolvePartenaireCode(cadre?.partenaire_cr),
       parent_cr: resolveParentCrCode(cadre?.parent_cr),
       projet_cr:
         resolveProjetCr(cadre?.projet_cr) ?? (cadre ? null : codeProjet),
@@ -128,7 +105,6 @@ export default function CadreResultatFormDialog({
       ...data,
       niveau_cr: data.niveau_cr ?? niveau.id_ncr ?? null,
       parent_cr: data.parent_cr || null,
-      partenaire_cr: data.partenaire_cr || null,
       projet_cr: data.projet_cr || (isEditing ? null : codeProjet) || null,
       etat: data.etat || 'Actif',
     }

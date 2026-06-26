@@ -9,10 +9,11 @@ import { normalizeApiList } from './apiListUtils'
 function toIndicateurCmrProjetApiPayload(
   data: Partial<IndicateurCmrProjetFormData>
 ): Record<string, unknown> {
-  const { resultat_cmr, referentiel_cmr, code_projet, ...rest } = data
+  const { resultat_cmr, indicateur_iop, referentiel_cmr, code_projet, ...rest } = data
   return {
     ...rest,
     ...(resultat_cmr !== undefined ? { resultat_cmr } : {}),
+    ...(indicateur_iop !== undefined ? { indicateur_iop } : {}),
     ...(referentiel_cmr !== undefined
       ? { referentiel_cmr: referentiel_cmr ?? null }
       : {}),
