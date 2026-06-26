@@ -37,6 +37,7 @@ type Props = {
   onOpenChange: (open: boolean) => void
   cadre: CadreResultat | null
   codeProjet: string
+  idProjet: number
 }
 
 export default function IndicateurCadreResultatCadreDialog({
@@ -44,6 +45,7 @@ export default function IndicateurCadreResultatCadreDialog({
   onOpenChange,
   cadre,
   codeProjet,
+  idProjet,
 }: Props) {
   const { data: allIndicateurs = [], dataUpdatedAt } =
     useGetIndicateursCadreResultat()
@@ -229,6 +231,7 @@ export default function IndicateurCadreResultatCadreDialog({
                 `new-${cadre.id_cr}-${fixedNiveauIop ?? 'niveau'}`
               }
               codeProjet={codeProjet}
+              idProjet={idProjet}
               fixedCadreCrCode={fixedCadreCrCode}
               fixedNiveauIop={fixedNiveauIop}
               indicateur={selectedIndicateur}

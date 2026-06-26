@@ -109,6 +109,7 @@ export default function ProjetCadreResultatsPanel({
 }) {
   const queryClient = useQueryClient()
   const codeProjet = projet.code_projet
+  const idProjet = projet.id_projet
   const { data: niveaux = [], isLoading: isLoadingNiveaux } =
     useGetNiveauxCadreResultat()
   const { data: cadres = [], dataUpdatedAt } = useGetCadresResultat(
@@ -301,6 +302,7 @@ export default function ProjetCadreResultatsPanel({
         onOpenChange={handleCloseIndicateurs}
         cadre={cadreForIndicateurs}
         codeProjet={codeProjet}
+        idProjet={idProjet}
       />
 
       <Dialog

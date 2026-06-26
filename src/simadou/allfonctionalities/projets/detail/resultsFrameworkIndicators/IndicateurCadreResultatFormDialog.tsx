@@ -26,6 +26,7 @@ import {
 
 export default function IndicateurCadreResultatFormDialog({
   codeProjet,
+  idProjet,
   fixedCadreCrCode,
   fixedNiveauIop,
   indicateur,
@@ -33,6 +34,7 @@ export default function IndicateurCadreResultatFormDialog({
   onSuccess,
 }: {
   codeProjet: string
+  idProjet: number
   fixedCadreCrCode?: string | null
   fixedNiveauIop?: number | null
   indicateur?: IndicateurCadreResultat | null
@@ -122,10 +124,11 @@ export default function IndicateurCadreResultatFormDialog({
       indicateurCadreResultatToFormValues({
         indicateur,
         codeProjet,
+        idProjet,
         fixedCadreCrCode,
         fixedNiveauIop,
       }),
-    [codeProjet, indicateur, fixedCadreCrCode, fixedNiveauIop]
+    [codeProjet, idProjet, indicateur, fixedCadreCrCode, fixedNiveauIop]
   )
 
   const onSubmit = (data: IndicateurCadreResultatCreateData) => {

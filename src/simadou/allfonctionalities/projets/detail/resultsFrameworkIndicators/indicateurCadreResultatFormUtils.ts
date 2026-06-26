@@ -94,11 +94,13 @@ export function resolveResponsableIopLabel(
 export function indicateurCadreResultatToFormValues({
   indicateur,
   codeProjet,
+  idProjet,
   fixedCadreCrCode,
   fixedNiveauIop,
 }: {
   indicateur?: IndicateurCadreResultat | null
   codeProjet: string
+  idProjet: number
   fixedCadreCrCode?: string | null
   fixedNiveauIop?: number | null
 }): Partial<IndicateurCadreResultatCreateData> {
@@ -122,7 +124,7 @@ export function indicateurCadreResultatToFormValues({
       undefined,
     projet_iop:
       resolveRelationCode(indicateur?.projet_iop, 'code_projet') ??
-      (indicateur ? undefined : codeProjet),
+      (indicateur ? undefined : String(idProjet)),
   }
 }
 
