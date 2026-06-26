@@ -185,35 +185,36 @@ export function IndicateursTable({
       </CardHeader>
       <CardContent className='p-0'>
         <div className='overflow-x-auto'>
-          <Table>
+          <Table className='w-full min-w-full table-auto border-collapse' style={{ tableLayout: 'auto' }}>
             <TableHeader>
-              <TableRow className='bg-muted/60 hover:bg-muted/60'>
-                <TableHead className='w-32 text-xs font-semibold tracking-wide text-muted-foreground uppercase'>
+              <TableRow className='border-b border-border/60 bg-muted/60 hover:bg-muted/60'>
+                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0'>
                   Code
                 </TableHead>
-                <TableHead className='min-w-52 text-xs font-semibold tracking-wide text-muted-foreground uppercase'>
+                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 min-w-48 max-w-[200px]'>
                   Activité
                 </TableHead>
-                <TableHead className='min-w-48 text-xs font-semibold tracking-wide text-muted-foreground uppercase'>
+                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 min-w-48 max-w-[250px]'>
                   Indicateur
                 </TableHead>
-                <TableHead className='w-24 text-center text-xs font-semibold tracking-wide text-muted-foreground uppercase'>
+                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 text-center'>
                   Unité
                 </TableHead>
-                <TableHead className='w-20 bg-blue-50/50 text-center text-xs font-semibold tracking-wide text-muted-foreground uppercase'>
+                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 bg-blue-50/50 text-center'>
                   T1
                 </TableHead>
-                <TableHead className='w-20 bg-blue-50/50 text-center text-xs font-semibold tracking-wide text-muted-foreground uppercase'>
+                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 bg-blue-50/50 text-center'>
                   T2
                 </TableHead>
-                <TableHead className='w-20 bg-blue-50/50 text-center text-xs font-semibold tracking-wide text-muted-foreground uppercase'>
+                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 bg-blue-50/50 text-center'>
                   T3
                 </TableHead>
-                <TableHead className='w-20 bg-blue-50/50 text-center text-xs font-semibold tracking-wide text-muted-foreground uppercase'>
+                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 bg-blue-50/50 text-center'>
                   T4
                 </TableHead>
               </TableRow>
             </TableHeader>
+
             <TableBody>
               {ptbas.map((ptba, ptbaIndex) => {
                 const activiteId = ptba.id_ptba
@@ -227,19 +228,19 @@ export function IndicateursTable({
                     <TableRow
                       key={ptba.id_ptba}
                       className={cn(
-                        'border-b',
+                        'border-b border-border/40 last:border-b-0 transition-colors duration-100',
                         isEven ? 'bg-background' : 'bg-muted/20'
                       )}
                     >
-                      <TableCell className='py-3 font-mono text-xs text-muted-foreground'>
+                      <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 font-mono text-xs text-muted-foreground'>
                         {ptba.code_activite_ptba || '—'}
                       </TableCell>
-                      <TableCell className='py-3 text-sm font-medium'>
+                      <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 font-medium max-w-[200px]'>
                         {ptba.intitule_activite_ptba || 'Sans intitulé'}
                       </TableCell>
                       <TableCell
                         colSpan={6}
-                        className='py-3 text-center text-xs text-muted-foreground italic'
+                        className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 text-center text-xs text-muted-foreground italic'
                       >
                         Aucun indicateur
                       </TableCell>
@@ -251,7 +252,7 @@ export function IndicateursTable({
                   <TableRow
                     key={`${ptba.id_ptba}-${ind.id_indicateur_tache || indIndex}`}
                     className={cn(
-                      'border-b transition-colors hover:bg-primary/5',
+                      'border-b border-border/40 last:border-b-0 transition-colors duration-100 hover:bg-primary/5',
                       isEven ? 'bg-background' : 'bg-muted/20'
                     )}
                   >
@@ -259,22 +260,22 @@ export function IndicateursTable({
                       <>
                         <TableCell
                           rowSpan={activiteIndicateurs.length}
-                          className='border-r border-border/50 py-3 align-top font-mono text-xs text-muted-foreground'
+                          className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 font-mono text-xs text-muted-foreground border-r border-border/50'
                         >
                           {ptba.code_activite_ptba || '—'}
                         </TableCell>
                         <TableCell
                           rowSpan={activiteIndicateurs.length}
-                          className='border-r border-border/50 py-3 align-top text-sm font-semibold'
+                          className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 font-semibold max-w-[200px] border-r border-border/50'
                         >
                           {ptba.intitule_activite_ptba || 'Sans intitulé'}
                         </TableCell>
                       </>
                     ) : null}
-                    <TableCell className='py-2.5 text-sm'>
+                    <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 max-w-[250px]'>
                       {ind.intitule_indicateur_tache || '—'}
                     </TableCell>
-                    <TableCell className='py-2.5 text-center'>
+                    <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 text-center'>
                       {ind.unite_ind_tache ? (
                         <span className='inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground'>
                           {ind.unite_ind_tache}
@@ -283,16 +284,16 @@ export function IndicateursTable({
                         <span className='text-sm text-muted-foreground'>—</span>
                       )}
                     </TableCell>
-                    <TableCell className='bg-blue-50/30 py-2.5 text-center text-sm'>
+                    <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 bg-blue-50/30 text-center'>
                       <ValeurCell value={ind.trimestre_1} />
                     </TableCell>
-                    <TableCell className='bg-blue-50/30 py-2.5 text-center text-sm'>
+                    <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 bg-blue-50/30 text-center'>
                       <ValeurCell value={ind.trimestre_2} />
                     </TableCell>
-                    <TableCell className='bg-blue-50/30 py-2.5 text-center text-sm'>
+                    <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 bg-blue-50/30 text-center'>
                       <ValeurCell value={ind.trimestre_3} />
                     </TableCell>
-                    <TableCell className='bg-blue-50/30 py-2.5 text-center text-sm'>
+                    <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 bg-blue-50/30 text-center'>
                       <ValeurCell value={ind.trimestre_4} />
                     </TableCell>
                   </TableRow>

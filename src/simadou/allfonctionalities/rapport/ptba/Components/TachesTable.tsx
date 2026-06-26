@@ -172,22 +172,30 @@ export function TachesTable({ ptbas, taches, isLoading }: TachesTableProps) {
 
       <CardContent className='p-0'>
         <div className='overflow-x-auto'>
-          <Table>
+          <Table className='w-full min-w-full table-auto border-collapse' style={{ tableLayout: 'auto' }}>
             <TableHeader>
-              <TableRow>
-                <TableHead>Code</TableHead>
-
-                <TableHead>Activité</TableHead>
-
-                <TableHead>Intitulé tâche</TableHead>
-
-                <TableHead>Proportion</TableHead>
-
-                <TableHead>N° Lot</TableHead>
-
-                <TableHead>Date début</TableHead>
-
-                <TableHead>Date fin</TableHead>
+              <TableRow className='border-b border-border/60 bg-muted/60 hover:bg-muted/60'>
+                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0'>
+                  Code
+                </TableHead>
+                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 min-w-48 max-w-[200px]'>
+                  Activité
+                </TableHead>
+                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 min-w-44 max-w-[250px]'>
+                  Intitulé tâche
+                </TableHead>
+                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 text-center'>
+                  Proportion
+                </TableHead>
+                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 text-center'>
+                  N° Lot
+                </TableHead>
+                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 text-center'>
+                  Date début
+                </TableHead>
+                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 text-center'>
+                  Date fin
+                </TableHead>
               </TableRow>
             </TableHeader>
 
@@ -196,25 +204,78 @@ export function TachesTable({ ptbas, taches, isLoading }: TachesTableProps) {
                 const activiteTaches = ptba.id_ptba
                   ? (tachesByActivite.get(ptba.id_ptba) ?? [])
                   : []
+                const isEven = index % 2 === 0
+
+                if (activiteTaches.length === 0) {
+                  return (
+                    <TableRow
+                      key={ptba.id_ptba}
+                      className={cn(
+                        'border-b border-border/40 last:border-b-0 transition-colors duration-100',
+                        isEven ? 'bg-background' : 'bg-muted/20'
+                      )}
+                    >
+                      <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 font-mono text-xs text-muted-foreground'>
+                        {ptba.code_activite_ptba || '—'}
+                      </TableCell>
+                      <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 font-medium max-w-[200px]'>
+                        {ptba.intitule_activite_ptba || 'Sans intitulé'}
+                      </TableCell>
+                      <TableCell
+                        colSpan={5}
+                        className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 text-center text-xs text-muted-foreground italic'
+                      >
+                        Aucune tâche
+                      </TableCell>
+                    </TableRow>
+                  )
+                }
 
                 return activiteTaches.map((tache, i) => (
                   <TableRow
                     key={`${ptba.id_ptba}-${i}`}
-                    className={cn(index % 2 ? 'bg-muted/20' : '')}
+                    className={cn(
+                      'border-b border-border/40 last:border-b-0 transition-colors duration-100 hover:bg-primary/5',
+                      isEven ? 'bg-background' : 'bg-muted/20'
+                    )}
                   >
-                    <TableCell>{ptba.code_activite_ptba}</TableCell>
-
-                    <TableCell>{ptba.intitule_activite_ptba}</TableCell>
-
-                    <TableCell>{tache.intutile_tache_gt}</TableCell>
-
-                    <TableCell>{tache.proportion_gt}</TableCell>
-
-                    <TableCell>{tache.n_lot_gt}</TableCell>
-
-                    <TableCell>{tache.date_debut_gt}</TableCell>
-
-                    <TableCell>{tache.date_fin_gt}</TableCell>
+                    {i === 0 ? (
+                      <>
+                        <TableCell
+                          rowSpan={activiteTaches.length}
+                          className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 font-mono text-xs text-muted-foreground border-r border-border/50'
+                        >
+                          {ptba.code_activite_ptba || '—'}
+                        </TableCell>
+                        <TableCell
+                          rowSpan={activiteTaches.length}
+                          className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 font-semibold max-w-[200px] border-r border-border/50'
+                        >
+                          {ptba.intitule_activite_ptba || 'Sans intitulé'}
+                        </TableCell>
+                      </>
+                    ) : null}
+                    <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 max-w-[250px]'>
+                      {tache.intutile_tache_gt || '—'}
+                    </TableCell>
+                    <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 text-center'>
+                      <span className='inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium'>
+                        {tache.proportion_gt || '—'}
+                      </span>
+                    </TableCell>
+                    <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 text-center font-mono text-sm'>
+                      {tache.n_lot_gt || '—'}
+                    </TableCell>
+                    <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 text-center font-mono text-sm'>
+                      {tache.date_debut_gt
+                        ? new Date(tache.date_debut_gt).toLocaleDateString('fr-FR')
+                        : '—'}
+                    </TableCell>
+                    <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 text-center font-mono text-sm'>
+                      {tache.date_fin_gt
+                        ? new Date(tache.date_fin_gt).toLocaleDateString('fr-FR')
+                        : '—'}
+                    </TableCell>
                   </TableRow>
                 ))
               })}

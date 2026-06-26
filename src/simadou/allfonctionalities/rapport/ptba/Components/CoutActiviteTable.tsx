@@ -177,35 +177,36 @@ export function CoutActiviteTable({
       </CardHeader>
       <CardContent className='p-0'>
         <div className='overflow-x-auto'>
-          <Table>
+          <Table className='w-full min-w-full table-auto border-collapse' style={{ tableLayout: 'auto' }}>
             <TableHeader>
-              <TableRow className='bg-muted/60 hover:bg-muted/60'>
-                <TableHead className='w-20 text-xs font-semibold tracking-wide text-muted-foreground uppercase'>
+              <TableRow className='border-b border-border/60 bg-muted/60 hover:bg-muted/60'>
+                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0'>
                   Code
                 </TableHead>
-                <TableHead className='min-w-48 text-xs font-semibold tracking-wide text-muted-foreground uppercase'>
+                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 min-w-48 max-w-[200px]'>
                   Activité
                 </TableHead>
-                <TableHead className='w-10 text-center text-xs font-semibold tracking-wide text-muted-foreground uppercase'>
+                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 text-center'>
                   #
                 </TableHead>
-                <TableHead className='min-w-44 text-xs font-semibold tracking-wide text-muted-foreground uppercase'>
+                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 min-w-44 max-w-[250px]'>
                   Intitulé tâche
                 </TableHead>
-                <TableHead className='w-20 text-center text-xs font-semibold tracking-wide text-muted-foreground uppercase'>
+                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 text-center'>
                   Unité
                 </TableHead>
-                <TableHead className='w-24 text-right text-xs font-semibold tracking-wide text-muted-foreground uppercase'>
+                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 text-right'>
                   Quantité
                 </TableHead>
-                <TableHead className='w-36 text-right text-xs font-semibold tracking-wide text-muted-foreground uppercase'>
+                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 text-right'>
                   Prix unitaire
                 </TableHead>
-                <TableHead className='w-36 bg-emerald-50/50 text-right text-xs font-semibold tracking-wide text-muted-foreground uppercase'>
+                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 bg-emerald-50/50 text-right'>
                   Montant
                 </TableHead>
               </TableRow>
             </TableHeader>
+
             <TableBody>
               {ptbas.map((ptba, ptbaIndex) => {
                 const activiteId = ptba.id_ptba
@@ -223,19 +224,19 @@ export function CoutActiviteTable({
                     <TableRow
                       key={ptba.id_ptba}
                       className={cn(
-                        'border-b',
+                        'border-b border-border/40 last:border-b-0 transition-colors duration-100',
                         isEven ? 'bg-background' : 'bg-muted/20'
                       )}
                     >
-                      <TableCell className='py-3 font-mono text-xs text-muted-foreground'>
+                      <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 font-mono text-xs text-muted-foreground'>
                         {ptba.code_activite_ptba || '—'}
                       </TableCell>
-                      <TableCell className='py-3 text-sm font-medium'>
+                      <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 font-medium max-w-[200px]'>
                         {ptba.intitule_activite_ptba || 'Sans intitulé'}
                       </TableCell>
                       <TableCell
                         colSpan={6}
-                        className='py-3 text-center text-xs text-muted-foreground italic'
+                        className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 text-center text-xs text-muted-foreground italic'
                       >
                         Aucun coût
                       </TableCell>
@@ -244,14 +245,13 @@ export function CoutActiviteTable({
                 }
 
                 return [
-                  // Lignes de détail
                   ...activiteCouts.map((cout, coutIndex) => {
                     const montant = cout.quantite_cu * cout.prix_unitaire
                     return (
                       <TableRow
                         key={`${ptba.id_ptba}-${cout.id_cout_unitaire || coutIndex}`}
                         className={cn(
-                          'border-b transition-colors hover:bg-primary/5',
+                          'border-b border-border/40 last:border-b-0 transition-colors duration-100 hover:bg-primary/5',
                           isEven ? 'bg-background' : 'bg-muted/20'
                         )}
                       >
@@ -259,56 +259,55 @@ export function CoutActiviteTable({
                           <>
                             <TableCell
                               rowSpan={activiteCouts.length + 1}
-                              className='border-r border-border/50 py-3 align-top font-mono text-xs text-muted-foreground'
+                              className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 font-mono text-xs text-muted-foreground border-r border-border/50'
                             >
                               {ptba.code_activite_ptba || '—'}
                             </TableCell>
                             <TableCell
                               rowSpan={activiteCouts.length + 1}
-                              className='border-r border-border/50 py-3 align-top text-sm font-semibold'
+                              className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 font-semibold max-w-[200px] border-r border-border/50'
                             >
                               {ptba.intitule_activite_ptba || 'Sans intitulé'}
                             </TableCell>
                           </>
                         ) : null}
-                        <TableCell className='py-2.5 text-center text-xs text-muted-foreground'>
+                        <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 text-center text-xs text-muted-foreground'>
                           {cout.ordre || coutIndex + 1}
                         </TableCell>
-                        <TableCell className='py-2.5 text-sm'>
+                        <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 max-w-[250px]'>
                           {cout.intitule_tache || '—'}
                         </TableCell>
-                        <TableCell className='py-2.5 text-center'>
+                        <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 text-center'>
                           <span className='inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground'>
                             {cout.unite_cu || '—'}
                           </span>
                         </TableCell>
-                        <TableCell className='py-2.5 text-right text-sm tabular-nums'>
+                        <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 text-right tabular-nums'>
                           {fmt(cout.quantite_cu)}
                         </TableCell>
-                        <TableCell className='py-2.5 text-right text-sm font-medium text-emerald-600 tabular-nums'>
+                        <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 text-right font-medium text-emerald-600 tabular-nums'>
                           {fmt(cout.prix_unitaire)}
                         </TableCell>
-                        <TableCell className='bg-emerald-50/30 py-2.5 text-right text-sm font-bold text-blue-600 tabular-nums'>
+                        <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 bg-emerald-50/30 text-right font-bold text-blue-600 tabular-nums'>
                           {fmt(montant)}
                         </TableCell>
                       </TableRow>
                     )
                   }),
-                  // Ligne total par activité
                   <TableRow
                     key={`${ptba.id_ptba}-total`}
                     className={cn(
-                      'border-b-2 border-border',
+                      'border-b border-border/40 last:border-b-0 transition-colors duration-100',
                       isEven ? 'bg-muted/10' : 'bg-muted/30'
                     )}
                   >
                     <TableCell
                       colSpan={5}
-                      className='py-2 text-right text-xs font-semibold tracking-wide text-muted-foreground uppercase'
+                      className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 text-right text-xs font-semibold tracking-wide text-muted-foreground uppercase'
                     >
                       Sous-total
                     </TableCell>
-                    <TableCell className='bg-emerald-50/30 py-2 text-right text-sm font-bold text-blue-700 tabular-nums'>
+                    <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 bg-emerald-50/30 text-right font-bold text-blue-700 tabular-nums'>
                       {fmt(totalActivite)}{' '}
                       <span className='text-[10px] font-normal text-muted-foreground'>
                         {currencyCode}
@@ -319,16 +318,15 @@ export function CoutActiviteTable({
               })}
             </TableBody>
 
-            {/* Total général */}
             <tfoot>
               <tr className='border-t-2 border-primary/20 bg-primary/5'>
                 <td
                   colSpan={7}
-                  className='px-4 py-3 text-right text-sm font-bold tracking-wide text-foreground uppercase'
+                  className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 text-right font-bold tracking-wide text-foreground uppercase'
                 >
                   Total général
                 </td>
-                <td className='px-4 py-3 text-right text-sm font-bold text-primary tabular-nums'>
+                <td className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 text-right font-bold text-primary tabular-nums'>
                   {fmt(totalGeneral)}{' '}
                   <span className='text-xs font-normal text-muted-foreground'>
                     {currencyCode}
