@@ -11,7 +11,7 @@ interface StatCardProps {
   title: string;
   icon?: LucideIcon; // Rend l'icône optionnelle
   color: string;
-  rows: StatRow[];
+  rows?: StatRow[];
   progressValue?: number;
   progressDecimals?: number;
   progressColor?: string;
@@ -20,6 +20,7 @@ interface StatCardProps {
     positive: boolean;
   };
   tags?: { label: string; value: number; color?: { bg: string; text: string; border: string } }[]
+  narrativeNode?: React.ReactNode
 }
 
 const colorMap: Record<
@@ -95,6 +96,7 @@ export default function StatCard({
   progressColor,
   trend,
   tags,
+  narrativeNode
 
 }: StatCardProps) {
   const theme = colorMap[color] || colorMap.blue;
@@ -154,34 +156,41 @@ export default function StatCard({
           })}
         </div>
       )}
+      {narrativeNode && (
+        <div className='relative'>
+          {narrativeNode}
+        </div>
+      )}
       {/* Stats */}
-      <div className="relative space-y-1">
-        {rows.map((row, index) => (
-          <div
-            key={index}
-            className="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-2 last:border-0 last:pb-0"
-          >
-            <span className="text-xs text-gray-500 dark:text-gray-400">
-              {row.label}
-            </span>
-
-            <div className="text-right">
-              <span
-                className={`text-base font-bold ${valueColors[row.valueColor || ""] || "text-gray-800 dark:text-gray-200"
-                  }`}
-              >
-                {row.value}
+      {rows &&
+        <div className="relative space-y-1">
+          {rows.map((row, index) => (
+            <div
+              key={index}
+              className="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-2 last:border-0 last:pb-0"
+            >
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                {row.label}
               </span>
 
-              {row.suffix && (
-                <span className="ml-1 text-xs font-medium text-gray-400 dark:text-gray-500">
-                  {row.suffix}
+              <div className="text-right">
+                <span
+                  className={`text-base font-bold ${valueColors[row.valueColor || ""] || "text-gray-800 dark:text-gray-200"
+                    }`}
+                >
+                  {row.value}
                 </span>
-              )}
+
+                {row.suffix && (
+                  <span className="ml-1 text-xs font-medium text-gray-400 dark:text-gray-500">
+                    {row.suffix}
+                  </span>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      }
 
       {/* Progress */}
       {progressValue !== undefined && (

@@ -72,6 +72,11 @@ export function buildProjetDashboardRow(
     nom_projet: projet.intitule_projet ?? '—',
     logo: projet.logo_projet,
     date_demarrage: projet.date_demarrage_projet ?? '',
+    date_fin: projet.date_demarrage_projet && projet.duree_projet
+        ? new Date(new Date(projet.date_demarrage_projet).setMonth(
+            new Date(projet.date_demarrage_projet).getMonth() + projet.duree_projet
+          )).toISOString().split('T')[0]
+        : '',
     date_cloture: dateCloture ? dateCloture.toISOString().split('T')[0] : '',
     delai_consomme: delaiConsomme,
     budget_prevu: Number(projet.budget_projet ?? 0),

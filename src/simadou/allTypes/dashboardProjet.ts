@@ -23,6 +23,7 @@ export interface ProjetDashboardRow {
   logo?: string
   date_demarrage: string
   date_cloture: string
+  date_fin?: string
   delai_consomme: number
   budget_prevu: number
   montant_decaisse: number

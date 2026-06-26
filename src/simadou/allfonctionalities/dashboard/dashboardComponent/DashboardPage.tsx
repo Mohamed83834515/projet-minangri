@@ -156,18 +156,48 @@ const DashboardPage: React.FC = () => {
                 <StatCard
                     title='Projets et Programmes'
                     color='blue'
-                    rows={[
-                        { label: 'Nombre total de projets', value: projetProgrammeStats.total },
-                        { label: 'Projets en cours', value: projetsEnCours, suffix: `(${pourcentageEnCours}%)`, valueColor: 'emerald' },
-                        {
-                            label: `Retard ${projetProgrammeStats.enRetard} (${projetProgrammeStats.pourcentageRetard}%) / Critique ${projetProgrammeStats.critiques} (${projetProgrammeStats.pourcentageCritique}%)`,
-                        },
-                    ]}
                     tags={projectsPerType.map((ppt, index) => ({
                         label: ppt.code_type_projet,
                         value: ppt.nombre_projets,
                         color: TAG_COLORS[index % TAG_COLORS.length],
                     }))}
+                    narrativeNode={
+                        <div className="space-y-2">
+                            {/* Ligne principale avec "dont" */}
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                                <span className="text-3xl font-black text-gray-900 dark:text-white">
+                                    {projetProgrammeStats.total}
+                                </span>
+                                <span className="ml-1.5 text-sm text-gray-500">
+                                    projets au total, dont
+                                </span>
+                            </p>
+
+                            {/* Statuts en ligne */}
+                            <div className="flex flex-wrap items-center gap-3 text-sm">
+                                <span className="flex items-center gap-1">
+                                    <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
+                                    <span className="font-semibold text-emerald-600">{projetsEnCours}</span>
+                                    <span className="text-gray-500">en cours</span>
+                                    <span className="text-xs text-gray-400">({pourcentageEnCours}%)</span>
+                                </span>
+                                <span className="text-gray-300">•</span>
+                                <span className="flex items-center gap-1">
+                                    <span className="inline-block h-2 w-2 rounded-full bg-orange-500" />
+                                    <span className="font-semibold text-orange-500">{projetProgrammeStats.enRetard}</span>
+                                    <span className="text-gray-500">en retard</span>
+                                    <span className="text-xs text-gray-400">({projetProgrammeStats.pourcentageRetard}%)</span>
+                                </span>
+                                <span className="text-gray-300">•</span>
+                                <span className="flex items-center gap-1">
+                                    <span className="inline-block h-2 w-2 rounded-full bg-red-500" />
+                                    <span className="font-semibold text-red-600">{projetProgrammeStats.critiques}</span>
+                                    <span className="text-gray-500">critiques</span>
+                                    <span className="text-xs text-gray-400">({projetProgrammeStats.pourcentageCritique}%)</span>
+                                </span>
+                            </div>
+                        </div>
+                    }
                 />
 
                 {/* Carte 2 : PAO Programme */}
@@ -275,7 +305,7 @@ const DashboardPage: React.FC = () => {
                     onAnneeChange={setSelectedAnnee}
                     title='Avancement des Taches par Unite de Gestion'
                 />
-            </div> 
+            </div>
 
         </div>
     )

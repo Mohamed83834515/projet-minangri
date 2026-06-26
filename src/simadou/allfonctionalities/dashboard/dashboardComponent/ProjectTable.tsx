@@ -234,7 +234,7 @@ const ProjectTable: React.FC<ProjectTableProps> = ({
 
                     {/* Date fin calculée */}
                     <td className="px-4 py-4 text-xs text-gray-600 dark:text-gray-400">
-                      {formatDate(projet.date_cloture)}
+                      {formatDate(projet.date_fin ?? '')}
                     </td>
 
                     {/* Délai consommé */}
