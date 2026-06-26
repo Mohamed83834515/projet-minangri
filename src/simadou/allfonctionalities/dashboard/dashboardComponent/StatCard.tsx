@@ -13,6 +13,7 @@ interface StatCardProps {
   color: string;
   rows: StatRow[];
   progressValue?: number;
+  progressDecimals?: number;
   progressColor?: string;
   trend?: {
     value: string;
@@ -90,6 +91,7 @@ export default function StatCard({
   color,
   rows,
   progressValue,
+  progressDecimals = 0,
   progressColor,
   trend,
   tags,
@@ -187,7 +189,7 @@ export default function StatCard({
           <div className="mb-1.5 flex justify-between text-xs">
             <span className="text-gray-500 dark:text-gray-400">Progression</span>
             <span className="font-medium text-gray-700 dark:text-gray-300">
-              {progressValue.toFixed(0)}%
+              {progressValue.toFixed(progressDecimals)}%
             </span>
           </div>
 

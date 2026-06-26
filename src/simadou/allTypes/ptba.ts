@@ -24,6 +24,7 @@ export interface Ptba extends Record<string, unknown> {
   created_at?: string;
   updated_at?: string;
   cout_total_ptba?:number;
+  montant_decaisse_ptba?: number;
   taux_execution_ptba?:number
   // Relations populées (optionnelles, selon l'API)
   responsable?: PlanSite; // PlanSite populé pour responsable_ptba

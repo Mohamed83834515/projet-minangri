@@ -1,15 +1,29 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useGetProjets } from '@/simadou/allHooks/admin/projetHooks'
 import { useCountProjectsPerType } from '@/simadou/allHooks/admin/typeProjetHooks'
 import {
     useActiveProgrammeCode,
     useActiveProgrammeId,
 } from '@/hooks/use-active-programme'
-import DashboardHeader from './DashboardHeader'
-import ProjectTable, { type ProjetRow } from './ProjectTable'
-import StatCard from './StatCard'
 import { useGetVersions } from '@/simadou/allHooks/admin/versionHooks'
-import { useGetAvancementDirections } from '@/simadou/allHooks/admin/dashboardProgrammeHooks'
+import { useGetPtbas } from '@/simadou/allHooks/admin/ptbaHooks'
+import {
+    useDashboardAnneeSelection,
+    useGetAvancementDirections,
+} from '@/simadou/allHooks/admin/dashboardProgrammeHooks'
+import { formatNumber } from '@/simadou/allSercices/montantFormater'
+import type { ProjetDashboardSource } from '@/simadou/allTypes/dashboardProjet'
+import {
+    buildProjetDashboardRows,
+    buildProjetProgrammeDashboardStats,
+} from '@/simadou/lib/dashboardProjetUtils'
+import {
+    buildPaoMinagriDashboardStats,
+    formatDashboardPercent,
+} from '@/simadou/lib/dashboardPaoStatsUtils'
+import DashboardHeader from './DashboardHeader'
+import ProjectTable from './ProjectTable'
+import StatCard from './StatCard'
 import AvancementDirectionChart from './AvancementDirectionChart'
 
 
@@ -22,69 +36,21 @@ const DashboardPage: React.FC = () => {
     const idProgramme = useActiveProgrammeId()
     const { data: projets = [] } = useGetProjets()
     const { data: avancement_directions = [] } = useGetAvancementDirections()
+    const { data: ptbas = [] } = useGetPtbas()
 
 
-    // ── Données tableau projets ───────────────────────────────────────────────────
-    const projetRows: ProjetRow[] = useMemo(() => {
-        const aujourdhui = new Date()
+    const { data: versions = [] } = useGetVersions()
+    const {
+        anneesDisponibles,
+        selectedAnnee,
+        setSelectedAnnee,
+        selectedVersion,
+    } = useDashboardAnneeSelection(versions)
 
-        return projets.map((p: any) => {
-            // Calcul de la date de clôture : date_demarrage + duree (en années)
-            const dateDebut = new Date(p.date_demarrage_projet)
-            const dureeAnnees = p.duree_projet || 2
-            const dateCloture = new Date(dateDebut)
-            dateCloture.setFullYear(dateDebut.getFullYear() + dureeAnnees)
-
-            // Calcul du délai consommé
-            const dateClotureMs = dateCloture.getTime()
-            const aujourdhuiMs = aujourdhui.getTime()
-            const delaiConsomme =
-                dateClotureMs > aujourdhuiMs
-                    ? Math.round(
-                        ((aujourdhuiMs - dateDebut.getTime()) /
-                            (dateClotureMs - dateDebut.getTime())) *
-                        100
-                    )
-                    : 100
-
-            // Détermination du statut
-            let statut: ProjetRow['statut'] = 'actif'
-            const avancement = p.taux_avancement_technique ?? 60
-            const isClotureDepassee = dateCloture < aujourdhui
-
-            if (isClotureDepassee && avancement < 100) {
-                statut = 'retard'
-            } else if (avancement < 30 && delaiConsomme > 70) {
-                statut = 'critique'
-            } else if (isClotureDepassee && avancement >= 100) {
-                statut = 'clôturé'
-            } else if (p.statut_projet?.toLowerCase() === 'suspendu') {
-                statut = 'suspendu'
-            }
-
-            // Récupérer les partenaires d'exécution
-            const partenairesExecution = p.signataires_projet || []
-            const partenairesNoms = partenairesExecution
-                .map((partenaire: any) => partenaire.code_acteur?.trim())
-                .filter(Boolean)
-
-            return {
-                id: p.id_projet ?? p.id,
-                sigle: p.sigle_projet ?? p.sigle ?? '—',
-                nom_projet: p.intitule_projet ?? p.titre ?? '—',
-                logo: p.logo_projet,
-                date_demarrage: p.date_demarrage_projet ?? p.date_debut ?? '',
-                date_cloture: dateCloture.toISOString().split('T')[0],
-                delai_consomme: delaiConsomme,
-                budget_prevu: Number(p.budget_prevu ?? p.montant_prevu ?? 1000000),
-                montant_decaisse: Number(p.montant_decaisse ?? 450000),
-                taux_decaissement: Number(p.taux_decaissement ?? 45),
-                taux_avancement_technique: avancement,
-                bailleur: partenairesNoms.join('/ ') || '—', // Affichage des partenaires d'exécution
-                statut,
-            }
-        })
-    }, [projets])
+    const projetRows = useMemo(
+        () => buildProjetDashboardRows(projets as ProjetDashboardSource[]),
+        [projets]
+    )
 
     // Filtrage par recherche globale
     const projetRowsFiltered = useMemo(() => {
@@ -100,38 +66,10 @@ const DashboardPage: React.FC = () => {
 
     // Données pour la carte 1 : Projet Programme
     const { data: projectsPerType = [] } = useCountProjectsPerType(idProgramme || 0)
-    const projetProgrammeStats = useMemo(() => {
-        const totalProjets = projets.length // ← Tes 4 projets réels
-
-        // Projets en retard : date_demarrage_projet > date_prevue ou date_cloture dépassée
-        // Comme tes projets n'ont pas de date_cloture, on utilise date_demarrage + duree
-        const aujourdhui = new Date()
-        const projetsEnRetard = projets.filter((p) => {
-            if (!p.date_demarrage_projet) return false
-            const dateDebut = new Date(p.date_demarrage_projet)
-            const dureeMois = p.duree_projet * 12
-            const dateFinPrevue = new Date(
-                dateDebut.setMonth(dateDebut.getMonth() + dureeMois)
-            )
-            return dateFinPrevue < aujourdhui
-        }).length
-
-        // Projets critiques : (données fictives car pas dans ton API)
-        const projetsCritiques = Math.floor(projets.length * 0.25) // 25% fictif
-
-        const pourcentageRetard =
-            totalProjets > 0 ? Math.round((projetsEnRetard / totalProjets) * 100) : 0
-        const pourcentageCritique =
-            totalProjets > 0 ? Math.round((projetsCritiques / totalProjets) * 100) : 0
-
-        return {
-            total: totalProjets,
-            enRetard: projetsEnRetard,
-            pourcentageRetard,
-            critiques: projetsCritiques,
-            pourcentageCritique,
-        }
-    }, [projets])
+    const projetProgrammeStats = useMemo(
+        () => buildProjetProgrammeDashboardStats(projets),
+        [projets]
+    )
 
     // Données pour la carte 2 : PAO Programme (avec données fictives pour montants)
     const notifications = useMemo(
@@ -160,69 +98,16 @@ const DashboardPage: React.FC = () => {
         ],
         [9]
     )
-        // ✅ Utiliser toutes les versions (sans filtre programme)
-    const { data: versions = [] } = useGetVersions()
-
-    // ✅ Extraire les années disponibles à partir de toutes les versions
-    const anneesDisponibles = useMemo(() => {
-        if (!versions || versions.length === 0) return []
-
-        // Récupérer toutes les années
-        const annees = versions.map((v) => v.annee_ptba)
-
-        // Dédoublonner et trier par ordre décroissant (plus récent en premier)
-        return [...new Set(annees)].sort((a, b) => b - a)
-    }, [versions])
-
-    // ✅ Pour chaque année, trouver la version avec la date de validation la plus récente
-    const versionsParAnnee = useMemo(() => {
-        if (!versions || versions.length === 0) return new Map()
-
-        const map = new Map<number, typeof versions[0]>()
-
-        versions.forEach((version) => {
-            const annee = version.annee_ptba
-            const dateValidation = version.date_validation
-                ? new Date(version.date_validation).getTime()
-                : 0
-
-            if (!map.has(annee)) {
-                map.set(annee, version)
-            } else {
-                const existing = map.get(annee)!
-                const existingDate = existing.date_validation
-                    ? new Date(existing.date_validation).getTime()
-                    : 0
-
-                if (dateValidation > existingDate) {
-                    map.set(annee, version)
-                }
-            }
-        })
-
-        return map
-    }, [versions])
-    
-    // ✅ Récupérer la version la plus récente pour une année donnée
-    const getVersionByAnnee = useCallback((annee: number) => {
-        return versionsParAnnee.get(annee) || null
-    }, [versionsParAnnee])
-
-    // ✅ Année par défaut (la plus récente)
-    const [anneeTaches, setAnneeTaches] = useState<number>(
-        anneesDisponibles.length > 0 ? anneesDisponibles[0] : new Date().getFullYear()
+    const paoMinagriStats = useMemo(
+        () =>
+            buildPaoMinagriDashboardStats(
+                ptbas,
+                selectedVersion?.id_version_ptba,
+                selectedAnnee
+            ),
+        [ptbas, selectedVersion, selectedAnnee]
     )
 
-    // ✅ Mettre à jour la version sélectionnée quand l'année change
-    useEffect(() => {
-        if (anneeTaches) {
-            const version = getVersionByAnnee(anneeTaches)
-            if (version) {
-                // Vous pouvez stocker l'ID de la version si nécessaire
-                console.log('Version sélectionnée pour l\'année', anneeTaches, version.id_version_ptba)
-            }
-        }
-    }, [anneeTaches, getVersionByAnnee])
     // Données pour la carte 4 : Points de blocage (fictives car pas dans ton API)
     const pointsBlocageStats = useMemo(() => {
         // Données fictives basées sur le nombre de projets
@@ -314,29 +199,29 @@ const DashboardPage: React.FC = () => {
 
                 {/* Carte 3 : PAO Département */}
                 <StatCard
-                    title={`PAO 2026 du MINAGRI`}
+                    title={`PAO ${paoMinagriStats.annee} du MINAGRI`}
                     color='purple'
                     rows={[
                         {
                             label: 'Montant Total Prévu',
-                            value: 79,
+                            value: formatNumber(paoMinagriStats.montantTotalPrevu),
                             suffix: 'GNF',
                         },
                         {
                             label: 'Montant Total Décaissé',
-                            value:
-                                78,
-                            suffix: `(49%) GNF`,
+                            value: formatNumber(paoMinagriStats.montantTotalDecaisse),
+                            suffix: `(${formatDashboardPercent(paoMinagriStats.tauxDecaissement)}%) GNF`,
                             valueColor: 'purple',
                         },
                         {
                             label: "Nombre Total d'activité réalisée",
-                            value: 900000,
-                            suffix: `(90%)`,
+                            value: paoMinagriStats.activitesRealisees,
+                            suffix: `(${formatDashboardPercent(paoMinagriStats.tauxRealisationActivites)}%)`,
                             valueColor: 'purple',
                         },
                     ]}
-                    progressValue={90}
+                    progressValue={paoMinagriStats.tauxRealisationActivites}
+                    progressDecimals={2}
                     progressColor='purple'
                 />
 
@@ -368,9 +253,6 @@ const DashboardPage: React.FC = () => {
             <ProjectTable
                 projets={projetRowsFiltered}
                 pageSize={10}
-                onProjetClick={(p) => {
-                    console.log('Naviguer vers projet', p.id)
-                }}
             />
 
 
@@ -389,8 +271,8 @@ const DashboardPage: React.FC = () => {
                     data={avancement_directions}
                     mode='detail'
                     anneesDisponibles={anneesDisponibles}
-                    selectedAnnee={anneeTaches}
-                    onAnneeChange={setAnneeTaches}
+                    selectedAnnee={selectedAnnee}
+                    onAnneeChange={setSelectedAnnee}
                     title='Avancement des Taches par Unite de Gestion'
                 />
             </div> 
