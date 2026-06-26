@@ -41,7 +41,7 @@ function toRow(n: NiveauCadreAnalytique): NiveauRow {
   return {
     id: n.id_nca,
     libelle: n.libelle_nca,
-    codeLength: Number(n.nombre_nca) || 2,
+    codeLength: Number(n.code_number_nca) || 2,
     isNew: false,
   }
 }
@@ -122,11 +122,11 @@ export default function NiveauCadreAnalytiqueManager() {
         order += 1
         const data = {
           libelle_nca: row.libelle.trim(),
-          code_number_nca: order,
-          nombre_nca: Number(row.codeLength) || 2,
+          nombre_nca: order,
+          code_number_nca: Number(row.codeLength) || 2,
           programme: codeProgramme,
         }
-
+        console.log('row', data)
         if (row.isNew) {
           await createMutation.mutateAsync(data)
         } else if (row.id != null) {

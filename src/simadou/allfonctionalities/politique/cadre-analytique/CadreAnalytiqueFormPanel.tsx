@@ -25,6 +25,7 @@ export default function CadreAnalytiqueFormPanel({
   codeProgramme,
   niveauCodeNumber,
   niveaux,
+  niveauId,
   cadres,
   cadre,
   onClose,
@@ -33,6 +34,7 @@ export default function CadreAnalytiqueFormPanel({
   programmeId: number
   codeProgramme?: string
   niveauCodeNumber: number
+  niveauId: number
   niveaux: NiveauCadreAnalytique[]
   cadres: CadreAnalytique[]
   cadre?: CadreAnalytique | null
@@ -133,7 +135,7 @@ export default function CadreAnalytiqueFormPanel({
   const onSubmit = (data: CadreAnalytiqueWriteData) => {
     const payload: CadreAnalytiqueWriteData = {
       ...data,
-      niveau_ca: niveauCodeNumber,
+      niveau_ca: niveauId,
       programme_ca: programmeId,
       parent_ca: data.parent_ca || null,
       partenaire_ca: data.partenaire_ca ?? [],
@@ -172,7 +174,7 @@ export default function CadreAnalytiqueFormPanel({
 
   return (
     <DynamicForm
-      key={cadre?.id_ca ?? `new-${niveauCodeNumber}`}
+      key={cadre?.id_ca ?? `new-${niveauId}`}
       config={formConfig}
       schema={schema}
       defaultValues={defaultValues}

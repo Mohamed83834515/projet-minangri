@@ -158,6 +158,7 @@ export default function ListeCadreAnalytique() {
   const { tabsStyle } = useNiveauTabsTheme()
 
   const [activeNiveauCode, setActiveNiveauCode] = useState<string>('')
+  const [activeNiveauId, setActiveNiveauId] = useState<number>(0)
   const [searchTerm, setSearchTerm] = useState('')
   const [showForm, setShowForm] = useState(false)
   const [showNiveauxDialog, setShowNiveauxDialog] = useState(false)
@@ -168,14 +169,34 @@ export default function ListeCadreAnalytique() {
     useState<CadreAnalytique | null>(null)
   const [showIndicateursDialog, setShowIndicateursDialog] = useState(false)
 
+  // Ajouter un state pour suivre le programme actif
+  const [currentProgramme, setCurrentProgramme] = useState(codeProgramme)
+
+  useEffect(() => {
+    // Si le programme a changé, réinitialiser tout
+    if (codeProgramme !== currentProgramme) {
+      setCurrentProgramme(codeProgramme)
+      setActiveNiveauCode('')
+      setActiveNiveauId(0)
+      // Les autres effets se déclencheront pour sélectionner le premier niveau
+    }
+  }, [codeProgramme, currentProgramme])
+
+  // Effet pour sélectionner le premier niveau
   useEffect(() => {
     if (sortedNiveaux.length > 0 && activeNiveauCode === '') {
-      setActiveNiveauCode(String(sortedNiveaux[0].code_number_nca))
+      const premierNiveau = sortedNiveaux[0]
+      if (premierNiveau && premierNiveau.nombre_nca != null) {
+        const code = String(premierNiveau.nombre_nca)
+        setActiveNiveauCode(code)
+        setActiveNiveauId(premierNiveau.id_nca)
+        handleTabChange(code)
+      }
     }
-  }, [sortedNiveaux, activeNiveauCode])
-
+  }, [codeProgramme, sortedNiveaux, activeNiveauCode])
+  console.log()
   const currentNiveauCode = Number(
-    activeNiveauCode || sortedNiveaux[0]?.code_number_nca || 0
+    activeNiveauCode || sortedNiveaux[0]?.nombre_nca || 0
   )
 
   const currentNiveauLibelle = useMemo(() => {
@@ -200,7 +221,7 @@ export default function ListeCadreAnalytique() {
   const maxNiveauCodeNumber = useMemo(
     () =>
       sortedNiveaux.length > 0
-        ? Number(sortedNiveaux[sortedNiveaux.length - 1].code_number_nca)
+        ? Number(sortedNiveaux[sortedNiveaux.length - 1].nombre_nca)
         : 0,
     [sortedNiveaux]
   )
@@ -222,8 +243,27 @@ export default function ListeCadreAnalytique() {
 
   const handleTabChange = useCallback((value: string) => {
     setActiveNiveauCode(value)
+
+    // Convertir en nombre et vérifier que c'est valide
+    const index = Number(value) - 1
+
+    // Vérifier que l'index est valide
+    if (index >= 0 && index < sortedNiveaux.length) {
+      const niveau = sortedNiveaux[index]
+      if (niveau && niveau.id_nca != null) {
+        setActiveNiveauId(niveau.id_nca)
+        console.log('Niveau sélectionné:', niveau.id_nca)
+      } else {
+        console.warn('Niveau invalide à l\'index:', index)
+        setActiveNiveauId(0)
+      }
+    } else {
+      console.warn('Index de niveau invalide:', index, 'Total niveaux:', sortedNiveaux.length)
+      setActiveNiveauId(0)
+    }
+
     setSearchTerm('')
-  }, [])
+  }, [sortedNiveaux])
 
   const handleEdit = useCallback((cadre: CadreAnalytique) => {
     setSelectedCadre(cadre)
@@ -310,9 +350,9 @@ export default function ListeCadreAnalytique() {
             <NiveauTabsList>
               {sortedNiveaux.map((n) => (
                 <NiveauTabTrigger
-                  key={n.id_nca}
-                  value={String(n.code_number_nca)}
-                  count={countByNiveau.get(Number(n.code_number_nca)) ?? 0}
+                  key={n.nombre_nca}
+                  value={String(n.nombre_nca)}
+                  count={countByNiveau.get(Number(n.id_nca)) ?? 0}
                 >
                   {n.libelle_nca}
                 </NiveauTabTrigger>
@@ -340,17 +380,17 @@ export default function ListeCadreAnalytique() {
         {sortedNiveaux.map((n) => (
           <TabsContent
             key={n.id_nca}
-            value={String(n.code_number_nca)}
+            value={String(n.nombre_nca)}
           >
-            {Number(n.code_number_nca) === currentNiveauCode && (
+            {Number(n.nombre_nca) === currentNiveauCode && (
               <CadreAnalytiqueNiveauTable
-                niveauCodeNumber={Number(n.code_number_nca)}
+                niveauCodeNumber={Number(n.id_nca)}
                 niveaux={sortedNiveaux}
                 cadres={cadres}
                 acteurs={acteurs}
                 searchTerm={searchTerm}
                 tableKey={`cadres-ca-${n.id_nca}-${dataUpdatedAt}-${cadres.length}-${searchTerm}-${allIndicateurs.length}`}
-                isLastLevel={Number(n.code_number_nca) === maxNiveauCodeNumber}
+                isLastLevel={Number(n.nombre_nca) === maxNiveauCodeNumber}
                 onOpenIndicateurs={handleOpenIndicateurs}
                 getIndicateurCount={getIndicateurCount}
                 onEdit={handleEdit}
@@ -396,6 +436,7 @@ export default function ListeCadreAnalytique() {
               programmeId={programmeId}
               codeProgramme={codeProgramme}
               niveauCodeNumber={currentNiveauCode}
+              niveauId={activeNiveauId || 1}
               niveaux={niveaux}
               cadres={cadres}
               cadre={selectedCadre}
