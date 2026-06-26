@@ -99,11 +99,12 @@ export function indicateurCadreResultatToFormValues({
   fixedNiveauIop,
 }: {
   indicateur?: IndicateurCadreResultat | null
-  codeProjet: string
+  codeProjet?: string
   idProjet: number
   fixedCadreCrCode?: string | null
   fixedNiveauIop?: number | null
 }): Partial<IndicateurCadreResultatCreateData> {
+  console.log(codeProjet)
   return {
     niveau_iop:
       indicateur?.niveau_iop ??
@@ -127,7 +128,6 @@ export function indicateurCadreResultatToFormValues({
       (indicateur ? undefined : String(idProjet)),
   }
 }
-
 export function buildIndicateurCadreResultatPayload({
   data,
   codeProjet,
