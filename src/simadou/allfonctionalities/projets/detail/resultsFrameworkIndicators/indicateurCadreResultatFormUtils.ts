@@ -19,7 +19,7 @@ export function resolveNiveauIopFromCadre(
   cadre: CadreResultat,
   niveaux: NiveauCadreResultat[]
 ): number | null {
-  const populated = cadre.niveau?.nombre_ncr
+  const populated = cadre.niveau?.id_ncr
   if (populated != null && Number.isFinite(Number(populated))) {
     return Number(populated)
   }
@@ -93,18 +93,15 @@ export function resolveResponsableIopLabel(
 
 export function indicateurCadreResultatToFormValues({
   indicateur,
-  codeProjet,
   idProjet,
   fixedCadreCrCode,
   fixedNiveauIop,
 }: {
   indicateur?: IndicateurCadreResultat | null
-  codeProjet?: string
   idProjet: number
   fixedCadreCrCode?: string | null
   fixedNiveauIop?: number | null
 }): Partial<IndicateurCadreResultatCreateData> {
-  console.log(codeProjet)
   return {
     niveau_iop:
       indicateur?.niveau_iop ??
@@ -130,12 +127,12 @@ export function indicateurCadreResultatToFormValues({
 }
 export function buildIndicateurCadreResultatPayload({
   data,
-  codeProjet,
+  idProjet,
   fixedCadreCrCode,
   fixedNiveauIop,
 }: {
   data: IndicateurCadreResultatCreateData
-  codeProjet: string
+  idProjet: number
   fixedCadreCrCode?: string | null
   fixedNiveauIop?: number | null
 }): IndicateurCadreResultatCreateData {
@@ -143,7 +140,7 @@ export function buildIndicateurCadreResultatPayload({
     ...data,
     niveau_iop: fixedNiveauIop ?? data.niveau_iop,
     code_cr_iop: fixedCadreCrCode ?? data.code_cr_iop,
-    projet_iop: codeProjet,
+    projet_iop: String(idProjet),
     responsable_iop: String(data.responsable_iop),
     structure_iop: data.structure_iop || undefined,
   }

@@ -123,18 +123,18 @@ export default function IndicateurCadreResultatFormDialog({
     () =>
       indicateurCadreResultatToFormValues({
         indicateur,
-        codeProjet,
         idProjet,
         fixedCadreCrCode,
         fixedNiveauIop,
       }),
-    [codeProjet, idProjet, indicateur, fixedCadreCrCode, fixedNiveauIop]
+    [ idProjet, indicateur, fixedCadreCrCode, fixedNiveauIop]
   )
+  console.log('defaultValues', defaultValues)
 
   const onSubmit = (data: IndicateurCadreResultatCreateData) => {
     const payload = buildIndicateurCadreResultatPayload({
       data,
-      codeProjet,
+      idProjet,
       fixedCadreCrCode,
       fixedNiveauIop,
     })
