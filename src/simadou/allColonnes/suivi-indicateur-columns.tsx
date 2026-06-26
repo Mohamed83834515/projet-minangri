@@ -9,7 +9,7 @@ import { type UniteIndicateur } from '../allTypes'
 export type SuiviIndicateurTableRow = IndicateurTache
 
 export type SuiviIndicateurColumnHandlers = {
-  unites: UniteIndicateur[]
+  unites?: UniteIndicateur[]
   onSuivre: (indicateur: IndicateurTache) => void
   suivisByIndicateur: Map<string, SuiviIndicateurActivite[]>
   resolveIndicateurKey?: (indicateur: IndicateurTache) => string

@@ -140,9 +140,9 @@ export default function ProjetCadreResultatsPanel({
     activeNiveau?.id_ncr || niveaux[0]?.id_ncr || 0
   )
 
-  const parent = niveaux.find(
-    (n) => Number(n.nombre_ncr) == Number(activeNiveau?.nombre_ncr) - 1
-  )
+  // const parent = niveaux.find(
+  //   (n) => Number(n.nombre_ncr) == Number(activeNiveau?.nombre_ncr) - 1
+  // )
 
   const countByNiveau = useMemo(() => {
     const counts = new Map<number, number>()
