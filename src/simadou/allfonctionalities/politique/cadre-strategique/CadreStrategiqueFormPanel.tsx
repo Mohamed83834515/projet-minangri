@@ -15,7 +15,7 @@ import {
   type CadreStrategiqueWriteData,
 } from '@/simadou/schemas/cadreStrategiqueSchemas'
 import { toast } from 'sonner'
-import { cadreStrategiqueToFormValues } from './cadreStrategiqueFormUtils'
+import { cadreStrategiqueToFormValues, getCadreStrategiqueSaveErrorMessage } from './cadreStrategiqueFormUtils'
 
 export default function CadreStrategiqueFormPanel({
   programmeId,
@@ -134,8 +134,8 @@ export default function CadreStrategiqueFormPanel({
         )
         onSuccess()
       },
-      onError: () =>
-        toast.error('Erreur lors de la sauvegarde du cadre stratégique'),
+      onError: (error: unknown) =>
+        toast.error(getCadreStrategiqueSaveErrorMessage(error)),
     }
 
     if (isEditing && cadre) {

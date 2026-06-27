@@ -116,6 +116,16 @@ export const getIndicateurCmrFormConfigForDialog = ({
   ],
 });
 
+function withCascadeIndicateurField(
+  base: FormConfig,
+  indicateurField: FormConfig['fields'][number]
+): FormConfig {
+  const resultatIndex = base.fields.findIndex((field) => field.name === 'resultat_cmr');
+  const fields = [...base.fields];
+  fields.splice(resultatIndex + 1, 0, indicateurField);
+  return { ...base, fields };
+}
+
 export const getIndicateurCmrProjetFormConfigForDialog = ({
   referentielOptions,
   isLoadingReferentiels,
@@ -140,7 +150,6 @@ export const getIndicateurCmrProjetFormConfigForDialog = ({
     resultatFieldLabel,
   });
 
-  const resultatIndex = base.fields.findIndex((field) => field.name === 'resultat_cmr');
   const indicateurField = {
     name: 'indicateur_iop',
     label: 'Indicateur',
@@ -156,8 +165,47 @@ export const getIndicateurCmrProjetFormConfigForDialog = ({
     gridCols: 2 as const,
   };
 
-  const fields = [...base.fields];
-  fields.splice(resultatIndex + 1, 0, indicateurField);
+  return withCascadeIndicateurField(base, indicateurField);
+};
 
-  return { ...base, fields };
+export const getIndicateurCmrProgrammeFormConfigForDialog = ({
+  referentielOptions,
+  isLoadingReferentiels,
+  cadreStrategiqueOptions,
+  indicateurStrategiqueOptions,
+  isLoadingIndicateursStrategiques,
+  resultatFieldLabel = 'Cadre stratégique',
+  indicateurFieldDisabled = false,
+}: {
+  referentielOptions: SelectOption[];
+  isLoadingReferentiels?: boolean;
+  cadreStrategiqueOptions: SelectOption[];
+  indicateurStrategiqueOptions: SelectOption[];
+  isLoadingIndicateursStrategiques?: boolean;
+  resultatFieldLabel?: string;
+  indicateurFieldDisabled?: boolean;
+}): FormConfig => {
+  const base = getIndicateurCmrFormConfigForDialog({
+    referentielOptions,
+    isLoadingReferentiels,
+    indicateurStrategiqueOptions: cadreStrategiqueOptions,
+    resultatFieldLabel,
+  });
+
+  const indicateurField = {
+    name: 'indicateur_istr',
+    label: 'Indicateur stratégique',
+    type: 'select' as const,
+    placeholder: indicateurFieldDisabled
+      ? "Sélectionnez d'abord un cadre stratégique"
+      : 'Sélectionner un indicateur stratégique…',
+    required: true,
+    options: indicateurStrategiqueOptions,
+    isLoading: isLoadingIndicateursStrategiques,
+    disabled: indicateurFieldDisabled,
+    dependsOn: 'resultat_cmr',
+    gridCols: 2 as const,
+  };
+
+  return withCascadeIndicateurField(base, indicateurField);
 };

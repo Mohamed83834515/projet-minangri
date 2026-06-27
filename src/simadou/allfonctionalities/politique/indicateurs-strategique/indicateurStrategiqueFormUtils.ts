@@ -1,3 +1,5 @@
+import type { SelectOption } from '@/Global/types/formConfig'
+import type { CadreStrategique } from '@/simadou/allTypes/cadreStrategique'
 import type { IndicateurStrategique } from '@/simadou/allTypes/indicateurStrategique'
 import type { IndicateurStrategiqueWriteData } from '@/simadou/schemas/indicateurStrategiqueSchemas'
 import {
@@ -79,4 +81,60 @@ export function resolveIndicateurStrategiqueCode(
     )
   }
   return ''
+}
+
+export function filterIndicateursStrategiqueForCadreStrategique(
+  indicateurs: IndicateurStrategique[],
+  cadre: CadreStrategique,
+  codeProgramme?: string | null
+): IndicateurStrategique[] {
+  const cadreCode = cadre.code_cs
+  const cadreId = cadre.id_cs
+
+  return indicateurs.filter((indicateur) => {
+    if (codeProgramme) {
+      const progCode =
+        resolveRelationCode(indicateur.programme_istr, 'code_programme') ??
+        (typeof indicateur.programme_istr === 'string'
+          ? indicateur.programme_istr
+          : null)
+      if (progCode && progCode !== codeProgramme) return false
+    }
+
+    const linkedId = resolveRelationId(indicateur.code_istr, 'id_cs')
+    if (linkedId != null && linkedId === cadreId) return true
+
+    const linkedCode =
+      resolveRelationCode(indicateur.code_istr, 'code_cs') ??
+      (typeof indicateur.code_istr === 'string' ? indicateur.code_istr : null)
+
+    return linkedCode === cadreCode
+  })
+}
+
+export function buildIndicateurStrategiqueSelectOptions(
+  indicateurs: IndicateurStrategique[],
+  currentIndicateurId?: number | null,
+  currentIndicateurLabel?: string | null
+): SelectOption[] {
+  const options = indicateurs
+    .filter((ind) => ind.id_indicateur_str != null)
+    .map((ind) => ({
+      value: ind.id_indicateur_str,
+      label: `${ind.code_indicateur_istr} — ${ind.intitule_indicateur_istr}`,
+    }))
+
+  if (
+    currentIndicateurId != null &&
+    !options.some((opt) => Number(opt.value) === currentIndicateurId)
+  ) {
+    options.unshift({
+      value: currentIndicateurId,
+      label:
+        currentIndicateurLabel ??
+        `Indicateur stratégique #${currentIndicateurId}`,
+    })
+  }
+
+  return options
 }

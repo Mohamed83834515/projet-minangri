@@ -1,3 +1,4 @@
+import type { SelectOption } from '@/Global/types/formConfig'
 import type { Acteur } from '@/simadou/allTypes/acteur'
 import type { CadreStrategique } from '@/simadou/allTypes/cadreStrategique'
 import type { NiveauCadreStrategique } from '@/simadou/allTypes/niveauCadreStrategique'
@@ -138,4 +139,46 @@ export function getNiveauCadreStrategiqueLibelle(
 ): string {
   const niveauConfig = niveaux.find((n) => n.id_nsc === niveauId)
   return niveauConfig?.libelle_nsc ?? ''
+}
+
+export function filterCadresStrategiqueByNiveau(
+  cadres: CadreStrategique[],
+  niveauId: number
+): CadreStrategique[] {
+  return cadres.filter(
+    (cadre) => resolveNiveauCsNumber(cadre.niveau_cs) === niveauId
+  )
+}
+
+export function resolveCadreStrategiqueById(
+  cadres: CadreStrategique[],
+  cadreId?: number | null
+): CadreStrategique | null {
+  if (cadreId == null || !Number.isFinite(cadreId)) return null
+  return cadres.find((cadre) => cadre.id_cs === cadreId) ?? null
+}
+
+export function buildCadreStrategiqueSelectOptions(
+  cadres: CadreStrategique[],
+  currentCadreId?: number | null,
+  currentCadreLabel?: string | null
+): SelectOption[] {
+  const options = cadres
+    .filter((cadre) => cadre.id_cs != null)
+    .map((cadre) => ({
+      value: cadre.id_cs,
+      label: `${cadre.code_cs} — ${cadre.intutile_cs}`,
+    }))
+
+  if (
+    currentCadreId != null &&
+    !options.some((opt) => Number(opt.value) === currentCadreId)
+  ) {
+    options.unshift({
+      value: currentCadreId,
+      label: currentCadreLabel ?? `Cadre stratégique #${currentCadreId}`,
+    })
+  }
+
+  return options
 }

@@ -9,11 +9,26 @@ import { normalizeApiList } from './apiListUtils'
 function toIndicateurCmrProjetApiPayload(
   data: Partial<IndicateurCmrProjetFormData>
 ): Record<string, unknown> {
-  const { resultat_cmr, indicateur_iop, referentiel_cmr, code_projet, ...rest } = data
+  const {
+    resultat_cmr: cadreCrId,
+    indicateur_iop,
+    referentiel_cmr,
+    code_projet,
+    ...rest
+  } = data
+
+  // API: resultat_cmr → FK IndicateurCadreResultat (id_indicateur_cr_iop).
+  // Le formulaire utilise resultat_cmr pour le cadre (UI) et indicateur_iop pour l'indicateur.
+  const indicateurCrId = indicateur_iop ?? cadreCrId
+
   return {
     ...rest,
-    ...(resultat_cmr !== undefined ? { resultat_cmr } : {}),
-    ...(indicateur_iop !== undefined ? { indicateur_iop } : {}),
+    ...(indicateurCrId !== undefined && indicateurCrId !== 0
+      ? { resultat_cmr: indicateurCrId }
+      : {}),
+    ...(indicateur_iop !== undefined && indicateur_iop !== 0
+      ? { indicateur_iop }
+      : {}),
     ...(referentiel_cmr !== undefined
       ? { referentiel_cmr: referentiel_cmr ?? null }
       : {}),

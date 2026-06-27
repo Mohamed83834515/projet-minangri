@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { DynamicForm, type DynamicFormHandle } from '@/Global/Forms/DynamicForm'
 import { getApiErrorMessage } from '@/lib/api-error-message'
@@ -21,10 +21,12 @@ import {
   filterCadresResultatByNiveau,
   filterIndicateursForCadreResultat,
   indicateurCmrProjetToFormValues,
+  resolveCadreIdForIndicateurCmrProjet,
   resolveCadreResultatById,
   resolveIndicateurIopId,
+  resolveIndicateurIopLabel,
   resolveReferentielCmrId,
-  resolveResultatCmrProjetId,
+  resolveResultatCmrProjetLabel,
 } from './indicateurCmrProjetFormUtils'
 
 export default function IndicateurCmrProjetFormPanel({
@@ -54,8 +56,14 @@ export default function IndicateurCmrProjetFormPanel({
     useGetDictionnaireIndicateurs()
 
   const [selectedCadreId, setSelectedCadreId] = useState<number | null>(() =>
-    resolveResultatCmrProjetId(indicateur)
+    resolveCadreIdForIndicateurCmrProjet(indicateur, cadresResultat)
   )
+
+  useEffect(() => {
+    setSelectedCadreId(
+      resolveCadreIdForIndicateurCmrProjet(indicateur, cadresResultat)
+    )
+  }, [indicateur, cadresResultat])
 
   const cadresResultatForNiveau = useMemo(
     () => filterCadresResultatByNiveau(cadresResultat, niveauId),
@@ -67,17 +75,45 @@ export default function IndicateurCmrProjetFormPanel({
     [cadresResultat, selectedCadreId]
   )
 
-  const indicateursForCadre = useMemo(
-    () =>
-      selectedCadre
-        ? filterIndicateursForCadreResultat(
-            indicateursCadreResultat,
-            selectedCadre,
-            codeProjet
-          )
-        : [],
-    [indicateursCadreResultat, selectedCadre, codeProjet]
-  )
+  const indicateursForCadre = useMemo(() => {
+    if (!selectedCadre) return []
+
+    const filtered = filterIndicateursForCadreResultat(
+      indicateursCadreResultat,
+      selectedCadre,
+      codeProjet
+    )
+
+    const currentIndicateurId = resolveIndicateurIopId(indicateur)
+    if (
+      currentIndicateurId == null ||
+      filtered.some((item) => item.id_indicateur_cr_iop === currentIndicateurId)
+    ) {
+      return filtered
+    }
+
+    const populatedIndicateur =
+      indicateur?.indicateur_iop ??
+      (indicateur?.resultat_cmr != null &&
+      typeof indicateur.resultat_cmr === 'object' &&
+      'id_indicateur_cr_iop' in indicateur.resultat_cmr
+        ? (indicateur.resultat_cmr as unknown as IndicateurCadreResultat)
+        : null)
+
+    if (populatedIndicateur && typeof populatedIndicateur === 'object') {
+      return [...filtered, populatedIndicateur]
+    }
+
+    return filtered
+  }, [indicateursCadreResultat, selectedCadre, codeProjet, indicateur])
+
+  const savedCadreLabel = useMemo(() => {
+    if (!indicateur) return null
+    const cadreId = resolveCadreIdForIndicateurCmrProjet(indicateur, cadresResultat)
+    const cadre = cadresResultat.find((item) => item.id_cr === cadreId)
+    if (cadre) return `${cadre.code_cr} — ${cadre.intutile_cr}`
+    return resolveResultatCmrProjetLabel(indicateur.resultat_cmr) || null
+  }, [indicateur, cadresResultat])
 
   const referentielOptions = useMemo(
     () =>
@@ -92,16 +128,18 @@ export default function IndicateurCmrProjetFormPanel({
     () =>
       buildCadreResultatSelectOptions(
         cadresResultatForNiveau,
-        resolveResultatCmrProjetId(indicateur)
+        resolveCadreIdForIndicateurCmrProjet(indicateur, cadresResultat),
+        savedCadreLabel
       ),
-    [cadresResultatForNiveau, indicateur]
+    [cadresResultatForNiveau, indicateur, cadresResultat, savedCadreLabel]
   )
 
   const indicateurCadreResultatOptions = useMemo(
     () =>
       buildIndicateurCadreResultatSelectOptions(
         indicateursForCadre,
-        resolveIndicateurIopId(indicateur)
+        resolveIndicateurIopId(indicateur),
+        indicateur ? resolveIndicateurIopLabel(indicateur.indicateur_iop ?? indicateur.resultat_cmr) : null
       ),
     [indicateursForCadre, indicateur]
   )
@@ -127,8 +165,8 @@ export default function IndicateurCmrProjetFormPanel({
   )
 
   const defaultValues = useMemo(
-    () => indicateurCmrProjetToFormValues(indicateur),
-    [indicateur]
+    () => indicateurCmrProjetToFormValues(indicateur, cadresResultat),
+    [indicateur, cadresResultat]
   )
 
   const handleFieldChange = (fieldName: string, value: unknown) => {

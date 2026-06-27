@@ -16,12 +16,24 @@ function mapIndicateurCmrFromApi(raw: Record<string, unknown>): IndicateurCmr {
 }
 
 function toIndicateurCmrApiPayload(
-  data: Partial<IndicateurCmrFormData>,
+  data: Partial<IndicateurCmrFormData & { indicateur_istr?: number }>,
 ): Record<string, unknown> {
-  const { resultat_cmr, referentiel_cmr, ...rest } = data;
+  const {
+    resultat_cmr: cadreCsId,
+    indicateur_istr,
+    referentiel_cmr,
+    ...rest
+  } = data
+
+  // API: resultat_cmr → FK IndicateurStrategique (id_indicateur_str).
+  // Le formulaire utilise resultat_cmr pour le cadre stratégique (UI) et indicateur_istr pour l'indicateur.
+  const indicateurStrId = indicateur_istr ?? cadreCsId
+
   return {
     ...rest,
-    ...(resultat_cmr !== undefined ? { resultat_cmr } : {}),
+    ...(indicateurStrId !== undefined && indicateurStrId !== 0
+      ? { resultat_cmr: indicateurStrId }
+      : {}),
     ...(referentiel_cmr !== undefined
       ? { referentiel_cmr: referentiel_cmr ?? null }
       : {}),

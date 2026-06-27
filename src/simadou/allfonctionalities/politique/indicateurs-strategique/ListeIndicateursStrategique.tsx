@@ -164,12 +164,16 @@ export default function ListeIndicateursStrategique() {
     activeNiveauCode || niveaux[0]?.code_number_nsc || 0
   )
 
-  const currentNiveauLibelle = useMemo(() => {
-    const n = niveaux.find(
-      (x) => Number(x.code_number_nsc) === currentNiveauCode
-    )
-    return n?.libelle_nsc ?? 'indicateur'
-  }, [niveaux, currentNiveauCode])
+  const currentNiveau = useMemo(
+    () =>
+      niveaux.find((x) => Number(x.code_number_nsc) === currentNiveauCode) ??
+      niveaux[0],
+    [niveaux, currentNiveauCode]
+  )
+
+  const currentNiveauId = Number(currentNiveau?.id_nsc ?? 0)
+
+  const currentNiveauLibelle = currentNiveau?.libelle_nsc ?? 'indicateur'
 
   const getValeurCible = useCallback(
     (ind: IndicateurStrategique) => {
@@ -404,7 +408,7 @@ export default function ListeIndicateursStrategique() {
               <IndicateurStrategiqueFormPanel
                 key={
                   selectedIndicateur?.id_indicateur_str ??
-                  `new-${currentNiveauCode}`
+                  `new-${currentNiveauId}`
                 }
                 niveauId={activeNiveauId || 1}
                 codeProgramme={codeProgramme}

@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
-import { AxiosError } from 'axios'
+import { toast } from 'sonner'
 import { DynamicForm } from '@/Global/Forms/DynamicForm'
+import { getApiErrorMessage } from '@/lib/api-error-message'
 import { useGetActeurs } from '@/simadou/allHooks/admin/acteurHooks'
 import { useGetCadresStrategique } from '@/simadou/allHooks/admin/cadreStrategiqueHooks'
 import {
@@ -10,29 +11,15 @@ import {
 import { useGetPersonnels } from '@/simadou/allHooks/admin/personnelHooks'
 import type { IndicateurStrategique } from '@/simadou/allTypes/indicateurStrategique'
 import { getIndicateurStrategiqueFormConfigForDialog } from '@/simadou/allfieldsConfig/indicateurStrategiqueForm'
-import { resolveNiveauCsNumber } from '@/simadou/lib/cadreStrategiqueUtils'
 import {
   indicateurStrategiqueWriteSchema,
   type IndicateurStrategiqueWriteData,
 } from '@/simadou/schemas/indicateurStrategiqueSchemas'
-import { toast } from 'sonner'
 import {
   buildIndicateurStrategiquePayload,
   indicateurStrategiqueToFormValues,
 } from './indicateurStrategiqueFormUtils'
-
-function formatSaveError(error: unknown): string {
-  if (error instanceof AxiosError) {
-    const data = error.response?.data
-    if (data && typeof data === 'object') {
-      const messages = Object.values(data as Record<string, unknown>)
-        .flatMap((value) => (Array.isArray(value) ? value : [value]))
-        .filter((value): value is string => typeof value === 'string')
-      if (messages.length > 0) return messages.join(' ')
-    }
-  }
-  return "Erreur lors de l'enregistrement"
-}
+import { resolveNiveauCsNumber } from '@/simadou/lib/cadreStrategiqueUtils'
 
 export default function IndicateurStrategiqueFormPanel({
   codeProgramme,
@@ -131,7 +118,8 @@ export default function IndicateurStrategiqueFormPanel({
         toast.success(isEditing ? 'Indicateur mis à jour' : 'Indicateur ajouté')
         onSuccess()
       },
-      onError: (error: unknown) => toast.error(formatSaveError(error)),
+      onError: (error: unknown) =>
+        toast.error(getApiErrorMessage(error, "Erreur lors de l'enregistrement")),
     }
 
     if (isEditing && indicateur) {

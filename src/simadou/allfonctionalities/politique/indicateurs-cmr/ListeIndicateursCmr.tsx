@@ -3,7 +3,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { GenericTable } from '@/Global/Generic/Generictable'
 import { GenericDeleteDialog } from '@/Global/Tableaux/GenericDeleteDialog'
 import { buildIndicateurCmrColumns } from '@/simadou/allColonnes/indicateur-cmr-columns'
-import { useGetNiveauxCadreStrategique } from '@/simadou/allHooks/admin/cadreStrategiqueHooks'
+import { useGetNiveauxCadreStrategique, useGetCadresStrategique } from '@/simadou/allHooks/admin/cadreStrategiqueHooks'
 import {
   useDeleteIndicateurCmr,
   useGetIndicateursCmr,
@@ -35,7 +35,11 @@ import { Tabs } from '@/components/ui/tabs'
 import { DataTableToolbarOutlineButton } from '@/components/data-table/toolbar-outline-button'
 import CiblesCmrDialog from './CiblesCmrDialog'
 import IndicateurCmrFormPanel from './IndicateurCmrFormPanel'
-import { filterIndicateursStrategiqueByNiveau } from './indicateurCmrFormUtils'
+import { filterCadresStrategiqueByNiveau } from '@/simadou/lib/cadreStrategiqueUtils'
+import {
+  countIndicateursCmrByNiveau,
+  filterIndicateursCmrByNiveau,
+} from './indicateurCmrFormUtils'
 
 type ModalState = 'indicateur' | 'indicateurView'
 
@@ -55,6 +59,7 @@ export default function ListeIndicateursCmr({
 
   const { data: niveaux = [], isLoading: isLoadingNiveaux } =
     useGetNiveauxCadreStrategique()
+  const { data: cadresStrategiques = [] } = useGetCadresStrategique()
   const { data: indicateurs = [], dataUpdatedAt } = useGetIndicateursCmr()
   const { data: indicateursStrategiques = [] } = useGetIndicateursStrategique()
   const deleteMutation = useDeleteIndicateurCmr()
@@ -87,12 +92,16 @@ export default function ListeIndicateursCmr({
     activeNiveauCode || niveaux[0]?.code_number_nsc || 0
   )
 
-  const currentNiveauLibelle = useMemo(() => {
-    const n = niveaux.find(
-      (x) => Number(x.code_number_nsc) === currentNiveauCode
-    )
-    return n?.libelle_nsc ?? 'niveau'
-  }, [niveaux, currentNiveauCode])
+  const currentNiveau = useMemo(
+    () =>
+      niveaux.find((x) => Number(x.code_number_nsc) === currentNiveauCode) ??
+      niveaux[0],
+    [niveaux, currentNiveauCode]
+  )
+
+  const currentNiveauId = Number(currentNiveau?.id_nsc ?? 0)
+
+  const currentNiveauLibelle = currentNiveau?.libelle_nsc ?? 'niveau'
 
   const closeAll = useCallback(() => {
     setModal(null)
@@ -138,15 +147,20 @@ export default function ListeIndicateursCmr({
     [routerNavigate]
   )
 
-  const strategiqueCountByNiveau = useMemo(() => {
-    const counts: Record<number, number> = {}
-    for (const indicateur of indicateursStrategiques) {
-      const niveau = Number(indicateur.niveau_istr)
-      if (!Number.isFinite(niveau)) continue
-      counts[niveau] = (counts[niveau] ?? 0) + 1
-    }
-    return counts
-  }, [indicateursStrategiques])
+  const cmrCountByNiveau = useMemo(
+    () => countIndicateursCmrByNiveau(indicateurs, indicateursStrategiques),
+    [indicateurs, indicateursStrategiques]
+  )
+
+  const indicateursForNiveau = useMemo(
+    () =>
+      filterIndicateursCmrByNiveau(
+        indicateurs,
+        currentNiveauCode,
+        indicateursStrategiques
+      ),
+    [indicateurs, currentNiveauCode, indicateursStrategiques]
+  )
 
   const columns = useMemo(
     () =>
@@ -183,13 +197,13 @@ export default function ListeIndicateursCmr({
       toast.info('Configurez d’abord les niveaux du cadre stratégique.')
       return
     }
-    const strategiquesAtNiveau = filterIndicateursStrategiqueByNiveau(
-      indicateursStrategiques,
-      currentNiveauCode
+    const cadresAtNiveau = filterCadresStrategiqueByNiveau(
+      cadresStrategiques,
+      currentNiveauId
     )
-    if (strategiquesAtNiveau.length === 0) {
+    if (cadresAtNiveau.length === 0) {
       toast.info(
-        `Aucun indicateur stratégique au niveau « ${currentNiveauLibelle} ». Créez-en un d’abord.`
+        `Aucun cadre stratégique au niveau « ${currentNiveauLibelle} ». Créez-en un d’abord.`
       )
       return
     }
@@ -240,7 +254,7 @@ export default function ListeIndicateursCmr({
               <NiveauTabTrigger
                 key={n.id_nsc}
                 value={String(n.code_number_nsc)}
-                count={strategiqueCountByNiveau[Number(n.code_number_nsc)] ?? 0}
+                count={cmrCountByNiveau[Number(n.code_number_nsc)] ?? 0}
               >
                 {n.libelle_nsc}
               </NiveauTabTrigger>
@@ -250,8 +264,8 @@ export default function ListeIndicateursCmr({
       </Tabs>
 
       <GenericTable<IndicateurCmr>
-        key={`indicateurs-cmr-politique-${dataUpdatedAt}-${indicateurs.length}`}
-        data={indicateurs}
+        key={`indicateurs-cmr-politique-${dataUpdatedAt}-${currentNiveauCode}-${indicateursForNiveau.length}`}
+        data={indicateursForNiveau}
         columns={columns}
         search={search}
         navigate={navigate}
@@ -322,10 +336,13 @@ export default function ListeIndicateursCmr({
               <IndicateurCmrFormPanel
                 key={
                   selectedIndicateur?.id_ref_ind_cmr ??
-                  `new-${currentNiveauCode}`
+                  `new-${currentNiveauId}`
                 }
                 indicateur={selectedIndicateur}
-                niveauCodeNumber={currentNiveauCode}
+                codeProgramme={codeProgramme}
+                niveauId={currentNiveauId}
+                niveauLibelle={currentNiveauLibelle}
+                cadresStrategiques={cadresStrategiques}
                 indicateursStrategiques={indicateursStrategiques}
                 onClose={closeAll}
                 onSuccess={closeAll}

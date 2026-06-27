@@ -4,7 +4,10 @@ import type { IndicateurCmrProjet } from '@/simadou/allTypes/indicateurCmrProjet
 import type { IndicateurCmrProjetCreateData } from '@/simadou/schemas/indicateurCmrProjetSchemas'
 import { filterIndicateursForCadreResultat } from '@/simadou/allfonctionalities/projets/detail/resultsFrameworkIndicators/indicateurCadreResultatFormUtils'
 import { resolveNiveauCrId } from '@/simadou/lib/cadreResultatUtils'
-import { resolveRelationId } from '@/simadou/lib/resolveApiRelation'
+import {
+  resolveRelationCode,
+  resolveRelationId,
+} from '@/simadou/lib/resolveApiRelation'
 import {
   buildDictionnaireIndicateurSelectOptions,
   resolveReferentielCmrId,
@@ -36,7 +39,67 @@ export function resolveResultatCmrProjetId(
   if (!indicateur) return null
   const value = indicateur.resultat_cmr
   if (typeof value === 'number' && Number.isFinite(value)) return value
-  return resolveRelationId(value, 'id_cr')
+  if (value != null && typeof value === 'object' && 'id_cr' in value) {
+    return resolveRelationId(value, 'id_cr')
+  }
+  return null
+}
+
+function resolvePopulatedIndicateurIop(
+  indicateur?: IndicateurCmrProjet | null
+): IndicateurCadreResultat | null {
+  if (!indicateur) return null
+
+  const indicateurIop = indicateur.indicateur_iop
+  if (indicateurIop != null && typeof indicateurIop === 'object') {
+    return indicateurIop
+  }
+
+  const resultat = indicateur.resultat_cmr
+  if (
+    resultat != null &&
+    typeof resultat === 'object' &&
+    ('id_indicateur_cr_iop' in resultat || 'code_indicateur_cr_iop' in resultat)
+  ) {
+    return resultat as unknown as IndicateurCadreResultat
+  }
+
+  return null
+}
+
+export function resolveCadreIdForIndicateurCmrProjet(
+  indicateur?: IndicateurCmrProjet | null,
+  cadresResultat: CadreResultat[] = []
+): number | null {
+  if (!indicateur) return null
+
+  const directCadreId = resolveResultatCmrProjetId(indicateur)
+  if (
+    directCadreId != null &&
+    cadresResultat.some((cadre) => cadre.id_cr === directCadreId)
+  ) {
+    return directCadreId
+  }
+
+  const resultat = indicateur.resultat_cmr
+  if (resultat != null && typeof resultat === 'object' && 'id_cr' in resultat) {
+    const populatedCadreId = resolveRelationId(resultat, 'id_cr')
+    if (populatedCadreId != null) return populatedCadreId
+  }
+
+  const populatedIndicateur = resolvePopulatedIndicateurIop(indicateur)
+  const codeCr =
+    resolveRelationCode(populatedIndicateur?.code_cr_iop, 'code_cr') ??
+    (typeof populatedIndicateur?.code_cr_iop === 'string'
+      ? populatedIndicateur.code_cr_iop
+      : null)
+
+  if (codeCr) {
+    const cadre = cadresResultat.find((item) => item.code_cr === codeCr)
+    if (cadre) return cadre.id_cr
+  }
+
+  return directCadreId
 }
 
 export function resolveIndicateurIopId(
@@ -45,7 +108,16 @@ export function resolveIndicateurIopId(
   if (!indicateur) return null
   const value = indicateur.indicateur_iop
   if (typeof value === 'number' && Number.isFinite(value)) return value
-  return resolveRelationId(value, 'id_indicateur_cr_iop')
+  if (value != null && typeof value === 'object') {
+    return resolveRelationId(value, 'id_indicateur_cr_iop')
+  }
+
+  const populatedIndicateur = resolvePopulatedIndicateurIop(indicateur)
+  if (populatedIndicateur?.id_indicateur_cr_iop != null) {
+    return populatedIndicateur.id_indicateur_cr_iop
+  }
+
+  return null
 }
 
 export function resolveResultatCmrProjetLabel(
@@ -62,12 +134,19 @@ export function resolveResultatCmrProjetLabel(
 }
 
 export function resolveIndicateurIopLabel(
-  value: IndicateurCmrProjet['indicateur_iop']
+  value: IndicateurCmrProjet['indicateur_iop'] | IndicateurCmrProjet['resultat_cmr']
 ): string {
   if (value == null) return ''
   if (typeof value === 'object') {
-    const code = value.code_indicateur_cr_iop
-    const intitule = value.intitule_indicateur_cr_iop
+    const record = value as Record<string, unknown>
+    const code =
+      typeof record.code_indicateur_cr_iop === 'string'
+        ? record.code_indicateur_cr_iop
+        : null
+    const intitule =
+      typeof record.intitule_indicateur_cr_iop === 'string'
+        ? record.intitule_indicateur_cr_iop
+        : null
     if (code && intitule) return `${code} — ${intitule}`
     return intitule ?? code ?? ''
   }
@@ -76,7 +155,8 @@ export function resolveIndicateurIopLabel(
 
 export function buildCadreResultatSelectOptions(
   cadres: CadreResultat[],
-  currentCadreId?: number | null
+  currentCadreId?: number | null,
+  currentCadreLabel?: string | null
 ): SelectOption[] {
   const options = cadres
     .filter((cadre) => cadre.id_cr != null)
@@ -91,7 +171,7 @@ export function buildCadreResultatSelectOptions(
   ) {
     options.unshift({
       value: currentCadreId,
-      label: `Cadre de résultat #${currentCadreId}`,
+      label: currentCadreLabel ?? `Cadre de résultat #${currentCadreId}`,
     })
   }
 
@@ -100,7 +180,8 @@ export function buildCadreResultatSelectOptions(
 
 export function buildIndicateurCadreResultatSelectOptions(
   indicateurs: IndicateurCadreResultat[],
-  currentIndicateurId?: number | null
+  currentIndicateurId?: number | null,
+  currentIndicateurLabel?: string | null
 ): SelectOption[] {
   const options = indicateurs
     .filter((ind) => ind.id_indicateur_cr_iop != null)
@@ -115,7 +196,7 @@ export function buildIndicateurCadreResultatSelectOptions(
   ) {
     options.unshift({
       value: currentIndicateurId,
-      label: `Indicateur #${currentIndicateurId}`,
+      label: currentIndicateurLabel ?? `Indicateur #${currentIndicateurId}`,
     })
   }
 
@@ -123,12 +204,16 @@ export function buildIndicateurCadreResultatSelectOptions(
 }
 
 export function indicateurCmrProjetToFormValues(
-  indicateur?: IndicateurCmrProjet | null
+  indicateur?: IndicateurCmrProjet | null,
+  cadresResultat: CadreResultat[] = []
 ): IndicateurCmrProjetCreateData {
+  const cadreId = resolveCadreIdForIndicateurCmrProjet(indicateur, cadresResultat)
+  const indicateurIopId = resolveIndicateurIopId(indicateur)
+
   return {
     code_ref_ind: indicateur?.code_ref_ind ?? '',
-    resultat_cmr: resolveResultatCmrProjetId(indicateur) ?? 0,
-    indicateur_iop: resolveIndicateurIopId(indicateur) ?? 0,
+    resultat_cmr: cadreId ?? 0,
+    indicateur_iop: indicateurIopId ?? 0,
     intitule_ref_ind: indicateur?.intitule_ref_ind ?? '',
     reference_cmr: indicateur?.reference_cmr ?? '',
     annee_reference: indicateur?.annee_reference ?? new Date().getFullYear(),
