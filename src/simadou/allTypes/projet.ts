@@ -19,6 +19,9 @@ export interface Projet {
   partenaires_execution_projet: Acteur[];
   zone_projet: Localite[];
   budget_projet?: number,
+  nombre_ptbas?: number,
+  taux_execution_ptba?: number,
+  montant_total_decaisse?: number,
   responsable_projet?: number | Personnel,
   type_projet?: number | TypeProjet,
   is_cloture?: boolean,
