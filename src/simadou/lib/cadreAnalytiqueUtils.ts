@@ -162,14 +162,16 @@ export function getPtbaCadreAnalytiqueNiveauCode(
   niveaux: NiveauCadreAnalytique[]
 ): number {
   const sorted = sortNiveauxCadreAnalytique(niveaux)
-  const secondByCode = sorted.find((n) => Number(n.nombre_nca) === 2)
-  if (secondByCode) return 2
-
-  const secondByOrder = sorted[1]
-  const code = Number(secondByOrder?.nombre_nca)
-  return Number.isFinite(code) && code > 0 ? code : 2
+  
+  // Prendre le niveau le plus élevé présent dans le tableau
+  const maxNiveau = sorted.reduce((max, n) => {
+    const niveau = Number(n.nombre_nca)
+    return niveau > max ? niveau : max
+  }, 0)
+  
+  // Retourner le max s'il est valide, sinon 3 par défaut
+  return Number.isFinite(maxNiveau) && maxNiveau > 0 ? maxNiveau : 3
 }
-
 /** Options select PTBA — valeur = id_ca (clé API), filtrées par niveau. */
 export function buildCadreAnalytiqueSelectOptions(
   cadres: CadreAnalytique[],
