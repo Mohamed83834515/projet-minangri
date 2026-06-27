@@ -61,7 +61,9 @@ export function buildProjetDashboardRow(
     referenceDate
   )
   const avancement = projet.taux_avancement_technique ?? 60
-
+  const budget_projet = projet.budget_projet || 0;
+  const decaissement_projet = projet.montant_total_decaisse || 0;
+  const taux_decaisser = budget_projet !== 0 ? (decaissement_projet * 100) / budget_projet : 0;
   const partenairesNoms = (projet.signataires_projet ?? [])
     .map((partenaire) => partenaire.code_acteur?.trim())
     .filter(Boolean)
@@ -79,9 +81,9 @@ export function buildProjetDashboardRow(
         : '',
     date_cloture: dateCloture ? dateCloture.toISOString().split('T')[0] : '',
     delai_consomme: delaiConsomme,
-    budget_prevu: Number(projet.budget_projet ?? 0),
-    montant_decaisse: Number(projet.montant_decaisse ?? 0),
-    taux_decaissement: Number(projet.taux_decaissement ?? 0),
+    budget_prevu: Number(budget_projet ?? 0),
+    montant_decaisse: Number(decaissement_projet ?? 0),
+    taux_decaissement: taux_decaisser  ,
     taux_avancement_technique: avancement,
     bailleur: partenairesNoms.join('/ ') || '—',
     statut: resolveProjetDashboardStatut(
