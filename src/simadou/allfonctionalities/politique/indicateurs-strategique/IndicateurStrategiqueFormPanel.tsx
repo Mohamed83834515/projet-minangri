@@ -36,13 +36,13 @@ function formatSaveError(error: unknown): string {
 
 export default function IndicateurStrategiqueFormPanel({
   codeProgramme,
-  niveauCodeNumber,
+  niveauId,
   indicateur,
   onClose,
   onSuccess,
 }: {
   codeProgramme: string
-  niveauCodeNumber: number
+  niveauId: number
   indicateur?: IndicateurStrategique | null
   onClose: () => void
   onSuccess: () => void
@@ -59,12 +59,12 @@ export default function IndicateurStrategiqueFormPanel({
   const cadreOptions = useMemo(
     () =>
       cadres
-        .filter((c) => resolveNiveauCsNumber(c.niveau_cs) === niveauCodeNumber)
+        .filter((c) => resolveNiveauCsNumber(c.niveau_cs) === niveauId)
         .map((c) => ({
           value: String(c.id_cs),
           label: `${c.code_cs} — ${c.intutile_cs}`,
         })),
-    [cadres, niveauCodeNumber]
+    [cadres, niveauId ]
   )
 
   const acteurOptions = useMemo(
@@ -114,16 +114,16 @@ export default function IndicateurStrategiqueFormPanel({
       indicateurStrategiqueToFormValues({
         indicateur,
         codeProgramme,
-        niveauCodeNumber,
+        niveauId,
       }),
-    [indicateur, codeProgramme, niveauCodeNumber]
+    [indicateur, codeProgramme, niveauId]
   )
 
   const onSubmit = (data: IndicateurStrategiqueWriteData) => {
     const payload = buildIndicateurStrategiquePayload({
       data,
       codeProgramme,
-      niveauCodeNumber,
+      niveauId,
     })
 
     const callbacks = {
@@ -147,7 +147,7 @@ export default function IndicateurStrategiqueFormPanel({
 
   return (
     <DynamicForm
-      key={indicateur?.id_indicateur_str ?? `new-${niveauCodeNumber}`}
+      key={indicateur?.id_indicateur_str ?? `new-${niveauId}`}
       config={formConfig}
       schema={indicateurStrategiqueWriteSchema}
       defaultValues={defaultValues}

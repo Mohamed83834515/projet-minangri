@@ -112,6 +112,7 @@ export default function ListeIndicateursStrategique() {
   const { data: cibles = [] } = useGetCiblesIndicateurStrategique()
   const { data: personnels = [] } = useGetPersonnels()
   const deleteMutation = useDeleteIndicateurStrategique()
+  const [activeNiveauId, setActiveNiveauId] = useState<number>(0)
 
   const hasNiveaux = niveaux.length > 0
   const { tabsStyle } = useNiveauTabsTheme()
@@ -129,9 +130,33 @@ export default function ListeIndicateursStrategique() {
     null
   )
 
+  const [currentProgramme, setCurrentProgramme] = useState(codeProgramme)
+  useEffect(() => {
+    // Si le programme a changé, réinitialiser tout
+    if (codeProgramme !== currentProgramme) {
+      setCurrentProgramme(codeProgramme)
+      setActiveNiveauCode('')
+      setActiveNiveauId(0)
+      // Les autres effets se déclencheront pour sélectionner le premier niveau
+    }
+  }, [codeProgramme, currentProgramme])
+
+  // Effet pour sélectionner le premier niveau
   useEffect(() => {
     if (niveaux.length > 0 && activeNiveauCode === '') {
-      setActiveNiveauCode(String(niveaux[0].code_number_nsc))
+      const premierNiveau = niveaux[0]
+      if (premierNiveau && premierNiveau.id_nsc != null) {
+        const code = String(premierNiveau.id_nsc)
+        setActiveNiveauCode(code)
+        setActiveNiveauId(premierNiveau.id_nsc)
+        handleTabChange(code)
+      }
+    }
+  }, [codeProgramme, niveaux, activeNiveauCode])
+
+  useEffect(() => {
+    if (niveaux.length > 0 && activeNiveauCode === '') {
+      setActiveNiveauCode(String(niveaux[0].id_nsc))
     }
   }, [niveaux, activeNiveauCode])
 
@@ -177,11 +202,32 @@ export default function ListeIndicateursStrategique() {
     },
     [personnels]
   )
-
   const handleTabChange = useCallback((value: string) => {
     setActiveNiveauCode(value)
+
+    // Convertir en nombre et vérifier que c'est valide
+    const index = Number(value) - 1
+
+    // Vérifier que l'index est valide
+    if (index >= 0 && index < niveaux.length) {
+      const niveau = niveaux[index]
+      if (niveau && niveau.id_nsc != null) {
+        setActiveNiveauId(niveau.id_nsc)
+      } else {
+        setActiveNiveauId(0)
+      }
+    } else {
+      console.warn('Index de niveau invalide:', index, 'Total niveaux:', niveaux.length)
+      setActiveNiveauId(0)
+    }
+
     setSearchTerm('')
-  }, [])
+  }, [niveaux])
+
+  // const handleTabChange = useCallback((value: string) => {
+  //   setActiveNiveauCode(value)
+  //   setSearchTerm('')
+  // }, [])
 
   const handleEdit = useCallback((row: IndicateurStrategique) => {
     setSelectedIndicateur(row)
@@ -261,10 +307,10 @@ export default function ListeIndicateursStrategique() {
               {niveaux.map((n) => (
                 <NiveauTabTrigger
                   key={n.id_nsc}
-                  value={String(n.code_number_nsc)}
+                  value={String(n.id_nsc)}
                   count={
                     indicateurs.filter(
-                      (i) => Number(i.niveau_istr) === Number(n.code_number_nsc)
+                      (i) => Number(i.niveau_istr) === Number(n.id_nsc)
                     ).length
                   }
                 >
@@ -291,10 +337,10 @@ export default function ListeIndicateursStrategique() {
         </div>
 
         {niveaux.map((n) => (
-          <TabsContent key={n.id_nsc} value={String(n.code_number_nsc)}>
-            {Number(n.code_number_nsc) === currentNiveauCode && (
+          <TabsContent key={n.id_nsc} value={String(n.id_nsc)}>
+            {Number(n.id_nsc) === currentNiveauCode && (
               <IndicateurStrategiqueNiveauTable
-                niveauCodeNumber={Number(n.code_number_nsc)}
+                niveauCodeNumber={Number(n.id_nsc)}
                 indicateurs={indicateurs}
                 searchTerm={searchTerm}
                 tableKey={`indic-istr-${n.id_nsc}-${dataUpdatedAt}-${searchTerm}`}
@@ -360,8 +406,8 @@ export default function ListeIndicateursStrategique() {
                   selectedIndicateur?.id_indicateur_str ??
                   `new-${currentNiveauCode}`
                 }
+                niveauId={activeNiveauId || 1}
                 codeProgramme={codeProgramme}
-                niveauCodeNumber={currentNiveauCode}
                 indicateur={selectedIndicateur}
                 onClose={handleCloseForm}
                 onSuccess={handleCloseForm}

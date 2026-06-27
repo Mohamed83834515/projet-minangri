@@ -187,15 +187,15 @@ export default function ListeCadreAnalytique() {
     if (sortedNiveaux.length > 0 && activeNiveauCode === '') {
       const premierNiveau = sortedNiveaux[0]
       if (premierNiveau && premierNiveau.nombre_nca != null) {
-        const code = String(premierNiveau.nombre_nca)
-        setActiveNiveauCode(code)
-        setActiveNiveauId(premierNiveau.id_nca)
-        handleTabChange(code)
+        const id = premierNiveau.id_nca
+        setActiveNiveauCode(String(id))
+        setActiveNiveauId(id)
+        handleTabChange(String(id))
       }
     }
   }, [codeProgramme, sortedNiveaux, activeNiveauCode])
   const currentNiveauCode = Number(
-    activeNiveauCode || sortedNiveaux[0]?.nombre_nca || 0
+    activeNiveauCode || sortedNiveaux[0]?.id_nca || 0
   )
 
   const currentNiveauLibelle = useMemo(() => {
@@ -242,25 +242,7 @@ export default function ListeCadreAnalytique() {
 
   const handleTabChange = useCallback((value: string) => {
     setActiveNiveauCode(value)
-
-    // Convertir en nombre et vérifier que c'est valide
-    const index = Number(value) - 1
-
-    // Vérifier que l'index est valide
-    if (index >= 0 && index < sortedNiveaux.length) {
-      const niveau = sortedNiveaux[index]
-      if (niveau && niveau.id_nca != null) {
-        setActiveNiveauId(niveau.id_nca)
-        console.log('Niveau sélectionné:', niveau.id_nca)
-      } else {
-        console.warn('Niveau invalide à l\'index:', index)
-        setActiveNiveauId(0)
-      }
-    } else {
-      console.warn('Index de niveau invalide:', index, 'Total niveaux:', sortedNiveaux.length)
-      setActiveNiveauId(0)
-    }
-
+    setActiveNiveauId(Number(value))
     setSearchTerm('')
   }, [sortedNiveaux])
 
@@ -349,8 +331,8 @@ export default function ListeCadreAnalytique() {
             <NiveauTabsList>
               {sortedNiveaux.map((n) => (
                 <NiveauTabTrigger
-                  key={n.nombre_nca}
-                  value={String(n.nombre_nca)}
+                  key={n.id_nca}
+                  value={String(n.id_nca)}
                   count={countByNiveau.get(Number(n.id_nca)) ?? 0}
                 >
                   {n.libelle_nca}
@@ -379,9 +361,9 @@ export default function ListeCadreAnalytique() {
         {sortedNiveaux.map((n) => (
           <TabsContent
             key={n.id_nca}
-            value={String(n.nombre_nca)}
+            value={String(n.id_nca)}
           >
-            {Number(n.nombre_nca) === currentNiveauCode && (
+            {Number(n.id_nca) === currentNiveauCode && (
               <CadreAnalytiqueNiveauTable
                 niveauCodeNumber={Number(n.id_nca)}
                 niveaux={sortedNiveaux}

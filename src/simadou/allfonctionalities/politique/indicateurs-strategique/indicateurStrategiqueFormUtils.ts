@@ -8,11 +8,11 @@ import {
 export function indicateurStrategiqueToFormValues({
   indicateur,
   codeProgramme,
-  niveauCodeNumber,
+  niveauId,
 }: {
   indicateur?: IndicateurStrategique | null
   codeProgramme: string
-  niveauCodeNumber: number
+  niveauId: number
 }): IndicateurStrategiqueWriteData {
   const codeIstrRaw = indicateur?.code_istr
   const codeIstr =
@@ -41,8 +41,7 @@ export function indicateurStrategiqueToFormValues({
     responsable_istr: responsable || '',
     description_istr: indicateur?.description_istr ?? '',
     structure_istr: structure,
-    niveau_istr:
-      Number(indicateur?.niveau_istr) || niveauCodeNumber,
+    niveau_istr: niveauId,
     programme_istr: codeProgramme,
   }
 }
@@ -50,17 +49,17 @@ export function indicateurStrategiqueToFormValues({
 export function buildIndicateurStrategiquePayload({
   data,
   codeProgramme,
-  niveauCodeNumber,
+  niveauId,
 }: {
   data: IndicateurStrategiqueWriteData
   codeProgramme: string
-  niveauCodeNumber: number
+  niveauId: number
 }): Omit<IndicateurStrategique, 'id_indicateur_str'> {
   return {
     code_indicateur_istr: data.code_indicateur_istr,
     intitule_indicateur_istr: data.intitule_indicateur_istr,
     code_istr: String(data.code_istr),
-    niveau_istr: niveauCodeNumber,
+    niveau_istr: niveauId,
     programme_istr: codeProgramme,
     responsable_istr: String(data.responsable_istr),
     description_istr: data.description_istr,

@@ -152,7 +152,7 @@ export function getNiveauCadreAnalytiqueLibelle(
     : niveaux
 
   const niveauConfig = scoped.find(
-    (n) => Number(n.code_number_nca) === niveauCodeNumber
+    (n) => Number(n.id_nca) === niveauCodeNumber
   )
   return niveauConfig?.libelle_nca ?? ''
 }
@@ -162,11 +162,11 @@ export function getPtbaCadreAnalytiqueNiveauCode(
   niveaux: NiveauCadreAnalytique[]
 ): number {
   const sorted = sortNiveauxCadreAnalytique(niveaux)
-  const secondByCode = sorted.find((n) => Number(n.code_number_nca) === 2)
+  const secondByCode = sorted.find((n) => Number(n.nombre_nca) === 2)
   if (secondByCode) return 2
 
   const secondByOrder = sorted[1]
-  const code = Number(secondByOrder?.code_number_nca)
+  const code = Number(secondByOrder?.nombre_nca)
   return Number.isFinite(code) && code > 0 ? code : 2
 }
 
