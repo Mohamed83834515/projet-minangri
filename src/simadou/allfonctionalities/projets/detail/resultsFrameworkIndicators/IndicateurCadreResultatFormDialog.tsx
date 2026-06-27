@@ -23,6 +23,7 @@ import {
   buildIndicateurCadreResultatPayload,
   indicateurCadreResultatToFormValues,
 } from './indicateurCadreResultatFormUtils'
+import { useMe } from '@/simadou/allHooks/auth/authHooks'
 
 export default function IndicateurCadreResultatFormDialog({
   codeProjet,
@@ -51,7 +52,8 @@ export default function IndicateurCadreResultatFormDialog({
     useGetNiveauxCadreResultat()
   const { data: acteurs = [], isLoading: isLoadingActeurs } = useGetActeurs()
   const { data: personnels = [], isLoading: isLoadingPersonnels } = useGetPersonnels()
-
+  const { data: user } = useMe()
+ const id_personnel =  user?.id_personnel_perso || 'admin'
   const cadreOptions = useMemo(
     () =>
       cadres.map((c) => ({
@@ -126,8 +128,9 @@ export default function IndicateurCadreResultatFormDialog({
         idProjet,
         fixedCadreCrCode,
         fixedNiveauIop,
+        id_personnel,
       }),
-    [ idProjet, indicateur, fixedCadreCrCode, fixedNiveauIop]
+    [idProjet, indicateur, fixedCadreCrCode, fixedNiveauIop, id_personnel]
   )
   const onSubmit = (data: IndicateurCadreResultatCreateData) => {
     const payload = buildIndicateurCadreResultatPayload({

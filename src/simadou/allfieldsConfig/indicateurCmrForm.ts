@@ -78,7 +78,7 @@ export const getIndicateurCmrFormConfigForDialog = ({
     },
     {
       name: "referentiel_cmr",
-      label: "Dictionnaire des indicateurs",
+      label: "indicateurs des Dictionnaires",
       type: "select",
       placeholder: "Sélectionner un indicateur du dictionnaire…",
       required: false,

@@ -34,7 +34,7 @@ export const getCadreResultatFormConfigForDialog = ({
     {
       name: 'intutile_cr',
       label: 'Intitulé du cadre',
-      type: 'text',
+      type: 'textarea',
       placeholder: 'Intitulé complet du cadre de résultat',
       required: true,
       maxLength: 200,

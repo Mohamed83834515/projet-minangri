@@ -7,7 +7,6 @@ import {
   useDeleteIndicateurCadreResultat,
   useGetIndicateursCadreResultat,
 } from '@/simadou/allHooks/admin/indicateurCadreResultatHooks'
-import { useGetPersonnels } from '@/simadou/allHooks/admin/personnelHooks'
 import type { CadreResultat, IndicateurCadreResultat } from '@/simadou/allTypes'
 import { Plus } from 'lucide-react'
 import { toast } from 'sonner'
@@ -27,7 +26,6 @@ import {
   resolveFixedCodeCrFromCadre,
   resolveNiveauCrLabel,
   resolveNiveauIopFromCadre,
-  resolveResponsableIopLabel,
 } from './indicateurCadreResultatFormUtils'
 
 type Modal = 'list' | 'form'
@@ -50,7 +48,6 @@ export default function IndicateurCadreResultatCadreDialog({
   const { data: allIndicateurs = [], dataUpdatedAt } =
     useGetIndicateursCadreResultat()
   const { data: niveaux = [] } = useGetNiveauxCadreResultat()
-  const { data: personnels = [] } = useGetPersonnels()
   const deleteMutation = useDeleteIndicateurCadreResultat()
   const tableState = useEmbeddedTableState()
 
@@ -106,11 +103,6 @@ export default function IndicateurCadreResultatCadreDialog({
     [setDeleteOpen]
   )
 
-  const getResponsableLabel = useCallback(
-    (row: IndicateurCadreResultat) =>
-      resolveResponsableIopLabel(row.responsable_iop, personnels),
-    [personnels]
-  )
 
   const columns = useMemo(
     () =>
@@ -118,9 +110,8 @@ export default function IndicateurCadreResultatCadreDialog({
         onEdit: handleEdit,
         onDeleteRequest: handleDeleteRequest,
         hideCadreColumn: true,
-        getResponsableLabel,
       }),
-    [handleEdit, handleDeleteRequest, getResponsableLabel]
+    [handleEdit, handleDeleteRequest]
   )
 
   const handleConfirmDelete = (row: IndicateurCadreResultat) => {

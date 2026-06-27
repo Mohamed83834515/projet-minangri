@@ -90,11 +90,13 @@ export function indicateurCadreResultatToFormValues({
   idProjet,
   fixedCadreCrCode,
   fixedNiveauIop,
+  id_personnel,
 }: {
   indicateur?: IndicateurCadreResultat | null
   idProjet: number
   fixedCadreCrCode?: string | null
   fixedNiveauIop?: number | null
+  id_personnel: string
 }): Partial<IndicateurCadreResultatCreateData> {
   return {
     niveau_iop:
@@ -109,7 +111,7 @@ export function indicateurCadreResultatToFormValues({
     intitule_indicateur_cr_iop: indicateur?.intitule_indicateur_cr_iop ?? '',
     periodicite_iop: indicateur?.periodicite_iop ?? '',
     source_iop: indicateur?.source_iop ?? '',
-    responsable_iop: resolveResponsableIopForForm(indicateur),
+    responsable_iop: id_personnel, 
     description_iop: indicateur?.description_iop ?? '',
     structure_iop:
       resolveRelationId(indicateur?.structure_iop, 'id_acteur')?.toString() ||
