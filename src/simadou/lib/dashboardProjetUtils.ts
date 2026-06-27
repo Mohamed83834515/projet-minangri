@@ -60,7 +60,7 @@ export function buildProjetDashboardRow(
     dateCloture,
     referenceDate
   )
-  const avancement = projet.taux_avancement_technique ?? 60
+  const avancement = projet.taux_execution_ptba ?? 60
   const budget_projet = projet.budget_projet || 0;
   const decaissement_projet = projet.montant_total_decaisse || 0;
   const taux_decaisser = budget_projet !== 0 ? (decaissement_projet * 100) / budget_projet : 0;
