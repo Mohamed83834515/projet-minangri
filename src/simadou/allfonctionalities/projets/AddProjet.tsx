@@ -44,7 +44,7 @@ export default function AddProjet({ open, onOpenChange, currentRow }: OpenPropsP
   )
 
   // ── Mutations ──
-  const createMutation = useCreateProjet(idProgramme)
+  const createMutation = useCreateProjet()
   const updateMutation = useUpdateProjet(currentRow?.id_projet || 0)
 
   const mutation = isEdit ? updateMutation : createMutation
