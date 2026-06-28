@@ -15,8 +15,10 @@ import {
 } from '@/simadou/allHooks/admin/cadreAnalytiqueHooks'
 import {
   buildCadreAnalytiqueParentOptions,
+  filterNiveauxByProgramme,
   getFixedCodeLengthForNiveau,
   getNiveauCadreAnalytiqueLibelle,
+  sortNiveauxCadreAnalytique,
 } from '@/simadou/lib/cadreAnalytiqueUtils'
 import { cadreAnalytiqueToFormValues } from './cadreAnalytiqueFormUtils'
 
@@ -53,7 +55,15 @@ export default function CadreAnalytiqueFormPanel({
   )
 
   const showParent = niveauCodeNumber > 1
-  const showBudget = niveauCodeNumber === 1
+
+  const showBudget = useMemo(() => {
+    const scoped = sortNiveauxCadreAnalytique(
+      filterNiveauxByProgramme(niveaux, codeProgramme, programmeId)
+    )
+    if (scoped.length === 0) return false
+    const lastNiveauOrder = Number(scoped[scoped.length - 1].nombre_nca)
+    return niveauCodeNumber === lastNiveauOrder
+  }, [niveaux, codeProgramme, programmeId, niveauCodeNumber])
 
   const schema = useMemo(() => {
     const withCode = cadreAnalytiqueWriteSchema.extend({

@@ -53,6 +53,55 @@ export function getNextNiveauCadreAnalytique(
   return sorted[index + 1] ?? null
 }
 
+export function getLastNiveauCadreAnalytiqueId(
+  niveaux: NiveauCadreAnalytique[]
+): number | null {
+  const sorted = sortNiveauxCadreAnalytique(niveaux)
+  if (sorted.length === 0) return null
+  return sorted[sorted.length - 1].id_nca
+}
+
+/** Budget agrégé par id_ca — feuilles = cout_axe, parents = somme des descendants feuilles. */
+export function buildAggregatedBudgetByCadreId(
+  cadres: CadreAnalytique[],
+  lastNiveauId: number
+): Map<number, number> {
+  const budgets = new Map<number, number>()
+  const childrenByParent = new Map<number, number[]>()
+
+  for (const cadre of cadres) {
+    const niveau = resolveNiveauCaNumber(cadre.niveau_ca)
+    if (niveau === lastNiveauId) {
+      budgets.set(cadre.id_ca, Number(cadre.cout_axe) || 0)
+    }
+
+    const parentId = resolveParentCaId(cadre.parent_ca)
+    if (parentId == null) continue
+
+    const siblings = childrenByParent.get(parentId) ?? []
+    siblings.push(cadre.id_ca)
+    childrenByParent.set(parentId, siblings)
+  }
+
+  const resolveBudget = (id: number): number => {
+    const cached = budgets.get(id)
+    if (cached != null) return cached
+
+    const sum = (childrenByParent.get(id) ?? []).reduce(
+      (total, childId) => total + resolveBudget(childId),
+      0
+    )
+    budgets.set(id, sum)
+    return sum
+  }
+
+  for (const cadre of cadres) {
+    resolveBudget(cadre.id_ca)
+  }
+
+  return budgets
+}
+
 export function buildChildCountByParentCaId(
   cadres: CadreAnalytique[],
   nextNiveauCodeNumber: number

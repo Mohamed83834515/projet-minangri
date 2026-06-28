@@ -10,7 +10,9 @@ import type {
   NiveauCadreAnalytique,
 } from '@/simadou/allTypes/cadreAnalytique'
 import {
+  buildAggregatedBudgetByCadreId,
   buildChildCountByParentCaId,
+  getLastNiveauCadreAnalytiqueId,
   getNextNiveauCadreAnalytique,
   resolvePartenaireCaIds,
 } from '@/simadou/lib/cadreAnalytiqueUtils'
@@ -81,24 +83,30 @@ export function buildCadreAnalytiqueColumns({
         ]
       : []
 
-  const budgetColumn: ColumnDef<CadreAnalytique>[] =
-    currentNiveauCodeNumber === 1
-      ? [
-          {
-            id: 'cout_axe',
-            accessorKey: 'cout_axe',
-            header: ({ column }) => (
-              <DataTableColumnHeader column={column} title='Budget GNF' />
-            ),
-            cell: ({ row }) => (
-              <span className='whitespace-nowrap tabular-nums text-sm'>
-                {formatNumber(row.original.cout_axe)}
-              </span>
-            ),
-            enableHiding: false,
-          },
-        ]
-      : []
+  const lastNiveauId = getLastNiveauCadreAnalytiqueId(niveaux)
+  const aggregatedBudgetByCadreId =
+    lastNiveauId != null
+      ? buildAggregatedBudgetByCadreId(cadres, lastNiveauId)
+      : new Map<number, number>()
+
+  const budgetColumn: ColumnDef<CadreAnalytique> = {
+    id: 'cout_axe',
+    accessorFn: (row) =>
+      aggregatedBudgetByCadreId.get(row.id_ca) ??
+      (Number(row.cout_axe) || 0),
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='Budget GNF' />
+    ),
+    cell: ({ row }) => (
+      <span className='whitespace-nowrap tabular-nums text-sm'>
+        {formatNumber(
+          aggregatedBudgetByCadreId.get(row.original.id_ca) ??
+            row.original.cout_axe
+        )}
+      </span>
+    ),
+    enableHiding: false,
+  }
 
   const indicateursColumn: ColumnDef<CadreAnalytique>[] =
     isLastLevel && onOpenIndicateurs
@@ -168,7 +176,7 @@ export function buildCadreAnalytiqueColumns({
       ),
       enableHiding: false,
     },
-    ...budgetColumn,
+    budgetColumn,
     {
       id: 'partenaire_ca',
       header: ({ column }) => (
