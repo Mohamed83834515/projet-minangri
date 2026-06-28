@@ -12,7 +12,7 @@ import {
   useUpdateActiviteProjet,
 } from '@/simadou/allHooks/admin/activiteProjetHooks'
 import { useGetActivitesProgramme } from '@/simadou/allHooks/admin/activiteProgrammeHooks'
-import { useGetAllProjets } from '@/simadou/allHooks/admin/projetHooks'
+import { useGetProjets } from '@/simadou/allHooks/admin/projetHooks'
 
 function resolveCodeActiviteProgramme(
   value: ActiviteProjet['code_activite_programme']
@@ -54,7 +54,7 @@ export default function ActiviteProjetFormDialog({
   const updateMutation = useUpdateActiviteProjet(codeProjet)
   const { data: activitesProgramme = [], isLoading: isLoadingActivitesProgramme } =
     useGetActivitesProgramme()
-  const { data: projets = [], isLoading: isLoadingProjets } = useGetAllProjets()
+  const { data: projets = [], isLoading: isLoadingProjets } = useGetProjets()
 
   // ✅ Trouver le niveau correspondant
   const niveauConfig = useMemo(

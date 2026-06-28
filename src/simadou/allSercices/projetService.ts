@@ -5,7 +5,11 @@ const BASE_URL = '/projets/'
 
 export const projetService = {
   // Récupérer tous les projets
-  async getAll(): Promise<Projet[]> {
+  async getAll(idProgramme:number): Promise<Projet[]> {
+    return await apiClient.request<Projet[]>(`${BASE_URL}?programme_projet=${idProgramme}`)
+  },
+
+  async getAllWithfilter(): Promise<Projet[]> {
     return await apiClient.request<Projet[]>(BASE_URL)
   },
 
@@ -14,7 +18,7 @@ export const projetService = {
     return await apiClient.request<{ annee: number; budget_annuel: number }[]>(
       `${BASE_URL}${idProjet}/budgets-annuels/`
     )
-  },
+  }, 
 
   // Récupérer un projet par ID
   async getById(id: number | string): Promise<Projet> {

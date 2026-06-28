@@ -8,7 +8,6 @@ import {
 import { projetService } from '@/simadou/allSercices/projetService'
 import { projetStatsService } from '@/simadou/allSercices/projetStatsService'
 import type { Projet } from '@/simadou/allTypes/projet'
-import { projetBelongsToProgramme } from '@/simadou/allTypes/projet'
 import { ProjectCreateData } from '@/simadou/schemas/projetSchema'
 import { toast } from 'sonner'
 import { useActiveProgrammeId } from '@/hooks/use-active-programme'
@@ -30,25 +29,14 @@ function findProjetByRouteId(
 
 function findProjetInCache(
   queryClient: QueryClient,
-  idProgramme: number | undefined,
   id: number | string
 ): Projet | undefined {
-  const programmeKey = projetQueryKeys.byProgramme(idProgramme)
-  const fromProgramme = queryClient.getQueryData<Projet[]>(programmeKey)
-  const inProgramme = fromProgramme
-    ? findProjetByRouteId(fromProgramme, id)
-    : undefined
-  if (inProgramme) return inProgramme
+  // Chercher dans le cache principal
+  const allProjets = queryClient.getQueryData<Projet[]>(projetQueryKeys.all)
+  const inAll = allProjets ? findProjetByRouteId(allProjets, id) : undefined
+  if (inAll) return inAll
 
-  const unfiltered = queryClient.getQueryData<Projet[]>([
-    ...projetQueryKeys.all,
-    'unfiltered',
-  ])
-  const inUnfiltered = unfiltered
-    ? findProjetByRouteId(unfiltered, id)
-    : undefined
-  if (inUnfiltered) return inUnfiltered
-
+  // Chercher dans tous les caches qui commencent par ['projets']
   for (const query of queryClient
     .getQueryCache()
     .findAll({ queryKey: projetQueryKeys.all })) {
@@ -67,14 +55,9 @@ async function resolveProjetByRouteId(
   idProgramme: number | undefined
 ): Promise<Projet> {
   try {
-    const projets = await projetService.getAll()
-    const scoped =
-      idProgramme != null
-        ? projets.filter((p) => projetBelongsToProgramme(p, idProgramme))
-        : projets
-
-    const found =
-      findProjetByRouteId(scoped, id) ?? findProjetByRouteId(projets, id)
+    const projets = await projetService.getAll(idProgramme || 7)
+   
+    const found = findProjetByRouteId(projets, id)
 
     if (!found) {
       throw new Error('Projet introuvable')
@@ -90,9 +73,6 @@ async function resolveProjetByRouteId(
 
 export const projetQueryKeys = {
   all: ['projets'] as const,
-  byProgramme: (idProgramme: number | undefined) =>
-    [...projetQueryKeys.all, idProgramme] as const,
-  // ✅ Ajouter byId pour les détails
   byId: (id: number | string) => [...projetQueryKeys.all, 'detail', id] as const,
 }
 
@@ -100,13 +80,9 @@ export function useGetProjets() {
   const idProgramme = useActiveProgrammeId()
 
   return useQuery({
-    queryKey: projetQueryKeys.byProgramme(idProgramme),
-    queryFn: () => projetService.getAll(),
+    queryKey: projetQueryKeys.all,
+    queryFn: () => projetService.getAll(idProgramme || 7),
     enabled: idProgramme != null,
-    select: (projets) =>
-      idProgramme != null
-        ? projets.filter((p) => projetBelongsToProgramme(p, idProgramme))
-        : [],
   })
 }
 
@@ -118,15 +94,8 @@ export const useGetTauxGlobalActiviteProjet = (projetId: number | string | undef
   })
 }
 
-/** Tous les projets (sans filtre programme) — ex. sélecteurs de formulaires comme l'ancienne app. */
-export function useGetAllProjets() {
-  return useQuery({
-    queryKey: [...projetQueryKeys.all, 'unfiltered'] as const,
-    queryFn: () => projetService.getAll(),
-  })
-}
 
-/** Tous les projets (sans filtre programme) — ex. sélecteurs de formulaires comme l'ancienne app. */
+/** Récupère les budgets annuels d'un projet */
 export function useGetBudgetAnnuel(idProjet: number) {
   return useQuery({
     queryKey: [...projetQueryKeys.all, idProjet, 'budgets-annuels'] as const,
@@ -139,20 +108,21 @@ export function useGetProjet(id: number | string | undefined) {
   const queryClient = useQueryClient()
 
   return useQuery({
-    queryKey: [...projetQueryKeys.all, 'detail', id, idProgramme] as const,
+    queryKey: projetQueryKeys.byId(id||0),
     queryFn: () => resolveProjetByRouteId(id!, idProgramme),
-    initialData: () => findProjetInCache(queryClient, idProgramme, id!),
+    initialData: () => findProjetInCache(queryClient, id!),
     staleTime: 30_000,
     enabled: id != null && String(id).length > 0,
     meta: { suppressGlobalErrorToast: true },
   })
 }
 
-export function useCreateProjet(idProgramme: number | undefined) {
+export function useCreateProjet() {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: (data: ProjectCreateData) => {
+      const idProgramme = useActiveProgrammeId()
       if (idProgramme == null) {
         return Promise.reject(new Error('Programme actif requis'))
       }
@@ -171,34 +141,19 @@ export function useCreateProjet(idProgramme: number | undefined) {
   })
 }
 
-// ✅ Hook pour basculer la clôture - CORRIGÉ
 export function useToggleProjetCloture() {
   const queryClient = useQueryClient()
-  const idProgramme = useActiveProgrammeId()
 
   return useMutation({
     mutationFn: ({ id, isCloture }: { id: string | number; isCloture: boolean }) =>
       projetService.toggleCloture(id, isCloture),
 
     onSuccess: (data) => {
-      // ✅ Invalider toutes les clés de projets
       queryClient.invalidateQueries({ queryKey: projetQueryKeys.all })
-      queryClient.invalidateQueries({ queryKey: ['projets'] })
       
-      // ✅ Invalider le cache par programme
-      if (idProgramme != null) {
-        queryClient.invalidateQueries({ 
-          queryKey: projetQueryKeys.byProgramme(idProgramme) 
-        })
-      }
-      
-      // ✅ Invalider le cache du projet spécifique
       if (data.id_projet) {
         queryClient.invalidateQueries({ 
           queryKey: projetQueryKeys.byId(data.id_projet) 
-        })
-        queryClient.invalidateQueries({ 
-          queryKey: [...projetQueryKeys.all, 'detail', data.id_projet, idProgramme] 
         })
       }
       
@@ -216,7 +171,6 @@ export function useToggleProjetCloture() {
 
 export function useUpdateProjet(id: number) {
   const queryClient = useQueryClient()
-  const idProgramme = useActiveProgrammeId()
 
   return useMutation({
     mutationFn: (data: ProjectCreateData) => {
@@ -224,11 +178,7 @@ export function useUpdateProjet(id: number) {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: projetQueryKeys.all })
-      if (idProgramme != null) {
-        queryClient.invalidateQueries({ 
-          queryKey: projetQueryKeys.byProgramme(idProgramme) 
-        })
-      }
+      
       if (data?.id_projet) {
         queryClient.invalidateQueries({ 
           queryKey: projetQueryKeys.byId(data.id_projet) 
@@ -244,18 +194,12 @@ export function useUpdateProjet(id: number) {
 
 export function useDeleteProjet() {
   const queryClient = useQueryClient()
-  const idProgramme = useActiveProgrammeId()
 
   return useMutation({
     mutationFn: (id: number) => projetService.delete(id),
     onSuccess: () => {
       toast.success('Projet supprimé avec succès 🗑️')
       queryClient.invalidateQueries({ queryKey: projetQueryKeys.all })
-      if (idProgramme != null) {
-        queryClient.invalidateQueries({ 
-          queryKey: projetQueryKeys.byProgramme(idProgramme) 
-        })
-      }
     },
     onError: (error: Error) => {
       toast.error(`Erreur lors de la suppression: ${error.message}`)
