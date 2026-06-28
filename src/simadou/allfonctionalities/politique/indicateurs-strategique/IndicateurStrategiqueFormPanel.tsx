@@ -42,7 +42,7 @@ export default function IndicateurStrategiqueFormPanel({
   const { data: acteurs = [], isLoading: isLoadingActeurs } = useGetActeurs()
   const { data: personnels = [], isLoading: isLoadingPersonnels } =
     useGetPersonnels()
-
+  console.log('niveauId', niveauId)
   const cadreOptions = useMemo(
     () =>
       cadres

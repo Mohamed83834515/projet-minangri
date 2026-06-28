@@ -39,7 +39,7 @@ import IndicateurStrategiqueFormPanel from './IndicateurStrategiqueFormPanel'
 import { resolveIndicateurStrategiqueCode } from './indicateurStrategiqueFormUtils'
 
 function IndicateurStrategiqueNiveauTable({
-  niveauCodeNumber,
+  niveauId,
   indicateurs,
   searchTerm,
   tableKey,
@@ -49,7 +49,7 @@ function IndicateurStrategiqueNiveauTable({
   onEdit,
   onDeleteRequest,
 }: {
-  niveauCodeNumber: number
+  niveauId: number
   indicateurs: IndicateurStrategique[]
   searchTerm: string
   tableKey: string
@@ -76,14 +76,14 @@ function IndicateurStrategiqueNiveauTable({
   const rows = useMemo(() => {
     const normalizedSearch = searchTerm.trim().toLowerCase()
     return indicateurs.filter((ind) => {
-      if (Number(ind.niveau_istr) !== niveauCodeNumber) return false
+      if (Number(ind.niveau_istr) !== niveauId) return false
       if (!normalizedSearch) return true
       return (
         ind.intitule_indicateur_istr.toLowerCase().includes(normalizedSearch) ||
         ind.code_indicateur_istr.toLowerCase().includes(normalizedSearch)
       )
     })
-  }, [indicateurs, niveauCodeNumber, searchTerm])
+  }, [indicateurs, niveauId, searchTerm])
 
   return (
     <GenericTable<IndicateurStrategique>
@@ -112,7 +112,6 @@ export default function ListeIndicateursStrategique() {
   const { data: cibles = [] } = useGetCiblesIndicateurStrategique()
   const { data: personnels = [] } = useGetPersonnels()
   const deleteMutation = useDeleteIndicateurStrategique()
-  const [activeNiveauId, setActiveNiveauId] = useState<number>(0)
 
   const hasNiveaux = niveaux.length > 0
   const { tabsStyle } = useNiveauTabsTheme()
@@ -131,13 +130,12 @@ export default function ListeIndicateursStrategique() {
   )
 
   const [currentProgramme, setCurrentProgramme] = useState(codeProgramme)
+  
   useEffect(() => {
     // Si le programme a changé, réinitialiser tout
     if (codeProgramme !== currentProgramme) {
       setCurrentProgramme(codeProgramme)
       setActiveNiveauCode('')
-      setActiveNiveauId(0)
-      // Les autres effets se déclencheront pour sélectionner le premier niveau
     }
   }, [codeProgramme, currentProgramme])
 
@@ -148,30 +146,18 @@ export default function ListeIndicateursStrategique() {
       if (premierNiveau && premierNiveau.id_nsc != null) {
         const code = String(premierNiveau.id_nsc)
         setActiveNiveauCode(code)
-        setActiveNiveauId(premierNiveau.id_nsc)
-        handleTabChange(code)
       }
-    }
-  }, [codeProgramme, niveaux, activeNiveauCode])
-
-  useEffect(() => {
-    if (niveaux.length > 0 && activeNiveauCode === '') {
-      setActiveNiveauCode(String(niveaux[0].id_nsc))
     }
   }, [niveaux, activeNiveauCode])
 
-  const currentNiveauCode = Number(
-    activeNiveauCode || niveaux[0]?.code_number_nsc || 0
+  const currentNiveauId = Number(
+    activeNiveauCode || niveaux[0]?.id_nsc || 0
   )
-
+  console.log("currentNiveauId", currentNiveauId)
   const currentNiveau = useMemo(
-    () =>
-      niveaux.find((x) => Number(x.code_number_nsc) === currentNiveauCode) ??
-      niveaux[0],
-    [niveaux, currentNiveauCode]
+    () => niveaux.find((x) => Number(x.id_nsc) === currentNiveauId) ?? niveaux[0],
+    [niveaux, currentNiveauId]
   )
-
-  const currentNiveauId = Number(currentNiveau?.id_nsc ?? 0)
 
   const currentNiveauLibelle = currentNiveau?.libelle_nsc ?? 'indicateur'
 
@@ -206,32 +192,11 @@ export default function ListeIndicateursStrategique() {
     },
     [personnels]
   )
+
   const handleTabChange = useCallback((value: string) => {
     setActiveNiveauCode(value)
-
-    // Convertir en nombre et vérifier que c'est valide
-    const index = Number(value) - 1
-
-    // Vérifier que l'index est valide
-    if (index >= 0 && index < niveaux.length) {
-      const niveau = niveaux[index]
-      if (niveau && niveau.id_nsc != null) {
-        setActiveNiveauId(niveau.id_nsc)
-      } else {
-        setActiveNiveauId(0)
-      }
-    } else {
-      console.warn('Index de niveau invalide:', index, 'Total niveaux:', niveaux.length)
-      setActiveNiveauId(0)
-    }
-
     setSearchTerm('')
-  }, [niveaux])
-
-  // const handleTabChange = useCallback((value: string) => {
-  //   setActiveNiveauCode(value)
-  //   setSearchTerm('')
-  // }, [])
+  }, [])
 
   const handleEdit = useCallback((row: IndicateurStrategique) => {
     setSelectedIndicateur(row)
@@ -302,7 +267,7 @@ export default function ListeIndicateursStrategique() {
         className='space-y-4'
         style={tabsStyle}
         key={niveaux.length}
-        value={String(currentNiveauCode)}
+        value={String(currentNiveauId)}
         onValueChange={handleTabChange}
       >
         <div className='flex items-center justify-between gap-4'>
@@ -342,9 +307,9 @@ export default function ListeIndicateursStrategique() {
 
         {niveaux.map((n) => (
           <TabsContent key={n.id_nsc} value={String(n.id_nsc)}>
-            {Number(n.id_nsc) === currentNiveauCode && (
+            {Number(n.id_nsc) === currentNiveauId && (
               <IndicateurStrategiqueNiveauTable
-                niveauCodeNumber={Number(n.id_nsc)}
+                niveauId={Number(n.id_nsc)}
                 indicateurs={indicateurs}
                 searchTerm={searchTerm}
                 tableKey={`indic-istr-${n.id_nsc}-${dataUpdatedAt}-${searchTerm}`}
@@ -410,7 +375,7 @@ export default function ListeIndicateursStrategique() {
                   selectedIndicateur?.id_indicateur_str ??
                   `new-${currentNiveauId}`
                 }
-                niveauId={activeNiveauId || 1}
+                niveauId={currentNiveauId || 1}
                 codeProgramme={codeProgramme}
                 indicateur={selectedIndicateur}
                 onClose={handleCloseForm}

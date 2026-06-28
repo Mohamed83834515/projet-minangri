@@ -84,17 +84,17 @@ export default function ListeIndicateursCmr({
 
   useEffect(() => {
     if (niveaux.length > 0 && activeNiveauCode === '') {
-      setActiveNiveauCode(String(niveaux[0].code_number_nsc))
+      setActiveNiveauCode(String(niveaux[0].id_nsc))
     }
   }, [niveaux, activeNiveauCode])
 
   const currentNiveauCode = Number(
-    activeNiveauCode || niveaux[0]?.code_number_nsc || 0
+    activeNiveauCode || niveaux[0]?.id_nsc || 0
   )
 
   const currentNiveau = useMemo(
     () =>
-      niveaux.find((x) => Number(x.code_number_nsc) === currentNiveauCode) ??
+      niveaux.find((x) => Number(x.id_nsc) === currentNiveauCode) ??
       niveaux[0],
     [niveaux, currentNiveauCode]
   )
@@ -253,8 +253,8 @@ export default function ListeIndicateursCmr({
             {niveaux.map((n) => (
               <NiveauTabTrigger
                 key={n.id_nsc}
-                value={String(n.code_number_nsc)}
-                count={cmrCountByNiveau[Number(n.code_number_nsc)] ?? 0}
+                value={String(n.id_nsc)}
+                count={cmrCountByNiveau[Number(n.id_nsc)] ?? 0}
               >
                 {n.libelle_nsc}
               </NiveauTabTrigger>
