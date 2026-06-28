@@ -11,7 +11,7 @@ type BuildProjetsColumnsOptions = {
   setOpen: (dialog: ProjetDialogType | null) => void
   setCurrentRow: React.Dispatch<React.SetStateAction<Projet | null>>
   onDetail: (projet: Projet) => void
-  handleClotureConfirm: (projet: Projet) => void
+  handleClotureClick: (projet: Projet) => void
   currencyCode?: string
   userLevel?: number // ✅ Ajout du niveau d'accès
 }
@@ -20,7 +20,7 @@ export function buildProjetsColumns({
   setOpen,
   setCurrentRow,
   onDetail,
-  handleClotureConfirm,
+  handleClotureClick,
   currencyCode,
   userLevel = 1, // Par défaut admin
 }: BuildProjetsColumnsOptions): ColumnDef<Projet>[] {
@@ -196,7 +196,7 @@ export function buildProjetsColumns({
                 icon: isCloture ? <Unlock size={16} /> : <Lock size={16} />,
                 onClick: () => {
                   setCurrentRow(row.original)
-                  handleClotureConfirm(row.original)
+                  handleClotureClick(row.original)
                 },
                 className: isCloture ? 'text-green-600!' : 'text-amber-600!',
                 separator: true,

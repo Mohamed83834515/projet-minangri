@@ -26,6 +26,12 @@ export const projectCreateSchema = z.object({
   zone_projet: z.array(z.number()).min(1, "Zones requises"),
 });
 
+export const projetClotureSchema = z.object({
+  date_cloture_projet: z.string().min(1, 'La date de clôture est requise'),
+  is_cloture: z.boolean().default(false),
+})
+
+export type ProjetClotureFormData = z.infer<typeof projetClotureSchema>
 export const projectCreateStep1Schema = projectCreateSchema.pick({
   code_projet: true,
   sigle_projet: true,

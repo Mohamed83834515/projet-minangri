@@ -4,9 +4,9 @@ import { Loader2 } from 'lucide-react'
 import { GenericTable } from '@/Global/Generic/Generictable'
 import { useActiveProgramme } from '@/hooks/use-active-programme'
 import { buildProjetsColumns } from '@/simadou/allColonnes/projets-columns'
-import { useDeleteProjet, useGetProjets, useToggleProjetCloture } from '@/simadou/allHooks/admin/projetHooks'
+import { useClotureProjet, useDeleteProjet, useGetProjets } from '@/simadou/allHooks/admin/projetHooks'
 import { useGetTypeProjet } from '@/simadou/allHooks/admin/typeProjetHooks'
-import type { Projet } from '@/simadou/allTypes/projet'
+import type { Projet, ProjetClotureForm } from '@/simadou/allTypes/projet'
 import useDialogState from '@/hooks/use-dialog-state'
 import { GenericDialogs } from '@/Global/Generic/Genericdialogs'
 import { GenericDeleteDialog } from '@/Global/Tableaux/GenericDeleteDialog'
@@ -33,6 +33,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useMe } from '@/simadou/allHooks/auth/authHooks'
+import { format } from 'date-fns'
+import ClotureProjetDialog from './ClotureProjet'
 
 const route = getRouteApi('/_authenticated/projet-programme/projets/')
 
@@ -49,7 +51,7 @@ export default function ListeProjets() {
 
   // ✅ État pour le filtre de clôture (par défaut "en_cours")
   const [filtreCloture, setFiltreCloture] = useState<FiltreCloture>('en_cours')
-
+  const [clotureDate, setClotureDate] = useState<Date | undefined>(new Date())
   // ✅ Récupérer l'utilisateur connecté
   const { data: user } = useMe()
   const userLevel = user?.niveau_perso || 1
@@ -59,7 +61,7 @@ export default function ListeProjets() {
   const { data: typeProjets = [], isLoading: isLoadingTypes } = useGetTypeProjet()
   const { selectedTypeProjetId, setSelectedTypeProjetId } = useTypeProjetStore()
   const deleteMutation = useDeleteProjet()
-  const { mutate: toggleCloture, isPending: isClotureLoading } = useToggleProjetCloture()
+  const { mutate: clotureProjet, isPending: isClotureLoading } = useClotureProjet()
 
   const goToDetail = useCallback(
     (projet: Projet) => {
@@ -95,35 +97,44 @@ export default function ListeProjets() {
     }
   }, [activeTypeId, selectedTypeProjetId, setSelectedTypeProjetId])
 
-  // ✅ Gestion de la clôture
-  const handleClotureConfirm = useCallback((projet: Projet) => {
-    setCurrentRow(projet)
+  // Fonction pour ouvrir le dialogue de clôture
+  const handleClotureClick = (row: Projet) => {
+    setCurrentRow(row)
     setOpen('cloture')
-  }, [setOpen])
+  }
 
-  const handleClotureAction = useCallback(() => {
+  // Fonction pour gérer la clôture/déclôture
+  const handleClotureAction = () => {
     if (!currentRow) return
-    toggleCloture({
+
+    const data: ProjetClotureForm = {
+      is_cloture: !currentRow.is_cloture,
+      date_cloture_projet: clotureDate ? format(clotureDate, 'yyyy-MM-dd') : '',
+    }
+
+    clotureProjet({
       id: currentRow.id_projet,
-      isCloture: !currentRow.is_cloture,
+      data,
     }, {
       onSuccess: () => {
         setOpen(null)
         setCurrentRow(null)
-      },
+        setClotureDate(undefined)
+      }
     })
-  }, [currentRow, toggleCloture, setOpen])
+  }
+
 
   const columns = useMemo(
     () => buildProjetsColumns({
       setOpen,
       setCurrentRow,
       onDetail: goToDetail,
-      handleClotureConfirm,
+      handleClotureClick,
       currencyCode,
       userLevel,
     }),
-    [setOpen, setCurrentRow, goToDetail, handleClotureConfirm, currencyCode, userLevel]
+    [setOpen, setCurrentRow, goToDetail, handleClotureClick, currencyCode, userLevel]
   )
 
   // ✅ Filtrer par responsable (niveau 3 uniquement)
@@ -255,7 +266,7 @@ export default function ListeProjets() {
       </div>
 
       {/* Dialogue de clôture */}
-      <AlertDialog
+      {/* <AlertDialog
         open={open === 'cloture'}
         onOpenChange={(isOpen) => {
           if (!isOpen) {
@@ -287,7 +298,7 @@ export default function ListeProjets() {
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
-      </AlertDialog>
+      </AlertDialog> */}
 
       {/* Dialogues génériques (edit, delete) */}
       <GenericDialogs<Projet, 'add' | 'edit' | 'delete' | 'cloture'>
@@ -295,7 +306,7 @@ export default function ListeProjets() {
         setOpen={setOpen}
         currentRow={currentRow}
         setCurrentRow={setCurrentRow}
-        rowRequiredDialogs={['edit', 'delete']}
+        rowRequiredDialogs={['edit', 'delete', 'cloture']}
         dialogMap={{
           edit: (props) => (
             <AddProjet
@@ -313,6 +324,14 @@ export default function ListeProjets() {
               entityName='projet'
               getEntityLabel={(row) => row.intitule_projet}
               onDelete={(row) => deleteMutation.mutate(row.id_projet)}
+            />
+          ),
+          cloture: (props) => (
+            <ClotureProjetDialog
+              key={`projet-cloture-${props.currentRow?.id_projet}`}
+              open={props.open}
+              onOpenChange={props.onOpenChange}
+              currentRow={props.currentRow}
             />
           ),
         }}

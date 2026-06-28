@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import { useGetProjets } from '@/simadou/allHooks/admin/projetHooks'
+import { useGetProjets, useGetProjetsFilterVersion } from '@/simadou/allHooks/admin/projetHooks'
 import { useCountProjectsPerType } from '@/simadou/allHooks/admin/typeProjetHooks'
 import {
     useActiveProgrammeCode,
@@ -51,7 +51,7 @@ const DashboardPage: React.FC = () => {
         () => buildProjetDashboardRows(projets as ProjetDashboardSource[]),
         [projets]
     )
-
+    const { data: projets_versions = [] } = useGetProjetsFilterVersion(3)
     // Filtrage par recherche globale
     const projetRowsFiltered = useMemo(() => {
         if (!searchQuery.trim()) return projetRows
@@ -71,6 +71,8 @@ const DashboardPage: React.FC = () => {
         [projets]
     )
 
+    console.log("selectedVersion", selectedVersion)
+    console.log("projets_versions", projets_versions)
     // Données pour la carte 2 : PAO Programme (avec données fictives pour montants)
     const notifications = useMemo(
         () => [
@@ -105,8 +107,18 @@ const DashboardPage: React.FC = () => {
                 selectedVersion?.id_version_ptba,
                 selectedAnnee
             ),
-        [ptbas, selectedVersion, selectedAnnee]
+        [ptbas]
     )
+
+    // const paoMinagriStats = useMemo(
+    //     () =>
+    //         buildPtbaDashboardStats(
+    //             projets,
+    //             selectedVersion?.id_version_ptba,
+    //             selectedAnnee
+    //         ),
+    //     [ptbas, selectedVersion, selectedAnnee]
+    // )
 
     // Données pour la carte 4 : Points de blocage (fictives car pas dans ton API)
     const pointsBlocageStats = useMemo(() => {

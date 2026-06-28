@@ -7,7 +7,7 @@ import {
 } from '@tanstack/react-query'
 import { projetService } from '@/simadou/allSercices/projetService'
 import { projetStatsService } from '@/simadou/allSercices/projetStatsService'
-import type { Projet } from '@/simadou/allTypes/projet'
+import type { Projet, ProjetClotureForm } from '@/simadou/allTypes/projet'
 import { ProjectCreateData } from '@/simadou/schemas/projetSchema'
 import { toast } from 'sonner'
 import { useActiveProgrammeId } from '@/hooks/use-active-programme'
@@ -65,7 +65,7 @@ async function resolveProjetByRouteId(
 ): Promise<Projet> {
   try {
     const projets = await projetService.getAll(idProgramme || 7)
-   
+
     const found = findProjetByRouteId(projets, id)
 
     if (!found) {
@@ -84,6 +84,8 @@ export const projetQueryKeys = {
   all: ['projets'] as const,
   byProgramme: (idProgramme: number | undefined) =>
     [...projetQueryKeys.all, 'programme', idProgramme] as const,
+  byProgrammeWithFilter: (idProgramme: number | undefined, idVersions: number) =>
+    [...projetQueryKeys.all, 'programme', idProgramme, 'filter', idVersions] as const,
   byId: (id: number | string) => [...projetQueryKeys.all, 'detail', id] as const,
 }
 
@@ -94,6 +96,16 @@ export function useGetProjets() {
     queryKey: projetQueryKeys.byProgramme(idProgramme),
     queryFn: () => projetService.getAll(idProgramme || 7),
     enabled: idProgramme != null,
+  })
+}
+
+export function useGetProjetsFilterVersion(idVersions: number) {
+  const idProgramme = useActiveProgrammeId()
+
+  return useQuery({
+    queryKey: projetQueryKeys.byProgrammeWithFilter(idProgramme, idVersions),
+    queryFn: () => projetService.getAllWithfilter(idProgramme || 7, idVersions),
+    enabled: idProgramme != null && idVersions != null,
   })
 }
 
@@ -151,30 +163,30 @@ export function useCreateProjet() {
   })
 }
 
-export function useToggleProjetCloture() {
+export function useClotureProjet() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ id, isCloture }: { id: string | number; isCloture: boolean }) =>
-      projetService.toggleCloture(id, isCloture),
+    mutationFn: ({ id, data }: { id: string | number; data: ProjetClotureForm }) =>
+      projetService.cloture(id, data),
 
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: projetQueryKeys.all })
-      
+
       if (data.id_projet) {
-        queryClient.invalidateQueries({ 
-          queryKey: projetQueryKeys.byId(data.id_projet) 
+        queryClient.invalidateQueries({
+          queryKey: projetQueryKeys.byId(data.id_projet)
         })
       }
-      
-      const message = data.is_cloture 
-        ? 'Projet clôturé avec succès ✅' 
+
+      const message = data.is_cloture
+        ? 'Projet clôturé avec succès ✅'
         : 'Projet déclôturé avec succès 🔓'
       toast.success(message)
     },
 
     onError: (error: Error) => {
-      toast.error(`Erreur lors du changement de statut: ${error.message}`)
+      toast.error(`Erreur lors de la clôture: ${error.message}`)
     },
   })
 }
@@ -188,10 +200,10 @@ export function useUpdateProjet(id: number) {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: projetQueryKeys.all })
-      
+
       if (data?.id_projet) {
-        queryClient.invalidateQueries({ 
-          queryKey: projetQueryKeys.byId(data.id_projet) 
+        queryClient.invalidateQueries({
+          queryKey: projetQueryKeys.byId(data.id_projet)
         })
       }
       toast.success('Projet modifié avec succès ✅')

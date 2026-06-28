@@ -12,6 +12,7 @@ export interface Projet {
   duree_projet: number;
   date_signature_projet: string;
   date_demarrage_projet: string;
+  date_cloture_projet: string;
   partenaire_projet: Acteur | null;
   programme_projet?: Programme | number;
   structure_projet: number;
@@ -25,6 +26,10 @@ export interface Projet {
   responsable_projet?: number | Personnel,
   type_projet?: number | TypeProjet,
   is_cloture?: boolean,
+}
+export interface ProjetClotureForm {
+  date_cloture_projet: string;
+  is_cloture: boolean;
 }
 
 export type ProjetFormData = Omit<Projet, "id_projet">;
