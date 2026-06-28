@@ -29,9 +29,18 @@ function findProjetByRouteId(
 
 function findProjetInCache(
   queryClient: QueryClient,
+  idProgramme: number | undefined,
   id: number | string
 ): Projet | undefined {
-  // Chercher dans le cache principal
+  // Chercher dans le cache des projets par programme
+  const programmeKey = projetQueryKeys.byProgramme(idProgramme)
+  const fromProgramme = queryClient.getQueryData<Projet[]>(programmeKey)
+  const inProgramme = fromProgramme
+    ? findProjetByRouteId(fromProgramme, id)
+    : undefined
+  if (inProgramme) return inProgramme
+
+  // Chercher dans le cache principal (fallback)
   const allProjets = queryClient.getQueryData<Projet[]>(projetQueryKeys.all)
   const inAll = allProjets ? findProjetByRouteId(allProjets, id) : undefined
   if (inAll) return inAll
@@ -73,6 +82,8 @@ async function resolveProjetByRouteId(
 
 export const projetQueryKeys = {
   all: ['projets'] as const,
+  byProgramme: (idProgramme: number | undefined) =>
+    [...projetQueryKeys.all, 'programme', idProgramme] as const,
   byId: (id: number | string) => [...projetQueryKeys.all, 'detail', id] as const,
 }
 
@@ -80,7 +91,7 @@ export function useGetProjets() {
   const idProgramme = useActiveProgrammeId()
 
   return useQuery({
-    queryKey: projetQueryKeys.all,
+    queryKey: projetQueryKeys.byProgramme(idProgramme),
     queryFn: () => projetService.getAll(idProgramme || 7),
     enabled: idProgramme != null,
   })
@@ -93,7 +104,6 @@ export const useGetTauxGlobalActiviteProjet = (projetId: number | string | undef
     enabled: !!projetId,
   })
 }
-
 
 /** Récupère les budgets annuels d'un projet */
 export function useGetBudgetAnnuel(idProjet: number) {
@@ -108,9 +118,9 @@ export function useGetProjet(id: number | string | undefined) {
   const queryClient = useQueryClient()
 
   return useQuery({
-    queryKey: projetQueryKeys.byId(id||0),
+    queryKey: projetQueryKeys.byId(id || 0),
     queryFn: () => resolveProjetByRouteId(id!, idProgramme),
-    initialData: () => findProjetInCache(queryClient, id!),
+    initialData: () => findProjetInCache(queryClient, idProgramme, id!),
     staleTime: 30_000,
     enabled: id != null && String(id).length > 0,
     meta: { suppressGlobalErrorToast: true },
@@ -119,10 +129,10 @@ export function useGetProjet(id: number | string | undefined) {
 
 export function useCreateProjet() {
   const queryClient = useQueryClient()
+  const idProgramme = useActiveProgrammeId()
 
   return useMutation({
     mutationFn: (data: ProjectCreateData) => {
-      const idProgramme = useActiveProgrammeId()
       if (idProgramme == null) {
         return Promise.reject(new Error('Programme actif requis'))
       }
