@@ -4,9 +4,9 @@ import { Loader2 } from 'lucide-react'
 import { GenericTable } from '@/Global/Generic/Generictable'
 import { useActiveProgramme } from '@/hooks/use-active-programme'
 import { buildProjetsColumns } from '@/simadou/allColonnes/projets-columns'
-import { useClotureProjet, useDeleteProjet, useGetProjets } from '@/simadou/allHooks/admin/projetHooks'
+import {  useDeleteProjet, useGetProjets } from '@/simadou/allHooks/admin/projetHooks'
 import { useGetTypeProjet } from '@/simadou/allHooks/admin/typeProjetHooks'
-import type { Projet, ProjetClotureForm } from '@/simadou/allTypes/projet'
+import type { Projet } from '@/simadou/allTypes/projet'
 import useDialogState from '@/hooks/use-dialog-state'
 import { GenericDialogs } from '@/Global/Generic/Genericdialogs'
 import { GenericDeleteDialog } from '@/Global/Tableaux/GenericDeleteDialog'
@@ -16,16 +16,6 @@ import { useTypeProjetStore } from '@/stores/type-projet-store'
 import { useNiveauTabsTheme } from './detail/NiveauTabs'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -33,7 +23,6 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useMe } from '@/simadou/allHooks/auth/authHooks'
-import { format } from 'date-fns'
 import ClotureProjetDialog from './ClotureProjet'
 
 const route = getRouteApi('/_authenticated/projet-programme/projets/')
@@ -51,7 +40,6 @@ export default function ListeProjets() {
 
   // ✅ État pour le filtre de clôture (par défaut "en_cours")
   const [filtreCloture, setFiltreCloture] = useState<FiltreCloture>('en_cours')
-  const [clotureDate, setClotureDate] = useState<Date | undefined>(new Date())
   // ✅ Récupérer l'utilisateur connecté
   const { data: user } = useMe()
   const userLevel = user?.niveau_perso || 1
@@ -61,7 +49,6 @@ export default function ListeProjets() {
   const { data: typeProjets = [], isLoading: isLoadingTypes } = useGetTypeProjet()
   const { selectedTypeProjetId, setSelectedTypeProjetId } = useTypeProjetStore()
   const deleteMutation = useDeleteProjet()
-  const { mutate: clotureProjet, isPending: isClotureLoading } = useClotureProjet()
 
   const goToDetail = useCallback(
     (projet: Projet) => {
@@ -101,27 +88,6 @@ export default function ListeProjets() {
   const handleClotureClick = (row: Projet) => {
     setCurrentRow(row)
     setOpen('cloture')
-  }
-
-  // Fonction pour gérer la clôture/déclôture
-  const handleClotureAction = () => {
-    if (!currentRow) return
-
-    const data: ProjetClotureForm = {
-      is_cloture: !currentRow.is_cloture,
-      date_cloture_projet: clotureDate ? format(clotureDate, 'yyyy-MM-dd') : '',
-    }
-
-    clotureProjet({
-      id: currentRow.id_projet,
-      data,
-    }, {
-      onSuccess: () => {
-        setOpen(null)
-        setCurrentRow(null)
-        setClotureDate(undefined)
-      }
-    })
   }
 
 
