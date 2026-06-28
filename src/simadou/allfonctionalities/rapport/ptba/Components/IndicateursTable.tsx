@@ -1,11 +1,9 @@
 import { useMemo } from 'react'
 import { useGetUnitesIndicateur } from '@/simadou/allHooks/admin/uniteIndicateurHooks'
-import type { Ptba } from '@/simadou/allTypes'
+import type { CadreAnalytique, Ptba } from '@/simadou/allTypes'
 import { type IndicateurTache } from '@/simadou/allTypes/indicateurTache'
 import { useRapportExportRegistration } from '@/simadou/allfonctionalities/rapport/useRapportExportRegistration'
-import { Loader2, Target } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { Badge } from '@/components/ui/badge'
+import { Loader2 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Table,
@@ -15,37 +13,41 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { type RapportExportRowMeta } from '../../export/rapportExportTypes'
 
 interface IndicateursTableProps {
+  cadresAnalytiques: CadreAnalytique[]
   ptbas: Ptba[]
   indicateurs: IndicateurTache[]
   isLoading: boolean
 }
 
-function ValeurCell({ value }: { value: any }) {
-  if (value === null || value === undefined)
-    return <span className='text-muted-foreground'>—</span>
-  return <span className='font-medium tabular-nums'>{value}</span>
+type TreeRow = {
+  type: 'cadre' | 'ptba'
+  label?: string
+  niveau: number
+  ptba?: Ptba
+  ind?: IndicateurTache
+  groupKey?: string
 }
 
 export function IndicateursTable({
+  cadresAnalytiques,
   ptbas,
   indicateurs,
   isLoading,
 }: IndicateursTableProps) {
   const { data: unites = [] } = useGetUnitesIndicateur()
+
   const indicateursByActivite = useMemo(() => {
     const map = new Map<number, IndicateurTache[]>()
 
     for (const ptba of ptbas) {
-      if (ptba.id_ptba) {
-        map.set(ptba.id_ptba, [])
-      }
+      if (ptba.id_ptba) map.set(ptba.id_ptba, [])
     }
 
     for (const ind of indicateurs) {
       const id = ind.id_activite
-
       if (id && map.has(id)) {
         map.get(id)!.push(ind)
       }
@@ -55,52 +57,157 @@ export function IndicateursTable({
   }, [ptbas, indicateurs])
 
   /**
-   * EXPORT RAPPORT
+   * =========================
+   * TREE BUILD (comme TachesTable)
+   * =========================
    */
+  const rows = useMemo(() => {
+    const result: TreeRow[] = []
+
+    const ptbasByCadre = new Map<number, Ptba[]>()
+
+    ptbas.forEach((ptba) => {
+      if (typeof ptba.cadre_analytique === 'object' && ptba.cadre_analytique) {
+        const id = ptba.cadre_analytique.id_ca
+        if (!ptbasByCadre.has(id)) ptbasByCadre.set(id, [])
+        ptbasByCadre.get(id)!.push(ptba)
+      }
+    })
+
+    function children(cadres: CadreAnalytique[], parentId: number) {
+      return cadres.filter((c) => {
+        if (typeof c.parent_ca === 'object' && c.parent_ca) {
+          return c.parent_ca.id_ca === parentId
+        }
+        return c.parent_ca === parentId
+      })
+    }
+
+    function cadreHasPtba(cadre: CadreAnalytique): boolean {
+      const activites = ptbasByCadre.get(cadre.id_ca) ?? []
+      if (activites.length > 0) return true
+
+      const enfants = children(cadresAnalytiques, cadre.id_ca)
+      return enfants.some(cadreHasPtba)
+    }
+
+    function parcourir(cadre: CadreAnalytique, niveau: number) {
+      if (!cadreHasPtba(cadre)) return
+
+      result.push({
+        type: 'cadre',
+        label: cadre.intutile_ca,
+        niveau,
+      })
+
+      children(cadresAnalytiques, cadre.id_ca).forEach((c) =>
+        parcourir(c, niveau + 1)
+      )
+
+      const activites = ptbasByCadre.get(cadre.id_ca) ?? []
+
+      activites.forEach((ptba) => {
+        const inds = indicateursByActivite.get(ptba.id_ptba) ?? []
+
+        const groupKey = String(ptba.id_ptba)
+
+        if (inds.length === 0) {
+          result.push({
+            type: 'ptba',
+            ptba,
+            niveau,
+            groupKey,
+          })
+        } else {
+          inds.forEach((ind) => {
+            result.push({
+              type: 'ptba',
+              ptba,
+              niveau,
+              groupKey,
+              ind,
+            })
+          })
+        }
+      })
+    }
+
+    cadresAnalytiques
+      .filter((c) => c.parent_ca === null)
+      .filter(cadreHasPtba)
+      .forEach((c) => parcourir(c, 0))
+
+    return result
+  }, [cadresAnalytiques, ptbas, indicateursByActivite])
+
+  /**
+   * =========================
+   * GROUP SPAN PTBA
+   * =========================
+   */
+  const groupSpans = useMemo(() => {
+    const map = new Map<string, number>()
+
+    rows.forEach((r) => {
+      if (r.type !== 'ptba') return
+      if (!r.groupKey) return
+      map.set(r.groupKey, (map.get(r.groupKey) ?? 0) + 1)
+    })
+
+    return map
+  }, [rows])
+
   useRapportExportRegistration({
     isLoading,
 
     buildExportTable: () => {
-      const rows: string[][] = []
+      const exportRows: string[][] = []
+      const rowMetas: RapportExportRowMeta[] = []
 
-      for (const ptba of ptbas) {
-        const activiteId = ptba.id_ptba
+      rows.forEach((r) => {
+        /**
+         * =========================
+         * CADRE ANALYTIQUE
+         * =========================
+         */
+        if (r.type === 'cadre') {
+          exportRows.push([r.label ?? '', '', '', '', '', '', '', ''])
 
-        const activiteIndicateurs = activiteId
-          ? (indicateursByActivite.get(activiteId) ?? [])
-          : []
+          rowMetas.push({
+            type: 'section',
+            niveau: r.niveau,
+            label: r.label,
+          })
 
-        if (activiteIndicateurs.length === 0) {
-          rows.push([
-            ptba.code_activite_ptba ?? '',
-            ptba.intitule_activite_ptba ?? '',
-            'Aucun indicateur',
-            '',
-            '',
-            '',
-            '',
-            '',
-          ])
-
-          continue
+          return
         }
 
-        for (const ind of activiteIndicateurs) {
-          const unite = unites.find((u) => u.id_unite == ind.unite_ind_tache)
-          rows.push([
-            ptba.code_activite_ptba ?? '',
-            ptba.intitule_activite_ptba ?? '',
-            ind.intitule_indicateur_tache ?? '',
-            ...(unite
-              ? [`${unite.definition_ui} (${unite.unite_ui})`]
-              : [String(ind.unite_ind_tache)]),
-            ind.trimestre_1 != null ? String(ind.trimestre_1) : '',
-            ind.trimestre_2 != null ? String(ind.trimestre_2) : '',
-            ind.trimestre_3 != null ? String(ind.trimestre_3) : '',
-            ind.trimestre_4 != null ? String(ind.trimestre_4) : '',
-          ])
-        }
-      }
+        /**
+         * =========================
+         * PTBA + INDICATEUR
+         * =========================
+         */
+
+        const unite = unites.find((u) => u.id_unite == r.ind?.unite_ind_tache)
+
+        exportRows.push([
+          r.ptba?.code_activite_ptba ?? '',
+          r.ptba?.intitule_activite_ptba ?? '',
+          r.ind?.intitule_indicateur_tache ?? 'Aucun indicateur',
+          ...(unite
+            ? [`${unite.definition_ui} (${unite.unite_ui})`]
+            : [r.ind?.unite_ind_tache ? String(r.ind.unite_ind_tache) : '']),
+          r.ind?.trimestre_1 != null ? String(r.ind.trimestre_1) : '',
+          r.ind?.trimestre_2 != null ? String(r.ind.trimestre_2) : '',
+          r.ind?.trimestre_3 != null ? String(r.ind.trimestre_3) : '',
+          r.ind?.trimestre_4 != null ? String(r.ind.trimestre_4) : '',
+        ])
+
+        rowMetas.push({
+          type: 'data',
+          groupKey: r.ptba?.id_ptba ? String(r.ptba.id_ptba) : undefined,
+        })
+      })
 
       return {
         columns: [
@@ -138,7 +245,9 @@ export function IndicateursTable({
           },
         ],
 
-        rows,
+        rowMetas,
+
+        rows: exportRows,
 
         visibleColumnIds: [
           'code',
@@ -154,154 +263,108 @@ export function IndicateursTable({
     },
   })
 
-  if (isLoading)
-    return (
-      <div className='flex items-center justify-center py-16'>
-        <Loader2 className='h-6 w-6 animate-spin text-muted-foreground' />
-      </div>
-    )
-
-  if (ptbas.length === 0)
-    return (
-      <div className='flex flex-col items-center justify-center py-16 text-sm text-muted-foreground'>
-        Aucune activité trouvée
-      </div>
-    )
+  if (isLoading) return <Loader2 className='animate-spin' />
 
   return (
-    <Card className='border-0 shadow-sm'>
-      <CardHeader className='border-b pb-3'>
-        <div className='flex items-center gap-2'>
-          <div className='rounded-lg bg-violet-500/10 p-1.5'>
-            <Target className='h-4 w-4 text-violet-600' />
-          </div>
-          <CardTitle className='text-sm font-semibold'>
-            Indicateurs par activité
-          </CardTitle>
-          <Badge variant='secondary' className='ml-auto text-xs'>
-            {indicateurs.length} indicateur{indicateurs.length > 1 ? 's' : ''}
-          </Badge>
-        </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Indicateurs par cadre analytique</CardTitle>
       </CardHeader>
-      <CardContent className='p-0'>
-        <div className='overflow-x-auto'>
-          <Table className='w-full min-w-full table-auto border-collapse' style={{ tableLayout: 'auto' }}>
-            <TableHeader>
-              <TableRow className='border-b border-border/60 bg-muted/60 hover:bg-muted/60'>
-                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0'>
-                  Code
-                </TableHead>
-                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 min-w-48 max-w-[200px]'>
-                  Activité
-                </TableHead>
-                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 min-w-48 max-w-[250px]'>
-                  Indicateur
-                </TableHead>
-                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 text-center'>
-                  Unité
-                </TableHead>
-                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 bg-blue-50/50 text-center'>
-                  T1
-                </TableHead>
-                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 bg-blue-50/50 text-center'>
-                  T2
-                </TableHead>
-                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 bg-blue-50/50 text-center'>
-                  T3
-                </TableHead>
-                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 bg-blue-50/50 text-center'>
-                  T4
-                </TableHead>
-              </TableRow>
-            </TableHeader>
 
-            <TableBody>
-              {ptbas.map((ptba, ptbaIndex) => {
-                const activiteId = ptba.id_ptba
-                const activiteIndicateurs = activiteId
-                  ? indicateursByActivite.get(activiteId) || []
-                  : []
-                const isEven = ptbaIndex % 2 === 0
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Code</TableHead>
+              <TableHead>Activité</TableHead>
+              <TableHead>Indicateur</TableHead>
+              <TableHead>Unité</TableHead>
+              <TableHead>T1</TableHead>
+              <TableHead>T2</TableHead>
+              <TableHead>T3</TableHead>
+              <TableHead>T4</TableHead>
+            </TableRow>
+          </TableHeader>
 
-                if (activiteIndicateurs.length === 0) {
-                  return (
-                    <TableRow
-                      key={ptba.id_ptba}
-                      className={cn(
-                        'border-b border-border/40 last:border-b-0 transition-colors duration-100',
-                        isEven ? 'bg-background' : 'bg-muted/20'
-                      )}
+          <TableBody>
+            {rows.map((row, i) => {
+              /**
+               * =========================
+               * CADRE ROW
+               * =========================
+               */
+              if (row.type === 'cadre') {
+                const totalColumns = 8
+                const empty = row.niveau
+                const span = totalColumns - empty
+
+                return (
+                  <TableRow key={i}>
+                    {Array.from({ length: empty }).map((_, idx) => (
+                      <TableCell key={idx} />
+                    ))}
+                    <TableCell
+                      colSpan={span}
+                      className='bg-muted font-semibold'
                     >
-                      <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 font-mono text-xs text-muted-foreground'>
-                        {ptba.code_activite_ptba || '—'}
-                      </TableCell>
-                      <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 font-medium max-w-[200px]'>
-                        {ptba.intitule_activite_ptba || 'Sans intitulé'}
-                      </TableCell>
-                      <TableCell
-                        colSpan={6}
-                        className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 text-center text-xs text-muted-foreground italic'
-                      >
-                        Aucun indicateur
-                      </TableCell>
-                    </TableRow>
-                  )
-                }
-
-                return activiteIndicateurs.map((ind, indIndex) => (
-                  <TableRow
-                    key={`${ptba.id_ptba}-${ind.id_indicateur_tache || indIndex}`}
-                    className={cn(
-                      'border-b border-border/40 last:border-b-0 transition-colors duration-100 hover:bg-primary/5',
-                      isEven ? 'bg-background' : 'bg-muted/20'
-                    )}
-                  >
-                    {indIndex === 0 ? (
-                      <>
-                        <TableCell
-                          rowSpan={activiteIndicateurs.length}
-                          className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 font-mono text-xs text-muted-foreground border-r border-border/50'
-                        >
-                          {ptba.code_activite_ptba || '—'}
-                        </TableCell>
-                        <TableCell
-                          rowSpan={activiteIndicateurs.length}
-                          className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 font-semibold max-w-[200px] border-r border-border/50'
-                        >
-                          {ptba.intitule_activite_ptba || 'Sans intitulé'}
-                        </TableCell>
-                      </>
-                    ) : null}
-                    <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 max-w-[250px]'>
-                      {ind.intitule_indicateur_tache || '—'}
-                    </TableCell>
-                    <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 text-center'>
-                      {ind.unite_ind_tache ? (
-                        <span className='inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground'>
-                          {ind.unite_ind_tache}
-                        </span>
-                      ) : (
-                        <span className='text-sm text-muted-foreground'>—</span>
-                      )}
-                    </TableCell>
-                    <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 bg-blue-50/30 text-center'>
-                      <ValeurCell value={ind.trimestre_1} />
-                    </TableCell>
-                    <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 bg-blue-50/30 text-center'>
-                      <ValeurCell value={ind.trimestre_2} />
-                    </TableCell>
-                    <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 bg-blue-50/30 text-center'>
-                      <ValeurCell value={ind.trimestre_3} />
-                    </TableCell>
-                    <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 bg-blue-50/30 text-center'>
-                      <ValeurCell value={ind.trimestre_4} />
+                      {row.label}
                     </TableCell>
                   </TableRow>
-                ))
-              })}
-            </TableBody>
-          </Table>
-        </div>
+                )
+              }
+
+              /**
+               * =========================
+               * PTBA + INDICATEUR
+               * =========================
+               */
+              const span = row.groupKey
+                ? (groupSpans.get(row.groupKey) ?? 1)
+                : 1
+
+              const isFirst = row.groupKey
+                ? rows.findIndex(
+                    (r) => r.groupKey === row.groupKey && r.type === 'ptba'
+                  ) === i
+                : true
+
+              const unite = unites.find(
+                (u) => u.id_unite == row.ind?.unite_ind_tache
+              )
+
+              return (
+                <TableRow key={i}>
+                  {isFirst && (
+                    <TableCell rowSpan={span}>
+                      {row.ptba?.code_activite_ptba}
+                    </TableCell>
+                  )}
+
+                  {isFirst && (
+                    <TableCell rowSpan={span}>
+                      {row.ptba?.intitule_activite_ptba}
+                    </TableCell>
+                  )}
+
+                  <TableCell>
+                    {row.ind?.intitule_indicateur_tache ?? '—'}
+                  </TableCell>
+
+                  <TableCell>
+                    {unite
+                      ? `${unite.definition_ui} (${unite.unite_ui})`
+                      : row.ind?.unite_ind_tache}
+                  </TableCell>
+
+                  <TableCell>{row.ind?.trimestre_1 ?? ''}</TableCell>
+                  <TableCell>{row.ind?.trimestre_2 ?? ''}</TableCell>
+                  <TableCell>{row.ind?.trimestre_3 ?? ''}</TableCell>
+                  <TableCell>{row.ind?.trimestre_4 ?? ''}</TableCell>
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
       </CardContent>
     </Card>
   )

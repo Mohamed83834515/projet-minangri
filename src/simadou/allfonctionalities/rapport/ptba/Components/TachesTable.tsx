@@ -1,9 +1,12 @@
 import { useMemo } from 'react'
-import type { TacheActivitePtba, Ptba } from '@/simadou/allTypes'
+import type {
+  TacheActivitePtba,
+  Ptba,
+  CadreAnalytique,
+} from '@/simadou/allTypes'
 import { resolveIdActivite } from '@/simadou/allTypes/tacheActivitePtba'
 import { useRapportExportRegistration } from '@/simadou/allfonctionalities/rapport/useRapportExportRegistration'
 import { Loader2, ListTodo } from 'lucide-react'
-import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -14,87 +17,173 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { type RapportExportRowMeta } from '../../export/rapportExportTypes'
 
-interface TachesTableProps {
+interface Props {
+  cadresAnalytiques: CadreAnalytique[]
   ptbas: Ptba[]
-
   taches: TacheActivitePtba[]
-
   isLoading: boolean
 }
 
-export function TachesTable({ ptbas, taches, isLoading }: TachesTableProps) {
-  const tachesByActivite = useMemo(() => {
-    const map = new Map<number, TacheActivitePtba[]>()
+type TreeRow = {
+  type: 'cadre' | 'ptba'
+  label?: string
+  niveau: number
+  ptba?: Ptba
+  tache?: TacheActivitePtba
+  groupKey?: string
+}
 
-    for (const ptba of ptbas) {
-      if (ptba.id_ptba) {
-        map.set(ptba.id_ptba, [])
+export function TachesTable({
+  cadresAnalytiques,
+  ptbas,
+  taches,
+  isLoading,
+}: Props) {
+  const rows = useMemo(() => {
+    const tachesByActivite = new Map<number, TacheActivitePtba[]>()
+
+    ptbas.forEach((p) => tachesByActivite.set(p.id_ptba, []))
+
+    taches.forEach((t) => {
+      const id = resolveIdActivite(t)
+      if (id && tachesByActivite.has(id)) {
+        tachesByActivite.get(id)!.push(t)
       }
+    })
+
+    const ptbasByCadre = new Map<number, Ptba[]>()
+
+    ptbas.forEach((ptba) => {
+      if (typeof ptba.cadre_analytique === 'object' && ptba.cadre_analytique) {
+        const id = ptba.cadre_analytique.id_ca
+        if (!ptbasByCadre.has(id)) ptbasByCadre.set(id, [])
+        ptbasByCadre.get(id)!.push(ptba)
+      }
+    })
+
+    const result: TreeRow[] = []
+
+    function children(parentId: number) {
+      return cadresAnalytiques.filter((c) => {
+        if (typeof c.parent_ca === 'object' && c.parent_ca) {
+          return c.parent_ca.id_ca === parentId
+        }
+        return c.parent_ca === parentId
+      })
     }
 
-    for (const tache of taches) {
-      const id = resolveIdActivite(tache)
+    function cadreHasPtba(cadre: CadreAnalytique): boolean {
+      const activites = ptbasByCadre.get(cadre.id_ca) ?? []
+      if (activites.length > 0) return true
 
-      if (id && map.has(id)) {
-        map.get(id)!.push(tache)
-      }
+      const enfants = children(cadre.id_ca)
+      return enfants.some(cadreHasPtba)
     }
+
+    function parcourir(cadre: CadreAnalytique, niveau: number) {
+      if (!cadreHasPtba(cadre)) return
+
+      result.push({
+        type: 'cadre',
+        label: cadre.intutile_ca,
+        niveau,
+      })
+
+      children(cadre.id_ca).forEach((c) => parcourir(c, niveau + 1))
+
+      const activites = ptbasByCadre.get(cadre.id_ca) ?? []
+
+      activites.forEach((ptba) => {
+        const activiteTaches = tachesByActivite.get(ptba.id_ptba) ?? []
+
+        // GROUP KEY
+        const groupKey = String(ptba.id_ptba)
+
+        if (activiteTaches.length === 0) {
+          result.push({
+            type: 'ptba',
+            niveau,
+            ptba,
+            groupKey,
+          })
+        } else {
+          activiteTaches.forEach((tache) => {
+            result.push({
+              type: 'ptba',
+              niveau,
+              ptba,
+              tache,
+              groupKey,
+            })
+          })
+        }
+      })
+    }
+
+    cadresAnalytiques
+      .filter((c) => c.parent_ca === null)
+      .filter(cadreHasPtba)
+      .forEach((c) => parcourir(c, 0))
+
+    return result
+  }, [cadresAnalytiques, ptbas, taches])
+
+  const groupSpans = useMemo(() => {
+    const map = new Map<string, number>()
+
+    rows.forEach((r) => {
+      if (r.type !== 'ptba') return
+      if (!r.groupKey) return
+
+      map.set(r.groupKey, (map.get(r.groupKey) ?? 0) + 1)
+    })
 
     return map
-  }, [ptbas, taches])
+  }, [rows])
 
-  /**
-   * EXPORT RAPPORT
-   */
   useRapportExportRegistration({
     isLoading,
 
     buildExportTable: () => {
-      const rows: string[][] = []
+      const exportRows: string[][] = []
+      const rowMetas: RapportExportRowMeta[] = []
 
-      for (const ptba of ptbas) {
-        const activiteId = ptba.id_ptba
+      rows.forEach((r) => {
+        if (r.type === 'cadre') {
+          exportRows.push([r.label ?? '', '', '', '', '', '', ''])
 
-        const activiteTaches = activiteId
-          ? (tachesByActivite.get(activiteId) ?? [])
-          : []
-
-        if (activiteTaches.length === 0) {
-          rows.push([
-            ptba.code_activite_ptba ?? '',
-            ptba.intitule_activite_ptba ?? '',
-            'Aucune tâche',
-            '',
-            '',
-            '',
-            '',
-          ])
-
-          continue
-        }
-
-        for (const tache of activiteTaches) {
-          rows.push([
-            ptba.code_activite_ptba ?? '',
-            ptba.intitule_activite_ptba ?? '',
-            tache.intutile_tache_gt ?? '',
-            tache.proportion_gt ? String(tache.proportion_gt) : '',
-            tache.n_lot_gt ? String(tache.n_lot_gt) : '',
-            tache.date_debut_gt
-              ? new Date(tache.date_debut_gt).toLocaleDateString('fr-FR')
+          rowMetas.push({
+            type: 'section',
+            niveau: r.niveau,
+            label: r.label,
+          })
+        } else {
+          exportRows.push([
+            r.ptba?.code_activite_ptba ?? '',
+            r.ptba?.intitule_activite_ptba ?? '',
+            r.tache?.intutile_tache_gt ?? '',
+            r.tache?.proportion_gt ? String(r.tache.proportion_gt) : '',
+            r.tache?.n_lot_gt ? String(r.tache.n_lot_gt) : '',
+            r.tache?.date_debut_gt
+              ? new Date(r.tache.date_debut_gt).toLocaleDateString('fr-FR')
               : '',
-            tache.date_fin_gt
-              ? new Date(tache.date_fin_gt).toLocaleDateString('fr-FR')
+            r.tache?.date_fin_gt
+              ? new Date(r.tache.date_fin_gt).toLocaleDateString('fr-FR')
               : '',
           ])
+          rowMetas.push({
+            type: 'data',
+            groupKey: r.ptba?.id_ptba ? String(r.ptba?.id_ptba) : undefined,
+          })
         }
-      }
+      })
 
       return {
         columns: [
           {
-            id: 'code_activite',
+            id: 'code',
             header: 'Code',
           },
           {
@@ -123,10 +212,11 @@ export function TachesTable({ ptbas, taches, isLoading }: TachesTableProps) {
           },
         ],
 
-        rows,
+        rowMetas,
+        rows: exportRows,
 
         visibleColumnIds: [
-          'code_activite',
+          'code',
           'activite',
           'tache',
           'proportion',
@@ -140,144 +230,115 @@ export function TachesTable({ ptbas, taches, isLoading }: TachesTableProps) {
 
   if (isLoading)
     return (
-      <div className='flex items-center justify-center py-16'>
-        <Loader2 className='h-6 w-6 animate-spin text-muted-foreground' />
-      </div>
-    )
-
-  if (ptbas.length === 0)
-    return (
-      <div className='flex flex-col items-center justify-center py-16 text-sm text-muted-foreground'>
-        Aucune activité trouvée
+      <div className='flex justify-center py-16'>
+        <Loader2 className='animate-spin' />
       </div>
     )
 
   return (
-    <Card className='border-0 shadow-sm'>
-      <CardHeader className='border-b pb-3'>
+    <Card>
+      <CardHeader>
         <div className='flex items-center gap-2'>
-          <div className='rounded-lg bg-primary/10 p-1.5'>
-            <ListTodo className='h-4 w-4 text-primary' />
-          </div>
+          <ListTodo className='h-4 w-4' />
 
-          <CardTitle className='text-sm font-semibold'>
-            Tâches par activité
-          </CardTitle>
+          <CardTitle>Tâches par cadre analytique</CardTitle>
 
-          <Badge variant='secondary' className='ml-auto text-xs'>
-            {taches.length} tâche{taches.length > 1 ? 's' : ''}
-          </Badge>
+          <Badge className='ml-auto'>{taches.length}</Badge>
         </div>
       </CardHeader>
 
-      <CardContent className='p-0'>
+      <CardContent>
         <div className='overflow-x-auto'>
-          <Table className='w-full min-w-full table-auto border-collapse' style={{ tableLayout: 'auto' }}>
+          <Table>
             <TableHeader>
-              <TableRow className='border-b border-border/60 bg-muted/60 hover:bg-muted/60'>
-                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0'>
-                  Code
-                </TableHead>
-                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 min-w-48 max-w-[200px]'>
-                  Activité
-                </TableHead>
-                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 min-w-44 max-w-[250px]'>
-                  Intitulé tâche
-                </TableHead>
-                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 text-center'>
-                  Proportion
-                </TableHead>
-                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 text-center'>
-                  N° Lot
-                </TableHead>
-                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 text-center'>
-                  Date début
-                </TableHead>
-                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 text-center'>
-                  Date fin
-                </TableHead>
+              <TableRow>
+                <TableHead>Code</TableHead>
+
+                <TableHead>Activité</TableHead>
+
+                <TableHead>Intitulé tâche</TableHead>
+
+                <TableHead>Proportion</TableHead>
+
+                <TableHead>N° Lot</TableHead>
+
+                <TableHead>Date début</TableHead>
+
+                <TableHead>Date fin</TableHead>
               </TableRow>
             </TableHeader>
 
             <TableBody>
-              {ptbas.map((ptba, index) => {
-                const activiteTaches = ptba.id_ptba
-                  ? (tachesByActivite.get(ptba.id_ptba) ?? [])
-                  : []
-                const isEven = index % 2 === 0
+              {rows.map((row, i) => {
+                if (row.type === 'cadre') {
+                  const totalColumns = 7
+                  const emptyColumns = row.niveau
+                  const spanColumns = totalColumns - emptyColumns
 
-                if (activiteTaches.length === 0) {
                   return (
-                    <TableRow
-                      key={ptba.id_ptba}
-                      className={cn(
-                        'border-b border-border/40 last:border-b-0 transition-colors duration-100',
-                        isEven ? 'bg-background' : 'bg-muted/20'
-                      )}
-                    >
-                      <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 font-mono text-xs text-muted-foreground'>
-                        {ptba.code_activite_ptba || '—'}
-                      </TableCell>
-                      <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 font-medium max-w-[200px]'>
-                        {ptba.intitule_activite_ptba || 'Sans intitulé'}
-                      </TableCell>
+                    <TableRow key={i}>
+                      {Array.from({ length: emptyColumns }).map((_, index) => (
+                        <TableCell key={index} className='bg-muted/40' />
+                      ))}
                       <TableCell
-                        colSpan={5}
-                        className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 text-center text-xs text-muted-foreground italic'
+                        colSpan={spanColumns}
+                        className='bg-muted font-semibold'
                       >
-                        Aucune tâche
+                        {row.label}
                       </TableCell>
                     </TableRow>
                   )
                 }
 
-                return activiteTaches.map((tache, i) => (
-                  <TableRow
-                    key={`${ptba.id_ptba}-${i}`}
-                    className={cn(
-                      'border-b border-border/40 last:border-b-0 transition-colors duration-100 hover:bg-primary/5',
-                      isEven ? 'bg-background' : 'bg-muted/20'
-                    )}
-                  >
-                    {i === 0 ? (
-                      <>
-                        <TableCell
-                          rowSpan={activiteTaches.length}
-                          className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 font-mono text-xs text-muted-foreground border-r border-border/50'
-                        >
-                          {ptba.code_activite_ptba || '—'}
+                if (row.type === 'ptba') {
+                  const span = row.groupKey
+                    ? (groupSpans.get(row.groupKey) ?? 1)
+                    : 1
+
+                  const isFirst = row.groupKey
+                    ? rows.findIndex(
+                        (r) => r.groupKey === row.groupKey && r.type === 'ptba'
+                      ) === i
+                    : true
+
+                  return (
+                    <TableRow key={i}>
+                      {isFirst && (
+                        <TableCell rowSpan={span}>
+                          {row.ptba?.code_activite_ptba}
                         </TableCell>
-                        <TableCell
-                          rowSpan={activiteTaches.length}
-                          className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 font-semibold max-w-[200px] border-r border-border/50'
-                        >
-                          {ptba.intitule_activite_ptba || 'Sans intitulé'}
+                      )}
+
+                      {isFirst && (
+                        <TableCell rowSpan={span}>
+                          {row.ptba?.intitule_activite_ptba}
                         </TableCell>
-                      </>
-                    ) : null}
-                    <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 max-w-[250px]'>
-                      {tache.intutile_tache_gt || '—'}
-                    </TableCell>
-                    <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 text-center'>
-                      <span className='inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium'>
-                        {tache.proportion_gt || '—'}
-                      </span>
-                    </TableCell>
-                    <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 text-center font-mono text-sm'>
-                      {tache.n_lot_gt || '—'}
-                    </TableCell>
-                    <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 text-center font-mono text-sm'>
-                      {tache.date_debut_gt
-                        ? new Date(tache.date_debut_gt).toLocaleDateString('fr-FR')
-                        : '—'}
-                    </TableCell>
-                    <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 text-center font-mono text-sm'>
-                      {tache.date_fin_gt
-                        ? new Date(tache.date_fin_gt).toLocaleDateString('fr-FR')
-                        : '—'}
-                    </TableCell>
-                  </TableRow>
-                ))
+                      )}
+
+                      <TableCell>{row.tache?.intutile_tache_gt}</TableCell>
+                      <TableCell>{row.tache?.proportion_gt}</TableCell>
+                      <TableCell>{row.tache?.n_lot_gt}</TableCell>
+
+                      <TableCell>
+                        {row.tache?.date_debut_gt
+                          ? new Date(
+                              row.tache.date_debut_gt
+                            ).toLocaleDateString('fr-FR')
+                          : ''}
+                      </TableCell>
+
+                      <TableCell>
+                        {row.tache?.date_fin_gt
+                          ? new Date(row.tache.date_fin_gt).toLocaleDateString(
+                              'fr-FR'
+                            )
+                          : ''}
+                      </TableCell>
+                    </TableRow>
+                  )
+                }
+
+                return null
               })}
             </TableBody>
           </Table>

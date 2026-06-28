@@ -1,7 +1,10 @@
 import { useMemo } from 'react'
-import type { CoutUnitairePtba, Ptba } from '@/simadou/allTypes'
+import type {
+  CoutUnitairePtba,
+  Ptba,
+  CadreAnalytique,
+} from '@/simadou/allTypes'
 import { Loader2, Receipt } from 'lucide-react'
-import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -12,81 +15,184 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { type RapportExportRowMeta } from '../../export/rapportExportTypes'
 import { useRapportExportRegistration } from '../../useRapportExportRegistration'
 
-interface CoutActiviteTableProps {
+interface Props {
+  cadresAnalytiques: CadreAnalytique[]
   ptbas: Ptba[]
   couts: CoutUnitairePtba[]
   isLoading: boolean
   currencyCode?: string
 }
 
+type TreeRow = {
+  type: 'cadre' | 'ptba'
+  label?: string
+  niveau: number
+  ptba?: Ptba
+  cout?: CoutUnitairePtba
+  groupKey?: string
+}
+
 const fmt = (v: number) => new Intl.NumberFormat('fr-FR').format(v)
 
 export function CoutActiviteTable({
+  cadresAnalytiques,
   ptbas,
   couts,
   isLoading,
   currencyCode = 'GNF',
-}: CoutActiviteTableProps) {
-  const coutsByActivite = useMemo(() => {
-    const map = new Map<number, CoutUnitairePtba[]>()
-    for (const ptba of ptbas) {
-      if (ptba.id_ptba) map.set(ptba.id_ptba, [])
-    }
-    for (const cout of couts) {
+}: Props) {
+  const rows = useMemo(() => {
+    const coutsByActivite = new Map<number, CoutUnitairePtba[]>()
+
+    ptbas.forEach((p) => {
+      coutsByActivite.set(p.id_ptba, [])
+    })
+
+    couts.forEach((c) => {
       const id =
-        typeof cout.ptba_activite === 'number'
-          ? cout.ptba_activite
-          : cout.ptba_activite?.id_ptba
-      if (id && map.has(id)) map.get(id)!.push(cout)
+        typeof c.ptba_activite === 'number'
+          ? c.ptba_activite
+          : c.ptba_activite?.id_ptba
+
+      if (id && coutsByActivite.has(id)) {
+        coutsByActivite.get(id)!.push(c)
+      }
+    })
+
+    const ptbasByCadre = new Map<number, Ptba[]>()
+
+    ptbas.forEach((ptba) => {
+      if (typeof ptba.cadre_analytique === 'object' && ptba.cadre_analytique) {
+        const id = ptba.cadre_analytique.id_ca
+
+        if (!ptbasByCadre.has(id)) ptbasByCadre.set(id, [])
+
+        ptbasByCadre.get(id)!.push(ptba)
+      }
+    })
+
+    const result: TreeRow[] = []
+
+    function children(parentId: number) {
+      return cadresAnalytiques.filter((c) => {
+        if (typeof c.parent_ca === 'object' && c.parent_ca)
+          return c.parent_ca.id_ca === parentId
+
+        return c.parent_ca === parentId
+      })
     }
+
+    function cadreHasPtba(cadre: CadreAnalytique): boolean {
+      const activites = ptbasByCadre.get(cadre.id_ca) ?? []
+
+      if (activites.length > 0) return true
+
+      return children(cadre.id_ca).some(cadreHasPtba)
+    }
+
+    function parcourir(cadre: CadreAnalytique, niveau: number) {
+      if (!cadreHasPtba(cadre)) return
+
+      result.push({
+        type: 'cadre',
+
+        label: cadre.intutile_ca,
+
+        niveau,
+      })
+
+      children(cadre.id_ca).forEach((c) => parcourir(c, niveau + 1))
+
+      const activites = ptbasByCadre.get(cadre.id_ca) ?? []
+
+      activites.forEach((ptba) => {
+        const activiteCouts = coutsByActivite.get(ptba.id_ptba) ?? []
+
+        const groupKey = String(ptba.id_ptba)
+
+        if (activiteCouts.length === 0) {
+          result.push({
+            type: 'ptba',
+            niveau,
+            ptba,
+            groupKey,
+          })
+        } else {
+          activiteCouts.forEach((cout) => {
+            result.push({
+              type: 'ptba',
+              niveau,
+              ptba,
+              cout,
+              groupKey,
+            })
+          })
+        }
+      })
+    }
+
+    cadresAnalytiques
+      .filter((c) => c.parent_ca === null)
+      .filter(cadreHasPtba)
+      .forEach((c) => parcourir(c, 0))
+
+    return result
+  }, [cadresAnalytiques, ptbas, couts])
+
+  const groupSpans = useMemo(() => {
+    const map = new Map<string, number>()
+
+    rows.forEach((r) => {
+      if (r.type !== 'ptba') return
+
+      if (!r.groupKey) return
+
+      map.set(r.groupKey, (map.get(r.groupKey) ?? 0) + 1)
+    })
+
     return map
-  }, [ptbas, couts])
+  }, [rows])
 
   useRapportExportRegistration({
     isLoading,
 
     buildExportTable: () => {
-      const rows: string[][] = []
+      const exportRows: string[][] = []
 
-      for (const ptba of ptbas) {
-        const activiteId = ptba.id_ptba
+      const rowMetas: RapportExportRowMeta[] = []
 
-        const activiteCouts = activiteId
-          ? (coutsByActivite.get(activiteId) ?? [])
-          : []
+      rows.forEach((r) => {
+        if (r.type === 'cadre') {
+          exportRows.push([r.label ?? '', '', '', '', '', '', '', ''])
 
-        if (activiteCouts.length === 0) {
-          rows.push([
-            ptba.code_activite_ptba ?? '',
-            ptba.intitule_activite_ptba ?? '',
-            '',
-            'Aucun coût',
-            '',
-            '',
-            '',
-            '',
+          rowMetas.push({
+            type: 'section',
+            niveau: r.niveau,
+            label: r.label,
+          })
+        } else {
+          exportRows.push([
+            r.ptba?.code_activite_ptba ?? '',
+            r.ptba?.intitule_activite_ptba ?? '',
+            r.cout ? String(r.cout.ordre ?? '') : '',
+            r.cout?.intitule_tache ?? '',
+            r.cout?.unite_cu ?? '',
+            r.cout ? fmt(r.cout.quantite_cu) : '',
+            r.cout ? fmt(r.cout.prix_unitaire) : '',
+            r.cout
+              ? fmt(r.cout.quantite_cu * r.cout.prix_unitaire)
+              : 'Aucun coût',
           ])
 
-          continue
+          rowMetas.push({
+            type: 'data',
+            groupKey: r.groupKey,
+          })
         }
-
-        for (const [index, cout] of activiteCouts.entries()) {
-          const montant = cout.quantite_cu * cout.prix_unitaire
-
-          rows.push([
-            ptba.code_activite_ptba ?? '',
-            ptba.intitule_activite_ptba ?? '',
-            String(cout.ordre ?? index + 1),
-            cout.intitule_tache ?? '',
-            cout.unite_cu ?? '',
-            fmt(cout.quantite_cu),
-            fmt(cout.prix_unitaire),
-            fmt(montant),
-          ])
-        }
-      }
+      })
 
       return {
         columns: [
@@ -116,16 +222,16 @@ export function CoutActiviteTable({
           },
           {
             id: 'prix',
-            header: 'Prix unitaire',
+            header:
+              `Prix unitaire ${currencyCode ? `(${currencyCode})` : ''}`.trim(),
           },
           {
             id: 'montant',
-            header: 'Montant',
+            header: `Montant ${currencyCode ? `(${currencyCode})` : ''}`.trim(),
           },
         ],
-
-        rows,
-
+        rowMetas,
+        rows: exportRows,
         visibleColumnIds: [
           'code',
           'activite',
@@ -140,202 +246,103 @@ export function CoutActiviteTable({
     },
   })
 
-  // Total général
-  const totalGeneral = useMemo(
-    () => couts.reduce((s, c) => s + c.quantite_cu * c.prix_unitaire, 0),
-    [couts]
-  )
-
   if (isLoading)
     return (
-      <div className='flex items-center justify-center py-16'>
-        <Loader2 className='h-6 w-6 animate-spin text-muted-foreground' />
-      </div>
-    )
-
-  if (ptbas.length === 0)
-    return (
-      <div className='flex flex-col items-center justify-center py-16 text-sm text-muted-foreground'>
-        Aucune activité trouvée
+      <div className='flex justify-center py-16'>
+        <Loader2 className='animate-spin' />
       </div>
     )
 
   return (
-    <Card className='border-0 shadow-sm'>
-      <CardHeader className='border-b pb-3'>
+    <Card>
+      <CardHeader>
         <div className='flex items-center gap-2'>
-          <div className='rounded-lg bg-emerald-500/10 p-1.5'>
-            <Receipt className='h-4 w-4 text-emerald-600' />
-          </div>
-          <CardTitle className='text-sm font-semibold'>
-            Coûts par activité
-          </CardTitle>
-          <Badge variant='secondary' className='ml-auto text-xs'>
-            {couts.length} ligne{couts.length > 1 ? 's' : ''}
-          </Badge>
+          <Receipt className='h-4 w-4' />
+
+          <CardTitle>Coûts par activité</CardTitle>
+
+          <Badge className='ml-auto'>{couts.length}</Badge>
         </div>
       </CardHeader>
-      <CardContent className='p-0'>
-        <div className='overflow-x-auto'>
-          <Table className='w-full min-w-full table-auto border-collapse' style={{ tableLayout: 'auto' }}>
-            <TableHeader>
-              <TableRow className='border-b border-border/60 bg-muted/60 hover:bg-muted/60'>
-                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0'>
-                  Code
-                </TableHead>
-                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 min-w-48 max-w-[200px]'>
-                  Activité
-                </TableHead>
-                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 text-center'>
-                  #
-                </TableHead>
-                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 min-w-44 max-w-[250px]'>
-                  Intitulé tâche
-                </TableHead>
-                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 text-center'>
-                  Unité
-                </TableHead>
-                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 text-right'>
-                  Quantité
-                </TableHead>
-                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 text-right'>
-                  Prix unitaire
-                </TableHead>
-                <TableHead className='px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-normal break-words align-middle border-r border-border/30 last:border-r-0 bg-emerald-50/50 text-right'>
-                  Montant
-                </TableHead>
-              </TableRow>
-            </TableHeader>
 
-            <TableBody>
-              {ptbas.map((ptba, ptbaIndex) => {
-                const activiteId = ptba.id_ptba
-                const activiteCouts = activiteId
-                  ? coutsByActivite.get(activiteId) || []
-                  : []
-                const isEven = ptbaIndex % 2 === 0
-                const totalActivite = activiteCouts.reduce(
-                  (s, c) => s + c.quantite_cu * c.prix_unitaire,
-                  0
-                )
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Code</TableHead>
+              <TableHead>Activité</TableHead>
+              <TableHead>#</TableHead>
+              <TableHead>Intitulé tâche</TableHead>
+              <TableHead>Unité</TableHead>
+              <TableHead>Quantité</TableHead>
+              <TableHead>Prix unitaire</TableHead>
+              <TableHead>Montant</TableHead>
+            </TableRow>
+          </TableHeader>
 
-                if (activiteCouts.length === 0) {
-                  return (
-                    <TableRow
-                      key={ptba.id_ptba}
-                      className={cn(
-                        'border-b border-border/40 last:border-b-0 transition-colors duration-100',
-                        isEven ? 'bg-background' : 'bg-muted/20'
-                      )}
-                    >
-                      <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 font-mono text-xs text-muted-foreground'>
-                        {ptba.code_activite_ptba || '—'}
-                      </TableCell>
-                      <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 font-medium max-w-[200px]'>
-                        {ptba.intitule_activite_ptba || 'Sans intitulé'}
-                      </TableCell>
-                      <TableCell
-                        colSpan={6}
-                        className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 text-center text-xs text-muted-foreground italic'
-                      >
-                        Aucun coût
-                      </TableCell>
-                    </TableRow>
-                  )
-                }
+          <TableBody>
+            {rows.map((row, i) => {
+              if (row.type === 'cadre') {
+                const total = 8
+                const empty = row.niveau
 
-                return [
-                  ...activiteCouts.map((cout, coutIndex) => {
-                    const montant = cout.quantite_cu * cout.prix_unitaire
-                    return (
-                      <TableRow
-                        key={`${ptba.id_ptba}-${cout.id_cout_unitaire || coutIndex}`}
-                        className={cn(
-                          'border-b border-border/40 last:border-b-0 transition-colors duration-100 hover:bg-primary/5',
-                          isEven ? 'bg-background' : 'bg-muted/20'
-                        )}
-                      >
-                        {coutIndex === 0 ? (
-                          <>
-                            <TableCell
-                              rowSpan={activiteCouts.length + 1}
-                              className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 font-mono text-xs text-muted-foreground border-r border-border/50'
-                            >
-                              {ptba.code_activite_ptba || '—'}
-                            </TableCell>
-                            <TableCell
-                              rowSpan={activiteCouts.length + 1}
-                              className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 font-semibold max-w-[200px] border-r border-border/50'
-                            >
-                              {ptba.intitule_activite_ptba || 'Sans intitulé'}
-                            </TableCell>
-                          </>
-                        ) : null}
-                        <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 text-center text-xs text-muted-foreground'>
-                          {cout.ordre || coutIndex + 1}
-                        </TableCell>
-                        <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 max-w-[250px]'>
-                          {cout.intitule_tache || '—'}
-                        </TableCell>
-                        <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 text-center'>
-                          <span className='inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground'>
-                            {cout.unite_cu || '—'}
-                          </span>
-                        </TableCell>
-                        <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 text-right tabular-nums'>
-                          {fmt(cout.quantite_cu)}
-                        </TableCell>
-                        <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 text-right font-medium text-emerald-600 tabular-nums'>
-                          {fmt(cout.prix_unitaire)}
-                        </TableCell>
-                        <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 bg-emerald-50/30 text-right font-bold text-blue-600 tabular-nums'>
-                          {fmt(montant)}
-                        </TableCell>
-                      </TableRow>
-                    )
-                  }),
-                  <TableRow
-                    key={`${ptba.id_ptba}-total`}
-                    className={cn(
-                      'border-b border-border/40 last:border-b-0 transition-colors duration-100',
-                      isEven ? 'bg-muted/10' : 'bg-muted/30'
-                    )}
-                  >
+                return (
+                  <TableRow key={i}>
+                    {Array.from({
+                      length: empty,
+                    }).map((_, x) => (
+                      <TableCell key={x} className='bg-muted/40' />
+                    ))}
+
                     <TableCell
-                      colSpan={5}
-                      className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 text-right text-xs font-semibold tracking-wide text-muted-foreground uppercase'
+                      colSpan={total - empty}
+                      className='bg-muted font-semibold'
                     >
-                      Sous-total
+                      {row.label}
                     </TableCell>
-                    <TableCell className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 bg-emerald-50/30 text-right font-bold text-blue-700 tabular-nums'>
-                      {fmt(totalActivite)}{' '}
-                      <span className='text-[10px] font-normal text-muted-foreground'>
-                        {currencyCode}
-                      </span>
-                    </TableCell>
-                  </TableRow>,
-                ]
-              })}
-            </TableBody>
+                  </TableRow>
+                )
+              }
 
-            <tfoot>
-              <tr className='border-t-2 border-primary/20 bg-primary/5'>
-                <td
-                  colSpan={7}
-                  className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 text-right font-bold tracking-wide text-foreground uppercase'
-                >
-                  Total général
-                </td>
-                <td className='px-4 py-2.5 text-sm align-top whitespace-normal break-words border-r border-border/20 last:border-r-0 text-right font-bold text-primary tabular-nums'>
-                  {fmt(totalGeneral)}{' '}
-                  <span className='text-xs font-normal text-muted-foreground'>
-                    {currencyCode}
-                  </span>
-                </td>
-              </tr>
-            </tfoot>
-          </Table>
-        </div>
+              const span = row.groupKey
+                ? (groupSpans.get(row.groupKey) ?? 1)
+                : 1
+
+              const first =
+                rows.findIndex((r) => r.groupKey === row.groupKey) === i
+
+              return (
+                <TableRow key={i}>
+                  {first && (
+                    <TableCell rowSpan={span}>
+                      {row.ptba?.code_activite_ptba}
+                    </TableCell>
+                  )}
+
+                  {first && (
+                    <TableCell rowSpan={span}>
+                      {row.ptba?.intitule_activite_ptba}
+                    </TableCell>
+                  )}
+
+                  <TableCell>{row.cout?.ordre}</TableCell>
+                  <TableCell>{row.cout?.intitule_tache}</TableCell>
+                  <TableCell>{row.cout?.unite_cu}</TableCell>
+                  <TableCell>{row.cout && fmt(row.cout.quantite_cu)}</TableCell>
+                  <TableCell>
+                    {row.cout && fmt(row.cout.prix_unitaire)}
+                  </TableCell>
+
+                  <TableCell>
+                    {row.cout
+                      ? fmt(row.cout.quantite_cu * row.cout.prix_unitaire)
+                      : 'Aucun coût'}
+                  </TableCell>
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
       </CardContent>
     </Card>
   )

@@ -1,6 +1,36 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { GenericTable } from '@/Global/Generic/Generictable'
+import { GenericDeleteDialog } from '@/Global/Tableaux/GenericDeleteDialog'
+import { buildCadreAnalytiqueColumns } from '@/simadou/allColonnes/cadre-analytique-columns'
+import { useGetActeurs } from '@/simadou/allHooks/admin/acteurHooks'
+import {
+  useDeleteCadreAnalytique,
+  useGetCadresAnalytique,
+  useGetNiveauxCadreAnalytique,
+} from '@/simadou/allHooks/admin/cadreAnalytiqueHooks'
+import { useGetAllIndicateursPerformanceProgramme } from '@/simadou/allHooks/admin/indicateurPerformanceProgrammeHooks'
+import type {
+  CadreAnalytique,
+  NiveauCadreAnalytique,
+} from '@/simadou/allTypes/cadreAnalytique'
+import {
+  getNiveauCadreAnalytiqueLibelle,
+  resolveNiveauCaNumber,
+} from '@/simadou/lib/cadreAnalytiqueUtils'
+import { buildIndicateurCountByCadreAnalytiqueId } from '@/simadou/lib/indicateurPerformanceProgrammeUtils'
 import { Plus, Search, Settings } from 'lucide-react'
 import { toast } from 'sonner'
+import {
+  useActiveProgramme,
+  useActiveProgrammeId,
+} from '@/hooks/use-active-programme'
+import useDialogState from '@/hooks/use-dialog-state'
+import { useEmbeddedTableState } from '@/hooks/use-embedded-table-state'
+import {
+  NiveauTabTrigger,
+  NiveauTabsList,
+  useNiveauTabsTheme,
+} from '@/components/ui/NiveauTabs'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import {
@@ -11,38 +41,6 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsContent } from '@/components/ui/tabs'
-import { GenericTable } from '@/Global/Generic/Generictable'
-import { GenericDeleteDialog } from '@/Global/Tableaux/GenericDeleteDialog'
-import useDialogState from '@/hooks/use-dialog-state'
-import { useEmbeddedTableState } from '@/hooks/use-embedded-table-state'
-import {
-  useActiveProgramme,
-  useActiveProgrammeId,
-} from '@/hooks/use-active-programme'
-import type {
-  CadreAnalytique,
-  NiveauCadreAnalytique,
-} from '@/simadou/allTypes/cadreAnalytique'
-import { buildCadreAnalytiqueColumns } from '@/simadou/allColonnes/cadre-analytique-columns'
-import {
-  useDeleteCadreAnalytique,
-  useGetCadresAnalytique,
-  useGetNiveauxCadreAnalytique,
-} from '@/simadou/allHooks/admin/cadreAnalytiqueHooks'
-import { useGetAllIndicateursPerformanceProgramme } from '@/simadou/allHooks/admin/indicateurPerformanceProgrammeHooks'
-import { useGetActeurs } from '@/simadou/allHooks/admin/acteurHooks'
-import {
-  NiveauTabTrigger,
-  NiveauTabsList,
-  useNiveauTabsTheme,
-} from '@/components/ui/NiveauTabs'
-import {
-  filterNiveauxByProgramme,
-  getNiveauCadreAnalytiqueLibelle,
-  resolveNiveauCaNumber,
-  sortNiveauxCadreAnalytique,
-} from '@/simadou/lib/cadreAnalytiqueUtils'
-import { buildIndicateurCountByCadreAnalytiqueId } from '@/simadou/lib/indicateurPerformanceProgrammeUtils'
 import CadreAnalytiqueFormPanel from './CadreAnalytiqueFormPanel'
 import NiveauCadreAnalytiqueDialog from './NiveauCadreAnalytiqueDialog'
 import CadreAnalytiqueIndicateursDialog from './indicateur-performance/CadreAnalytiqueIndicateursDialog'
@@ -139,22 +137,13 @@ export default function ListeCadreAnalytique() {
 
   const { data: niveaux = [], isLoading: isLoadingNiveaux } =
     useGetNiveauxCadreAnalytique()
-  const { data: cadres = [], dataUpdatedAt } = useGetCadresAnalytique(programmeId)
+  const { data: cadres = [], dataUpdatedAt } = useGetCadresAnalytique()
   const { data: acteurs = [] } = useGetActeurs()
-  const deleteMutation = useDeleteCadreAnalytique(programmeId)
+  const deleteMutation = useDeleteCadreAnalytique()
 
-  const sortedNiveaux = useMemo(
-    () =>
-      sortNiveauxCadreAnalytique(
-        filterNiveauxByProgramme(niveaux, codeProgramme, programmeId)
-      ),
-    [niveaux, codeProgramme, programmeId]
-  )
-
-  const hasNiveaux = sortedNiveaux.length > 0
-  const { data: allIndicateurs = [] } = useGetAllIndicateursPerformanceProgramme(
-    hasNiveaux
-  )
+  const hasNiveaux = niveaux.length > 0
+  const { data: allIndicateurs = [] } =
+    useGetAllIndicateursPerformanceProgramme(hasNiveaux)
   const { tabsStyle } = useNiveauTabsTheme()
 
   const [activeNiveauCode, setActiveNiveauCode] = useState<string>('')
@@ -162,15 +151,51 @@ export default function ListeCadreAnalytique() {
   const [searchTerm, setSearchTerm] = useState('')
   const [showForm, setShowForm] = useState(false)
   const [showNiveauxDialog, setShowNiveauxDialog] = useState(false)
-  const [selectedCadre, setSelectedCadre] = useState<CadreAnalytique | null>(null)
+  const [selectedCadre, setSelectedCadre] = useState<CadreAnalytique | null>(
+    null
+  )
   const [deleteOpen, setDeleteOpen] = useDialogState<'delete'>(null)
-  const [cadreToDelete, setCadreToDelete] = useState<CadreAnalytique | null>(null)
+  const [cadreToDelete, setCadreToDelete] = useState<CadreAnalytique | null>(
+    null
+  )
   const [cadreForIndicateurs, setCadreForIndicateurs] =
     useState<CadreAnalytique | null>(null)
   const [showIndicateursDialog, setShowIndicateursDialog] = useState(false)
 
   // Ajouter un state pour suivre le programme actif
   const [currentProgramme, setCurrentProgramme] = useState(codeProgramme)
+
+  const handleTabChange = useCallback(
+    (value: string) => {
+      setActiveNiveauCode(value)
+
+      // Convertir en nombre et vérifier que c'est valide
+      const index = Number(value) - 1
+
+      // Vérifier que l'index est valide
+      if (index >= 0 && index < niveaux.length) {
+        const niveau = niveaux[index]
+        if (niveau && niveau.id_nca != null) {
+          setActiveNiveauId(niveau.id_nca)
+          console.log('Niveau sélectionné:', niveau.id_nca)
+        } else {
+          console.warn("Niveau invalide à l'index:", index)
+          setActiveNiveauId(0)
+        }
+      } else {
+        console.warn(
+          'Index de niveau invalide:',
+          index,
+          'Total niveaux:',
+          niveaux.length
+        )
+        setActiveNiveauId(0)
+      }
+
+      setSearchTerm('')
+    },
+    [niveaux]
+  )
 
   useEffect(() => {
     // Si le programme a changé, réinitialiser tout
@@ -184,8 +209,8 @@ export default function ListeCadreAnalytique() {
 
   // Effet pour sélectionner le premier niveau
   useEffect(() => {
-    if (sortedNiveaux.length > 0 && activeNiveauCode === '') {
-      const premierNiveau = sortedNiveaux[0]
+    if (niveaux.length > 0 && activeNiveauCode === '') {
+      const premierNiveau = niveaux[0]
       if (premierNiveau && premierNiveau.nombre_nca != null) {
         const code = String(premierNiveau.nombre_nca)
         setActiveNiveauCode(code)
@@ -193,9 +218,9 @@ export default function ListeCadreAnalytique() {
         handleTabChange(code)
       }
     }
-  }, [codeProgramme, sortedNiveaux, activeNiveauCode])
+  }, [codeProgramme, niveaux, activeNiveauCode])
   const currentNiveauCode = Number(
-    activeNiveauCode || sortedNiveaux[0]?.nombre_nca || 0
+    activeNiveauCode || niveaux[0]?.nombre_nca || 0
   )
 
   const currentNiveauLibelle = useMemo(() => {
@@ -219,10 +244,8 @@ export default function ListeCadreAnalytique() {
 
   const maxNiveauCodeNumber = useMemo(
     () =>
-      sortedNiveaux.length > 0
-        ? Number(sortedNiveaux[sortedNiveaux.length - 1].nombre_nca)
-        : 0,
-    [sortedNiveaux]
+      niveaux.length > 0 ? Number(niveaux[niveaux.length - 1].nombre_nca) : 0,
+    [niveaux]
   )
 
   const indicateurCountByCadreId = useMemo(
@@ -239,30 +262,6 @@ export default function ListeCadreAnalytique() {
     setCadreForIndicateurs(cadre)
     setShowIndicateursDialog(true)
   }, [])
-
-  const handleTabChange = useCallback((value: string) => {
-    setActiveNiveauCode(value)
-
-    // Convertir en nombre et vérifier que c'est valide
-    const index = Number(value) - 1
-
-    // Vérifier que l'index est valide
-    if (index >= 0 && index < sortedNiveaux.length) {
-      const niveau = sortedNiveaux[index]
-      if (niveau && niveau.id_nca != null) {
-        setActiveNiveauId(niveau.id_nca)
-        console.log('Niveau sélectionné:', niveau.id_nca)
-      } else {
-        console.warn('Niveau invalide à l\'index:', index)
-        setActiveNiveauId(0)
-      }
-    } else {
-      console.warn('Index de niveau invalide:', index, 'Total niveaux:', sortedNiveaux.length)
-      setActiveNiveauId(0)
-    }
-
-    setSearchTerm('')
-  }, [sortedNiveaux])
 
   const handleEdit = useCallback((cadre: CadreAnalytique) => {
     setSelectedCadre(cadre)
@@ -296,7 +295,8 @@ export default function ListeCadreAnalytique() {
     return (
       <Card className='border-dashed p-6 text-center'>
         <p className='text-sm text-muted-foreground'>
-          Sélectionnez un programme dans l&apos;en-tête pour gérer le cadre analytique.
+          Sélectionnez un programme dans l&apos;en-tête pour gérer le cadre
+          analytique.
         </p>
       </Card>
     )
@@ -317,8 +317,8 @@ export default function ListeCadreAnalytique() {
           <Settings className='mx-auto mb-4 h-10 w-10 text-muted-foreground' />
           <h3 className='mb-2 text-lg font-semibold'>Configuration requise</h3>
           <p className='mb-4 text-sm text-muted-foreground'>
-            Veuillez d&apos;abord configurer les niveaux du cadre analytique avant
-            de pouvoir ajouter des cadres.
+            Veuillez d&apos;abord configurer les niveaux du cadre analytique
+            avant de pouvoir ajouter des cadres.
           </p>
           <Button type='button' onClick={() => setShowNiveauxDialog(true)}>
             <Settings className='h-4 w-4' />
@@ -340,14 +340,14 @@ export default function ListeCadreAnalytique() {
         orientation='vertical'
         className='gap-1 space-y-1'
         style={tabsStyle}
-        key={sortedNiveaux.length}
+        key={niveaux.length}
         value={String(currentNiveauCode)}
         onValueChange={handleTabChange}
       >
         <div className='flex items-center justify-between gap-2'>
           <div className='flex-1 overflow-x-auto'>
             <NiveauTabsList>
-              {sortedNiveaux.map((n) => (
+              {niveaux.map((n) => (
                 <NiveauTabTrigger
                   key={n.nombre_nca}
                   value={String(n.nombre_nca)}
@@ -376,15 +376,12 @@ export default function ListeCadreAnalytique() {
           </div>
         </div>
 
-        {sortedNiveaux.map((n) => (
-          <TabsContent
-            key={n.id_nca}
-            value={String(n.nombre_nca)}
-          >
+        {niveaux.map((n) => (
+          <TabsContent key={n.id_nca} value={String(n.nombre_nca)}>
             {Number(n.nombre_nca) === currentNiveauCode && (
               <CadreAnalytiqueNiveauTable
                 niveauCodeNumber={Number(n.id_nca)}
-                niveaux={sortedNiveaux}
+                niveaux={niveaux}
                 cadres={cadres}
                 acteurs={acteurs}
                 searchTerm={searchTerm}
@@ -415,14 +412,19 @@ export default function ListeCadreAnalytique() {
                 setDeleteOpen(null)
               },
               onError: () =>
-                toast.error('Erreur lors de la suppression du cadre analytique'),
+                toast.error(
+                  'Erreur lors de la suppression du cadre analytique'
+                ),
             })
           }
         />
       )}
 
       <Dialog open={showForm} onOpenChange={(o) => !o && handleCloseForm()}>
-        <DialogContent className='gap-0 overflow-hidden p-0 sm:max-w-3xl' aria-describedby={undefined}>
+        <DialogContent
+          className='gap-0 overflow-hidden p-0 sm:max-w-3xl'
+          aria-describedby={undefined}
+        >
           <DialogHeader className='border-b px-4 py-3'>
             <DialogTitle>
               {selectedCadre

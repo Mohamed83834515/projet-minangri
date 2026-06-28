@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useGetCadresAnalytique, useGetNiveauxCadreAnalytique } from '@/simadou/allHooks/admin/cadreAnalytiqueHooks'
 import { useGetCoutsUnitaires } from '@/simadou/allHooks/admin/coutUnitairePtbaHooks'
 import { useGetAllIndicateursTache } from '@/simadou/allHooks/admin/indicateurTacheHooks'
 import { useGetPtbas } from '@/simadou/allHooks/admin/ptbaHooks'
@@ -37,6 +38,10 @@ export default function RapportPtbaPage() {
     useGetAllIndicateursTache()
   const { data: allCouts = [], isLoading: coutsLoading } =
     useGetCoutsUnitaires()
+  const { data: niveaux = [], isLoading: niveauxCaLoading } =
+    useGetNiveauxCadreAnalytique()
+  const { data: cadresAnalaytiques = [], isLoading: caLoading } =
+    useGetCadresAnalytique()
   const { data: config } = useGeneralParamsQuery()
   const currencyCode = config?.currencyCode
 
@@ -91,9 +96,16 @@ export default function RapportPtbaPage() {
   }, [allCouts, activiteIds])
 
   const isLoading =
-    ptbasLoading || tachesLoading || indicateursLoading || coutsLoading
+    ptbasLoading ||
+    tachesLoading ||
+    indicateursLoading ||
+    coutsLoading ||
+    niveauxCaLoading ||
+    caLoading
 
   const rapportData: RapportPtbaData = {
+    niveaux,
+    cadresAnalaytiques,
     ptbas,
     taches,
     indicateurs,

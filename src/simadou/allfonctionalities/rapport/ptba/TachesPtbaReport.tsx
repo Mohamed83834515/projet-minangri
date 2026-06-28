@@ -5,10 +5,16 @@ export function TachesPtbaReport({
   ptbas,
   taches,
   isLoading,
+  cadresAnalaytiques,
 }: RapportPtbaData) {
   return (
     <div className='space-y-4'>
-      <TachesTable ptbas={ptbas} taches={taches} isLoading={isLoading} />
+      <TachesTable
+        cadresAnalytiques={cadresAnalaytiques}
+        ptbas={ptbas}
+        taches={taches}
+        isLoading={isLoading}
+      />
     </div>
   )
 }

@@ -1,12 +1,20 @@
-import type { Ptba, TacheActivitePtba, CoutUnitairePtba } from '@/simadou/allTypes'
-import { IndicateurTache } from '@/simadou/allTypes/indicateurTache'
+import type {
+  Ptba,
+  TacheActivitePtba,
+  CoutUnitairePtba,
+  CadreAnalytique,
+  NiveauCadreAnalytique,
+} from '@/simadou/allTypes'
+import { type IndicateurTache } from '@/simadou/allTypes/indicateurTache'
 
 export interface RapportPtbaData {
+  niveaux: NiveauCadreAnalytique[]
+  cadresAnalaytiques: CadreAnalytique[]
   ptbas: Ptba[]
   taches: TacheActivitePtba[]
   indicateurs: IndicateurTache[]
   couts: CoutUnitairePtba[]
-  currencyCode?:string
+  currencyCode?: string
   isLoading: boolean
   selectedVersionId: string | null
   onVersionChange: (versionId: string) => void

@@ -1,4 +1,8 @@
-import type { RapportExportColumn, RapportExportDocumentMeta } from './rapportExportTypes'
+import type {
+  RapportExportColumn,
+  RapportExportDocumentMeta,
+  RapportExportRowMeta,
+} from './rapportExportTypes'
 
 export function slugifyRapportTitle(title: string): string {
   return title
@@ -9,7 +13,9 @@ export function slugifyRapportTitle(title: string): string {
     .replace(/^-+|-+$/g, '')
 }
 
-export function buildRapportDocumentMeta(pageTitle: string): RapportExportDocumentMeta {
+export function buildRapportDocumentMeta(
+  pageTitle: string
+): RapportExportDocumentMeta {
   const generatedAt = new Date().toLocaleString('fr-FR', {
     day: '2-digit',
     month: 'long',
@@ -19,7 +25,9 @@ export function buildRapportDocumentMeta(pageTitle: string): RapportExportDocume
   })
 
   return {
-    title: pageTitle.startsWith('Rapport') ? pageTitle : `Rapport — ${pageTitle}`,
+    title: pageTitle.startsWith('Rapport')
+      ? pageTitle
+      : `Rapport — ${pageTitle}`,
     subtitle: `Généré le ${generatedAt}`,
     filenameSlug: slugifyRapportTitle(pageTitle),
   }
@@ -28,14 +36,25 @@ export function buildRapportDocumentMeta(pageTitle: string): RapportExportDocume
 export function filterExportRows(
   rows: string[][],
   columns: RapportExportColumn[],
-  visibleColumnIds?: string[]
-): { columns: RapportExportColumn[]; rows: string[][] } {
+  visibleColumnIds?: string[],
+  rowMetas?: RapportExportRowMeta[]
+): {
+  columns: RapportExportColumn[]
+  rows: string[][]
+  rowMetas?: RapportExportRowMeta[]
+} {
   if (!visibleColumnIds?.length || visibleColumnIds.length === columns.length) {
-    return { columns, rows }
+    return {
+      columns,
+      rows,
+      rowMetas,
+    }
   }
 
   const visible = new Set(visibleColumnIds)
+
   const visibleColumns = columns.filter((column) => visible.has(column.id))
+
   const indices = visibleColumns.map((column) =>
     columns.findIndex((source) => source.id === column.id)
   )
@@ -43,6 +62,7 @@ export function filterExportRows(
   return {
     columns: visibleColumns,
     rows: rows.map((row) => indices.map((index) => row[index] ?? '')),
+    rowMetas,
   }
 }
 
@@ -58,4 +78,23 @@ export function downloadBlob(blob: Blob, filename: string) {
 export function buildExportFilename(slug: string, extension: string): string {
   const date = new Date().toISOString().slice(0, 10)
   return `${slug}_${date}.${extension}`
+}
+
+export function detectAlignment(value: unknown): 'left' | 'center' {
+  if (value == null) return 'left'
+
+  // number réel
+  if (typeof value === 'number' && !isNaN(value)) {
+    return 'center'
+  }
+
+  // string numérique ("123", "12.5", "1 200")
+  if (typeof value === 'string') {
+    const normalized = value.replace(/\s/g, '').replace(',', '.')
+    if (!isNaN(Number(normalized)) && normalized !== '') {
+      return 'center'
+    }
+  }
+
+  return 'left'
 }

@@ -1,23 +1,23 @@
-import { useMemo } from "react"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { DIALOG_SIZES } from "@/Global/Forms/dialog"
-import { StepDynamicForm } from "@/Global/Forms/StepDynamicForm"
-import { getApiErrorMessage } from "@/lib/api-error-message"
-import { useActiveProgrammeCode, useActiveProgrammeId } from "@/hooks/use-active-programme"
-import { usePtbaVersionSelection } from "@/simadou/allHooks/admin/versionHooks"
-import { getPtbaFormConfig } from "@/simadou/allfieldsConfig/ptbaForm"
+import { useMemo } from 'react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { StepDynamicForm } from '@/Global/Forms/StepDynamicForm'
+import { DIALOG_SIZES } from '@/Global/Forms/dialog'
 import {
   useGetCadresAnalytique,
   useGetNiveauxCadreAnalytique,
-} from "@/simadou/allHooks/admin/cadreAnalytiqueHooks"
+} from '@/simadou/allHooks/admin/cadreAnalytiqueHooks'
+import { usePtbaVersionSelection } from '@/simadou/allHooks/admin/versionHooks'
+import ptbaService from '@/simadou/allSercices/ptbaService'
+import {
+  type Acteur,
+  type Localite,
+  type Ptba,
+} from '@/simadou/allTypes/entities'
+import { getPtbaFormConfig } from '@/simadou/allfieldsConfig/ptbaForm'
 import {
   buildCadreAnalytiqueSelectOptions,
-  filterNiveauxByProgramme,
   getPtbaCadreAnalytiqueNiveauCode,
-  sortNiveauxCadreAnalytique,
-} from "@/simadou/lib/cadreAnalytiqueUtils"
-import ptbaService from "@/simadou/allSercices/ptbaService"
-import { Acteur, Localite, Ptba } from "@/simadou/allTypes/entities"
+} from '@/simadou/lib/cadreAnalytiqueUtils'
 import {
   resolveCadreAnalytiqueFormValue,
   resolveCodeCrpFormValue,
@@ -25,29 +25,34 @@ import {
   resolveTypeActiviteFormValue,
   resolveUglPtbaFormValue,
   resolveVersionPtbaFormValue,
-} from "@/simadou/lib/ptbaFormUtils"
-import { PtbaFormData, ptbaSchema } from "@/simadou/schemas/ptbaSchemas"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import {toast} from "sonner"
+} from '@/simadou/lib/ptbaFormUtils'
+import { type PtbaFormData, ptbaSchema } from '@/simadou/schemas/ptbaSchemas'
+import { toast } from 'sonner'
+import { getApiErrorMessage } from '@/lib/api-error-message'
+import { useActiveProgrammeCode } from '@/hooks/use-active-programme'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+
 export interface OpenPropsPTBA {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  currentRow?: Ptba | null;
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  currentRow?: Ptba | null
 }
 const AddPtba = ({ open, onOpenChange, currentRow }: OpenPropsPTBA) => {
   const isEdit = !!currentRow?.id_ptba
-  const codeProgramme = useActiveProgrammeCode();
-  const programmeId = useActiveProgrammeId()
+  const codeProgramme = useActiveProgrammeCode()
   const { selectedVersionId } = usePtbaVersionSelection(codeProgramme)
-  const { data: cadresAnalytique = [] } = useGetCadresAnalytique(programmeId)
+  const { data: cadresAnalytique = [] } = useGetCadresAnalytique()
   const { data: niveaux = [] } = useGetNiveauxCadreAnalytique()
 
   const ptbaNiveauCode = useMemo(() => {
-    const sortedNiveaux = sortNiveauxCadreAnalytique(
-      filterNiveauxByProgramme(niveaux, codeProgramme, programmeId)
-    )
-    return getPtbaCadreAnalytiqueNiveauCode(sortedNiveaux)
-  }, [niveaux, codeProgramme, programmeId])
+    return getPtbaCadreAnalytiqueNiveauCode(niveaux)
+  }, [niveaux])
 
   const selectedCadreId = useMemo(
     () =>
@@ -70,43 +75,52 @@ const AddPtba = ({ open, onOpenChange, currentRow }: OpenPropsPTBA) => {
     () => getPtbaFormConfig(cadreAnalytiqueOptions),
     [cadreAnalytiqueOptions]
   )
-  const defaultValues = useMemo((): PtbaFormData => ({
-    localites_ptba:
-      typeof currentRow?.localites_ptba === "object"
-        ? (currentRow?.localites_ptba as Localite[]).map(l => l.id_loca)
-        : [],
+  const defaultValues = useMemo(
+    (): PtbaFormData => ({
+      localites_ptba:
+        typeof currentRow?.localites_ptba === 'object'
+          ? (currentRow?.localites_ptba as Localite[]).map((l) => l.id_loca)
+          : [],
 
-    partenaire_conserne_ptba:
-      typeof currentRow?.partenaire_conserne_ptba === "object"
-        ? (currentRow?.partenaire_conserne_ptba as Acteur[]).map(p => p.id_acteur)
-        : [],
+      partenaire_conserne_ptba:
+        typeof currentRow?.partenaire_conserne_ptba === 'object'
+          ? (currentRow?.partenaire_conserne_ptba as Acteur[]).map(
+              (p) => p.id_acteur
+            )
+          : [],
 
-    code_activite_ptba: currentRow?.code_activite_ptba || "",
-    intitule_activite_ptba: currentRow?.intitule_activite_ptba || "",
+      code_activite_ptba: currentRow?.code_activite_ptba || '',
+      intitule_activite_ptba: currentRow?.intitule_activite_ptba || '',
 
-    chronogramme: currentRow?.chronogramme || "",
-    observation: currentRow?.observation || "",
+      chronogramme: currentRow?.chronogramme || '',
+      observation: currentRow?.observation || '',
 
-    code_crp: resolveCodeCrpFormValue(currentRow?.code_crp),
+      code_crp: resolveCodeCrpFormValue(currentRow?.code_crp),
 
-    cadre_analytique: resolveCadreAnalytiqueFormValue(
-      currentRow?.cadre_analytique,
-      cadresAnalytique
-    ),
+      cadre_analytique: resolveCadreAnalytiqueFormValue(
+        currentRow?.cadre_analytique,
+        cadresAnalytique
+      ),
 
-    responsable_ptba: resolveResponsablePtbaFormValue(currentRow ?? undefined),
-    ugl_ptba: resolveUglPtbaFormValue(currentRow ?? undefined),
+      responsable_ptba: resolveResponsablePtbaFormValue(
+        currentRow ?? undefined
+      ),
+      ugl_ptba: resolveUglPtbaFormValue(currentRow ?? undefined),
 
-    version_ptba:
-      resolveVersionPtbaFormValue(currentRow ?? undefined, selectedVersionId) ??
-      0,
+      version_ptba:
+        resolveVersionPtbaFormValue(
+          currentRow ?? undefined,
+          selectedVersionId
+        ) ?? 0,
 
-    code_programme: currentRow?.code_programme || codeProgramme,
+      code_programme: currentRow?.code_programme || codeProgramme,
 
-    statut_activite: currentRow?.statut_activite || "En construction",
+      statut_activite: currentRow?.statut_activite || 'En construction',
 
-    type_activite: resolveTypeActiviteFormValue(currentRow?.type_activite),
-  }), [currentRow, codeProgramme, selectedVersionId, cadresAnalytique])
+      type_activite: resolveTypeActiviteFormValue(currentRow?.type_activite),
+    }),
+    [currentRow, codeProgramme, selectedVersionId, cadresAnalytique]
+  )
   const queryClient = useQueryClient()
   const mutation = useMutation({
     mutationFn: (data: PtbaFormData) =>
@@ -116,13 +130,11 @@ const AddPtba = ({ open, onOpenChange, currentRow }: OpenPropsPTBA) => {
 
     onSuccess: async () => {
       toast.success(
-        isEdit
-          ? "Activité modifiée avec succès"
-          : "Activité créée avec succès"
+        isEdit ? 'Activité modifiée avec succès' : 'Activité créée avec succès'
       )
       await queryClient.invalidateQueries({
-      queryKey: ["ptba-activites-all"],
-    })
+        queryKey: ['ptba-activites-all'],
+      })
       onOpenChange(false)
     },
 
@@ -131,8 +143,8 @@ const AddPtba = ({ open, onOpenChange, currentRow }: OpenPropsPTBA) => {
         getApiErrorMessage(
           error,
           isEdit
-            ? "Erreur lors de la modification"
-            : "Erreur lors de la création"
+            ? 'Erreur lors de la modification'
+            : 'Erreur lors de la création'
         )
       )
     },
@@ -164,7 +176,7 @@ const AddPtba = ({ open, onOpenChange, currentRow }: OpenPropsPTBA) => {
       <DialogContent className={DIALOG_SIZES.xl}>
         <DialogHeader>
           <DialogTitle>
-            {isEdit ? "Modifier une Activité" : "Ajouter une Activité"}
+            {isEdit ? 'Modifier une Activité' : 'Ajouter une Activité'}
           </DialogTitle>
           <DialogDescription>
             {isEdit
@@ -174,14 +186,14 @@ const AddPtba = ({ open, onOpenChange, currentRow }: OpenPropsPTBA) => {
         </DialogHeader>
 
         <StepDynamicForm
-          key={`${currentRow?.id_ptba ?? "new"}-${open}`}
+          key={`${currentRow?.id_ptba ?? 'new'}-${open}`}
           config={formConfig}
           schema={ptbaSchema}
           defaultValues={defaultValues}
           onSubmit={onSubmit}
           isLoading={mutation.isPending}
-          submitText={isEdit ? "Modifier" : "Ajouter"}
-          loadingText={isEdit ? "Modification..." : "Ajout en cours..."}
+          submitText={isEdit ? 'Modifier' : 'Ajouter'}
+          loadingText={isEdit ? 'Modification...' : 'Ajout en cours...'}
         />
       </DialogContent>
     </Dialog>

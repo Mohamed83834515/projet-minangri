@@ -1,18 +1,18 @@
 import ExcelJS from 'exceljs'
 import {
-  buildExportFilename,
-  buildRapportDocumentMeta,
-  downloadBlob,
-  filterExportRows,
-} from './rapportExportUtils'
-import type { RapportExportPayload } from './rapportExportTypes'
-import {
   estimateExcelColumnWidth,
   estimateExcelRowHeight,
   estimateSubtitleRowHeight,
-  EXPORT_CELL_ALIGN,
 } from './rapportExportLayout'
 import { hexArgb, RAPPORT_EXPORT_THEME as theme } from './rapportExportTheme'
+import type { RapportExportPayload } from './rapportExportTypes'
+import {
+  buildExportFilename,
+  buildRapportDocumentMeta,
+  detectAlignment,
+  downloadBlob,
+  filterExportRows,
+} from './rapportExportUtils'
 
 function applyHeaderStyle(cell: ExcelJS.Cell) {
   cell.font = { bold: true, color: { argb: hexArgb(theme.white) }, size: 11 }
@@ -30,11 +30,9 @@ function applyHeaderStyle(cell: ExcelJS.Cell) {
   }
 }
 
-function applyBodyStyle(
-  cell: ExcelJS.Cell,
-  shaded: boolean,
-  horizontal: 'left' | 'center' | 'right'
-) {
+function applyBodyStyle(cell: ExcelJS.Cell, shaded: boolean, value: unknown) {
+  const horizontal = detectAlignment(value)
+
   cell.alignment = {
     vertical: 'middle',
     horizontal,
@@ -57,10 +55,11 @@ function applyBodyStyle(
 export async function exportRapportExcel(payload: RapportExportPayload) {
   const meta = buildRapportDocumentMeta(payload.pageTitle)
 
-  const { columns, rows } = filterExportRows(
+  const { columns, rows, rowMetas } = filterExportRows(
     payload.rows,
     payload.columns,
-    payload.visibleColumnIds
+    payload.visibleColumnIds,
+    payload.rowMetas
   )
 
   const workbook = new ExcelJS.Workbook()
@@ -78,13 +77,21 @@ export async function exportRapportExcel(payload: RapportExportPayload) {
 
   const titleCell = sheet.getCell(1, 1)
   titleCell.value = meta.title
-  titleCell.font = { bold: true, size: 18, color: { argb: hexArgb(theme.white) } }
+  titleCell.font = {
+    bold: true,
+    size: 18,
+    color: { argb: hexArgb(theme.white) },
+  }
   titleCell.fill = {
     type: 'pattern',
     pattern: 'solid',
     fgColor: { argb: hexArgb(theme.green) },
   }
-  titleCell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true }
+  titleCell.alignment = {
+    vertical: 'middle',
+    horizontal: 'center',
+    wrapText: true,
+  }
   sheet.getRow(1).height = 34
 
   const subtitleCell = sheet.getCell(2, 1)
@@ -95,7 +102,11 @@ export async function exportRapportExcel(payload: RapportExportPayload) {
     pattern: 'solid',
     fgColor: { argb: hexArgb(theme.greenLight) },
   }
-  subtitleCell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true }
+  subtitleCell.alignment = {
+    vertical: 'middle',
+    horizontal: 'center',
+    wrapText: true,
+  }
   sheet.getRow(2).height = estimateSubtitleRowHeight(meta.subtitle, colCount)
 
   const stripeCell = sheet.getCell(3, 1)
@@ -109,7 +120,12 @@ export async function exportRapportExcel(payload: RapportExportPayload) {
 
   const columnWidths = columns.map((column, index) => {
     const values = rows.map((row) => row[index] ?? '')
-    return estimateExcelColumnWidth(column.header, values, column.width ?? 16, 52)
+    return estimateExcelColumnWidth(
+      column.header,
+      values,
+      column.width ?? 16,
+      52
+    )
   })
 
   columnWidths.forEach((width, index) => {
@@ -124,14 +140,96 @@ export async function exportRapportExcel(payload: RapportExportPayload) {
   })
   headerRow.height = 28
 
+  // PRE-PASS : calcul des rowSpans par groupKey
+  const groupSpans = new Map<string | number, number>()
+  const groupSeen = new Set<string | number>()
+
+  rows.forEach((_, i) => {
+    const rowMeta = rowMetas?.[i]
+    if (!rowMeta || rowMeta.type !== 'data') return
+    if (!rowMeta.groupKey) return
+    groupSpans.set(
+      rowMeta.groupKey,
+      (groupSpans.get(rowMeta.groupKey) ?? 0) + 1
+    )
+  })
+
   rows.forEach((row, rowIndex) => {
+    const rowMeta = rowMetas?.[rowIndex]
     const excelRow = sheet.getRow(6 + rowIndex)
     const isAlt = rowIndex % 2 === 1
 
+    // ── SECTION ROW (cadre analytique) 
+    if (rowMeta?.type === 'section') {
+      const startCol = (rowMeta.niveau ?? 1) + 1
+      const colCount = columns.length
+      const rowNumber = 6 + rowIndex
+
+      sheet.mergeCells(rowNumber, startCol, rowNumber, colCount)
+
+      const cell = excelRow.getCell(startCol)
+      cell.value = rowMeta.label ?? ''
+
+      applyBodyStyle(cell, false, cell.value)
+      cell.font = { bold: true, size: 10, color: { argb: hexArgb(theme.text) } }
+
+      excelRow.height = 22
+      return
+    }
+
+    // ── DATA ROW avec groupKey (code + activité fusionnés verticalement) ──
+    //
+    //   - première occurrence du groupKey → on fusionne les cellules des
+    //     colonnes 0 et 1 sur `span` lignes, on écrit toutes les valeurs
+    //   - occurrences suivantes → on saute les colonnes 0 et 1 (déjà
+    //     couvertes par la fusion), on écrit uniquement les autres colonnes
+    if (rowMeta?.type === 'data' && rowMeta.groupKey != null) {
+      const groupKey = rowMeta.groupKey
+      const isFirst = !groupSeen.has(groupKey)
+
+      if (isFirst) {
+        groupSeen.add(groupKey)
+        const span = groupSpans.get(groupKey) ?? 1
+        const rowNumber = 6 + rowIndex
+
+        // Fusion verticale des colonnes code (1) et activité (2)
+        if (span > 1) {
+          sheet.mergeCells(rowNumber, 1, rowNumber + span - 1, 1)
+          sheet.mergeCells(rowNumber, 2, rowNumber + span - 1, 2)
+        }
+
+        // Écriture de toutes les colonnes
+        row.forEach((value, colIndex) => {
+          const cell = excelRow.getCell(colIndex + 1)
+          cell.value = value
+          applyBodyStyle(cell, isAlt, value)
+
+          // Centrage vertical explicite pour les cellules fusionnées
+          if ((colIndex === 0 || colIndex === 1) && span > 1) {
+            cell.alignment = { ...cell.alignment, vertical: 'middle' }
+          }
+        })
+      } else {
+        // Lignes suivantes du groupe : colonnes 0 et 1 appartiennent à la
+        // fusion — on ne les touche pas. On écrit uniquement les autres.
+        row.forEach((value, colIndex) => {
+          if (colIndex === 0 || colIndex === 1) return
+
+          const cell = excelRow.getCell(colIndex + 1)
+          cell.value = value
+          applyBodyStyle(cell, isAlt, value)
+        })
+      }
+
+      excelRow.height = estimateExcelRowHeight(row, columnWidths)
+      return
+    }
+
+    // NORMAL ROW
     row.forEach((value, colIndex) => {
       const cell = excelRow.getCell(colIndex + 1)
       cell.value = value
-      applyBodyStyle(cell, isAlt, EXPORT_CELL_ALIGN)
+      applyBodyStyle(cell, isAlt, cell.value)
     })
 
     excelRow.height = estimateExcelRowHeight(row, columnWidths)

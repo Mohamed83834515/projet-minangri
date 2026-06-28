@@ -19,7 +19,9 @@ type RapportExportContextValue = {
   setExportPayload: (payload: RapportExportRegistration | null) => void
 }
 
-const RapportExportContext = createContext<RapportExportContextValue | null>(null)
+const RapportExportContext = createContext<RapportExportContextValue | null>(
+  null
+)
 
 type ProviderProps = {
   pageTitle: string
@@ -62,6 +64,7 @@ export function RapportExportProvider({ pageTitle, children }: ProviderProps) {
       rows: table.rows,
       visibleColumnIds: table.visibleColumnIds,
       isLoading: registration.isLoading,
+      rowMetas: table.rowMetas ?? [],
     }
   }, [])
 
@@ -85,7 +88,9 @@ export function RapportExportProvider({ pageTitle, children }: ProviderProps) {
 export function useRapportExport() {
   const context = useContext(RapportExportContext)
   if (!context) {
-    throw new Error('useRapportExport must be used within RapportExportProvider')
+    throw new Error(
+      'useRapportExport must be used within RapportExportProvider'
+    )
   }
   return context
 }
