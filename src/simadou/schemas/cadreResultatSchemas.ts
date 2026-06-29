@@ -11,6 +11,9 @@ export const niveauCadreResultatSchema = z.object({
     .string()
     .min(1, "Le libellé est requis")
     .max(100, "Le libellé ne peut pas dépasser 100 caractères"),
+  projet_ncr: z
+    .number()
+    .optional(),
   code_number_ncr: z
     .number()
     .min(1, "Le code numérique est requis")

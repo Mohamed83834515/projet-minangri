@@ -111,7 +111,7 @@ export default function ProjetCadreResultatsPanel({
   const codeProjet = projet.code_projet
   const idProjet = projet.id_projet
   const { data: niveaux = [], isLoading: isLoadingNiveaux } =
-    useGetNiveauxCadreResultat()
+    useGetNiveauxCadreResultat(projet.id_projet)
   const { data: cadres = [], dataUpdatedAt } = useGetCadresResultat(
     projet.code_projet
   )
@@ -318,7 +318,7 @@ export default function ProjetCadreResultatsPanel({
               Définissez les niveaux (Effet, Produit, Impact).
             </DialogDescription>
           </DialogHeader>
-          <NiveauCadreResultatManager />
+          <NiveauCadreResultatManager idProjet={projet.id_projet}  />
         </DialogContent>
       </Dialog>
 

@@ -17,10 +17,10 @@ export const cadreResultatQueryKeys = {
   all: ['cadres-resultat'] as const,
 }
 
-export function useGetNiveauxCadreResultat() {
+export function useGetNiveauxCadreResultat(idProjet: number) {
   return useQuery({
     queryKey: niveauCadreResultatQueryKeys.all,
-    queryFn: () => niveauCadreResultatService.getAll(),
+    queryFn: () => niveauCadreResultatService.getByProjet(idProjet),
   })
 }
 

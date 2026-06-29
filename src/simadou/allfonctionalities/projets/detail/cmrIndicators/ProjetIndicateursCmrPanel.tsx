@@ -46,7 +46,7 @@ type ModalState = 'indicateur' | 'indicateurView'
 export default function ProjetIndicateursCmrPanel({ projet }: { projet: Projet }) {
   const codeProjet = projet.code_projet
   const { data: niveaux = [], isLoading: isLoadingNiveaux } =
-    useGetNiveauxCadreResultat()
+    useGetNiveauxCadreResultat(projet.id_projet)
   const { data: cadresResultat = [] } = useGetCadresResultat(codeProjet)
   const { data: indicateursCadreResultat = [] } = useGetIndicateursCadreResultat()
   const { data: indicateurs = [], dataUpdatedAt: indicateursUpdatedAt } =

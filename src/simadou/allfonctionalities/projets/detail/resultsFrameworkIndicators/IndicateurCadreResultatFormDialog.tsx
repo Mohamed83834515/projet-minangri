@@ -49,7 +49,7 @@ export default function IndicateurCadreResultatFormDialog({
   const updateMutation = useUpdateIndicateurCadreResultat()
   const { data: cadres = [], isLoading: isLoadingCadres } = useGetCadresResultat(codeProjet)
   const { data: niveaux = [], isLoading: isLoadingNiveaux } =
-    useGetNiveauxCadreResultat()
+    useGetNiveauxCadreResultat(idProjet)
   const { data: acteurs = [], isLoading: isLoadingActeurs } = useGetActeurs()
   const { data: personnels = [], isLoading: isLoadingPersonnels } = useGetPersonnels()
   const { data: user } = useMe()

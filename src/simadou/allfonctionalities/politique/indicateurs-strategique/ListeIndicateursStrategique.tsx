@@ -112,7 +112,6 @@ export default function ListeIndicateursStrategique() {
   const { data: cibles = [] } = useGetCiblesIndicateurStrategique()
   const { data: personnels = [] } = useGetPersonnels()
   const deleteMutation = useDeleteIndicateurStrategique()
-  const [activeNiveauId, setActiveNiveauId] = useState<number>(0)
 
   const hasNiveaux = niveaux.length > 0
   const { tabsStyle } = useNiveauTabsTheme()
@@ -195,23 +194,6 @@ export default function ListeIndicateursStrategique() {
   )
   const handleTabChange = useCallback((value: string) => {
     setActiveNiveauCode(value)
-
-    // Convertir en nombre et vérifier que c'est valide
-    const index = Number(value) - 1
-
-    // Vérifier que l'index est valide
-    if (index >= 0 && index < niveaux.length) {
-      const niveau = niveaux[index]
-      if (niveau && niveau.id_nsc != null) {
-        setActiveNiveauId(niveau.id_nsc)
-      } else {
-        setActiveNiveauId(0)
-      }
-    } else {
-      console.warn('Index de niveau invalide:', index, 'Total niveaux:', niveaux.length)
-      setActiveNiveauId(0)
-    }
-
     setSearchTerm('')
   }, [niveaux])
 

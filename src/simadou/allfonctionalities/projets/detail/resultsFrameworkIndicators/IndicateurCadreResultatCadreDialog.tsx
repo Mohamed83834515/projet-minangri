@@ -47,7 +47,7 @@ export default function IndicateurCadreResultatCadreDialog({
 }: Props) {
   const { data: allIndicateurs = [], dataUpdatedAt } =
     useGetIndicateursCadreResultat()
-  const { data: niveaux = [] } = useGetNiveauxCadreResultat()
+  const { data: niveaux = [] } = useGetNiveauxCadreResultat(idProjet)
   const deleteMutation = useDeleteIndicateurCadreResultat()
   const tableState = useEmbeddedTableState()
 
