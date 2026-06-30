@@ -2,7 +2,7 @@ import { apiClient } from "@/axios/api";
 import type { VersionPtba } from "../allTypes";
 import type { VersionPtbaFormData } from "../schemas/ptbaSchemas";
 
-const ENDPOINT = "/version_ptba/";
+const ENDPOINT = "/versions-ptbas/";
 
 const versionPtbaService = {
   async getAll(): Promise<VersionPtba[]> {
