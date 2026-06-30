@@ -296,6 +296,7 @@ export function TachesTable({
             search={{}}
             navigate={navigate}
             showPagination={false}
+            defaultPageSize={rows.length}
             showSearch={false}
             showViewOptions={false}
             customRowRenderer={(row, i, { rowClassName, cellClassName }) => {
@@ -304,7 +305,7 @@ export function TachesTable({
                 const spanColumns = columns.length - emptyColumns
 
                 return (
-                  <TableRow className={rowClassName} key={i}>
+                  <TableRow className={`${rowClassName} font-bold`} key={i}>
                     {Array.from({ length: emptyColumns }).map((_, index) => (
                       <TableCell key={index} className={cellClassName()} />
                     ))}
