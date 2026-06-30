@@ -1,5 +1,6 @@
 import { apiClient } from "@/axios/api";
 import type { VersionPtba } from "../allTypes";
+import type { VersionPtbasProjetsResponse } from "../allTypes/ptbaProjet";
 import type { VersionPtbaFormData } from "../schemas/ptbaSchemas";
 
 const ENDPOINT = "/versions-ptbas/";
@@ -11,6 +12,12 @@ const versionPtbaService = {
 
   async getById(id: number): Promise<VersionPtba> {
     return apiClient.request(`${ENDPOINT}${id}/`, { method: "GET" });
+  },
+
+  async getPtbasProjets(idVersion: number): Promise<VersionPtbasProjetsResponse> {
+    return apiClient.request(`${ENDPOINT}${idVersion}/ptbas-projets/`, {
+      method: "GET",
+    });
   },
 
   async create(data: VersionPtbaFormData, file?: File): Promise<VersionPtba> {

@@ -12,4 +12,15 @@ export interface PtbaProjet extends Ptba {
   version_info?: VersionPtba 
   delais?:number| string
   montant_decaisse_ptba?:number
+  taux_decaissement_ptba?: number
+  ugl_ptba?: string
+  communes_ptba?: number[]
+  source_financement_ptba?: number | null
+}
+
+/** Réponse GET /versions-ptbas/{id}/ptbas-projets/ */
+export interface VersionPtbasProjetsResponse {
+  version: VersionPtba
+  nb_ptbas_projets: number
+  ptbas_projets: PtbaProjet[]
 }

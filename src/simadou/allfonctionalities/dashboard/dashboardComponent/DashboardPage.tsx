@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import { useGetProjets, useGetProjetsFilterVersion } from '@/simadou/allHooks/admin/projetHooks'
+import { useGetProjets } from '@/simadou/allHooks/admin/projetHooks'
 import { useCountProjectsPerType } from '@/simadou/allHooks/admin/typeProjetHooks'
 import {
     useActiveProgrammeCode,
@@ -10,6 +10,7 @@ import { useGetPtbas } from '@/simadou/allHooks/admin/ptbaHooks'
 import {
     useDashboardAnneeSelection,
     useGetAvancementDirections,
+    useGetPtbasProjetsByVersion,
 } from '@/simadou/allHooks/admin/dashboardProgrammeHooks'
 import { formatNumber } from '@/simadou/allSercices/montantFormater'
 import type { ProjetDashboardSource } from '@/simadou/allTypes/dashboardProjet'
@@ -21,6 +22,7 @@ import {
     buildPaoMinagriDashboardStats,
     formatDashboardPercent,
 } from '@/simadou/lib/dashboardPaoStatsUtils'
+import { buildPtbaProjetsDashboardStats } from '@/simadou/lib/dashboardPtbaProjetsStatsUtils'
 import DashboardHeader from './DashboardHeader'
 import ProjectTable from './ProjectTable'
 import StatCard from './StatCard'
@@ -47,11 +49,13 @@ const DashboardPage: React.FC = () => {
         selectedVersion,
     } = useDashboardAnneeSelection(versions)
 
+    const selectedVersionId = selectedVersion?.id_version_ptba
+
     const projetRows = useMemo(
         () => buildProjetDashboardRows(projets as ProjetDashboardSource[]),
         [projets]
     )
-    const { data: projets_versions = [] } = useGetProjetsFilterVersion(3)
+    const { data: ptbasProjetsData } = useGetPtbasProjetsByVersion(selectedVersionId)
     // Filtrage par recherche globale
     const projetRowsFiltered = useMemo(() => {
         if (!searchQuery.trim()) return projetRows
@@ -71,9 +75,12 @@ const DashboardPage: React.FC = () => {
         [projets]
     )
 
-    console.log("selectedVersion", selectedVersion)
-    console.log("projets_versions", projets_versions)
-    // Données pour la carte 2 : PAO Programme (avec données fictives pour montants)
+    // Données pour la carte 2 : PTBA Projets/Programmes
+    const ptbaProjetsStats = useMemo(
+        () => buildPtbaProjetsDashboardStats(ptbasProjetsData, selectedAnnee),
+        [ptbasProjetsData, selectedAnnee]
+    )
+
     const notifications = useMemo(
         () => [
             {
@@ -104,21 +111,11 @@ const DashboardPage: React.FC = () => {
         () =>
             buildPaoMinagriDashboardStats(
                 ptbas,
-                selectedVersion?.id_version_ptba,
+                selectedVersionId,
                 selectedAnnee
             ),
-        [ptbas]
+        [ptbas, selectedVersionId, selectedAnnee]
     )
-
-    // const paoMinagriStats = useMemo(
-    //     () =>
-    //         buildPtbaDashboardStats(
-    //             projets,
-    //             selectedVersion?.id_version_ptba,
-    //             selectedAnnee
-    //         ),
-    //     [ptbas, selectedVersion, selectedAnnee]
-    // )
 
     // Données pour la carte 4 : Points de blocage (fictives car pas dans ton API)
     const pointsBlocageStats = useMemo(() => {
@@ -214,28 +211,29 @@ const DashboardPage: React.FC = () => {
 
                 {/* Carte 2 : PAO Programme */}
                 <StatCard
-                    title={`PTBA 2025 des Projets/Programmes`}
+                    title={`PTBA ${ptbaProjetsStats.annee} des Projets/Programmes`}
                     color='emerald'
                     rows={[
                         {
                             label: 'Montant Total Prévu',
-                            value: 8000000,
+                            value: formatNumber(ptbaProjetsStats.montantTotalPrevu),
                             suffix: 'GNF',
                         },
                         {
                             label: 'Montant Total Décaissé',
-                            value: 900000000,
-                            suffix: `(60%) GNF`,
+                            value: formatNumber(ptbaProjetsStats.montantTotalDecaisse),
+                            suffix: `(${formatDashboardPercent(ptbaProjetsStats.tauxDecaissement)}%) GNF`,
                             valueColor: 'emerald',
                         },
                         {
                             label: "Nombre Total d'activité réalisée",
-                            value: 9,
-                            suffix: `(54%)`,
+                            value: ptbaProjetsStats.activitesRealisees,
+                            suffix: `(${formatDashboardPercent(ptbaProjetsStats.tauxRealisationActivites)}%)`,
                             valueColor: 'emerald',
                         },
                     ]}
-                    progressValue={90}
+                    progressValue={ptbaProjetsStats.tauxRealisationActivites}
+                    progressDecimals={2}
                     progressColor='emerald'
                 />
 

@@ -99,13 +99,13 @@ export function useGetProjets() {
   })
 }
 
-export function useGetProjetsFilterVersion(idVersions: number) {
+export function useGetProjetsFilterVersion(idVersion?: number) {
   const idProgramme = useActiveProgrammeId()
 
   return useQuery({
-    queryKey: projetQueryKeys.byProgrammeWithFilter(idProgramme, idVersions),
-    queryFn: () => projetService.getAllWithfilter(idProgramme || 7, idVersions),
-    enabled: idProgramme != null && idVersions != null,
+    queryKey: projetQueryKeys.byProgrammeWithFilter(idProgramme, idVersion ?? 0),
+    queryFn: () => projetService.getAllWithfilter(idProgramme!, idVersion!),
+    enabled: idProgramme != null && idVersion != null && idVersion > 0,
   })
 }
 
