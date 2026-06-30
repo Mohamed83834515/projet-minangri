@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useRouterState } from '@tanstack/react-router'
 import {
+  type Cell,
   type ColumnDef,
   type SortingState,
   type VisibilityState,
@@ -55,7 +56,9 @@ type GenericTableProps<TData> = {
   searchPlaceholder?: string
   urlFilterConfig?: ColumnFilterConfig[]
   facetedFilters?: FacetedFilter[]
-  bulkActionsSlot?: (table: ReturnType<typeof useReactTable<TData>>) => React.ReactNode
+  bulkActionsSlot?: (
+    table: ReturnType<typeof useReactTable<TData>>
+  ) => React.ReactNode
   defaultPageSize?: number
   emptyMessage?: string
   showViewOptions?: boolean
@@ -77,6 +80,14 @@ type GenericTableProps<TData> = {
     columnVisibility: Record<string, boolean>
     sorting: SortingState
   }>
+  customRowRenderer?: (
+    row: TData,
+    index: number,
+    options: {
+      rowClassName: string
+      cellClassName: string
+    }
+  ) => React.ReactNode
 }
 
 // ─── Composant ────────────────────────────────────────────────────────────────
@@ -103,8 +114,9 @@ export function GenericTable<TData>({
   onExportContext,
   isLoading: isLoadingProp = false,
   initialState,
+  customRowRenderer,
 }: GenericTableProps<TData>) {
-  const [rowSelection,     setRowSelection    ] = useState({})
+  const [rowSelection, setRowSelection] = useState({})
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
     initialState?.columnVisibility ?? {}
   )
@@ -112,9 +124,9 @@ export function GenericTable<TData>({
     initialState?.sorting ?? []
   )
 
-  const routerState     = useRouterState()
+  const routerState = useRouterState()
   const isRouterPending = routerState.status === 'pending'
-  const isLoading       = isRouterPending || isLoadingProp
+  const isLoading = isRouterPending || isLoadingProp
 
   const {
     columnFilters,
@@ -125,8 +137,8 @@ export function GenericTable<TData>({
   } = useTableUrlState({
     search,
     navigate,
-    pagination:    { defaultPage: 1, defaultPageSize },
-    globalFilter:  { enabled: false },
+    pagination: { defaultPage: 1, defaultPageSize },
+    globalFilter: { enabled: false },
     columnFilters: urlFilterConfig,
   })
 
@@ -134,19 +146,25 @@ export function GenericTable<TData>({
   const table = useReactTable({
     data,
     columns,
-    state: { sorting, pagination, rowSelection, columnFilters, columnVisibility },
-    enableRowSelection:       true,
+    state: {
+      sorting,
+      pagination,
+      rowSelection,
+      columnFilters,
+      columnVisibility,
+    },
+    enableRowSelection: true,
     onPaginationChange,
     onColumnFiltersChange,
-    onRowSelectionChange:     setRowSelection,
-    onSortingChange:          setSorting,
+    onRowSelectionChange: setRowSelection,
+    onSortingChange: setSorting,
     onColumnVisibilityChange: setColumnVisibility,
-    getPaginationRowModel:    getPaginationRowModel(),
-    getCoreRowModel:          getCoreRowModel(),
-    getFilteredRowModel:      getFilteredRowModel(),
-    getSortedRowModel:        getSortedRowModel(),
-    getFacetedRowModel:       getFacetedRowModel(),
-    getFacetedUniqueValues:   getFacetedUniqueValues(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFacetedRowModel: getFacetedRowModel(),
+    getFacetedUniqueValues: getFacetedUniqueValues(),
   })
 
   const pageCount = table.getPageCount()
@@ -162,7 +180,9 @@ export function GenericTable<TData>({
   useEffect(() => {
     if (!onExportContext) return
 
-    const filteredData = table.getFilteredRowModel().rows.map((row) => row.original)
+    const filteredData = table
+      .getFilteredRowModel()
+      .rows.map((row) => row.original)
     const visibleColumnIds = table
       .getVisibleLeafColumns()
       .map((column) => column.id)
@@ -216,8 +236,9 @@ export function GenericTable<TData>({
         className={cn(
           'relative w-full min-w-0',
           'rounded-xl border border-border/60 shadow-sm',
-          'overflow-x-auto',           // scroll horizontal si contenu dépasse (ex: dialog étroit)
-          isLoading && 'opacity-50 pointer-events-none select-none transition-opacity duration-200',
+          'overflow-x-auto', // scroll horizontal si contenu dépasse (ex: dialog étroit)
+          isLoading &&
+            'pointer-events-none opacity-50 transition-opacity duration-200 select-none',
           tableContainerClassName
         )}
       >
@@ -226,7 +247,10 @@ export function GenericTable<TData>({
         {/* Bande couleur système */}
         <div className='h-1 w-full bg-primary' />
 
-        <Table className='w-full min-w-full table-auto border-collapse' style={{ tableLayout: 'auto' }}>
+        <Table
+          className='w-full min-w-full table-auto border-collapse'
+          style={{ tableLayout: 'auto' }}
+        >
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow
@@ -239,8 +263,8 @@ export function GenericTable<TData>({
                     colSpan={header.colSpan}
                     className={cn(
                       // py-1.5 → header compact, pas d'espace inutile
-                      'px-4 py-1.5 text-xs font-semibold uppercase tracking-wider',
-                      'text-muted-foreground whitespace-normal break-words align-middle',
+                      'px-4 py-1.5 text-xs font-semibold tracking-wider uppercase',
+                      'align-middle break-words whitespace-normal text-muted-foreground',
                       'border-r border-border/30 last:border-r-0',
                       header.column.columnDef.meta?.className,
                       header.column.columnDef.meta?.thClassName
@@ -248,7 +272,10 @@ export function GenericTable<TData>({
                   >
                     {header.isPlaceholder
                       ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                   </TableHead>
                 ))}
               </TableRow>
@@ -257,37 +284,46 @@ export function GenericTable<TData>({
 
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row, rowIdx) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
-                  className={cn(
-                    'group/row border-b border-border/40 last:border-b-0',
-                    'transition-colors duration-100',
-                    rowIdx % 2 === 0 ? 'bg-background' : 'bg-muted/20',
-                    'hover:bg-primary/5 data-[state=selected]:bg-primary/10',
-                    onRowClick && 'cursor-pointer'
-                  )}
-                  onClick={() => onRowClick?.(row.original)}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      className={cn(
-                        'px-4 py-2.5 text-sm align-top',
-                        // Force l'affichage complet du texte — écrase truncate/whitespace-nowrap des colonnes enfants
-                        'whitespace-normal break-words',
-                        '[&_*]:!whitespace-normal [&_*]:!overflow-visible [&_*]:!text-clip',
-                        'border-r border-border/20 last:border-r-0',
-                        cell.column.columnDef.meta?.className,
-                        cell.column.columnDef.meta?.tdClassName
-                      )}
-                    >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
+              table.getRowModel().rows.map((row, rowIdx) => {
+                const rowClassName = cn(
+                  'group/row border-b border-border/40 last:border-b-0',
+                  'transition-colors duration-100',
+                  rowIdx % 2 === 0 ? 'bg-background' : 'bg-muted/20',
+                  'hover:bg-primary/5 data-[state=selected]:bg-primary/10',
+                  onRowClick && 'cursor-pointer'
+                )
+
+                const cellClassName = (cell?: Cell<TData, unknown>) =>
+                  cn(
+                    'px-4 py-2.5 align-top text-sm',
+                    // Force l'affichage complet du texte — écrase truncate/whitespace-nowrap des colonnes enfants
+                    'break-words whitespace-normal',
+                    '[&_*]:!overflow-visible [&_*]:!text-clip [&_*]:!whitespace-normal',
+                    'border-r border-border/20 last:border-r-0',
+                    cell?.column.columnDef.meta?.className,
+                    cell?.column.columnDef.meta?.tdClassName
+                  )
+
+                if (customRowRenderer) {
+                  return customRowRenderer(row.original, rowIdx, {
+                    rowClassName,
+                    cellClassName: cellClassName(),
+                  })
+                }
+
+                return (
+                  <TableRow key={row.id} className={rowClassName}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id} className={cellClassName(cell)}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                )
+              })
             ) : (
               <TableRow>
                 <TableCell
@@ -296,9 +332,18 @@ export function GenericTable<TData>({
                 >
                   <div className='flex flex-col items-center gap-2'>
                     <div className='rounded-full bg-muted p-3'>
-                      <svg className='h-5 w-5 text-muted-foreground' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
-                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={1.5}
-                          d='M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' />
+                      <svg
+                        className='h-5 w-5 text-muted-foreground'
+                        fill='none'
+                        viewBox='0 0 24 24'
+                        stroke='currentColor'
+                      >
+                        <path
+                          strokeLinecap='round'
+                          strokeLinejoin='round'
+                          strokeWidth={1.5}
+                          d='M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2'
+                        />
                       </svg>
                     </div>
                     <span>{emptyMessage}</span>

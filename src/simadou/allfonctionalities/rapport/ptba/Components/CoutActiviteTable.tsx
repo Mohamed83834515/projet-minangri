@@ -1,20 +1,16 @@
 import { useMemo } from 'react'
+import { type ColumnDef } from '@tanstack/react-table'
+import { GenericTable } from '@/Global/Generic/Generictable'
 import type {
   CoutUnitairePtba,
   Ptba,
   CadreAnalytique,
 } from '@/simadou/allTypes'
 import { Loader2, Receipt } from 'lucide-react'
+import { useEmbeddedTableState } from '@/hooks/use-embedded-table-state'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+import { TableCell, TableRow } from '@/components/ui/table'
 import { type RapportExportRowMeta } from '../../export/rapportExportTypes'
 import { useRapportExportRegistration } from '../../useRapportExportRegistration'
 
@@ -44,6 +40,51 @@ export function CoutActiviteTable({
   isLoading,
   currencyCode = 'GNF',
 }: Props) {
+  const { navigate } = useEmbeddedTableState()
+
+  const columns: ColumnDef<TreeRow>[] = [
+    {
+      id: 'code',
+      accessorKey: 'code',
+      header: 'Code',
+    },
+    {
+      id: 'activite',
+      accessorKey: 'activite',
+      header: 'Activité',
+    },
+    {
+      id: 'ordre',
+      accessorKey: 'ordre',
+      header: '#',
+    },
+    {
+      id: 'tache',
+      accessorKey: 'tache',
+      header: 'Intitulé tâche',
+    },
+    {
+      id: 'unite',
+      accessorKey: 'unite',
+      header: 'Unité',
+    },
+    {
+      id: 'quantite',
+      accessorKey: 'quantite',
+      header: 'Quantité',
+    },
+    {
+      id: 'prix',
+      accessorKey: 'prix',
+      header: `Prix unitaire`,
+    },
+    {
+      id: 'montant',
+      accessorKey: 'montant',
+      header: 'Montant',
+    },
+  ]
+
   const rows = useMemo(() => {
     const coutsByActivite = new Map<number, CoutUnitairePtba[]>()
 
@@ -266,83 +307,77 @@ export function CoutActiviteTable({
       </CardHeader>
 
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Code</TableHead>
-              <TableHead>Activité</TableHead>
-              <TableHead>#</TableHead>
-              <TableHead>Intitulé tâche</TableHead>
-              <TableHead>Unité</TableHead>
-              <TableHead>Quantité</TableHead>
-              <TableHead>Prix unitaire</TableHead>
-              <TableHead>Montant</TableHead>
-            </TableRow>
-          </TableHeader>
-
-          <TableBody>
-            {rows.map((row, i) => {
-              if (row.type === 'cadre') {
-                const total = 8
-                const empty = row.niveau
-
-                return (
-                  <TableRow key={i}>
-                    {Array.from({
-                      length: empty,
-                    }).map((_, x) => (
-                      <TableCell key={x} className='bg-muted/40' />
-                    ))}
-
-                    <TableCell
-                      colSpan={total - empty}
-                      className='bg-muted font-semibold'
-                    >
-                      {row.label}
-                    </TableCell>
-                  </TableRow>
-                )
-              }
-
-              const span = row.groupKey
-                ? (groupSpans.get(row.groupKey) ?? 1)
-                : 1
-
-              const first =
-                rows.findIndex((r) => r.groupKey === row.groupKey) === i
+        <GenericTable<TreeRow>
+          data={rows}
+          columns={columns}
+          search={{}}
+          navigate={navigate}
+          showPagination={false}
+          showSearch={false}
+          showViewOptions={false}
+          customRowRenderer={(row, i, { rowClassName, cellClassName }) => {
+            if (row.type === 'cadre') {
+              const empty = row.niveau
 
               return (
-                <TableRow key={i}>
-                  {first && (
-                    <TableCell rowSpan={span}>
-                      {row.ptba?.code_activite_ptba}
-                    </TableCell>
-                  )}
+                <TableRow className={rowClassName} key={i}>
+                  {Array.from({
+                    length: empty,
+                  }).map((_, x) => (
+                    <TableCell className={cellClassName} key={x} />
+                  ))}
 
-                  {first && (
-                    <TableCell rowSpan={span}>
-                      {row.ptba?.intitule_activite_ptba}
-                    </TableCell>
-                  )}
-
-                  <TableCell>{row.cout?.ordre}</TableCell>
-                  <TableCell>{row.cout?.intitule_tache}</TableCell>
-                  <TableCell>{row.cout?.unite_cu}</TableCell>
-                  <TableCell>{row.cout && fmt(row.cout.quantite_cu)}</TableCell>
-                  <TableCell>
-                    {row.cout && fmt(row.cout.prix_unitaire)}
-                  </TableCell>
-
-                  <TableCell>
-                    {row.cout
-                      ? fmt(row.cout.quantite_cu * row.cout.prix_unitaire)
-                      : 'Aucun coût'}
+                  <TableCell className={cellClassName} colSpan={columns.length - empty}>
+                    {row.label}
                   </TableCell>
                 </TableRow>
               )
-            })}
-          </TableBody>
-        </Table>
+            }
+
+            const span = row.groupKey ? (groupSpans.get(row.groupKey) ?? 1) : 1
+
+            const first =
+              rows.findIndex((r) => r.groupKey === row.groupKey) === i
+
+            return (
+              <TableRow className={rowClassName} key={i}>
+                {first && (
+                  <TableCell className={cellClassName} rowSpan={span}>
+                    {row.ptba?.code_activite_ptba}
+                  </TableCell>
+                )}
+
+                {first && (
+                  <TableCell className={cellClassName} rowSpan={span}>
+                    {row.ptba?.intitule_activite_ptba}
+                  </TableCell>
+                )}
+
+                <TableCell className={cellClassName}>
+                  {row.cout?.ordre}
+                </TableCell>
+                <TableCell className={cellClassName}>
+                  {row.cout?.intitule_tache}
+                </TableCell>
+                <TableCell className={cellClassName}>
+                  {row.cout?.unite_cu}
+                </TableCell>
+                <TableCell className={cellClassName}>
+                  {row.cout && fmt(row.cout.quantite_cu)}
+                </TableCell>
+                <TableCell className={cellClassName}>
+                  {row.cout && fmt(row.cout.prix_unitaire)}
+                </TableCell>
+
+                <TableCell className={cellClassName}>
+                  {row.cout
+                    ? fmt(row.cout.quantite_cu * row.cout.prix_unitaire)
+                    : 'Aucun coût'}
+                </TableCell>
+              </TableRow>
+            )
+          }}
+        />
       </CardContent>
     </Card>
   )

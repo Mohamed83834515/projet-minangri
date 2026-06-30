@@ -1,19 +1,16 @@
 import { useMemo } from 'react'
+import { type ColumnDef } from '@tanstack/react-table'
+import { GenericTable } from '@/Global/Generic/Generictable'
 import { useGetUnitesIndicateur } from '@/simadou/allHooks/admin/uniteIndicateurHooks'
 import type { CadreAnalytique, Ptba } from '@/simadou/allTypes'
 import { type IndicateurTache } from '@/simadou/allTypes/indicateurTache'
 import { useRapportExportRegistration } from '@/simadou/allfonctionalities/rapport/useRapportExportRegistration'
-import { Loader2 } from 'lucide-react'
+import { LineChart, Loader2 } from 'lucide-react'
+import { useEmbeddedTableState } from '@/hooks/use-embedded-table-state'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+import { TableCell, TableRow } from '@/components/ui/table'
 import { type RapportExportRowMeta } from '../../export/rapportExportTypes'
+import { Badge } from '@/components/ui/badge'
 
 interface IndicateursTableProps {
   cadresAnalytiques: CadreAnalytique[]
@@ -38,6 +35,50 @@ export function IndicateursTable({
   isLoading,
 }: IndicateursTableProps) {
   const { data: unites = [] } = useGetUnitesIndicateur()
+  const { navigate } = useEmbeddedTableState()
+
+  const columns: ColumnDef<TreeRow>[] = [
+    {
+      id: 'code',
+      accessorKey: 'code',
+      header: 'Code',
+    },
+    {
+      id: 'activite',
+      accessorKey: 'activite',
+      header: 'Activité',
+    },
+    {
+      id: 'indicateur',
+      accessorKey: 'indicateur',
+      header: 'Indicateur',
+    },
+    {
+      id: 'unite',
+      accessorKey: 'unite',
+      header: 'Unité',
+    },
+    {
+      id: 't1',
+      accessorKey: 't1',
+      header: 'T1',
+    },
+    {
+      id: 't2',
+      accessorKey: 't2',
+      header: 'T2',
+    },
+    {
+      id: 't3',
+      accessorKey: 't3',
+      header: 'T3',
+    },
+    {
+      id: 't4',
+      accessorKey: 't4',
+      header: 'T4',
+    },
+  ]
 
   const indicateursByActivite = useMemo(() => {
     const map = new Map<number, IndicateurTache[]>()
@@ -210,45 +251,13 @@ export function IndicateursTable({
       })
 
       return {
-        columns: [
-          {
-            id: 'code',
-            header: 'Code',
-          },
-          {
-            id: 'activite',
-            header: 'Activité',
-          },
-          {
-            id: 'indicateur',
-            header: 'Indicateur',
-          },
-          {
-            id: 'unite',
-            header: 'Unité',
-          },
-          {
-            id: 't1',
-            header: 'T1',
-          },
-          {
-            id: 't2',
-            header: 'T2',
-          },
-          {
-            id: 't3',
-            header: 'T3',
-          },
-          {
-            id: 't4',
-            header: 'T4',
-          },
-        ],
+        columns: columns.map((c) => ({
+          id: c.id as string,
+          header: c.header as string,
+        })),
 
         rowMetas,
-
         rows: exportRows,
-
         visibleColumnIds: [
           'code',
           'activite',
@@ -268,103 +277,103 @@ export function IndicateursTable({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Indicateurs par cadre analytique</CardTitle>
+        <div className='flex items-center gap-2'>
+          <LineChart className='h-4 w-4' />
+
+          <CardTitle>Indicateurs par cadre analytique</CardTitle>
+
+          <Badge className='ml-auto'>{indicateurs.length}</Badge>
+        </div>
       </CardHeader>
 
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Code</TableHead>
-              <TableHead>Activité</TableHead>
-              <TableHead>Indicateur</TableHead>
-              <TableHead>Unité</TableHead>
-              <TableHead>T1</TableHead>
-              <TableHead>T2</TableHead>
-              <TableHead>T3</TableHead>
-              <TableHead>T4</TableHead>
-            </TableRow>
-          </TableHeader>
-
-          <TableBody>
-            {rows.map((row, i) => {
-              /**
-               * =========================
-               * CADRE ROW
-               * =========================
-               */
-              if (row.type === 'cadre') {
-                const totalColumns = 8
-                const empty = row.niveau
-                const span = totalColumns - empty
-
-                return (
-                  <TableRow key={i}>
-                    {Array.from({ length: empty }).map((_, idx) => (
-                      <TableCell key={idx} />
-                    ))}
-                    <TableCell
-                      colSpan={span}
-                      className='bg-muted font-semibold'
-                    >
-                      {row.label}
-                    </TableCell>
-                  </TableRow>
-                )
-              }
-
-              /**
-               * =========================
-               * PTBA + INDICATEUR
-               * =========================
-               */
-              const span = row.groupKey
-                ? (groupSpans.get(row.groupKey) ?? 1)
-                : 1
-
-              const isFirst = row.groupKey
-                ? rows.findIndex(
-                    (r) => r.groupKey === row.groupKey && r.type === 'ptba'
-                  ) === i
-                : true
-
-              const unite = unites.find(
-                (u) => u.id_unite == row.ind?.unite_ind_tache
-              )
+        <GenericTable<TreeRow>
+          data={rows}
+          columns={columns}
+          search={{}}
+          navigate={navigate}
+          showPagination={false}
+          showSearch={false}
+          showViewOptions={false}
+          customRowRenderer={(row, i, { rowClassName, cellClassName }) => {
+            /**
+             * =========================
+             * CADRE ROW
+             * =========================
+             */
+            if (row.type === 'cadre') {
+              const empty = row.niveau
+              const span = columns.length - empty
 
               return (
-                <TableRow key={i}>
-                  {isFirst && (
-                    <TableCell rowSpan={span}>
-                      {row.ptba?.code_activite_ptba}
-                    </TableCell>
-                  )}
-
-                  {isFirst && (
-                    <TableCell rowSpan={span}>
-                      {row.ptba?.intitule_activite_ptba}
-                    </TableCell>
-                  )}
-
-                  <TableCell>
-                    {row.ind?.intitule_indicateur_tache ?? '—'}
+                <TableRow className={rowClassName} key={i}>
+                  {Array.from({ length: empty }).map((_, idx) => (
+                    <TableCell className={cellClassName} key={idx} />
+                  ))}
+                  <TableCell className={cellClassName} colSpan={span}>
+                    {row.label}
                   </TableCell>
-
-                  <TableCell>
-                    {unite
-                      ? `${unite.definition_ui} (${unite.unite_ui})`
-                      : row.ind?.unite_ind_tache}
-                  </TableCell>
-
-                  <TableCell>{row.ind?.trimestre_1 ?? ''}</TableCell>
-                  <TableCell>{row.ind?.trimestre_2 ?? ''}</TableCell>
-                  <TableCell>{row.ind?.trimestre_3 ?? ''}</TableCell>
-                  <TableCell>{row.ind?.trimestre_4 ?? ''}</TableCell>
                 </TableRow>
               )
-            })}
-          </TableBody>
-        </Table>
+            }
+
+            /**
+             * =========================
+             * PTBA + INDICATEUR
+             * =========================
+             */
+            const span = row.groupKey ? (groupSpans.get(row.groupKey) ?? 1) : 1
+
+            const isFirst = row.groupKey
+              ? rows.findIndex(
+                  (r) => r.groupKey === row.groupKey && r.type === 'ptba'
+                ) === i
+              : true
+
+            const unite = unites.find(
+              (u) => u.id_unite == row.ind?.unite_ind_tache
+            )
+
+            return (
+              <TableRow className={rowClassName} key={i}>
+                {isFirst && (
+                  <TableCell className={cellClassName} rowSpan={span}>
+                    {row.ptba?.code_activite_ptba}
+                  </TableCell>
+                )}
+
+                {isFirst && (
+                  <TableCell className={cellClassName} rowSpan={span}>
+                    {row.ptba?.intitule_activite_ptba}
+                  </TableCell>
+                )}
+
+                <TableCell className={cellClassName}>
+                  {row.ind?.intitule_indicateur_tache ?? '—'}
+                </TableCell>
+
+                <TableCell className={cellClassName}>
+                  {unite
+                    ? `${unite.definition_ui} (${unite.unite_ui})`
+                    : row.ind?.unite_ind_tache}
+                </TableCell>
+
+                <TableCell className={cellClassName}>
+                  {row.ind?.trimestre_1 ?? ''}
+                </TableCell>
+                <TableCell className={cellClassName}>
+                  {row.ind?.trimestre_2 ?? ''}
+                </TableCell>
+                <TableCell className={cellClassName}>
+                  {row.ind?.trimestre_3 ?? ''}
+                </TableCell>
+                <TableCell className={cellClassName}>
+                  {row.ind?.trimestre_4 ?? ''}
+                </TableCell>
+              </TableRow>
+            )
+          }}
+        />
       </CardContent>
     </Card>
   )
