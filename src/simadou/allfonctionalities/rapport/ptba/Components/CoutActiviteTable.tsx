@@ -313,6 +313,7 @@ export function CoutActiviteTable({
           search={{}}
           navigate={navigate}
           showPagination={false}
+          defaultPageSize={rows.length}
           showSearch={false}
           showViewOptions={false}
           customRowRenderer={(row, i, { rowClassName, cellClassName }) => {
@@ -320,14 +321,17 @@ export function CoutActiviteTable({
               const empty = row.niveau
 
               return (
-                <TableRow className={rowClassName} key={i}>
+                <TableRow className={`${rowClassName} font-bold`} key={i}>
                   {Array.from({
                     length: empty,
                   }).map((_, x) => (
                     <TableCell className={cellClassName} key={x} />
                   ))}
 
-                  <TableCell className={cellClassName} colSpan={columns.length - empty}>
+                  <TableCell
+                    className={cellClassName}
+                    colSpan={columns.length - empty}
+                  >
                     {row.label}
                   </TableCell>
                 </TableRow>

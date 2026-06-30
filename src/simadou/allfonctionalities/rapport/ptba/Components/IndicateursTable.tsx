@@ -7,10 +7,10 @@ import { type IndicateurTache } from '@/simadou/allTypes/indicateurTache'
 import { useRapportExportRegistration } from '@/simadou/allfonctionalities/rapport/useRapportExportRegistration'
 import { LineChart, Loader2 } from 'lucide-react'
 import { useEmbeddedTableState } from '@/hooks/use-embedded-table-state'
+import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { type RapportExportRowMeta } from '../../export/rapportExportTypes'
-import { Badge } from '@/components/ui/badge'
 
 interface IndicateursTableProps {
   cadresAnalytiques: CadreAnalytique[]
@@ -293,6 +293,7 @@ export function IndicateursTable({
           search={{}}
           navigate={navigate}
           showPagination={false}
+          defaultPageSize={rows.length}
           showSearch={false}
           showViewOptions={false}
           customRowRenderer={(row, i, { rowClassName, cellClassName }) => {
@@ -306,7 +307,7 @@ export function IndicateursTable({
               const span = columns.length - empty
 
               return (
-                <TableRow className={rowClassName} key={i}>
+                <TableRow className={`${rowClassName} font-bold`} key={i}>
                   {Array.from({ length: empty }).map((_, idx) => (
                     <TableCell className={cellClassName} key={idx} />
                   ))}
