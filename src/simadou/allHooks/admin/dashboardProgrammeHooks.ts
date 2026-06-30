@@ -1,5 +1,6 @@
 import { useActiveProgrammeCode } from "@/hooks/use-active-programme"
 import { dashboardService } from "@/simadou/allSercices/dashbordService"
+import tacheActivitePtbaService from "@/simadou/allSercices/tacheActivitePtbaService"
 import versionPtbaService from "@/simadou/allSercices/versionPtbaService"
 import { useQuery } from "@tanstack/react-query"
 
@@ -15,10 +16,32 @@ export const ptbasProjetsVersionQueryKeys = {
     ['versions-ptbas', idVersion, 'ptbas-projets'] as const,
 }
 
+export const tachesActiviteByPlanSiteQueryKeys = {
+  byVersion: (versionId: number, codeProgramme?: string) =>
+    ['tache-activite-by-plan-site', versionId, codeProgramme ?? ''] as const,
+}
+
 export function useGetPtbasProjetsByVersion(versionId?: number) {
   return useQuery({
     queryKey: ptbasProjetsVersionQueryKeys.byVersion(versionId ?? 0),
     queryFn: () => versionPtbaService.getPtbasProjets(versionId!),
+    enabled: versionId != null && versionId > 0,
+  })
+}
+
+export function useGetTachesActiviteByPlanSite(versionId?: number) {
+  const codeProgramme = useActiveProgrammeCode()
+
+  return useQuery({
+    queryKey: tachesActiviteByPlanSiteQueryKeys.byVersion(
+      versionId ?? 0,
+      codeProgramme
+    ),
+    queryFn: () =>
+      tacheActivitePtbaService.getByPlanSite({
+        versionPtba: versionId!,
+        codeProgramme: codeProgramme ?? undefined,
+      }),
     enabled: versionId != null && versionId > 0,
   })
 }

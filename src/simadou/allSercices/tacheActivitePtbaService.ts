@@ -1,11 +1,31 @@
 import { apiClient } from "@/axios/api";
+import type {
+  TacheActiviteByPlanSiteGroup,
+} from "../allTypes/dashboardType";
 import type { TacheActivitePtba } from "../allTypes/tacheActivitePtba";
 import {
   filterTachesByActivite,
   type TacheActivitePtbaApiPayload,
 } from "../lib/tacheActivitePtbaUtils";
 
+const BASE_URL = "/tache_activite_ptba/";
+
 class TacheActivitePtbaService {
+  async getByPlanSite(params: {
+    versionPtba: number
+    codeProgramme?: string
+  }): Promise<TacheActiviteByPlanSiteGroup[]> {
+    const searchParams = new URLSearchParams()
+    searchParams.set('version_ptba', String(params.versionPtba))
+    if (params.codeProgramme?.trim()) {
+      searchParams.set('code_programme', params.codeProgramme.trim())
+    }
+
+    return apiClient.request<TacheActiviteByPlanSiteGroup[]>(
+      `${BASE_URL}by-plan-site/?${searchParams.toString()}`
+    )
+  }
+
   async getAll(url:string): Promise<TacheActivitePtba[]> {
     const response = await apiClient.request<TacheActivitePtba[]>(
       url,

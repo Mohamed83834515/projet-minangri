@@ -11,6 +11,7 @@ import {
     useDashboardAnneeSelection,
     useGetAvancementDirections,
     useGetPtbasProjetsByVersion,
+    useGetTachesActiviteByPlanSite,
 } from '@/simadou/allHooks/admin/dashboardProgrammeHooks'
 import { formatNumber } from '@/simadou/allSercices/montantFormater'
 import type { ProjetDashboardSource } from '@/simadou/allTypes/dashboardProjet'
@@ -23,10 +24,12 @@ import {
     formatDashboardPercent,
 } from '@/simadou/lib/dashboardPaoStatsUtils'
 import { buildPtbaProjetsDashboardStats } from '@/simadou/lib/dashboardPtbaProjetsStatsUtils'
+import { buildAvancementTachesPlanSiteChartData } from '@/simadou/lib/dashboardTachesPlanSiteUtils'
 import DashboardHeader from './DashboardHeader'
 import ProjectTable from './ProjectTable'
 import StatCard from './StatCard'
 import AvancementDirectionChart from './AvancementDirectionChart'
+import AvancementTachesPlanSiteChart from './AvancementTachesPlanSiteChart'
 
 
 // ─── Dashboard principal ───────────────────────────────────────────────────────
@@ -49,13 +52,27 @@ const DashboardPage: React.FC = () => {
         selectedVersion,
     } = useDashboardAnneeSelection(versions)
 
+    const {
+        selectedAnnee: planSiteSelectedAnnee,
+        setSelectedAnnee: setPlanSiteSelectedAnnee,
+        selectedVersion: planSiteSelectedVersion,
+    } = useDashboardAnneeSelection(versions)
+
     const selectedVersionId = selectedVersion?.id_version_ptba
+    const planSiteVersionId = planSiteSelectedVersion?.id_version_ptba
 
     const projetRows = useMemo(
         () => buildProjetDashboardRows(projets as ProjetDashboardSource[]),
         [projets]
     )
     const { data: ptbasProjetsData } = useGetPtbasProjetsByVersion(selectedVersionId)
+    const { data: tachesByPlanSite = [] } =
+        useGetTachesActiviteByPlanSite(planSiteVersionId)
+
+    const tachesPlanSiteChartData = useMemo(
+        () => buildAvancementTachesPlanSiteChartData(tachesByPlanSite),
+        [tachesByPlanSite]
+    )
     // Filtrage par recherche globale
     const projetRowsFiltered = useMemo(() => {
         if (!searchQuery.trim()) return projetRows
@@ -314,6 +331,14 @@ const DashboardPage: React.FC = () => {
                     selectedAnnee={selectedAnnee}
                     onAnneeChange={setSelectedAnnee}
                     title='Avancement des Taches par Unite de Gestion'
+                />
+                <AvancementTachesPlanSiteChart
+                    data={tachesPlanSiteChartData}
+                    anneesDisponibles={anneesDisponibles}
+                    selectedAnnee={planSiteSelectedAnnee}
+                    onAnneeChange={setPlanSiteSelectedAnnee}
+                    title='Avancement des Tâches par Plan Site'
+                    subtitle='Nombre total et taux de validation par service'
                 />
             </div>
 
