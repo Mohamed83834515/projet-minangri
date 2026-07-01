@@ -22,6 +22,7 @@ import {
   ListChecks,
   Wallet,
   ClipboardCheck,
+  List,
 } from 'lucide-react'
 import { type SidebarData } from '../../components/layout/others/types'
 
@@ -144,6 +145,11 @@ export const sidebarData: SidebarData = {
               title: 'Suivi du PAO',
               url: '/programmation/suivi-ptba',
               icon: Eye,
+            },
+            {
+              title: 'Parametrage des marches',
+              url: '/programmation/parametrage-marches',
+              icon: List,
             },
           ],
         },
