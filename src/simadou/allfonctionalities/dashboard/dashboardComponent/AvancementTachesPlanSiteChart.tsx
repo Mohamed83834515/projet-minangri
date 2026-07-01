@@ -3,7 +3,6 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
-  Cell,
   Legend,
   ResponsiveContainer,
   Tooltip,
@@ -23,8 +22,9 @@ interface AvancementTachesPlanSiteChartProps {
   subtitle?: string
 }
 
-const NB_TACHES_COLOR = '#6366F1'
-const POURCENTAGE_COLOR = '#22C55E'
+/** Couleurs alignées sur les autres graphiques dashboard (AvancementDirectionChart, etc.) */
+const NB_TACHES_COLOR = '#22C55E'
+const TAUX_VALIDATION_COLOR = '#EF4444'
 
 const CustomTooltip: React.FC<any> = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null
@@ -156,29 +156,17 @@ const AvancementTachesPlanSiteChart: React.FC<
               yAxisId='percent'
               dataKey='pourcentageValide'
               name='Taux de validation'
+              fill={TAUX_VALIDATION_COLOR}
               radius={[4, 4, 0, 0]}
               barSize={28}
               label={{
                 position: 'top',
                 fontSize: 10,
-                fill: '#374151',
+                fill: TAUX_VALIDATION_COLOR,
                 formatter: (value: unknown) =>
                   `${formatDashboardPercent(Number(value))}%`,
               }}
-            >
-              {chartData.map((entry) => (
-                <Cell
-                  key={entry.service}
-                  fill={
-                    entry.pourcentageValide >= 75
-                      ? POURCENTAGE_COLOR
-                      : entry.pourcentageValide >= 40
-                        ? '#EAB308'
-                        : '#EF4444'
-                  }
-                />
-              ))}
-            </Bar>
+            />
           </BarChart>
         </ResponsiveContainer>
       )}
