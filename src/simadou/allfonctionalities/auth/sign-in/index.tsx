@@ -5,9 +5,6 @@ import { Logo } from '@/assets/logo'
 import pilier1Img from '@/assets/images/pilier1_simandou.png'
 
 
-import { KeyRound } from 'lucide-react'
-
-
 
 export function SignIn() {
   const { redirect } = useSearch({ from: '/(auth)/sign-in' })
@@ -163,13 +160,13 @@ export function SignIn() {
                 </h1>
               </div>
 
-              <div className="flex gap-3 rounded-xl border border-amber-200 bg-amber-50 p-3.5
+              {/* <div className="flex gap-3 rounded-xl border border-amber-200 bg-amber-50 p-3.5
                       dark:border-amber-800 dark:bg-amber-950">
                 <KeyRound
                   className="mt-0.5 size-4 shrink-0 text-amber-600 dark:text-amber-400"
                   aria-hidden
                 />
-                {/* <div className="space-y-1.5">
+                <div className="space-y-1.5">
                   <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
                     Première connexion ?
                   </p>
@@ -186,8 +183,8 @@ export function SignIn() {
                     Définir mon mot de passe
                     <ArrowRight className="size-3" aria-hidden />
                   </Link>
-                </div> */}
-              </div>
+                </div>
+              </div> */}
             </div>
 
             {/* Formulaire — logique inchangée */}
