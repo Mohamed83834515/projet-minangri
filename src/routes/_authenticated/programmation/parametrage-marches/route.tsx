@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Link, Outlet, useRouterState } from '@tanstack/react-router'
-import { Settings } from 'lucide-react'
+import { FileText, Settings, Tags } from 'lucide-react'
 
 
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -14,8 +14,24 @@ export const Route = createFileRoute(
 })
 
 const TABS = [
-  { to: '/programmation/parametrage-marches/versions-ppm',             label: ' Versions PPM',              icon: Settings , value : "version-ppm"   }
-
+  {
+    to: '/programmation/parametrage-marches/versions-ppm',
+    label: 'Versions PPM',
+    icon: Settings,
+    value: 'versions-ppm',
+  },
+  {
+    to: '/programmation/parametrage-marches/modes-passation',
+    label: 'Modes passation',
+    icon: FileText,
+    value: 'modes-passation',
+  },
+  {
+    to: '/programmation/parametrage-marches/natures-marche',
+    label: 'Natures marché',
+    icon: Tags,
+    value: 'natures-marche',
+  },
 ] as const
 
 
@@ -30,10 +46,11 @@ function ParametrageMarchesLayout() {
     const { headerColor } = useColor()
   const {bg} = HEADER_COLORS[headerColor]
 
-  const currentTab =
-    pathname.includes('/versions-ppm')
-      ? 'version-ppm'
-          :'version-ppm'
+  const currentTab = pathname.includes('/modes-passation')
+    ? 'modes-passation'
+    : pathname.includes('/natures-marche')
+      ? 'natures-marche'
+      : 'versions-ppm'
 
   return (
     <Main>

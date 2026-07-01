@@ -68,6 +68,8 @@ import { Route as AuthenticatedProgrammationProjetsIdRouteImport } from './route
 import { Route as authSetPasswordUidTokenRouteImport } from './routes/(auth)/set-password/$uid/$token'
 import { Route as AuthenticatedProjetProgrammeProjetsIdIndexRouteImport } from './routes/_authenticated/projet-programme/projets/$id/index'
 import { Route as AuthenticatedProgrammationParametrageMarchesVersionsPpmIndexRouteImport } from './routes/_authenticated/programmation/parametrage-marches/versions-ppm/index'
+import { Route as AuthenticatedProgrammationParametrageMarchesNaturesMarcheIndexRouteImport } from './routes/_authenticated/programmation/parametrage-marches/natures-marche/index'
+import { Route as AuthenticatedProgrammationParametrageMarchesModesPassationIndexRouteImport } from './routes/_authenticated/programmation/parametrage-marches/modes-passation/index'
 import { Route as AuthenticatedParametrageAutresUnitesIndicateurIndexRouteImport } from './routes/_authenticated/parametrage/autres/unites-indicateur/index'
 import { Route as AuthenticatedParametrageAutresTypeZoneIndexRouteImport } from './routes/_authenticated/parametrage/autres/type-zone/index'
 import { Route as AuthenticatedParametrageAutresSystemIndexRouteImport } from './routes/_authenticated/parametrage/autres/system/index'
@@ -415,6 +417,24 @@ const AuthenticatedProgrammationParametrageMarchesVersionsPpmIndexRoute =
         AuthenticatedProgrammationParametrageMarchesRouteRoute,
     } as any,
   )
+const AuthenticatedProgrammationParametrageMarchesNaturesMarcheIndexRoute =
+  AuthenticatedProgrammationParametrageMarchesNaturesMarcheIndexRouteImport.update(
+    {
+      id: '/natures-marche/',
+      path: '/natures-marche/',
+      getParentRoute: () =>
+        AuthenticatedProgrammationParametrageMarchesRouteRoute,
+    } as any,
+  )
+const AuthenticatedProgrammationParametrageMarchesModesPassationIndexRoute =
+  AuthenticatedProgrammationParametrageMarchesModesPassationIndexRouteImport.update(
+    {
+      id: '/modes-passation/',
+      path: '/modes-passation/',
+      getParentRoute: () =>
+        AuthenticatedProgrammationParametrageMarchesRouteRoute,
+    } as any,
+  )
 const AuthenticatedParametrageAutresUnitesIndicateurIndexRoute =
   AuthenticatedParametrageAutresUnitesIndicateurIndexRouteImport.update({
     id: '/unites-indicateur/',
@@ -501,6 +521,8 @@ export interface FileRoutesByFullPath {
   '/parametrage/autres/system/': typeof AuthenticatedParametrageAutresSystemIndexRoute
   '/parametrage/autres/type-zone/': typeof AuthenticatedParametrageAutresTypeZoneIndexRoute
   '/parametrage/autres/unites-indicateur/': typeof AuthenticatedParametrageAutresUnitesIndicateurIndexRoute
+  '/programmation/parametrage-marches/modes-passation/': typeof AuthenticatedProgrammationParametrageMarchesModesPassationIndexRoute
+  '/programmation/parametrage-marches/natures-marche/': typeof AuthenticatedProgrammationParametrageMarchesNaturesMarcheIndexRoute
   '/programmation/parametrage-marches/versions-ppm/': typeof AuthenticatedProgrammationParametrageMarchesVersionsPpmIndexRoute
   '/projet-programme/projets/$id/': typeof AuthenticatedProjetProgrammeProjetsIdIndexRoute
 }
@@ -561,6 +583,8 @@ export interface FileRoutesByTo {
   '/parametrage/autres/system': typeof AuthenticatedParametrageAutresSystemIndexRoute
   '/parametrage/autres/type-zone': typeof AuthenticatedParametrageAutresTypeZoneIndexRoute
   '/parametrage/autres/unites-indicateur': typeof AuthenticatedParametrageAutresUnitesIndicateurIndexRoute
+  '/programmation/parametrage-marches/modes-passation': typeof AuthenticatedProgrammationParametrageMarchesModesPassationIndexRoute
+  '/programmation/parametrage-marches/natures-marche': typeof AuthenticatedProgrammationParametrageMarchesNaturesMarcheIndexRoute
   '/programmation/parametrage-marches/versions-ppm': typeof AuthenticatedProgrammationParametrageMarchesVersionsPpmIndexRoute
   '/projet-programme/projets/$id': typeof AuthenticatedProjetProgrammeProjetsIdIndexRoute
 }
@@ -627,6 +651,8 @@ export interface FileRoutesById {
   '/_authenticated/parametrage/autres/system/': typeof AuthenticatedParametrageAutresSystemIndexRoute
   '/_authenticated/parametrage/autres/type-zone/': typeof AuthenticatedParametrageAutresTypeZoneIndexRoute
   '/_authenticated/parametrage/autres/unites-indicateur/': typeof AuthenticatedParametrageAutresUnitesIndicateurIndexRoute
+  '/_authenticated/programmation/parametrage-marches/modes-passation/': typeof AuthenticatedProgrammationParametrageMarchesModesPassationIndexRoute
+  '/_authenticated/programmation/parametrage-marches/natures-marche/': typeof AuthenticatedProgrammationParametrageMarchesNaturesMarcheIndexRoute
   '/_authenticated/programmation/parametrage-marches/versions-ppm/': typeof AuthenticatedProgrammationParametrageMarchesVersionsPpmIndexRoute
   '/_authenticated/projet-programme/projets/$id/': typeof AuthenticatedProjetProgrammeProjetsIdIndexRoute
 }
@@ -693,6 +719,8 @@ export interface FileRouteTypes {
     | '/parametrage/autres/system/'
     | '/parametrage/autres/type-zone/'
     | '/parametrage/autres/unites-indicateur/'
+    | '/programmation/parametrage-marches/modes-passation/'
+    | '/programmation/parametrage-marches/natures-marche/'
     | '/programmation/parametrage-marches/versions-ppm/'
     | '/projet-programme/projets/$id/'
   fileRoutesByTo: FileRoutesByTo
@@ -753,6 +781,8 @@ export interface FileRouteTypes {
     | '/parametrage/autres/system'
     | '/parametrage/autres/type-zone'
     | '/parametrage/autres/unites-indicateur'
+    | '/programmation/parametrage-marches/modes-passation'
+    | '/programmation/parametrage-marches/natures-marche'
     | '/programmation/parametrage-marches/versions-ppm'
     | '/projet-programme/projets/$id'
   id:
@@ -818,6 +848,8 @@ export interface FileRouteTypes {
     | '/_authenticated/parametrage/autres/system/'
     | '/_authenticated/parametrage/autres/type-zone/'
     | '/_authenticated/parametrage/autres/unites-indicateur/'
+    | '/_authenticated/programmation/parametrage-marches/modes-passation/'
+    | '/_authenticated/programmation/parametrage-marches/natures-marche/'
     | '/_authenticated/programmation/parametrage-marches/versions-ppm/'
     | '/_authenticated/projet-programme/projets/$id/'
   fileRoutesById: FileRoutesById
@@ -1252,6 +1284,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProgrammationParametrageMarchesVersionsPpmIndexRouteImport
       parentRoute: typeof AuthenticatedProgrammationParametrageMarchesRouteRoute
     }
+    '/_authenticated/programmation/parametrage-marches/natures-marche/': {
+      id: '/_authenticated/programmation/parametrage-marches/natures-marche/'
+      path: '/natures-marche'
+      fullPath: '/programmation/parametrage-marches/natures-marche/'
+      preLoaderRoute: typeof AuthenticatedProgrammationParametrageMarchesNaturesMarcheIndexRouteImport
+      parentRoute: typeof AuthenticatedProgrammationParametrageMarchesRouteRoute
+    }
+    '/_authenticated/programmation/parametrage-marches/modes-passation/': {
+      id: '/_authenticated/programmation/parametrage-marches/modes-passation/'
+      path: '/modes-passation'
+      fullPath: '/programmation/parametrage-marches/modes-passation/'
+      preLoaderRoute: typeof AuthenticatedProgrammationParametrageMarchesModesPassationIndexRouteImport
+      parentRoute: typeof AuthenticatedProgrammationParametrageMarchesRouteRoute
+    }
     '/_authenticated/parametrage/autres/unites-indicateur/': {
       id: '/_authenticated/parametrage/autres/unites-indicateur/'
       path: '/unites-indicateur'
@@ -1335,6 +1381,8 @@ const AuthenticatedParametrageAutresRouteRouteWithChildren =
 
 interface AuthenticatedProgrammationParametrageMarchesRouteRouteChildren {
   AuthenticatedProgrammationParametrageMarchesIndexRoute: typeof AuthenticatedProgrammationParametrageMarchesIndexRoute
+  AuthenticatedProgrammationParametrageMarchesModesPassationIndexRoute: typeof AuthenticatedProgrammationParametrageMarchesModesPassationIndexRoute
+  AuthenticatedProgrammationParametrageMarchesNaturesMarcheIndexRoute: typeof AuthenticatedProgrammationParametrageMarchesNaturesMarcheIndexRoute
   AuthenticatedProgrammationParametrageMarchesVersionsPpmIndexRoute: typeof AuthenticatedProgrammationParametrageMarchesVersionsPpmIndexRoute
 }
 
@@ -1342,6 +1390,10 @@ const AuthenticatedProgrammationParametrageMarchesRouteRouteChildren: Authentica
   {
     AuthenticatedProgrammationParametrageMarchesIndexRoute:
       AuthenticatedProgrammationParametrageMarchesIndexRoute,
+    AuthenticatedProgrammationParametrageMarchesModesPassationIndexRoute:
+      AuthenticatedProgrammationParametrageMarchesModesPassationIndexRoute,
+    AuthenticatedProgrammationParametrageMarchesNaturesMarcheIndexRoute:
+      AuthenticatedProgrammationParametrageMarchesNaturesMarcheIndexRoute,
     AuthenticatedProgrammationParametrageMarchesVersionsPpmIndexRoute:
       AuthenticatedProgrammationParametrageMarchesVersionsPpmIndexRoute,
   }
