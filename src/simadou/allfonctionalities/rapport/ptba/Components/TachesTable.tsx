@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { type RapportExportRowMeta } from '../../export/rapportExportTypes'
+import { buildGanttTimeline, tacheActiveInBucket } from './ganttTimeline'
 
 interface Props {
   cadresAnalytiques: CadreAnalytique[]
@@ -39,7 +40,9 @@ export function TachesTable({
 }: Props) {
   const { navigate } = useEmbeddedTableState()
 
-  const columns: ColumnDef<TreeRow>[] = [
+  const timeline = useMemo(() => buildGanttTimeline(taches), [taches])
+
+  const baseColumns: ColumnDef<TreeRow>[] = [
     {
       id: 'code',
       header: 'Code',
@@ -84,6 +87,17 @@ export function TachesTable({
           : '',
     },
   ]
+
+  // Colonnes du diagramme de Gantt : une par période (mois ou trimestre).
+  const ganttColumns: ColumnDef<TreeRow>[] = timeline.buckets.map((bucket) => ({
+    id: `gantt_${bucket.key}`,
+    header: bucket.label,
+    accessorFn: () => '',
+    meta: { thClassName: 'text-center min-w-[36px]' },
+  }))
+
+  const columns: ColumnDef<TreeRow>[] = [...baseColumns, ...ganttColumns]
+
   const rows = useMemo(() => {
     const tachesByActivite = new Map<number, TacheActivitePtba[]>()
 
@@ -193,9 +207,18 @@ export function TachesTable({
       const exportRows: string[][] = []
       const rowMetas: RapportExportRowMeta[] = []
 
+      // Cellule Gantt remplie lorsque la tâche est active sur la période.
+      const ganttCells = (tache: TacheActivitePtba | undefined) =>
+        timeline.buckets.map((bucket) =>
+          tache && tacheActiveInBucket(tache, bucket) ? '▓▓▓' : ''
+        )
+
       rows.forEach((r) => {
         if (r.type === 'cadre') {
-          exportRows.push([r.label ?? '', '', '', '', '', '', ''])
+          exportRows.push([
+            r.label ?? '',
+            ...Array(columns.length - 1).fill(''),
+          ])
 
           rowMetas.push({
             type: 'section',
@@ -215,6 +238,7 @@ export function TachesTable({
             r.tache?.date_fin_gt
               ? new Date(r.tache.date_fin_gt).toLocaleDateString('fr-FR')
               : '',
+            ...ganttCells(r.tache),
           ])
           rowMetas.push({
             type: 'data',
@@ -224,23 +248,23 @@ export function TachesTable({
       })
 
       return {
-        columns: columns.map((c) => ({
-          id: c.id as string,
-          header: c.header as string,
-        })),
+        columns: [
+          ...baseColumns.map((c) => ({
+            id: c.id as string,
+            header: c.header as string,
+          })),
+          ...timeline.buckets.map((bucket) => ({
+            id: `gantt_${bucket.key}`,
+            header: bucket.label,
+            width: 4,
+          })),
+        ],
 
         rowMetas,
         rows: exportRows,
 
-        visibleColumnIds: [
-          'code',
-          'activite',
-          'tache',
-          'proportion',
-          'lot',
-          'date_debut',
-          'date_fin',
-        ],
+        // Toutes les colonnes (base + Gantt) sont exportées.
+        visibleColumnIds: columns.map((c) => c.id as string),
       }
     },
   })
@@ -345,6 +369,23 @@ export function TachesTable({
                           )
                         : ''}
                     </TableCell>
+
+                    {timeline.buckets.map((bucket, bi) => {
+                      const active = row.tache
+                        ? tacheActiveInBucket(row.tache, bucket)
+                        : false
+
+                      return (
+                        <TableCell
+                          key={`gantt-${bucket.key}`}
+                          className={cellClassName(7 + bi)}
+                        >
+                          {active ? (
+                            <div className='-mx-4 my-0.5 h-3 bg-primary/70' />
+                          ) : null}
+                        </TableCell>
+                      )
+                    })}
                   </TableRow>
                 )
               }
