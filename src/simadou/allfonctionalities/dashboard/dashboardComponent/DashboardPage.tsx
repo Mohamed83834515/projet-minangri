@@ -330,15 +330,15 @@ const DashboardPage: React.FC = () => {
                     anneesDisponibles={anneesDisponibles}
                     selectedAnnee={selectedAnnee}
                     onAnneeChange={setSelectedAnnee}
-                    title='Avancement des Taches par Unite de Gestion'
+                    title='Avancement des Taches par Direction'
                 />
                 <AvancementTachesPlanSiteChart
                     data={tachesPlanSiteChartData}
                     anneesDisponibles={anneesDisponibles}
                     selectedAnnee={planSiteSelectedAnnee}
                     onAnneeChange={setPlanSiteSelectedAnnee}
-                    title='Avancement des Tâches par Plan Site'
-                    subtitle='Nombre total et taux de validation par service'
+                    title='Avancement des Tâches par Direction'
+                    subtitle='Nombre total et taux de validation par Direction'
                 />
             </div>
 
