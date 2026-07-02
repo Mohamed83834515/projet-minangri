@@ -32,6 +32,12 @@ const TABS = [
     icon: Tags,
     value: 'natures-marche',
   },
+  {
+    to: '/programmation/parametrage-marches/type-financement',
+    label: 'Types de financement PPM',
+    icon: FileText,
+    value: 'type-financement',
+  },
 ] as const
 
 
@@ -50,6 +56,8 @@ function ParametrageMarchesLayout() {
     ? 'modes-passation'
     : pathname.includes('/natures-marche')
       ? 'natures-marche'
+      : pathname.includes('/type-financement')
+        ? 'type-financement'
       : 'versions-ppm'
 
   return (

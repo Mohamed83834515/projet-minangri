@@ -13,7 +13,7 @@ export const getNatureMarcheFormConfig = (): FormConfig => ({
     {
       name: 'intitule_nature_marche',
       label: 'Intitulé',
-      type: 'text',
+      type: 'textarea',
       placeholder: 'Intitulé de la nature de marché',
       required: true,
       gridCols: 1,

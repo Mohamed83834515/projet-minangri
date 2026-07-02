@@ -13,7 +13,7 @@ export const getModePassationFormConfig = (): FormConfig => ({
     {
       name: 'intitule_mode_passation',
       label: 'Intitulé',
-      type: 'text',
+      type: 'textarea',
       placeholder: 'Intitulé du mode de passation',
       required: true,
       gridCols: 1,
