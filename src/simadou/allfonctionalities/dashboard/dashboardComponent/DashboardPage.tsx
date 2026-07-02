@@ -342,14 +342,14 @@ const DashboardPage: React.FC = () => {
                     subtitle='Nombre total et taux de validation par direction'
                     emptyMessage={`Aucune activité par direction pour l'année ${activitesDirectionSelectedAnnee}`}
                 />
-                <AvancementTachesPlanSiteChart
+                {/* <AvancementTachesPlanSiteChart
                     data={tachesPlanSiteChartData}
                     anneesDisponibles={anneesDisponibles}
                     selectedAnnee={planSiteSelectedAnnee}
                     onAnneeChange={setPlanSiteSelectedAnnee}
                     title='Avancement des Tâches par Plan Site'
                     subtitle='Nombre total et taux de validation par service'
-                />
+                /> */}
             </div>
 
         </div>
