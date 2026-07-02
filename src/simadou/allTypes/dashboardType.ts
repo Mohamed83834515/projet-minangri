@@ -26,6 +26,18 @@ export interface TacheActiviteByPlanSiteGroup {
   taches: TacheActiviteByPlanSiteSummary[]
 }
 
+export interface TacheActiviteByUglGroup {
+  ugl: {
+    id_ugl: number
+    code_ugl: string
+    nom_ugl: string
+    abrege_ugl: string
+  }
+  nb_taches: number
+  nb_taches_validees: number
+  taches: TacheActiviteByPlanSiteSummary[]
+}
+
 export interface AvancementTachesPlanSiteChartRow {
   service: string
   nbTaches: number

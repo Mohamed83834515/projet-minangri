@@ -21,6 +21,11 @@ export const tachesActiviteByPlanSiteQueryKeys = {
     ['tache-activite-by-plan-site', versionId, codeProgramme ?? ''] as const,
 }
 
+export const tachesActiviteByUglQueryKeys = {
+  byVersion: (versionId: number, codeProgramme?: string) =>
+    ['tache-activite-by-ugl', versionId, codeProgramme ?? ''] as const,
+}
+
 export function useGetPtbasProjetsByVersion(versionId?: number) {
   return useQuery({
     queryKey: ptbasProjetsVersionQueryKeys.byVersion(versionId ?? 0),
@@ -39,6 +44,23 @@ export function useGetTachesActiviteByPlanSite(versionId?: number) {
     ),
     queryFn: () =>
       tacheActivitePtbaService.getByPlanSite({
+        versionPtba: versionId!,
+        codeProgramme: codeProgramme ?? undefined,
+      }),
+    enabled: versionId != null && versionId > 0,
+  })
+}
+
+export function useGetTachesActiviteByUgl(versionId?: number) {
+  const codeProgramme = useActiveProgrammeCode()
+
+  return useQuery({
+    queryKey: tachesActiviteByUglQueryKeys.byVersion(
+      versionId ?? 0,
+      codeProgramme
+    ),
+    queryFn: () =>
+      tacheActivitePtbaService.getByUgl({
         versionPtba: versionId!,
         codeProgramme: codeProgramme ?? undefined,
       }),

@@ -20,6 +20,7 @@ interface AvancementTachesPlanSiteChartProps {
   onAnneeChange: (annee: number) => void
   title: string
   subtitle?: string
+  emptyMessage?: string
 }
 
 /** Couleurs alignées sur les autres graphiques dashboard (AvancementDirectionChart, etc.) */
@@ -61,6 +62,7 @@ const AvancementTachesPlanSiteChart: React.FC<
   onAnneeChange,
   title,
   subtitle,
+  emptyMessage,
 }) => {
   const chartData = useMemo(() => {
     return [...data].sort((a, b) => b.nbTaches - a.nbTaches)
@@ -100,7 +102,7 @@ const AvancementTachesPlanSiteChart: React.FC<
 
       {chartData.length === 0 ? (
         <div className='flex h-[320px] items-center justify-center text-sm text-muted-foreground'>
-          Aucune tâche par plan site pour l&apos;année {selectedAnnee}
+          {emptyMessage ?? `Aucune tâche pour l'année ${selectedAnnee}`}
         </div>
       ) : (
         <ResponsiveContainer width='100%' height={320}>

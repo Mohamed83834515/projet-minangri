@@ -21,7 +21,6 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import type { SuiviIndicateurActivite } from '@/simadou/allTypes'
-import type { Ptba } from '@/simadou/allTypes'
 import { IndicateurTache } from '@/simadou/allTypes/indicateurTache'
 import type { SuiviIndicateurActiviteFormData } from '@/simadou/schemas/suiviIndicateurSchemas'
 import {
@@ -32,7 +31,6 @@ import {
   useUpdateSuiviIndicateur,
   suiviPtbaQueryKeys,
 } from '@/simadou/allHooks/admin/suiviPtbaHooks'
-import { ensureIndicateurActivitePtbaCode } from './suiviIndicateurUtils'
 
 type SuiviRow = {
   id?: number
@@ -76,7 +74,6 @@ function rowHasData(row: SuiviRow): boolean {
 }
 
 type SuiviIndicateurInlineManagerProps = {
-  activite: Ptba
   indicateur: IndicateurTache
   onClose: () => void
 }
@@ -88,7 +85,6 @@ function syncRowsFromSuivis(suivis: SuiviIndicateurActivite[]): SuiviRow[] {
 }
 
 export default function SuiviIndicateurInlineManager({
-  activite,
   indicateur,
   onClose,
 }: SuiviIndicateurInlineManagerProps) {
@@ -177,13 +173,13 @@ export default function SuiviIndicateurInlineManager({
       }
     }
 
+    if (!codeIndicateur?.trim()) {
+      toast.error("Code indicateur manquant")
+      return
+    }
+
     setIsSaving(true)
     try {
-      const indicateurActiviteCode = await ensureIndicateurActivitePtbaCode(
-        activite,
-        indicateur
-      )
-
       for (const row of rowsToSave) {
         const payload: SuiviIndicateurActiviteFormData = {
           localite: row.localite,
@@ -191,7 +187,7 @@ export default function SuiviIndicateurInlineManager({
           valeur_suivi_indicateur: Number(
             row.valeur_suivi_indicateur.replace(',', '.')
           ),
-          indicateur_activite: indicateurActiviteCode,
+          indicateur_activite: codeIndicateur,
         }
 
         if (row.isNew) {

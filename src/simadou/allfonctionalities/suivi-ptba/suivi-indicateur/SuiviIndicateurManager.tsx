@@ -62,7 +62,6 @@ export default function SuiviIndicateurManager({
         >
           <SuiviIndicateurInlineManager
             key={selectedIndicateur.code_indicateur_ptba}
-            activite={activite}
             indicateur={selectedIndicateur}
             onClose={handleCloseForm}
           />

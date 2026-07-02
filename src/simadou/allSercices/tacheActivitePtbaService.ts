@@ -1,6 +1,7 @@
 import { apiClient } from "@/axios/api";
 import type {
   TacheActiviteByPlanSiteGroup,
+  TacheActiviteByUglGroup,
 } from "../allTypes/dashboardType";
 import type { TacheActivitePtba } from "../allTypes/tacheActivitePtba";
 import {
@@ -23,6 +24,21 @@ class TacheActivitePtbaService {
 
     return apiClient.request<TacheActiviteByPlanSiteGroup[]>(
       `${BASE_URL}by-plan-site/?${searchParams.toString()}`
+    )
+  }
+
+  async getByUgl(params: {
+    versionPtba: number
+    codeProgramme?: string
+  }): Promise<TacheActiviteByUglGroup[]> {
+    const searchParams = new URLSearchParams()
+    searchParams.set('version_ptba', String(params.versionPtba))
+    if (params.codeProgramme?.trim()) {
+      searchParams.set('code_programme', params.codeProgramme.trim())
+    }
+
+    return apiClient.request<TacheActiviteByUglGroup[]>(
+      `${BASE_URL}by-ugl/?${searchParams.toString()}`
     )
   }
 
