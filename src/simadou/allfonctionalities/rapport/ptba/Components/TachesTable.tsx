@@ -41,42 +41,49 @@ export function TachesTable({
 
   const columns: ColumnDef<TreeRow>[] = [
     {
-      accessorKey: 'code',
       id: 'code',
       header: 'Code',
+      accessorFn: (row) => row.ptba?.code_activite_ptba ?? '',
     },
     {
-      accessorKey: 'activite',
       id: 'activite',
       header: 'Activité',
+      accessorFn: (row) => row.ptba?.intitule_activite_ptba ?? '',
     },
     {
-      accessorKey: 'tache',
       id: 'tache',
       header: 'Intitulé tâche',
+      accessorFn: (row) => row.tache?.intutile_tache_gt ?? '',
     },
     {
-      accessorKey: 'proportion',
       id: 'proportion',
       header: 'Proportion',
+      accessorFn: (row) =>
+        row.tache?.proportion_gt != null ? String(row.tache.proportion_gt) : '',
     },
     {
-      accessorKey: 'lot',
       id: 'lot',
       header: 'N° Lot',
+      accessorFn: (row) =>
+        row.tache?.n_lot_gt != null ? String(row.tache.n_lot_gt) : '',
     },
     {
-      accessorKey: 'date_debut',
       id: 'date_debut',
       header: 'Date début',
+      accessorFn: (row) =>
+        row.tache?.date_debut_gt
+          ? new Date(row.tache.date_debut_gt).toLocaleDateString('fr-FR')
+          : '',
     },
     {
-      accessorKey: 'date_fin',
       id: 'date_fin',
       header: 'Date fin',
+      accessorFn: (row) =>
+        row.tache?.date_fin_gt
+          ? new Date(row.tache.date_fin_gt).toLocaleDateString('fr-FR')
+          : '',
     },
   ]
-
   const rows = useMemo(() => {
     const tachesByActivite = new Map<number, TacheActivitePtba[]>()
 
@@ -276,9 +283,12 @@ export function TachesTable({
                 return (
                   <TableRow className={`${rowClassName} font-bold`} key={i}>
                     {Array.from({ length: emptyColumns }).map((_, index) => (
-                      <TableCell key={index} className={cellClassName} />
+                      <TableCell key={index} className={cellClassName()} />
                     ))}
-                    <TableCell colSpan={spanColumns} className={cellClassName}>
+                    <TableCell
+                      colSpan={spanColumns}
+                      className={cellClassName()}
+                    >
                       {row.label}
                     </TableCell>
                   </TableRow>
@@ -299,28 +309,28 @@ export function TachesTable({
                 return (
                   <TableRow className={rowClassName} key={i}>
                     {isFirst && (
-                      <TableCell className={cellClassName} rowSpan={span}>
+                      <TableCell className={cellClassName(0)} rowSpan={span}>
                         {row.ptba?.code_activite_ptba}
                       </TableCell>
                     )}
 
                     {isFirst && (
-                      <TableCell className={cellClassName} rowSpan={span}>
+                      <TableCell className={cellClassName(1)} rowSpan={span}>
                         {row.ptba?.intitule_activite_ptba}
                       </TableCell>
                     )}
 
-                    <TableCell className={cellClassName}>
+                    <TableCell className={cellClassName(2)}>
                       {row.tache?.intutile_tache_gt}
                     </TableCell>
-                    <TableCell className={cellClassName}>
+                    <TableCell className={cellClassName(3)}>
                       {row.tache?.proportion_gt}
                     </TableCell>
-                    <TableCell className={cellClassName}>
+                    <TableCell className={cellClassName(4)}>
                       {row.tache?.n_lot_gt}
                     </TableCell>
 
-                    <TableCell className={cellClassName}>
+                    <TableCell className={cellClassName(5)}>
                       {row.tache?.date_debut_gt
                         ? new Date(row.tache.date_debut_gt).toLocaleDateString(
                             'fr-FR'
@@ -328,7 +338,7 @@ export function TachesTable({
                         : ''}
                     </TableCell>
 
-                    <TableCell className={cellClassName}>
+                    <TableCell className={cellClassName(6)}>
                       {row.tache?.date_fin_gt
                         ? new Date(row.tache.date_fin_gt).toLocaleDateString(
                             'fr-FR'

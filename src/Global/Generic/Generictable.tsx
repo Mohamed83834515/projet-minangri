@@ -14,6 +14,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
+import { detectAlignment } from '@/simadou/allfonctionalities/rapport/export/rapportExportUtils'
 import { cn } from '@/lib/utils'
 import { type NavigateFn, useTableUrlState } from '@/hooks/use-table-url-state'
 import {
@@ -85,7 +86,7 @@ type GenericTableProps<TData> = {
     index: number,
     options: {
       rowClassName: string
-      cellClassName: string
+      cellClassName: (cellIdx?: number) => string
     }
   ) => React.ReactNode
 }
@@ -293,21 +294,33 @@ export function GenericTable<TData>({
                   onRowClick && 'cursor-pointer'
                 )
 
-                const cellClassName = (cell?: Cell<TData, unknown>) =>
-                  cn(
+                const cellClassName = (
+                  cell?: Cell<TData, unknown> | number
+                ) => {
+                  const cll =
+                    typeof cell === 'number' ? row.getAllCells()[cell] : cell
+                  const align = detectAlignment(cll?.getValue())
+
+                  return cn(
                     'px-4 py-2.5 align-top text-sm',
                     // Force l'affichage complet du texte — écrase truncate/whitespace-nowrap des colonnes enfants
                     'break-words whitespace-normal',
                     '[&_*]:!overflow-visible [&_*]:!text-clip [&_*]:!whitespace-normal',
                     'border-r border-border/20 last:border-r-0',
-                    cell?.column.columnDef.meta?.className,
-                    cell?.column.columnDef.meta?.tdClassName
+                    `text-${align} justify-${align}`,
+                    typeof cell === 'number'
+                      ? ''
+                      : cell?.column.columnDef.meta?.className,
+                    typeof cell === 'number'
+                      ? ''
+                      : cell?.column.columnDef.meta?.tdClassName
                   )
+                }
 
                 if (customRowRenderer) {
                   return customRowRenderer(row.original, rowIdx, {
                     rowClassName,
-                    cellClassName: cellClassName(),
+                    cellClassName: (cellIdx) => cellClassName(cellIdx),
                   })
                 }
 

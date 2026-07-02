@@ -40,43 +40,53 @@ export function IndicateursTable({
   const columns: ColumnDef<TreeRow>[] = [
     {
       id: 'code',
-      accessorKey: 'code',
       header: 'Code',
+      accessorFn: (row) => row.ptba?.code_activite_ptba ?? '',
     },
     {
       id: 'activite',
-      accessorKey: 'activite',
       header: 'Activité',
+      accessorFn: (row) => row.ptba?.intitule_activite_ptba ?? '',
     },
     {
       id: 'indicateur',
-      accessorKey: 'indicateur',
       header: 'Indicateur',
+      accessorFn: (row) => row.ind?.intitule_indicateur_tache ?? '',
     },
     {
       id: 'unite',
-      accessorKey: 'unite',
       header: 'Unité',
+      accessorFn: (row) => {
+        const unite = unites.find((u) => u.id_unite == row.ind?.unite_ind_tache)
+
+        return unite
+          ? `${unite.definition_ui} (${unite.unite_ui})`
+          : (row.ind?.unite_ind_tache ?? '')
+      },
     },
     {
       id: 't1',
-      accessorKey: 't1',
       header: 'T1',
+      accessorFn: (row) =>
+        row.ind?.trimestre_1 != null ? String(row.ind.trimestre_1) : '',
     },
     {
       id: 't2',
-      accessorKey: 't2',
       header: 'T2',
+      accessorFn: (row) =>
+        row.ind?.trimestre_2 != null ? String(row.ind.trimestre_2) : '',
     },
     {
       id: 't3',
-      accessorKey: 't3',
       header: 'T3',
+      accessorFn: (row) =>
+        row.ind?.trimestre_3 != null ? String(row.ind.trimestre_3) : '',
     },
     {
       id: 't4',
-      accessorKey: 't4',
       header: 'T4',
+      accessorFn: (row) =>
+        row.ind?.trimestre_4 != null ? String(row.ind.trimestre_4) : '',
     },
   ]
 
@@ -309,9 +319,9 @@ export function IndicateursTable({
               return (
                 <TableRow className={`${rowClassName} font-bold`} key={i}>
                   {Array.from({ length: empty }).map((_, idx) => (
-                    <TableCell className={cellClassName} key={idx} />
+                    <TableCell className={cellClassName()} key={idx} />
                   ))}
-                  <TableCell className={cellClassName} colSpan={span}>
+                  <TableCell className={cellClassName()} colSpan={span}>
                     {row.label}
                   </TableCell>
                 </TableRow>
@@ -338,37 +348,37 @@ export function IndicateursTable({
             return (
               <TableRow className={rowClassName} key={i}>
                 {isFirst && (
-                  <TableCell className={cellClassName} rowSpan={span}>
+                  <TableCell className={cellClassName(0)} rowSpan={span}>
                     {row.ptba?.code_activite_ptba}
                   </TableCell>
                 )}
 
                 {isFirst && (
-                  <TableCell className={cellClassName} rowSpan={span}>
+                  <TableCell className={cellClassName(1)} rowSpan={span}>
                     {row.ptba?.intitule_activite_ptba}
                   </TableCell>
                 )}
 
-                <TableCell className={cellClassName}>
+                <TableCell className={cellClassName(2)}>
                   {row.ind?.intitule_indicateur_tache ?? '—'}
                 </TableCell>
 
-                <TableCell className={cellClassName}>
+                <TableCell className={cellClassName(3)}>
                   {unite
                     ? `${unite.definition_ui} (${unite.unite_ui})`
                     : row.ind?.unite_ind_tache}
                 </TableCell>
 
-                <TableCell className={cellClassName}>
+                <TableCell className={cellClassName(4)}>
                   {row.ind?.trimestre_1 ?? ''}
                 </TableCell>
-                <TableCell className={cellClassName}>
+                <TableCell className={cellClassName(5)}>
                   {row.ind?.trimestre_2 ?? ''}
                 </TableCell>
-                <TableCell className={cellClassName}>
+                <TableCell className={cellClassName(6)}>
                   {row.ind?.trimestre_3 ?? ''}
                 </TableCell>
-                <TableCell className={cellClassName}>
+                <TableCell className={cellClassName(7)}>
                   {row.ind?.trimestre_4 ?? ''}
                 </TableCell>
               </TableRow>

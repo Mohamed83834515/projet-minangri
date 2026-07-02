@@ -45,43 +45,44 @@ export function CoutActiviteTable({
   const columns: ColumnDef<TreeRow>[] = [
     {
       id: 'code',
-      accessorKey: 'code',
       header: 'Code',
+      accessorFn: (row) => row.ptba?.code_activite_ptba ?? '',
     },
     {
       id: 'activite',
-      accessorKey: 'activite',
       header: 'Activité',
+      accessorFn: (row) => row.ptba?.intitule_activite_ptba ?? '',
     },
     {
       id: 'ordre',
-      accessorKey: 'ordre',
       header: '#',
+      accessorFn: (row) => row.cout?.ordre ?? '',
     },
     {
       id: 'tache',
-      accessorKey: 'tache',
       header: 'Intitulé tâche',
+      accessorFn: (row) => row.cout?.intitule_tache ?? '',
     },
     {
       id: 'unite',
-      accessorKey: 'unite',
       header: 'Unité',
+      accessorFn: (row) => row.cout?.unite_cu ?? '',
     },
     {
       id: 'quantite',
-      accessorKey: 'quantite',
       header: 'Quantité',
+      accessorFn: (row) => (row.cout ? fmt(row.cout.quantite_cu) : ''),
     },
     {
       id: 'prix',
-      accessorKey: 'prix',
-      header: `Prix unitaire`,
+      header: 'Prix unitaire',
+      accessorFn: (row) => (row.cout ? fmt(row.cout.prix_unitaire) : ''),
     },
     {
       id: 'montant',
-      accessorKey: 'montant',
       header: 'Montant',
+      accessorFn: (row) =>
+        row.cout ? fmt(row.cout.quantite_cu * row.cout.prix_unitaire) : '',
     },
   ]
 
@@ -316,20 +317,20 @@ export function CoutActiviteTable({
           defaultPageSize={rows.length}
           showSearch={false}
           showViewOptions={false}
-          customRowRenderer={(row, i, { rowClassName, cellClassName }) => {
+          customRowRenderer={(row, rowIdx, { rowClassName, cellClassName }) => {
             if (row.type === 'cadre') {
               const empty = row.niveau
 
               return (
-                <TableRow className={`${rowClassName} font-bold`} key={i}>
+                <TableRow className={`${rowClassName} font-bold`} key={rowIdx}>
                   {Array.from({
                     length: empty,
                   }).map((_, x) => (
-                    <TableCell className={cellClassName} key={x} />
+                    <TableCell className={cellClassName()} key={x} />
                   ))}
 
                   <TableCell
-                    className={cellClassName}
+                    className={cellClassName()}
                     colSpan={columns.length - empty}
                   >
                     {row.label}
@@ -341,39 +342,39 @@ export function CoutActiviteTable({
             const span = row.groupKey ? (groupSpans.get(row.groupKey) ?? 1) : 1
 
             const first =
-              rows.findIndex((r) => r.groupKey === row.groupKey) === i
+              rows.findIndex((r) => r.groupKey === row.groupKey) === rowIdx
 
             return (
-              <TableRow className={rowClassName} key={i}>
+              <TableRow className={rowClassName} key={rowIdx}>
                 {first && (
-                  <TableCell className={cellClassName} rowSpan={span}>
+                  <TableCell className={cellClassName(0)} rowSpan={span}>
                     {row.ptba?.code_activite_ptba}
                   </TableCell>
                 )}
 
                 {first && (
-                  <TableCell className={cellClassName} rowSpan={span}>
+                  <TableCell className={cellClassName(1)} rowSpan={span}>
                     {row.ptba?.intitule_activite_ptba}
                   </TableCell>
                 )}
 
-                <TableCell className={cellClassName}>
+                <TableCell className={cellClassName(2)}>
                   {row.cout?.ordre}
                 </TableCell>
-                <TableCell className={cellClassName}>
+                <TableCell className={cellClassName(3)}>
                   {row.cout?.intitule_tache}
                 </TableCell>
-                <TableCell className={cellClassName}>
+                <TableCell className={cellClassName(4)}>
                   {row.cout?.unite_cu}
                 </TableCell>
-                <TableCell className={cellClassName}>
+                <TableCell className={cellClassName(5)}>
                   {row.cout && fmt(row.cout.quantite_cu)}
                 </TableCell>
-                <TableCell className={cellClassName}>
+                <TableCell className={cellClassName(6)}>
                   {row.cout && fmt(row.cout.prix_unitaire)}
                 </TableCell>
 
-                <TableCell className={cellClassName}>
+                <TableCell className={cellClassName(7)}>
                   {row.cout
                     ? fmt(row.cout.quantite_cu * row.cout.prix_unitaire)
                     : 'Aucun coût'}
