@@ -331,16 +331,16 @@ const DashboardPage: React.FC = () => {
                     anneesDisponibles={anneesDisponibles}
                     selectedAnnee={selectedAnnee}
                     onAnneeChange={setSelectedAnnee}
-                    title='Avancement des Taches par Direction'
+                    title='Avancement des activités de PTBA par Direction'
                 />
                 <AvancementTachesPlanSiteChart
                     data={activitesDirectionChartData}
                     anneesDisponibles={anneesDisponibles}
                     selectedAnnee={activitesDirectionSelectedAnnee}
                     onAnneeChange={setActivitesDirectionSelectedAnnee}
-                    title='Avancement des activités par Direction'
+                    title='Avancement des Taches par Direction'
                     subtitle='Nombre total et taux de validation par direction'
-                    emptyMessage={`Aucune activité par direction pour l'année ${activitesDirectionSelectedAnnee}`}
+                    emptyMessage={`Aucune tache par direction pour l'année ${activitesDirectionSelectedAnnee}`}
                 />
                 {/* <AvancementTachesPlanSiteChart
                     data={tachesPlanSiteChartData}
