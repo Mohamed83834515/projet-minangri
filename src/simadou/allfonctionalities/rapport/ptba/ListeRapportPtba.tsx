@@ -44,7 +44,7 @@ export default function ListeRapportPtba() {
   const search = route.useSearch()
   const navigate = route.useNavigate()
 
-  const { data: ptbas } = useGetPtbas()
+  const { data: ptbas } = useGetPtbas(selectedVersionId ? Number(selectedVersionId) : 0)
   const { data: personnels = [] } = useGetPersonnels()
   const { data: config } = useGeneralParamsQuery()
   const currencyCode = config?.currencyCode

@@ -11,7 +11,6 @@ export { useGetIndicateursByActivite } from './indicateurTacheHooks'
 import type { SuiviTacheActivite, TacheActivitePtba } from '@/simadou/allTypes'
 import { resolveIdActivite } from '@/simadou/allTypes/tacheActivitePtba'
 import { tauxAvancementGlobalTaches } from '@/simadou/allTypes/suiviTacheActivite'
-import type { SuiviIndicateurActiviteFormData } from '@/simadou/schemas/suiviIndicateurSchemas'
 import type { SuiviTacheActiviteFormData } from '@/simadou/schemas/suiviTacheActiviteSchemas'
 import type { ObservationPtbaFormData } from '@/simadou/schemas/observationPtbaSchemas'
 import type { SuiviDecaissementPtbaFormData } from '@/simadou/schemas/suiviDecaissementPtbaSchemas'
@@ -21,8 +20,6 @@ import type {
   SuiviAvancementWithSourcesInput,
 } from '@/simadou/allSercices/suiviAvancementContratService'
 import { SuiviIndicateurTacheProjetPayload } from '@/simadou/schemas/suiviIndicateurTacheProjetSchemas'
-import suiviIndicateurTacheProjetService from '@/simadou/allSercices/suiviIndicateurTacheProjetService'
-import { suiviPtbaProjetQueryKeys } from './suiviPtbaProjetHooks'
 import suiviIndicateurTacheService from '@/simadou/allSercices/suiviIndicateurTache'
 
 
