@@ -71,7 +71,7 @@ export default function SuiviIndicateurManager({
           <SuiviIndicateurActiviteTable
             activite={activite}
             indicateurs={indicateurs}
-            suivis={suivis}
+            suivis={suivis as any}
             onSuivre={handleSuivre}
           />
         </div>
