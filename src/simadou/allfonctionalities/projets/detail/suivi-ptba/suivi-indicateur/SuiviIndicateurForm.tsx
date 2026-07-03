@@ -28,7 +28,6 @@ export default function AddSuiviIndicateur({
   onSuccess,
 }: AddSuiviIndicateurProps) {
   const { data: localites = [], isLoading: isLoadingLocalites } = useGetLocalites()
-
   const indicateurOptions = [
     { value: '1', label: 'Indicateur 1' },
     { value: '2', label: 'Indicateur 2' },
@@ -50,7 +49,6 @@ export default function AddSuiviIndicateur({
     localite: suivi?.localite || '',
     indicateur_activite: suivi?.indicateur_activite || (indicateurId ? String(indicateurId) : null),
   }
-
   const form = useForm<SuiviIndicateurActiviteFormData>({
     resolver: zodResolver(suiviIndicateurActiviteSchema),
     defaultValues,

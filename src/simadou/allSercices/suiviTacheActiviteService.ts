@@ -92,7 +92,7 @@ const suiviTacheActiviteService = {
   async getByActivite(idActivite: number): Promise<SuiviTacheActivite[]> {
     const response = await apiClient.request<unknown>(ENDPOINT, {
       method: "GET",
-      params: { id_activite: idActivite },
+      params: { id_activite_ptba: idActivite },
     });
     return normalizeList(response).map(mapSuiviTacheActiviteFromApi);
   },

@@ -43,8 +43,6 @@ const DashboardPage: React.FC = () => {
     const idProgramme = useActiveProgrammeId()
     const { data: projets = [] } = useGetProjets()
     const { data: avancement_directions = [] } = useGetAvancementDirections()
-    const { data: ptbas = [] } = useGetPtbas()
-
 
     const { data: versions = [] } = useGetVersions()
     const {
@@ -53,6 +51,8 @@ const DashboardPage: React.FC = () => {
         setSelectedAnnee,
         selectedVersion,
     } = useDashboardAnneeSelection(versions)
+
+    const { data: ptbas = [] } = useGetPtbas(selectedVersion?.id_version_ptba || 0)
 
     const {
         selectedAnnee: activitesDirectionSelectedAnnee,

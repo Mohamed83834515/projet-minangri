@@ -83,12 +83,11 @@ export function buildSuiviTacheColumns(
       <DataTableColumnHeader column={column} title='P%' />
     ),
     cell: ({ row }) => {
-      const raw = row.original.proportion_gt?.trim()
+      const raw = row.original.proportion_gt
       if (!raw) {
         return <span className='text-muted-foreground'>—</span>
       }
-      const label = raw.endsWith('%') ? raw : `${raw}%`
-      return <span className='font-semibold tabular-nums'>{label}</span>
+      return <span className='font-semibold tabular-nums'>{raw}</span>
     },
     meta: { thClassName: 'text-center', className: 'text-center' },
     enableSorting: false,

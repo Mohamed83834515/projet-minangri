@@ -31,7 +31,7 @@ export default function RapportPtbaPage() {
   const { tabsStyle } = useNiveauTabsTheme()
 
   const { data: ptbasRaw = EMPTY_PTBA_LIST, isLoading: ptbasLoading } =
-    useGetPtbas()
+    useGetPtbas(Number(selectedVersionId))
   const { data: allTaches = [], isLoading: tachesLoading } =
     useGetAllTachesActivite()
   const { data: allIndicateurs = [], isLoading: indicateursLoading } =

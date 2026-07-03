@@ -37,8 +37,8 @@ export default function ListeSuiviPtba() {
   const [showObservationModal, setShowObservationModal] = useState(false)
   const [observationActivite, setObservationActivite] = useState<Ptba | null>(null)
 
-  const { data: ptbas = [] } = useGetPtbas()
-
+  const { data: ptbas = [] } = useGetPtbas(Number(selectedVersionId))
+ 
   const filteredPtbas = useMemo(() => {
     if (!selectedVersionId) return ptbas
     return ptbas.filter(
