@@ -20,6 +20,10 @@ export const tachesActiviteByPlanSiteQueryKeys = {
   byVersion: (versionId: number, codeProgramme?: string) =>
     ['tache-activite-by-plan-site', versionId, codeProgramme ?? ''] as const,
 }
+export const avancementComposanteQueryKeys = {
+  byVersion: (niveau: number, versionId: number, codeProgramme?: string) =>
+    ['avancement-composantes', niveau, versionId, codeProgramme ?? ''] as const,
+}
 
 export const tachesActiviteByUglQueryKeys = {
   byVersion: (versionId: number, codeProgramme?: string) =>
@@ -34,6 +38,20 @@ export function useGetPtbasProjetsByVersion(versionId?: number) {
   })
 }
 
+export function useGetAvancementParComposantes(niveau?: number, versionId?: number) {
+  const codeProgramme = useActiveProgrammeCode()
+
+  return useQuery({
+    queryKey: avancementComposanteQueryKeys.byVersion(
+      niveau ?? 0,
+      versionId ?? 0,
+      codeProgramme
+    ),
+    queryFn: () =>
+      dashboardService.avancementParComposante(codeProgramme ?? '', niveau ?? 0, versionId ?? 0),
+    enabled: niveau != null && niveau > 0,
+  })
+}
 export function useGetTachesActiviteByPlanSite(versionId?: number) {
   const codeProgramme = useActiveProgrammeCode()
 

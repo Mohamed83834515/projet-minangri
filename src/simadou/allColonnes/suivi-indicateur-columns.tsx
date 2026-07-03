@@ -42,7 +42,7 @@ export function getValeurCibleIndicateur(
   const values: number[] = []
   for (const t of trimestres) {
     const raw =
-      typeof t === 'string' ? t.trim() : t != null ? String(t).trim() : ''
+      typeof t === 'string' ? t : t != null ? String(t).trim() : 0
     if (!raw) continue
     const n = Number(raw.replace(/\s/g, '').replace(',', '.'))
     if (Number.isFinite(n)) values.push(n)

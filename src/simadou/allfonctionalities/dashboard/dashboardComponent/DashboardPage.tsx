@@ -10,6 +10,7 @@ import { useGetPtbas } from '@/simadou/allHooks/admin/ptbaHooks'
 import {
     useDashboardAnneeSelection,
     useGetAvancementDirections,
+    useGetAvancementParComposantes,
     useGetPtbasProjetsByVersion,
     useGetTachesActiviteByUgl,
 } from '@/simadou/allHooks/admin/dashboardProgrammeHooks'
@@ -30,6 +31,7 @@ import ProjectTable from './ProjectTable'
 import StatCard from './StatCard'
 import AvancementDirectionChart from './AvancementDirectionChart'
 import AvancementTachesPlanSiteChart from './AvancementTachesPlanSiteChart'
+import AvancementComposanteChart from './Avancementcomposantechart'
 
 
 // ─── Dashboard principal ───────────────────────────────────────────────────────
@@ -58,7 +60,16 @@ const DashboardPage: React.FC = () => {
         selectedVersion: activitesDirectionSelectedVersion,
     } = useDashboardAnneeSelection(versions)
 
+    const {
+        selectedAnnee: composanteSelectedAnnee,
+        setSelectedAnnee: setComposanteSelectedAnnee,
+        selectedVersion: composanteSelectedVersion,
+    } = useDashboardAnneeSelection(versions)
+
     const selectedVersionId = selectedVersion?.id_version_ptba
+    const composanteSelectedVersionId = composanteSelectedVersion?.id_version_ptba
+    const { data: avancementComposantesNiveau2 = [] } = useGetAvancementParComposantes(2, composanteSelectedVersionId)
+    const { data: avancementComposantesNiveau3 = [] } = useGetAvancementParComposantes(3, composanteSelectedVersionId)
     const activitesDirectionVersionId =
         activitesDirectionSelectedVersion?.id_version_ptba
 
@@ -85,6 +96,8 @@ const DashboardPage: React.FC = () => {
                 (r.bailleur && r.bailleur.toLowerCase().includes(q))
         )
     }, [projetRows, searchQuery])
+    console.log('avancementComposantesNiveau2', avancementComposantesNiveau2)
+    console.log('avancementComposantesNiveau3', avancementComposantesNiveau3)
 
     // Données pour la carte 1 : Projet Programme
     const { data: projectsPerType = [] } = useCountProjectsPerType(idProgramme || 0)
@@ -312,7 +325,15 @@ const DashboardPage: React.FC = () => {
                 projets={projetRowsFiltered}
                 pageSize={10}
             />
-
+            <AvancementComposanteChart
+                niveau2Data={avancementComposantesNiveau2}
+                niveau3Data={avancementComposantesNiveau3}
+                anneesDisponibles={anneesDisponibles}
+                selectedAnnee={composanteSelectedAnnee}
+                onAnneeChange={setComposanteSelectedAnnee}
+                title='PTBA par composante'
+                subtitle='Avancement technique · Indicateurs · Décaissement'
+            />
 
             {/* ── Graphiques ligne 2 : Avancement par service ── */}
             <div className='grid grid-cols-1 gap-2 lg:grid-cols-2'>
