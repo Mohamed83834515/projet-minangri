@@ -74,10 +74,10 @@ export default function IndicateurTacheProjetForm({
       indicateur_cmr:
         resolveIndicateurCmrFormValue(indicateur?.indicateur_cmr) ??
         (undefined as unknown as number),
-      trimestre_1: indicateur?.trimestre_1 || '',
-      trimestre_2: indicateur?.trimestre_2 || '',
-      trimestre_3: indicateur?.trimestre_3 || '',
-      trimestre_4: indicateur?.trimestre_4 || '',
+      trimestre_1: indicateur?.trimestre_1 || 0,
+      trimestre_2: indicateur?.trimestre_2 || 0,
+      trimestre_3: indicateur?.trimestre_3 || 0,
+      trimestre_4: indicateur?.trimestre_4 || 0,
       id_activite: indicateur?.id_activite || Number(idActivite),
     }),
     [indicateur, idActivite]
