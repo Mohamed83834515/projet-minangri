@@ -9,9 +9,9 @@ import type { IndicateurTacheFormData } from '@/simadou/schemas/indicateurTacheS
 import { resolveRelationId } from '@/simadou/lib/resolveApiRelation'
 import { IndicateurPerformanceProjet } from '../allTypes'
 
-function normalizeTrimestre(value: unknown): string {
-  if (value == null) return ''
-  return String(value)
+function normalizeTrimestre(value: unknown): number {
+  if (value == null) return 0
+  return Number(value)
 }
 
 export function normalizeIndicateurTache(raw: IndicateurTache): IndicateurTache {
@@ -111,9 +111,9 @@ export function buildIndicateurTachePayload(
     unite_ind_tache: data.unite_ind_tache,
     indicateur_cmr: data.indicateur_cmr,
     id_activite: idActivite,
-    trimestre_1: data.trimestre_1?.trim() ?? '',
-    trimestre_2: data.trimestre_2?.trim() ?? '',
-    trimestre_3: data.trimestre_3?.trim() ?? '',
-    trimestre_4: data.trimestre_4?.trim() ?? '',
+    trimestre_1: data.trimestre_1 ?? 0,
+    trimestre_2: data.trimestre_2 ?? 0,
+    trimestre_3: data.trimestre_3 ?? 0,
+    trimestre_4: data.trimestre_4 ?? 0,
   }
 }
