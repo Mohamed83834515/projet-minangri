@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -8,10 +8,11 @@ import {
 import { GenericTable } from '@/Global/Generic/Generictable'
 import { DIALOG_SIZES } from '@/Global/Forms/dialog'
 import { useEmbeddedTableState } from '@/hooks/use-embedded-table-state'
-import type { Projet } from '@/simadou/allTypes'
+import type { Projet, Ptba } from '@/simadou/allTypes'
 import type { PtbaProjet } from '@/simadou/allTypes/ptbaProjet'
-import { useGetPtbasProjet } from '@/simadou/allHooks/admin/ptbaProjetHooks'
+import { useGetPtbasProjetsByVersion } from '@/simadou/allHooks/admin/ptbaProjetHooks'
 import { useSuiviPtbaProjetActivitesProgress } from '@/simadou/allHooks/admin/suiviPtbaProjetHooks'
+import { useProjetPtbaVersionSelection } from '@/simadou/allHooks/admin/versionHooks'
 import ActiviteTabbedDialog from '@/simadou/allfonctionalities/suivi-ptba/ActiviteTabbedDialog'
 import SuiviTacheActiviteProjetManager from './suivi-tache/SuiviTacheActiviteManager'
 import SuiviIndicateurProjetManager from './suivi-indicateur/SuiviIndicateurManager'
@@ -19,90 +20,43 @@ import SuiviAvancementContratProjetManager from './suivi-avancement-contrat/Suiv
 import SuiviDecaissementPtbaProjetManager from './suivi-decaissement/SuiviDecaissementPtbaProjetManager'
 import { buildSuiviPtbaProjetColumns } from '@/simadou/allColonnes/suivi-ptba-projet-columns'
 import { PtbaVersionSelect } from '@/simadou/allfonctionalities/ptba/PtbaVersionSelect'
-import { usePtbaVersionSelection } from '@/simadou/allHooks/admin/versionHooks'
-import { useActiveProgrammeCode } from '@/hooks/use-active-programme'
 
 type ProjetSuiviPtbaPanelProps = {
   projet: Projet
 }
 
-export default function ProjetSuiviPtbaPanel({ projet }: ProjetSuiviPtbaPanelProps) {
+const EMPTY_PTBAS: PtbaProjet[] = []
+
+export default function ProjetSuiviPtbaPanel({
+  projet,
+}: ProjetSuiviPtbaPanelProps) {
   const codeProjet = projet.code_projet
-  const activeProgrammeCode = useActiveProgrammeCode()
-  const codeProgramme =
-    typeof projet.programme_projet === 'object' &&
-      projet.programme_projet?.code_programme
-      ? projet.programme_projet.code_programme
-      : activeProgrammeCode
+  const {
+    selectedVersionId,
+    handleChangeVersion,
+    filteredVersionOptions,
+    selectedVersionPtbaId,
+  } = useProjetPtbaVersionSelection(projet)
 
   const { search, navigate } = useEmbeddedTableState()
-  const { data: ptbas = [] } = useGetPtbasProjet(codeProjet)
-
-  // 📌 Filtre par version (année)
-  const { selectedVersionId, handleChangeVersion, versionOptions } =
-    usePtbaVersionSelection(codeProgramme)
-
   const [suiviActivite, setSuiviActivite] = useState<PtbaProjet | null>(null)
   const [showSuiviModal, setShowSuiviModal] = useState(false)
   const [showObservationModal, setShowObservationModal] = useState(false)
   const [observationActivite, setObservationActivite] =
     useState<PtbaProjet | null>(null)
 
-  // ✅ Calculer les années de la durée du projet
-  const projectYears = useMemo(() => {
-    if (!projet.date_demarrage_projet || !projet.duree_projet) {
-      return []
-    }
+  const { data: ptbasByVersion } = useGetPtbasProjetsByVersion(
+    selectedVersionPtbaId > 0 ? selectedVersionPtbaId : undefined,
+    codeProjet
+  )
+  const ptbas = ptbasByVersion?.ptbas_projets ?? EMPTY_PTBAS
 
-    const startDate = new Date(projet.date_demarrage_projet)
-    const startYear = startDate.getFullYear()
-    const durationInMonths = projet.duree_projet
-    const durationInYears = Math.ceil(durationInMonths / 12)
-    
-    return Array.from({ length: durationInYears }, (_, i) => startYear + i)
-  }, [projet.date_demarrage_projet, projet.duree_projet])
-
-  // ✅ Filtrer les versionOptions par durée du projet
-  const filteredVersionOptions = useMemo(() => {
-    const years = new Set(projectYears)
-    
-    return versionOptions.filter((option) => {
-      // ✅ Extraire l'année du label (ex: "2025" ou "Version 2025")
-      const yearMatch = option.label.match(/\d{4}/)
-      if (!yearMatch) return false
-      const year = Number(yearMatch[0])
-      return years.has(year)
-    })
-  }, [versionOptions, projectYears])
-
-  // ✅ Mettre à jour selectedVersionId si la version sélectionnée n'est plus valide
-  useEffect(() => {
-    if (filteredVersionOptions.length === 0) return
-    
-    const isSelectedValid = filteredVersionOptions.some(
-      (opt) => opt.value === selectedVersionId
-    )
-    
-    if (!isSelectedValid) {
-      handleChangeVersion(filteredVersionOptions[0].value)
-    }
-  }, [filteredVersionOptions, selectedVersionId, handleChangeVersion])
-
-  // 📌 Filtrer les PTBA par version (année) sélectionnée
-  const filteredPtbas = useMemo(() => {
-    if (!selectedVersionId) return ptbas
-    return ptbas.filter(
-      (ptba) => ptba.version_ptba?.toString() === selectedVersionId
-    )
-  }, [ptbas, selectedVersionId])
-
-  // 📌 Extraire les IDs des activités filtrées
   const activiteIds = useMemo(
     () =>
-      filteredPtbas
+      ptbas
         .map((a) => a.id_ptba)
         .filter((id): id is number => Number.isFinite(id)),
-    [filteredPtbas]
+    [ptbas]
   )
 
   const {
@@ -111,22 +65,32 @@ export default function ProjetSuiviPtbaPanel({ projet }: ProjetSuiviPtbaPanelPro
     isLoading: progressLoading,
   } = useSuiviPtbaProjetActivitesProgress(activiteIds)
 
+  const onOpenSuivi = useCallback((activite: Ptba) => {
+    setSuiviActivite(activite as PtbaProjet)
+    setShowSuiviModal(true)
+  }, [])
+
+  const onOpenObservations = useCallback((activite: Ptba) => {
+    setObservationActivite(activite as PtbaProjet)
+    setShowObservationModal(true)
+  }, [])
+
   const columns = useMemo(
     () =>
       buildSuiviPtbaProjetColumns({
-        onOpenSuivi: (activite) => {
-          setSuiviActivite(activite as PtbaProjet)
-          setShowSuiviModal(true)
-        },
-        onOpenObservations: (activite) => {
-          setObservationActivite(activite as PtbaProjet)
-          setShowObservationModal(true)
-        },
+        onOpenSuivi,
+        onOpenObservations,
         tachesByActivite,
         avancementByActivite,
         progressLoading,
       }),
-    [tachesByActivite, avancementByActivite, progressLoading]
+    [
+      onOpenSuivi,
+      onOpenObservations,
+      tachesByActivite,
+      avancementByActivite,
+      progressLoading,
+    ]
   )
 
   return (
@@ -135,7 +99,6 @@ export default function ProjetSuiviPtbaPanel({ projet }: ProjetSuiviPtbaPanelPro
         <p className='text-sm text-muted-foreground'>
           Suivi d&apos;avancement des activités PTBA rattachées à ce projet.
         </p>
-        {/* 📌 Sélecteur de version (année) filtré */}
         {filteredVersionOptions.length > 0 ? (
           <PtbaVersionSelect
             options={filteredVersionOptions}
@@ -146,7 +109,7 @@ export default function ProjetSuiviPtbaPanel({ projet }: ProjetSuiviPtbaPanelPro
       </div>
 
       <GenericTable<PtbaProjet>
-        data={filteredPtbas}  
+        data={ptbas}
         columns={columns}
         search={search}
         navigate={navigate}

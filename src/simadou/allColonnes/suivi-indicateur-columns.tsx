@@ -1,6 +1,6 @@
 import { type ColumnDef } from '@tanstack/react-table'
 import type { IndicateurTache } from '@/simadou/allTypes/indicateurTache'
-import type { SuiviIndicateurActivite } from '@/simadou/allTypes/suiviIndicateurActivite'
+import type { SuiviIndicateurTache } from '@/simadou/allTypes/suiviIndicateurTacheProjet'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { DataTableColumnHeader } from '@/components/data-table'
@@ -11,7 +11,7 @@ export type SuiviIndicateurTableRow = IndicateurTache
 export type SuiviIndicateurColumnHandlers = {
   unites?: UniteIndicateur[]
   onSuivre: (indicateur: IndicateurTache) => void
-  suivisByIndicateur: Map<string, SuiviIndicateurActivite[]>
+  suivisByIndicateur: Map<string, SuiviIndicateurTache[]>
   resolveIndicateurKey?: (indicateur: IndicateurTache) => string
 }
 
@@ -56,7 +56,7 @@ export function getValeurCibleIndicateur(
 }
 
 export function countSuivisForIndicateur(
-  suivisByIndicateur: Map<string, SuiviIndicateurActivite[]>,
+  suivisByIndicateur: Map<string, SuiviIndicateurTache[]>,
   indicateur: IndicateurTache,
   resolveIndicateurKey?: (indicateur: IndicateurTache) => string
 ): number {

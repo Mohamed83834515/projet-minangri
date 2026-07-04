@@ -14,9 +14,18 @@ const versionPtbaService = {
     return apiClient.request(`${ENDPOINT}${id}/`, { method: "GET" });
   },
 
-  async getPtbasProjets(idVersion: number): Promise<VersionPtbasProjetsResponse> {
+  async getPtbasProjets(
+    idVersion: number,
+    codeProjet?: string,
+  ): Promise<VersionPtbasProjetsResponse> {
+    const params =
+      codeProjet?.trim()
+        ? { code_projet: codeProjet.trim() }
+        : undefined
+
     return apiClient.request(`${ENDPOINT}${idVersion}/ptbas-projets/`, {
       method: "GET",
+      params,
     });
   },
 

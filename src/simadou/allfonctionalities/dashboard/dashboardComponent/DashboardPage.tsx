@@ -11,9 +11,9 @@ import {
     useDashboardAnneeSelection,
     useGetAvancementDirections,
     useGetAvancementParComposantes,
-    useGetPtbasProjetsByVersion,
     useGetTachesActiviteByUgl,
 } from '@/simadou/allHooks/admin/dashboardProgrammeHooks'
+import { useGetPtbasProjetsByVersion } from '@/simadou/allHooks/admin/ptbaProjetHooks'
 import { formatNumber } from '@/simadou/allSercices/montantFormater'
 import type { ProjetDashboardSource } from '@/simadou/allTypes/dashboardProjet'
 import {

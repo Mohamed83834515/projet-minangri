@@ -20,11 +20,17 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import type { SuiviIndicateurTacheProjet } from '@/simadou/allTypes/suiviIndicateurTacheProjet'
+import type { SuiviIndicateurTache } from '@/simadou/allTypes/suiviIndicateurTacheProjet'
 import { IndicateurTache } from '@/simadou/allTypes/indicateurTache'
-import type { SuiviIndicateurTacheProjetPayload } from '@/simadou/schemas/suiviIndicateurTacheProjetSchemas'
-import { useCreateSuiviIndicateur, useGetLocalites, useGetSuivisIndicateurByIndicateur, useUpdateSuiviIndicateur } from '@/simadou/allHooks/admin/suiviPtbaHooks'
-import { indicateursTacheAllQueryKey, useDeleteSuiviIndicateur } from '@/simadou/allHooks/admin/indicateurTacheHooks'
+import type { SuiviIndicateurTachePayload } from '@/simadou/schemas/suiviIndicateurTacheProjetSchemas'
+import {
+  useCreateSuiviIndicateur,
+  useDeleteSuiviIndicateur,
+  useGetLocalites,
+  useGetSuivisIndicateurByIndicateur,
+  useUpdateSuiviIndicateur,
+  suiviPtbaQueryKeys,
+} from '@/simadou/allHooks/admin/suiviPtbaHooks'
 
 type SuiviRow = {
   id?: number
@@ -34,7 +40,7 @@ type SuiviRow = {
   isNew: boolean
 }
 
-function toRow(suivi: SuiviIndicateurTacheProjet): SuiviRow {
+function toRow(suivi: SuiviIndicateurTache): SuiviRow {
   return {
     id: suivi.id_suivi_sit,
     commune_sit: suivi.commune_sit ?? null,
@@ -64,13 +70,13 @@ type SuiviIndicateurInlineManagerProps = {
   onClose: () => void
 }
 
-function syncRowsFromSuivis(suivis: SuiviIndicateurTacheProjet[]): SuiviRow[] {
+function syncRowsFromSuivis(suivis: SuiviIndicateurTache[]): SuiviRow[] {
   return suivis.length === 0
     ? [createEmptyRow()]
     : [...suivis.map(toRow), createEmptyRow()]
 }
 
-export default function SuiviIndicateurInlineProjetManager({
+export default function SuiviIndicateurInlineManager({
   indicateur,
   onClose,
 }: SuiviIndicateurInlineManagerProps) {
@@ -101,7 +107,7 @@ export default function SuiviIndicateurInlineProjetManager({
     await Promise.all([
       refetch(),
       queryClient.refetchQueries({
-        queryKey: indicateursTacheAllQueryKey,
+        queryKey: suiviPtbaQueryKeys.suivisIndicateurs,
       }),
     ])
   }
@@ -143,6 +149,11 @@ export default function SuiviIndicateurInlineProjetManager({
       return
     }
 
+    if (!Number.isFinite(idIndicateur) || idIndicateur <= 0) {
+      toast.error('Indicateur manquant')
+      return
+    }
+
     for (const row of rowsToSave) {
       if (row.commune_sit == null) {
         toast.error('La commune est requise sur chaque ligne')
@@ -162,7 +173,7 @@ export default function SuiviIndicateurInlineProjetManager({
     setIsSaving(true)
     try {
       for (const row of rowsToSave) {
-        const payload: SuiviIndicateurTacheProjetPayload = {
+        const payload: SuiviIndicateurTachePayload = {
           commune_sit: row.commune_sit!,
           date_suivi_sit: row.date_suivi_sit,
           valeur_suivi_sit: Math.trunc(
@@ -259,7 +270,7 @@ export default function SuiviIndicateurInlineProjetManager({
                       <SelectValue placeholder='Commune' />
                     </SelectTrigger>
                     <SelectContent>
-                      {localites.map((loc:any) => (
+                      {localites.map((loc) => (
                         <SelectItem
                           key={loc.id_loca}
                           value={String(loc.id_loca)}

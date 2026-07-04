@@ -46,7 +46,7 @@ export default function ListeRapportDecaissement() {
   const { selectedVersionId, handleChangeVersion, versionOptions } =
     usePtbaVersionSelection(codeProgramme)
 
-  const { data: ptbas } = useGetPtbas()
+  const { data: ptbas } = useGetPtbas(Number(selectedVersionId) || 0)
   const { data: config } = useGeneralParamsQuery()
   const currencyCode = config?.currencyCode
   const ptbaList = ptbas ?? EMPTY_PTBA_LIST

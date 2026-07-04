@@ -1,6 +1,6 @@
 import { apiClient } from '@/axios/api'
-import { SuiviIndicateurTache } from '../allTypes/suiviIndicateurTacheProjet'
-import type { SuiviIndicateurTacheProjetPayload } from '@/simadou/schemas/suiviIndicateurTacheProjetSchemas'
+import type { SuiviIndicateurTache } from '../allTypes/suiviIndicateurTacheProjet'
+import type { SuiviIndicateurTachePayload } from '@/simadou/schemas/suiviIndicateurTacheProjetSchemas'
 import { normalizeApiList } from './apiListUtils'
 
 const ENDPOINT = '/suivi_indicateur_tache/'
@@ -12,7 +12,7 @@ function toDateInput(value: unknown): string {
   return parsed.toISOString().split('T')[0]
 }
 
-export function mapSuiviIndicateurTacheProjetFromApi(
+export function mapSuiviIndicateurTacheFromApi(
   raw: Record<string, unknown>
 ): SuiviIndicateurTache {
   const communeRaw = raw.commune_sit
@@ -48,7 +48,7 @@ export function mapSuiviIndicateurTacheProjetFromApi(
 }
 
 function toApiPayload(
-  data: SuiviIndicateurTacheProjetPayload
+  data: SuiviIndicateurTachePayload
 ): Record<string, unknown> {
   return {
     date_suivi_sit: data.date_suivi_sit,
@@ -69,7 +69,7 @@ const suiviIndicateurTacheService = {
   async getAll(): Promise<SuiviIndicateurTache[]> {
     const response = await apiClient.request<unknown>(ENDPOINT, { method: 'GET' })
     return normalizeApiList<Record<string, unknown>>(response).map(
-      mapSuiviIndicateurTacheProjetFromApi
+      mapSuiviIndicateurTacheFromApi
     )
   },
 
@@ -79,7 +79,7 @@ const suiviIndicateurTacheService = {
       params: { id_activite: idActivite },
     })
     return normalizeApiList<Record<string, unknown>>(response).map(
-      mapSuiviIndicateurTacheProjetFromApi
+      mapSuiviIndicateurTacheFromApi
     )
   },
 
@@ -91,7 +91,7 @@ const suiviIndicateurTacheService = {
       params: { indicateur_sit: idIndicateur },
     })
     const list = normalizeApiList<Record<string, unknown>>(response).map(
-      mapSuiviIndicateurTacheProjetFromApi
+      mapSuiviIndicateurTacheFromApi
     )
     if (list.length > 0) return list
     const all = await this.getAll()
@@ -99,18 +99,18 @@ const suiviIndicateurTacheService = {
   },
 
   async create(
-    data: SuiviIndicateurTacheProjetPayload
+    data: SuiviIndicateurTachePayload
   ): Promise<SuiviIndicateurTache> {
     const raw = await apiClient.request<Record<string, unknown>>(ENDPOINT, {
       method: 'POST',
       data: toApiPayload(data),
     })
-    return mapSuiviIndicateurTacheProjetFromApi(raw)
+    return mapSuiviIndicateurTacheFromApi(raw)
   },
 
   async update(
     id: number,
-    data: SuiviIndicateurTacheProjetPayload
+    data: SuiviIndicateurTachePayload
   ): Promise<SuiviIndicateurTache> {
     const raw = await apiClient.request<Record<string, unknown>>(
       `${ENDPOINT}${id}/`,
@@ -119,7 +119,7 @@ const suiviIndicateurTacheService = {
         data: toApiPayload(data),
       }
     )
-    return mapSuiviIndicateurTacheProjetFromApi(raw)
+    return mapSuiviIndicateurTacheFromApi(raw)
   },
 
   async delete(id: number): Promise<void> {

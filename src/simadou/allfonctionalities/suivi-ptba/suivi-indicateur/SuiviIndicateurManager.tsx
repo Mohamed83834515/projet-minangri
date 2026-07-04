@@ -61,7 +61,7 @@ export default function SuiviIndicateurManager({
           }
         >
           <SuiviIndicateurInlineManager
-            key={selectedIndicateur.code_indicateur_ptba}
+            key={selectedIndicateur.id_indicateur_tache}
             indicateur={selectedIndicateur}
             onClose={handleCloseForm}
           />
@@ -70,7 +70,7 @@ export default function SuiviIndicateurManager({
         <div className='min-h-0 flex-1 overflow-y-auto px-3 py-2 sm:px-4 sm:py-3'>
           <SuiviIndicateurActiviteTable
             indicateurs={indicateurs}
-            suivis={suivis as any}
+            suivis={suivis}
             onSuivre={handleSuivre}
           />
         </div>

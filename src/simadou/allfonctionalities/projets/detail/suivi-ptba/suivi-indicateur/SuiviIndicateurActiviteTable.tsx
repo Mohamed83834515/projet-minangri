@@ -6,7 +6,6 @@ import {
 } from '@/simadou/allColonnes/suivi-indicateur-columns'
 import { useGetUnitesIndicateur } from '@/simadou/allHooks/admin/uniteIndicateurHooks'
 import type { IndicateurTache } from '@/simadou/allTypes/indicateurTache'
-import type { SuiviIndicateurActivite } from '@/simadou/allTypes/suiviIndicateurActivite'
 import type { SuiviIndicateurTacheProjet } from '@/simadou/allTypes/suiviIndicateurTacheProjet'
 import { useEmbeddedTableState } from '@/hooks/use-embedded-table-state'
 
@@ -16,16 +15,16 @@ type SuiviIndicateurActiviteTableProps = {
   onSuivre: (indicateur: IndicateurTache) => void
 }
 
-function groupSuivisByIndicateur(suivis: SuiviIndicateurTacheProjet[]) {
-  const map = new Map<string, SuiviIndicateurActivite[]>()
+function groupSuivisByIndicateur(
+  suivis: SuiviIndicateurTacheProjet[]
+): Map<string, SuiviIndicateurTacheProjet[]> {
+  const map = new Map<string, SuiviIndicateurTacheProjet[]>()
   for (const suivi of suivis) {
     const id = suivi.indicateur_sit
     if (id == null || !Number.isFinite(id)) continue
     const key = String(id)
     const list = map.get(key) ?? []
-    list.push({
-      id_suivi_indicateur: suivi.id_suivi_sit,
-    } as SuiviIndicateurActivite)
+    list.push(suivi)
     map.set(key, list)
   }
   return map

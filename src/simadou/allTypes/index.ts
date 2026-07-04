@@ -39,6 +39,7 @@ export * from "./projetStats";
 export * from "./ptba";
 export * from "./structure";
 export * from "./suiviIndicateurActivite";
+export * from "./suiviIndicateurTacheProjet";
 export * from "./suiviTacheActivite";
 export * from "./suiviAvancementContrat";
 export * from "./sourceVerificationSuiviAvancementContrat";

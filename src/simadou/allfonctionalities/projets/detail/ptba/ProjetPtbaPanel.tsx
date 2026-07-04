@@ -1,21 +1,18 @@
-import { useCallback, useMemo, useState, useEffect } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { GenericDialogs } from '@/Global/Generic/Genericdialogs'
 import { GenericTable } from '@/Global/Generic/Generictable'
 import { GenericDeleteDialog } from '@/Global/Tableaux/GenericDeleteDialog'
 import useDialogState from '@/hooks/use-dialog-state'
-import { useActiveProgrammeCode } from '@/hooks/use-active-programme'
 import { useEmbeddedTableState } from '@/hooks/use-embedded-table-state'
 import type { Projet } from '@/simadou/allTypes'
 import type { PtbaProjet } from '@/simadou/allTypes/ptbaProjet'
 import {
   useDeletePtbaProjet,
-  useGetPtbasProjet,
+  useGetPtbasProjetsByVersion,
 } from '@/simadou/allHooks/admin/ptbaProjetHooks'
-import { useGetPersonnels } from '@/simadou/allHooks/admin/personnelHooks'
-import { usePtbaVersionSelection } from '@/simadou/allHooks/admin/versionHooks'
-import { resolvePersonnelLabel } from '@/simadou/lib/resolveApiRelation'
+import { useProjetPtbaVersionSelection } from '@/simadou/allHooks/admin/versionHooks'
 import ActiviteTabbedDialog from '@/simadou/allfonctionalities/ptba/ActiviteTabbedDialog'
 import { PtbaVersionSelect } from '@/simadou/allfonctionalities/ptba/PtbaVersionSelect'
 import AddPtbaProjet from './AddPtbaProjet'
@@ -29,107 +26,26 @@ type ProjetPtbaPanelProps = {
   projet: Projet
 }
 
+const EMPTY_PTBAS: PtbaProjet[] = []
+
 export default function ProjetPtbaPanel({ projet }: ProjetPtbaPanelProps) {
   const codeProjet = projet.code_projet
-  const activeProgrammeCode = useActiveProgrammeCode()
-  const codeProgramme =
-    typeof projet.programme_projet === 'object' &&
-      projet.programme_projet?.code_programme
-      ? projet.programme_projet.code_programme
-      : activeProgrammeCode
-  
-  // ✅ Récupérer les versionOptions
   const {
     selectedVersionId,
     handleChangeVersion,
-    versionOptions,
-    versionsForProgramme,
-  } = usePtbaVersionSelection(codeProgramme)
+    filteredVersionOptions,
+    selectedVersionPtbaId,
+    selectedVersion,
+  } = useProjetPtbaVersionSelection(projet)
 
-  const selectedVersion = useMemo(() => {
-    if (!selectedVersionId) return null
-    return (
-      versionsForProgramme.find(
-        (v) => v.id_version_ptba.toString() === selectedVersionId
-      ) ?? null
-    )
-  }, [selectedVersionId, versionsForProgramme])
-
-  const selectedVersionPtbaId = useMemo(() => {
-    if (selectedVersion?.id_version_ptba != null) {
-      return selectedVersion.id_version_ptba
-    }
-    return selectedVersionId ? Number(selectedVersionId) : 0
-  }, [selectedVersion, selectedVersionId])
-  
   const { search, navigate } = useEmbeddedTableState()
-  const { data: ptbas = [] } = useGetPtbasProjet(codeProjet)
-  const { data: personnels = [] } = useGetPersonnels()
   const deleteMutation = useDeletePtbaProjet(codeProjet)
 
-  // ✅ Calculer les années de la durée du projet
-  const projectYears = useMemo(() => {
-    if (!projet.date_demarrage_projet || !projet.duree_projet) {
-      return []
-    }
-
-    const startDate = new Date(projet.date_demarrage_projet)
-    const startYear = startDate.getFullYear()
-    const durationInMonths = projet.duree_projet
-    const durationInYears = Math.ceil(durationInMonths / 12)
-    
-    return Array.from({ length: durationInYears }, (_, i) => startYear + i)
-  }, [projet.date_demarrage_projet, projet.duree_projet])
-
-  // ✅ Filtrer les versionOptions par durée du projet
-  const filteredVersionOptions = useMemo(() => {
-    const years = new Set(projectYears)
-    
-    return versionOptions.filter((option) => {
-      // ✅ Extraire l'année du label (ex: "2025" ou "Version 2025")
-      const yearMatch = option.label.match(/\d{4}/)
-      if (!yearMatch) return false
-      const year = Number(yearMatch[0])
-      return years.has(year)
-    })
-  }, [versionOptions, projectYears])
-
-  // ✅ Mettre à jour selectedVersionId si la version sélectionnée n'est plus valide
-  useEffect(() => {
-    if (filteredVersionOptions.length === 0) return
-    
-    const isSelectedValid = filteredVersionOptions.some(
-      (opt) => opt.value === selectedVersionId
-    )
-    
-    if (!isSelectedValid) {
-      handleChangeVersion(filteredVersionOptions[0].value)
-    }
-  }, [filteredVersionOptions, selectedVersionId, handleChangeVersion])
-
-  const personnelsById = useMemo(
-    () =>
-      new Map(
-        personnels
-          .filter((p) => p.n_personnel != null)
-          .map((p) => [p.n_personnel!, p])
-      ),
-    [personnels]
+  const { data: ptbasByVersion } = useGetPtbasProjetsByVersion(
+    selectedVersionPtbaId > 0 ? selectedVersionPtbaId : undefined,
+    codeProjet
   )
-
-  const getResponsableLabel = useCallback(
-    (ptba: PtbaProjet) =>
-      resolvePersonnelLabel(ptba.responsable_ptba, personnelsById),
-    [personnelsById]
-  )
-
-  // ✅ Filtrer les PTBA par version sélectionnée
-  const filteredPtbas = useMemo(() => {
-    if (!selectedVersionId) return ptbas
-    return ptbas.filter(
-      (ptba) => ptba.version_ptba?.toString() === selectedVersionId
-    )
-  }, [ptbas, selectedVersionId])
+  const ptbas = ptbasByVersion?.ptbas_projets ?? EMPTY_PTBAS
 
   const [planifierActivite, setPlanifierActivite] = useState<PtbaProjet | null>(
     null
@@ -154,7 +70,7 @@ export default function ProjetPtbaPanel({ projet }: ProjetPtbaPanelProps) {
         onOpenPlanification,
         currencyCode
       ),
-    [setOpen, setCurrentRow, onOpenPlanification, getResponsableLabel, currencyCode]
+    [setOpen, setCurrentRow, onOpenPlanification, currencyCode]
   )
 
   return (
@@ -165,12 +81,12 @@ export default function ProjetPtbaPanel({ projet }: ProjetPtbaPanelProps) {
         </p>
         <Button type='button' onClick={() => setOpen('add')}>
           <Plus className='h-4 w-4' />
-          Ajouter PTBA 
+          Ajouter PTBA
         </Button>
       </div>
 
       <GenericTable<PtbaProjet>
-        data={filteredPtbas}
+        data={ptbas}
         columns={columns}
         search={search}
         navigate={navigate}
@@ -184,7 +100,6 @@ export default function ProjetPtbaPanel({ projet }: ProjetPtbaPanelProps) {
           },
         ]}
         toolbarEndSlot={
-          // ✅ Utiliser filteredVersionOptions à la place de versionOptions
           filteredVersionOptions.length > 0 ? (
             <PtbaVersionSelect
               options={filteredVersionOptions}
@@ -213,36 +128,36 @@ export default function ProjetPtbaPanel({ projet }: ProjetPtbaPanelProps) {
         tabs={
           planifierActivite
             ? [
-              {
-                value: 'taches',
-                label: 'Planification des tâches',
-                content: (
-                  <TacheActiviteProjetManager activite={planifierActivite} />
-                ),
-              },
-              {
-                value: 'indicateurs',
-                label: 'Planification des indicateurs',
-                content: (
-                  <IndicateurTacheProjetManager activite={planifierActivite} />
-                ),
-              },
-              {
-                value: 'cout-activite',
-                label: 'Coût activité PTBA',
-                content: (
-                  <CoutActivitePtbaGridPanel
-                    activite={planifierActivite}
-                    projet={projet}
-                    versionPtbaId={
-                      Number(planifierActivite.version_ptba) ||
-                      selectedVersionPtbaId
-                    }
-                    anneePtbaYear={selectedVersion?.annee_ptba}
-                  />
-                ),
-              },
-            ]
+                {
+                  value: 'taches',
+                  label: 'Planification des tâches',
+                  content: (
+                    <TacheActiviteProjetManager activite={planifierActivite} />
+                  ),
+                },
+                {
+                  value: 'indicateurs',
+                  label: 'Planification des indicateurs',
+                  content: (
+                    <IndicateurTacheProjetManager activite={planifierActivite} />
+                  ),
+                },
+                {
+                  value: 'cout-activite',
+                  label: 'Coût activité PTBA',
+                  content: (
+                    <CoutActivitePtbaGridPanel
+                      activite={planifierActivite}
+                      projet={projet}
+                      versionPtbaId={
+                        Number(planifierActivite.version_ptba) ||
+                        selectedVersionPtbaId
+                      }
+                      anneePtbaYear={selectedVersion?.annee_ptba}
+                    />
+                  ),
+                },
+              ]
             : []
         }
       />

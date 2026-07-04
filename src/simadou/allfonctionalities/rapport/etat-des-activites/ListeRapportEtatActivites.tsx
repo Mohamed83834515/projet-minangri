@@ -59,7 +59,7 @@ export default function ListeRapportEtatActivites() {
   const { selectedVersionId, handleChangeVersion, versionOptions } =
     usePtbaVersionSelection(codeProgramme)
 
-  const { data: ptbas } = useGetPtbas()
+  const { data: ptbas } = useGetPtbas(Number(selectedVersionId) || 0)
   const ptbaList = ptbas ?? EMPTY_PTBA_LIST
   const { data: cadresAnalytiques = [] } = useGetCadresAnalytique()
 
