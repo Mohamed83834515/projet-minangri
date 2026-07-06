@@ -12,6 +12,7 @@ import {
   User,
   SlidersHorizontal,
   Handshake,
+  FileSignature,
   MapPin,
   FileStack,
   BarChart2,
@@ -73,6 +74,11 @@ export const sidebarData: SidebarData = {
               title: 'Partenaire Financier',
               url: '/parametrage/partenaire-financier',
               icon: Handshake,
+            },
+            {
+              title: 'Conventions',
+              url: '/parametrage/conventions',
+              icon: FileSignature,
             },
             {
               title: 'Zones agroécologiques',

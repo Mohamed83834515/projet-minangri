@@ -54,7 +54,7 @@ export const conventionSchema = z.object({
     }),
 
   // Montant de la convention - requis
-  montant_conv: z
+  montant_conv: z.coerce
     .number({
       message: "Le montant de convention est requis et doit être un nombre",
     })
@@ -104,7 +104,7 @@ export const conventionSchema = z.object({
     ),
 
   // Partenaire de la convention - optionnel (ID de l'acteur)
-  partenaire_conv: z
+  partenaire_conv: z.coerce
     .number({
       message: "L'ID du partenaire doit être un nombre",
     })
