@@ -12,7 +12,9 @@ export function formatExportMontant(value: unknown): string {
 export function formatExportTaux(value: number): string {
   const rounded = Math.round(value * 100) / 100
   const [integer, decimal] = rounded.toString().split('.')
-  return decimal != null ? `${integer},${decimal.padEnd(2, '0').slice(0, 2)}` : integer
+  return decimal != null
+    ? `${integer},${decimal.padEnd(2, '0').slice(0, 2)}`
+    : integer
 }
 
 export function formatExportDate(value: string | undefined | null): string {

@@ -41,9 +41,13 @@ export function getTacheRange(
   return { start: Math.min(start, end), end: Math.max(start, end) }
 }
 
-/** Construit l'axe temporel (mois ou trimestre) couvrant toutes les tâches. */
+/**
+ * Construit l'axe temporel couvrant toutes les tâches. Sans `forcedUnit`,
+ * bascule automatiquement en trimestres au-delà de 18 mois d'étendue.
+ */
 export function buildGanttTimeline(
-  taches: Pick<TacheActivitePtba, 'date_debut_gt' | 'date_fin_gt'>[]
+  taches: Pick<TacheActivitePtba, 'date_debut_gt' | 'date_fin_gt'>[],
+  forcedUnit?: GanttUnit
 ): GanttTimeline {
   let min = Infinity
   let max = -Infinity
@@ -68,7 +72,7 @@ export function buildGanttTimeline(
     1
 
   const unit: GanttUnit =
-    monthsSpan <= MAX_MONTHS_FOR_MONTHLY ? 'month' : 'quarter'
+    forcedUnit ?? (monthsSpan <= MAX_MONTHS_FOR_MONTHLY ? 'month' : 'quarter')
 
   const buckets: GanttBucket[] = []
 

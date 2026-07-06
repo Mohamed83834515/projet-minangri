@@ -1,7 +1,10 @@
 import { toast } from 'sonner'
 import type { ExportFormat, RapportExportPayload } from './rapportExportTypes'
 
-export async function exportRapport(format: ExportFormat, payload: RapportExportPayload) {
+export async function exportRapport(
+  format: ExportFormat,
+  payload: RapportExportPayload
+) {
   if (payload.isLoading) {
     toast.info('Les données sont encore en cours de chargement…')
     return
@@ -21,7 +24,7 @@ export async function exportRapport(format: ExportFormat, payload: RapportExport
       }
       case 'pdf': {
         const { exportRapportPdf } = await import('./exportRapportPdf')
-        exportRapportPdf(payload)
+        await exportRapportPdf(payload)
         break
       }
       case 'word': {

@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf'
-import autoTable from 'jspdf-autotable'
+import autoTable, { type Styles } from 'jspdf-autotable'
+import { mergeGanttColumns } from './rapportExportGanttColumns'
 import { EXPORT_CELL_ALIGN } from './rapportExportLayout'
 import { RAPPORT_EXPORT_THEME as theme } from './rapportExportTheme'
 import type { RapportExportPayload } from './rapportExportTypes'
@@ -20,15 +21,24 @@ function hexRgb(hex: string): [number, number, number] {
   ]
 }
 
-export function exportRapportPdf(payload: RapportExportPayload) {
+/** Largeur max (mm) d'une colonne mensuelle du Gantt. */
+const GANTT_PDF_COLUMN_WIDTH = 9
+/** Part max de la largeur utile réservée aux colonnes du Gantt. */
+const GANTT_PDF_MAX_WIDTH_RATIO = 0.5
+
+export async function exportRapportPdf(payload: RapportExportPayload) {
   const meta = buildRapportDocumentMeta(payload.pageTitle)
 
-  const { columns, rows, rowMetas } = filterExportRows(
+  const filtered = filterExportRows(
     payload.rows,
     payload.columns,
     payload.visibleColumnIds,
     payload.rowMetas
   )
+
+  const { columns, rows, ganttStartIndex, ganttColumnCount, isGanttActive } =
+    mergeGanttColumns(filtered.columns, filtered.rows, payload.gantt)
+  const rowMetas = filtered.rowMetas
 
   const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' })
 
@@ -40,7 +50,18 @@ export function exportRapportPdf(payload: RapportExportPayload) {
   const greenLight = hexRgb(theme.greenLight)
 
   const usableWidth = pageWidth - 20
-  const colWidth = usableWidth / columns.length
+
+  // Colonnes du Gantt étroites (plafonnées à la moitié de la page), le
+  // reste de la largeur est réparti entre les colonnes de données.
+  const ganttColWidth =
+    ganttColumnCount > 0
+      ? Math.min(
+          GANTT_PDF_COLUMN_WIDTH,
+          (usableWidth * GANTT_PDF_MAX_WIDTH_RATIO) / ganttColumnCount
+        )
+      : 0
+  const dataColWidth =
+    (usableWidth - ganttColWidth * ganttColumnCount) / ganttStartIndex
 
   // HEADER DOCUMENT
   doc.setFillColor(...green)
@@ -114,44 +135,36 @@ export function exportRapportPdf(payload: RapportExportPayload) {
       fillColor: greenLight,
     },
 
-    columnStyles: columns.reduce<Record<number, any>>((acc, _, i) => {
-      acc[i] = {
-        halign: EXPORT_CELL_ALIGN,
-        cellWidth: colWidth,
-      }
-      return acc
-    }, {}),
+    columnStyles: columns.reduce<Record<number, Partial<Styles>>>(
+      (acc, _, i) => {
+        acc[i] = {
+          halign: EXPORT_CELL_ALIGN,
+          cellWidth: i >= ganttStartIndex ? ganttColWidth : dataColWidth,
+        }
+        return acc
+      },
+      {}
+    ),
 
     margin: { top: 28, left: 10, right: 10, bottom: 14 },
 
     tableWidth: usableWidth,
 
-    // FOOTER PAGE
-    didDrawPage: (data) => {
-      const pageCount = doc.getNumberOfPages()
-
-      doc.setFontSize(8)
-      doc.setTextColor(...hexRgb(theme.textMuted))
-
-      doc.text(
-        `Page ${data.pageNumber} sur ${pageCount}`,
-        pageWidth - 10,
-        doc.internal.pageSize.getHeight() - 6,
-        { align: 'right' }
-      )
-    },
-
     // CELL LOGIC
     didParseCell: (data) => {
       if (!rowMetas) return
 
-      const rowIndex = rows.indexOf(data.row.raw as string[])
+      // Le hook est aussi appelé pour l'en-tête (row.index repart à 0 par
+      // section) : seules les lignes du corps portent des rowMetas.
+      if (data.section !== 'body') return
+
+      const rowIndex = data.row.index
       const meta = rowMetas[rowIndex]
 
       if (!meta) return
 
       // SECTION CADRE ANALYTIQUE
-      if (meta.type === 'section' && data.section === 'body') {
+      if (meta.type === 'section') {
         const totalColumns = columns.length
         const start = meta.niveau ?? 0
 
@@ -170,6 +183,14 @@ export function exportRapportPdf(payload: RapportExportPayload) {
 
         data.cell.text = ['']
         data.cell.styles.lineWidth = 0
+        return
+      }
+
+      // GANTT : cellule colorée si la tâche est active ce mois-là
+      if (data.column.index >= ganttStartIndex) {
+        if (isGanttActive(rowIndex, data.column.index)) {
+          data.cell.styles.fillColor = green
+        }
         return
       }
 
@@ -206,6 +227,20 @@ export function exportRapportPdf(payload: RapportExportPayload) {
       }
     },
   })
+
+  // FOOTER : passe finale pour un « Page X sur N » exact sur toutes les pages
+  const pageHeight = doc.internal.pageSize.getHeight()
+  const pageCount = doc.getNumberOfPages()
+
+  for (let page = 1; page <= pageCount; page += 1) {
+    doc.setPage(page)
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(8)
+    doc.setTextColor(...hexRgb(theme.textMuted))
+    doc.text(`Page ${page} sur ${pageCount}`, pageWidth - 10, pageHeight - 6, {
+      align: 'right',
+    })
+  }
 
   downloadBlob(
     doc.output('blob'),

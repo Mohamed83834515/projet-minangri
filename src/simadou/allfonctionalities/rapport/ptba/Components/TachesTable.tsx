@@ -40,9 +40,7 @@ export function TachesTable({
 }: Props) {
   const { navigate } = useEmbeddedTableState()
 
-  const timeline = useMemo(() => buildGanttTimeline(taches), [taches])
-
-  const baseColumns: ColumnDef<TreeRow>[] = [
+  const columns: ColumnDef<TreeRow>[] = [
     {
       id: 'code',
       header: 'Code',
@@ -87,16 +85,6 @@ export function TachesTable({
           : '',
     },
   ]
-
-  // Colonnes du diagramme de Gantt : une par période (mois ou trimestre).
-  const ganttColumns: ColumnDef<TreeRow>[] = timeline.buckets.map((bucket) => ({
-    id: `gantt_${bucket.key}`,
-    header: bucket.label,
-    accessorFn: () => '',
-    meta: { thClassName: 'text-center min-w-[36px]' },
-  }))
-
-  const columns: ColumnDef<TreeRow>[] = [...baseColumns, ...ganttColumns]
 
   const rows = useMemo(() => {
     const tachesByActivite = new Map<number, TacheActivitePtba[]>()
@@ -206,12 +194,10 @@ export function TachesTable({
     buildExportTable: () => {
       const exportRows: string[][] = []
       const rowMetas: RapportExportRowMeta[] = []
+      const ganttActiveByRow: number[][] = []
 
-      // Cellule Gantt remplie lorsque la tâche est active sur la période.
-      const ganttCells = (tache: TacheActivitePtba | undefined) =>
-        timeline.buckets.map((bucket) =>
-          tache && tacheActiveInBucket(tache, bucket) ? '▓▓▓' : ''
-        )
+      // Axe mensuel couvrant toutes les tâches datées.
+      const timeline = buildGanttTimeline(taches, 'month')
 
       rows.forEach((r) => {
         if (r.type === 'cadre') {
@@ -225,6 +211,8 @@ export function TachesTable({
             niveau: r.niveau,
             label: r.label,
           })
+
+          ganttActiveByRow.push([])
         } else {
           exportRows.push([
             r.ptba?.code_activite_ptba ?? '',
@@ -238,33 +226,44 @@ export function TachesTable({
             r.tache?.date_fin_gt
               ? new Date(r.tache.date_fin_gt).toLocaleDateString('fr-FR')
               : '',
-            ...ganttCells(r.tache),
           ])
           rowMetas.push({
             type: 'data',
             groupKey: r.ptba?.id_ptba ? String(r.ptba?.id_ptba) : undefined,
           })
+
+          // Mois actifs de la tâche : cellules colorées dans les exports.
+          ganttActiveByRow.push(
+            r.tache
+              ? timeline.buckets.reduce<number[]>((active, bucket, index) => {
+                  if (tacheActiveInBucket(r.tache!, bucket)) active.push(index)
+                  return active
+                }, [])
+              : []
+          )
         }
       })
 
       return {
-        columns: [
-          ...baseColumns.map((c) => ({
-            id: c.id as string,
-            header: c.header as string,
-          })),
-          ...timeline.buckets.map((bucket) => ({
-            id: `gantt_${bucket.key}`,
-            header: bucket.label,
-            width: 4,
-          })),
-        ],
+        columns: columns.map((c) => ({
+          id: c.id as string,
+          header: c.header as string,
+        })),
 
         rowMetas,
         rows: exportRows,
 
-        // Toutes les colonnes (base + Gantt) sont exportées.
-        visibleColumnIds: columns.map((c) => c.id as string),
+        // Le Gantt est exporté en colonnes mensuelles colorées.
+        gantt:
+          timeline.buckets.length > 0
+            ? {
+                columns: timeline.buckets.map((bucket) => ({
+                  id: bucket.key,
+                  header: bucket.label,
+                })),
+                activeByRow: ganttActiveByRow,
+              }
+            : undefined,
       }
     },
   })
@@ -369,23 +368,6 @@ export function TachesTable({
                           )
                         : ''}
                     </TableCell>
-
-                    {timeline.buckets.map((bucket, bi) => {
-                      const active = row.tache
-                        ? tacheActiveInBucket(row.tache, bucket)
-                        : false
-
-                      return (
-                        <TableCell
-                          key={`gantt-${bucket.key}`}
-                          className={cellClassName(7 + bi)}
-                        >
-                          {active ? (
-                            <div className='-mx-4 my-0.5 h-3 bg-primary/70' />
-                          ) : null}
-                        </TableCell>
-                      )
-                    })}
                   </TableRow>
                 )
               }

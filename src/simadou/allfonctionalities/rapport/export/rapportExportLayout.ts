@@ -8,7 +8,10 @@ export function estimateExcelColumnWidth(
   min = 14,
   max = 48
 ): number {
-  const longest = Math.max(header.length, ...values.map((value) => value.length))
+  const longest = Math.max(
+    header.length,
+    ...values.map((value) => value.length)
+  )
   return Math.min(max, Math.max(min, Math.ceil(longest * 0.95) + 3))
 }
 
@@ -28,7 +31,10 @@ export function estimateExcelRowHeight(
   return Math.max(22, maxLines * 16)
 }
 
-export function estimateSubtitleRowHeight(text: string, columnCount: number): number {
+export function estimateSubtitleRowHeight(
+  text: string,
+  columnCount: number
+): number {
   const avgColumnWidth = 18
   const totalWidth = Math.max(avgColumnWidth * columnCount, 80)
   const charsPerLine = Math.max(40, Math.floor(totalWidth * 1.1))
@@ -44,22 +50,34 @@ export function computeWordColumnWidthsDxa(
   rows: string[][],
   contentWidth = WORD_LANDSCAPE_CONTENT_WIDTH
 ): number[] {
+  if (columns.length === 0) return []
+
   const weights = columns.map((column, index) => {
     const values = rows.map((row) => row[index] ?? '')
-    return estimateExcelColumnWidth(column.header, values, column.width ?? 16, 52)
+    return estimateExcelColumnWidth(
+      column.header,
+      values,
+      column.width ?? 16,
+      52
+    )
   })
   const totalWeight = weights.reduce((sum, weight) => sum + weight, 0) || 1
 
-  const rawWidths = weights.map((weight) =>
-    Math.max(800, Math.round((weight / totalWeight) * contentWidth))
+  // Minimum garanti à chaque colonne, réduit à une part égale quand la
+  // place manque : la somme des minimums ne dépasse jamais contentWidth.
+  const minWidth = Math.min(800, Math.floor(contentWidth / columns.length))
+
+  // L'espace au-delà des minimums est réparti au prorata des poids ; les
+  // arrondis par défaut (floor) laissent un reliquat ajouté à la dernière
+  // colonne — toujours positif, aucune largeur ne peut devenir négative.
+  const extra = contentWidth - minWidth * columns.length
+
+  const widths = weights.map(
+    (weight) => minWidth + Math.floor((weight / totalWeight) * extra)
   )
 
-  const actualTotal = rawWidths.reduce((sum, width) => sum + width, 0)
-  const diff = contentWidth - actualTotal
+  const actualTotal = widths.reduce((sum, width) => sum + width, 0)
+  widths[widths.length - 1] += contentWidth - actualTotal
 
-  if (diff !== 0 && rawWidths.length > 0) {
-    rawWidths[rawWidths.length - 1] += diff
-  }
-
-  return rawWidths
+  return widths
 }

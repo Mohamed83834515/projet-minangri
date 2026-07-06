@@ -17,12 +17,15 @@ import {
   WidthType,
 } from 'docx'
 import {
+  mergeGanttColumns,
+  type MergedGanttTable,
+} from './rapportExportGanttColumns'
+import {
   computeWordColumnWidthsDxa,
   WORD_LANDSCAPE_CONTENT_WIDTH,
 } from './rapportExportLayout'
 import { RAPPORT_EXPORT_THEME as theme } from './rapportExportTheme'
 import type {
-  RapportExportColumn,
   RapportExportPayload,
   RapportExportRowMeta,
 } from './rapportExportTypes'
@@ -175,6 +178,20 @@ function headerCell(text: string, width: number) {
   })
 }
 
+/** Cellule mensuelle du Gantt : vide, la couleur porte l'information. */
+function ganttCell(width: number, active: boolean, shaded: boolean) {
+  return new TableCell({
+    width: { size: width, type: WidthType.DXA },
+    shading: {
+      fill: active ? theme.green : shaded ? theme.greenMuted : theme.white,
+      type: ShadingType.CLEAR,
+      color: 'auto',
+    },
+    borders: dataCellBorders(false),
+    children: [new Paragraph('')],
+  })
+}
+
 function bodyCell(text: string, width: number, shaded: boolean) {
   return new TableCell({
     width: { size: width, type: WidthType.DXA },
@@ -195,11 +212,11 @@ function bodyCell(text: string, width: number, shaded: boolean) {
 }
 
 function buildDataTable(
-  columns: RapportExportColumn[],
-  rows: string[][],
+  merged: MergedGanttTable,
   columnWidths: number[],
   rowMetas?: RapportExportRowMeta[]
 ) {
+  const { columns, rows, ganttStartIndex, isGanttActive } = merged
   // GROUPING PTBA (comme PDF)
   const groupSpans = new Map<string | number, number>()
   const groupSeen = new Set<string | number>()
@@ -238,45 +255,45 @@ function buildDataTable(
           const startCol = meta.niveau ?? 0
           const colSpan = columns.length - startCol
 
+          // Les cellules couvertes par le span ne sont PAS émises : en
+          // OOXML une ligne occupe `nb de tc + (gridSpan - 1)` colonnes du
+          // grid — des tc excédentaires élargiraient le grid et
+          // écraseraient les vraies colonnes.
           return new TableRow({
-            children: Array.from({ length: columns.length }).map(
-              (_, colIndex) => {
-                // colonnes avant le niveau → vides invisibles
-                if (colIndex < startCol) {
-                  return new TableCell({
+            children: [
+              // colonnes d'indentation avant le niveau → vides
+              ...Array.from(
+                { length: startCol },
+                (_, colIndex) =>
+                  new TableCell({
+                    width: {
+                      size: columnWidths[colIndex] ?? 1800,
+                      type: WidthType.DXA,
+                    },
                     children: [new Paragraph('')],
                     borders: dataCellBorders(false),
                   })
-                }
+              ),
 
-                // première cellule du bloc → fusion
-                if (colIndex === startCol) {
-                  return new TableCell({
-                    columnSpan: colSpan,
-                    shading: {
-                      fill: theme.greenMuted,
-                      type: ShadingType.CLEAR,
-                      color: 'auto',
-                    },
-                    borders: dataCellBorders(false),
-                    verticalAlign: VerticalAlignTable.CENTER,
-                    children: [
-                      cellParagraph(meta.label ?? '', {
-                        bold: true,
-                        align: 'left',
-                        size: FONT_BODY,
-                      }),
-                    ],
-                  })
-                }
-
-                // cellules couvertes par le span → ignorées
-                return new TableCell({
-                  children: [new Paragraph('')],
-                  borders: noBorder(),
-                })
-              }
-            ),
+              // cellule fusionnée sur tout le reste de la ligne
+              new TableCell({
+                columnSpan: colSpan,
+                shading: {
+                  fill: theme.greenMuted,
+                  type: ShadingType.CLEAR,
+                  color: 'auto',
+                },
+                borders: dataCellBorders(false),
+                verticalAlign: VerticalAlignTable.CENTER,
+                children: [
+                  cellParagraph(meta.label ?? '', {
+                    bold: true,
+                    align: 'left',
+                    size: FONT_BODY,
+                  }),
+                ],
+              }),
+            ],
           })
         }
 
@@ -310,6 +327,14 @@ function buildDataTable(
                   })
                 }
 
+                if (colIndex >= ganttStartIndex) {
+                  return ganttCell(
+                    width,
+                    isGanttActive(rowIndex, colIndex),
+                    shaded
+                  )
+                }
+
                 return bodyCell(value, width, shaded)
               }),
             })
@@ -334,6 +359,14 @@ function buildDataTable(
                 })
               }
 
+              if (colIndex >= ganttStartIndex) {
+                return ganttCell(
+                  width,
+                  isGanttActive(rowIndex, colIndex),
+                  shaded
+                )
+              }
+
               return bodyCell(value, width, shaded)
             }),
           })
@@ -343,26 +376,64 @@ function buildDataTable(
 
         return new TableRow({
           cantSplit: true,
-          children: row.map((value, colIndex) =>
-            bodyCell(value, columnWidths[colIndex] ?? 1800, shaded)
-          ),
+          children: row.map((value, colIndex) => {
+            const width = columnWidths[colIndex] ?? 1800
+
+            if (colIndex >= ganttStartIndex) {
+              return ganttCell(width, isGanttActive(rowIndex, colIndex), shaded)
+            }
+
+            return bodyCell(value, width, shaded)
+          }),
         })
       }),
     ],
   })
 }
 
+/** Largeur max (dxa) d'une colonne mensuelle du Gantt. */
+const GANTT_WORD_COLUMN_WIDTH = 700
+/** Part max de la largeur utile réservée aux colonnes du Gantt. */
+const GANTT_WORD_MAX_WIDTH_RATIO = 0.5
+
 export async function exportRapportWord(payload: RapportExportPayload) {
   const meta = buildRapportDocumentMeta(payload.pageTitle)
 
-  const { columns, rows, rowMetas } = filterExportRows(
+  const filtered = filterExportRows(
     payload.rows,
     payload.columns,
     payload.visibleColumnIds,
     payload.rowMetas
   )
 
-  const columnWidths = computeWordColumnWidthsDxa(columns, rows)
+  const merged = mergeGanttColumns(
+    filtered.columns,
+    filtered.rows,
+    payload.gantt
+  )
+  const rowMetas = filtered.rowMetas
+
+  // Colonnes du Gantt étroites (plafonnées à la moitié de la page), le
+  // reste de la largeur est réparti entre les colonnes de données.
+  const ganttColWidth =
+    merged.ganttColumnCount > 0
+      ? Math.min(
+          GANTT_WORD_COLUMN_WIDTH,
+          Math.floor(
+            (WORD_LANDSCAPE_CONTENT_WIDTH * GANTT_WORD_MAX_WIDTH_RATIO) /
+              merged.ganttColumnCount
+          )
+        )
+      : 0
+
+  const columnWidths = [
+    ...computeWordColumnWidthsDxa(
+      filtered.columns,
+      filtered.rows,
+      WORD_LANDSCAPE_CONTENT_WIDTH - ganttColWidth * merged.ganttColumnCount
+    ),
+    ...Array.from({ length: merged.ganttColumnCount }, () => ganttColWidth),
+  ]
 
   const doc = new Document({
     styles: {
@@ -397,7 +468,7 @@ export async function exportRapportWord(payload: RapportExportPayload) {
             spacing: { after: 160 },
             children: [],
           }),
-          buildDataTable(columns, rows, columnWidths, rowMetas),
+          buildDataTable(merged, columnWidths, rowMetas),
         ],
       },
     ],

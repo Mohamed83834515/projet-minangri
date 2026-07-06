@@ -1,4 +1,5 @@
 import ExcelJS from 'exceljs'
+import { mergeGanttColumns } from './rapportExportGanttColumns'
 import {
   estimateExcelColumnWidth,
   estimateExcelRowHeight,
@@ -52,15 +53,34 @@ function applyBodyStyle(cell: ExcelJS.Cell, shaded: boolean, value: unknown) {
   }
 }
 
+/** Cellule Gantt active : remplissage plein, la couleur porte l'information. */
+function applyGanttActiveStyle(cell: ExcelJS.Cell) {
+  cell.fill = {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: { argb: hexArgb(theme.green) },
+  }
+}
+
+/** Largeur (en caractères) des colonnes mensuelles du Gantt. */
+const GANTT_EXCEL_COLUMN_WIDTH = 8
+
 export async function exportRapportExcel(payload: RapportExportPayload) {
   const meta = buildRapportDocumentMeta(payload.pageTitle)
 
-  const { columns, rows, rowMetas } = filterExportRows(
+  const filtered = filterExportRows(
     payload.rows,
     payload.columns,
     payload.visibleColumnIds,
     payload.rowMetas
   )
+
+  const { columns, rows, ganttStartIndex, isGanttActive } = mergeGanttColumns(
+    filtered.columns,
+    filtered.rows,
+    payload.gantt
+  )
+  const rowMetas = filtered.rowMetas
 
   const workbook = new ExcelJS.Workbook()
   workbook.creator = 'Simandu'
@@ -119,6 +139,8 @@ export async function exportRapportExcel(payload: RapportExportPayload) {
   sheet.getRow(3).height = 4
 
   const columnWidths = columns.map((column, index) => {
+    if (index >= ganttStartIndex) return GANTT_EXCEL_COLUMN_WIDTH
+
     const values = rows.map((row) => row[index] ?? '')
     return estimateExcelColumnWidth(
       column.header,
@@ -159,7 +181,7 @@ export async function exportRapportExcel(payload: RapportExportPayload) {
     const excelRow = sheet.getRow(6 + rowIndex)
     const isAlt = rowIndex % 2 === 1
 
-    // ── SECTION ROW (cadre analytique) 
+    // ── SECTION ROW (cadre analytique)
     if (rowMeta?.type === 'section') {
       const startCol = (rowMeta.niveau ?? 1) + 1
       const colCount = columns.length
@@ -203,6 +225,7 @@ export async function exportRapportExcel(payload: RapportExportPayload) {
           const cell = excelRow.getCell(colIndex + 1)
           cell.value = value
           applyBodyStyle(cell, isAlt, value)
+          if (isGanttActive(rowIndex, colIndex)) applyGanttActiveStyle(cell)
 
           // Centrage vertical explicite pour les cellules fusionnées
           if ((colIndex === 0 || colIndex === 1) && span > 1) {
@@ -218,6 +241,7 @@ export async function exportRapportExcel(payload: RapportExportPayload) {
           const cell = excelRow.getCell(colIndex + 1)
           cell.value = value
           applyBodyStyle(cell, isAlt, value)
+          if (isGanttActive(rowIndex, colIndex)) applyGanttActiveStyle(cell)
         })
       }
 
@@ -230,6 +254,7 @@ export async function exportRapportExcel(payload: RapportExportPayload) {
       const cell = excelRow.getCell(colIndex + 1)
       cell.value = value
       applyBodyStyle(cell, isAlt, cell.value)
+      if (isGanttActive(rowIndex, colIndex)) applyGanttActiveStyle(cell)
     })
 
     excelRow.height = estimateExcelRowHeight(row, columnWidths)

@@ -1,10 +1,10 @@
-import { computeTauxDecaissement } from '@/simadou/allColonnes/rapport-format-utils'
 import {
   computeRetardAccuse,
   formatRetardAccuseLabel,
   getLatestObservation,
   getMostRecentDateRealisation,
 } from '@/simadou/allColonnes/rapport-etat-activites-utils'
+import { computeTauxDecaissement } from '@/simadou/allColonnes/rapport-format-utils'
 import type {
   Ptba,
   SuiviAvancementContrat,
@@ -19,7 +19,9 @@ import {
 } from './rapportExportFormatters'
 import type { RapportExportColumn } from './rapportExportTypes'
 
-export function getRapportPtbaExportColumns(currencyCode?: string): RapportExportColumn[] {
+export function getRapportPtbaExportColumns(
+  currencyCode?: string
+): RapportExportColumn[] {
   return [
     { id: 'code', header: 'Code', width: 16 },
     { id: 'activite', header: 'Activité', width: 40 },
@@ -28,7 +30,9 @@ export function getRapportPtbaExportColumns(currencyCode?: string): RapportExpor
     { id: 'responsable', header: 'Responsable', width: 24 },
     {
       id: 'cout',
-      header: currencyCode ? `Coût activités (${currencyCode})` : 'Coût activités',
+      header: currencyCode
+        ? `Coût activités (${currencyCode})`
+        : 'Coût activités',
       width: 22,
     },
   ]
@@ -45,7 +49,9 @@ export function buildRapportPtbaExportRows(
   return ptbas.map((ptba) => {
     const activiteId = resolvePtbaActiviteId(ptba)
     const taches =
-      activiteId != null ? (handlers.tachesCountByActivite.get(activiteId) ?? 0) : 0
+      activiteId != null
+        ? (handlers.tachesCountByActivite.get(activiteId) ?? 0)
+        : 0
     const indicateurs =
       activiteId != null
         ? (handlers.indicateursCountByActivite.get(activiteId) ?? 0)

@@ -6,11 +6,27 @@ export type RapportExportColumn = {
   width?: number
 }
 
+/**
+ * Diagramme de Gantt exporté : une colonne par mois ajoutée à droite du
+ * tableau, cellule colorée quand la tâche est active ce mois-là.
+ */
+export type RapportExportGantt = {
+  /** Colonnes mensuelles (une par mois couvert par les tâches). */
+  columns: RapportExportColumn[]
+  /**
+   * Indices (dans `columns`) des mois actifs, une entrée par ligne de
+   * `rows` (tableau vide pour les sections et les lignes non datées).
+   */
+  activeByRow: number[][]
+}
+
 export type RapportExportTableData = {
   columns: RapportExportColumn[]
   rows: string[][]
   rowMetas?: RapportExportRowMeta[]
   visibleColumnIds?: string[]
+  /** Colonnes mensuelles colorées du diagramme de Gantt. */
+  gantt?: RapportExportGantt
 }
 
 export type RapportExportRegistration = {
@@ -26,6 +42,7 @@ export type RapportExportPayload = {
   rowMetas: RapportExportRowMeta[]
   visibleColumnIds?: string[]
   isLoading?: boolean
+  gantt?: RapportExportGantt
 }
 
 export type RapportExportDocumentMeta = {
