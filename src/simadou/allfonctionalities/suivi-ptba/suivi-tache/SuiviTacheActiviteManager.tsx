@@ -46,7 +46,7 @@ export default function SuiviTacheActiviteManager({
   )
 
   const filteredTaches = useMemo(
-    () => taches.filter((t) => tacheBelongsToActivite(t, activite)),
+    () => taches.filter((t) => tacheBelongsToActivite(t, activite) && t.valide),
     [taches, activite]
   )
 
@@ -113,6 +113,7 @@ export default function SuiviTacheActiviteManager({
         ) : (
           <div className='min-h-0 flex-1 overflow-y-auto px-3 py-2 sm:px-4 sm:py-3'>
             <SuiviTacheActiviteList
+              activite={activite}
               taches={filteredTaches}
               suivis={suivisForTaches}
               onSuivre={handleSuivre}

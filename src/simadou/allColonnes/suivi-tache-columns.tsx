@@ -116,30 +116,6 @@ export function buildSuiviTacheColumns(
     enableHiding: false,
   }
 
-  const valideColumn: ColumnDef<SuiviTacheTableRow> = {
-    id: 'valide',
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Validé' />
-    ),
-    cell: ({ row }) => {
-      const suivi = findSuiviForTache(suivis, row.original.id_groupe_tache)
-      if (!suivi) {
-        return <span className='text-muted-foreground'>—</span>
-      }
-      return (
-        <Badge
-          variant={suivi.valide ? 'default' : 'secondary'}
-          className='min-w-[48px] justify-center'
-        >
-          {suivi.valide ? 'Oui' : 'Non'}
-        </Badge>
-      )
-    },
-    meta: { thClassName: 'text-center', className: 'text-center' },
-    enableSorting: false,
-    enableHiding: false,
-  }
-
   const suiviActionColumn: ColumnDef<SuiviTacheTableRow> = {
     id: 'suivi_action',
     header: ({ column }) => (
@@ -194,7 +170,6 @@ export function buildSuiviTacheColumns(
     lotColumn,
     proportionColumn,
     dateColumn,
-    valideColumn,
     suiviActionColumn,
     observationColumn,
   ]

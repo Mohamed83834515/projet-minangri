@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import type { Ptba } from '@/simadou/allTypes'
-import { IndicateurTache } from '@/simadou/allTypes/indicateurTache'
+import type { IndicateurTache } from '@/simadou/allTypes/indicateurTache'
 import { getValeurCibleIndicateur } from '@/simadou/allColonnes/suivi-indicateur-columns'
 import { useGetIndicateursByActivite } from '@/simadou/allHooks/admin/indicateurTacheHooks'
 import { useGetAllSuivisIndicateurs } from '@/simadou/allHooks/admin/suiviPtbaHooks'
@@ -69,6 +69,7 @@ export default function SuiviIndicateurManager({
       ) : (
         <div className='min-h-0 flex-1 overflow-y-auto px-3 py-2 sm:px-4 sm:py-3'>
           <SuiviIndicateurActiviteTable
+            activite={activite}
             indicateurs={indicateurs}
             suivis={suivis}
             onSuivre={handleSuivre}
