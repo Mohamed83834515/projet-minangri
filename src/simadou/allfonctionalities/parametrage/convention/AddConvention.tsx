@@ -67,7 +67,7 @@ export default function AddConvention({
         reference_conv: currentRow.reference_conv ?? '',
         montant_conv: Number(currentRow.montant_conv) || 0,
         date_signature_conv: formatDateForInput(currentRow.date_signature_conv),
-        etat_conv: currentRow.etat_conv ?? 'active',
+        etat_conv: 'modifier',
         partenaire_conv: resolvePartenaireId(currentRow),
       }
     }
@@ -78,7 +78,7 @@ export default function AddConvention({
       reference_conv: '',
       montant_conv: 0,
       date_signature_conv: '',
-      etat_conv: 'active',
+      etat_conv: 'ajouter',
       partenaire_conv: null,
     }
   }, [currentRow, isEdit])

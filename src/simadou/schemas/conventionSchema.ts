@@ -87,21 +87,8 @@ export const conventionSchema = z.object({
 
   // État de la convention - requis
   etat_conv: z
-    .string({
-      message: "L'état de convention est requis",
-    })
-    .min(1, "État de convention requis")
-    .max(50, "État trop long")
-    .refine(
-      (val) =>
-        ["active", "inactive", "en_cours", "terminee", "suspendue"].includes(
-          val
-        ),
-      {
-        message:
-          "État invalide. Valeurs acceptées: active, inactive, en_cours, terminee, suspendue",
-      }
-    ),
+    .string().optional()
+  ,
 
   // Partenaire de la convention - optionnel (ID de l'acteur)
   partenaire_conv: z.coerce

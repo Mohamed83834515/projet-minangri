@@ -52,7 +52,7 @@ export default function ListeConvention() {
           },
         ]}
         defaultPageSize={10}
-        showViewOptions
+        showViewOptions={false}
         emptyMessage='Aucune convention trouvée.'
       />
 

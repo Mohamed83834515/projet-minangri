@@ -1,5 +1,4 @@
 import type { FormConfig } from '@/Global/types/formConfig'
-import { CONVENTION_STATES } from '@/simadou/schemas/conventionSchema'
 
 export const getConventionFormConfig = (): FormConfig => ({
   fields: [
@@ -29,9 +28,9 @@ export const getConventionFormConfig = (): FormConfig => ({
     },
     {
       name: 'montant_conv',
-      label: 'Montant ($)',
+      label: 'Montant (GNF)',
       type: 'number',
-      placeholder: 'Montant en dollars',
+      placeholder: 'Montant en GNF',
       required: true,
       gridCols: 2,
     },
@@ -43,25 +42,13 @@ export const getConventionFormConfig = (): FormConfig => ({
       gridCols: 2,
     },
     {
-      name: 'etat_conv',
-      label: 'État',
-      type: 'select',
-      placeholder: 'Sélectionner un état',
-      required: true,
-      options: CONVENTION_STATES.map((state) => ({
-        value: state.value,
-        label: state.label,
-      })),
-      gridCols: 2,
-    },
-    {
       name: 'partenaire_conv',
       label: 'Partenaire',
       type: 'select',
       placeholder: 'Sélectionner un partenaire',
       required: false,
       options: [],
-      gridCols: 2,
+      gridCols: 1,
     },
   ],
 })

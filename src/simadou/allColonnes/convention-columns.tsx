@@ -1,28 +1,11 @@
 import { ColumnDef } from '@tanstack/react-table'
 import { DataTableColumnHeader } from '@/components/data-table'
-import { Badge } from '@/components/ui/badge'
 import { GenericRowActions } from '@/Global/Tableaux/GenericRowActions'
 import type { Convention } from '@/simadou/allTypes/convention'
-import { CONVENTION_STATES } from '@/simadou/schemas/conventionSchema'
 import { Trash2, UserPen } from 'lucide-react'
+import { formatNumber } from '../allSercices/montantFormater'
 
 type ConventionDialogType = 'add' | 'edit' | 'delete'
-
-const ETAT_VARIANTS: Record<
-  string,
-  'default' | 'secondary' | 'outline' | 'destructive'
-> = {
-  active: 'default',
-  inactive: 'secondary',
-  en_cours: 'outline',
-  terminee: 'secondary',
-  suspendue: 'destructive',
-}
-
-function getEtatLabel(value: string) {
-  return CONVENTION_STATES.find((state) => state.value === value)?.label ?? value
-}
-
 export const buildConventionColumns = (
   setOpen: (dialog: ConventionDialogType | null) => void,
   setCurrentRow: React.Dispatch<React.SetStateAction<Convention | null>>
@@ -61,10 +44,7 @@ export const buildConventionColumns = (
     ),
     cell: ({ row }) => (
       <div className='w-full text-center font-mono tabular-nums'>
-        {new Intl.NumberFormat('fr-FR', {
-          style: 'currency',
-          currency: 'XOF',
-        }).format(Number(row.original.montant_conv))}
+        {formatNumber(row.original.montant_conv)} GNF
       </div>
     ),
     meta: { thClassName: 'text-center', className: 'text-center' },
@@ -80,21 +60,6 @@ export const buildConventionColumns = (
         {new Date(row.original.date_signature_conv).toLocaleDateString('fr-FR')}
       </div>
     ),
-  },
-  {
-    id: 'etat_conv',
-    accessorKey: 'etat_conv',
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='État' />
-    ),
-    cell: ({ row }) => {
-      const etat = row.original.etat_conv
-      return (
-        <Badge variant={ETAT_VARIANTS[etat] ?? 'outline'}>
-          {getEtatLabel(etat)}
-        </Badge>
-      )
-    },
   },
   {
     id: 'partenaire_conv',
