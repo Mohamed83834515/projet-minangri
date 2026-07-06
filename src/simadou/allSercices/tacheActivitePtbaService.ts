@@ -50,7 +50,7 @@ class TacheActivitePtbaService {
 
   async getByActivite(url:string,idActivite: number): Promise<TacheActivitePtba[]> {
     const response = await apiClient.request<TacheActivitePtba[]>
-    (`${url}?id_activite_ptba=${idActivite}`);
+    (`${url}?id_activite=${idActivite}`);
     return response;
   }
 

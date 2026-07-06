@@ -24,7 +24,7 @@ export const useGetPartsBailleursByActivite = (
     queryKey: query
       ? partBailleurQueryKeys.byActivite(query)
       : partBailleurQueryKeys.all,
-    queryFn: () => partBailleurService.getForActivite(query!),
+    queryFn: () => partBailleurService.getByActivite(query!.activitePtbaId, query!.projetId),
     enabled:
       query != null &&
       query.activitePtbaId > 0 &&

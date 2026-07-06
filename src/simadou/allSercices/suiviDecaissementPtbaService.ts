@@ -58,13 +58,6 @@ function resolveActivitePtbaFromApi(raw: unknown): number | null {
   return Number.isFinite(n) ? n : null
 }
 
-function filterSuivisDecaissementByActivite(
-  items: SuiviDecaissementPtba[],
-  idActivite: number
-): SuiviDecaissementPtba[] {
-  return items.filter((item) => item.activite_ptba === idActivite)
-}
-
 function mapSuiviDecaissementPtbaFromApi(
   raw: Record<string, unknown>
 ): SuiviDecaissementPtba {
@@ -128,7 +121,7 @@ const suiviDecaissementPtbaService = {
     const items = normalizeApiList<Record<string, unknown>>(response).map(
       mapSuiviDecaissementPtbaFromApi
     )
-    return filterSuivisDecaissementByActivite(items, idActivite)
+    return items
   },
 
   async create(

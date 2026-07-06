@@ -45,13 +45,6 @@ function mapSuiviDecaissementPtbaProjetFromApi(
   }
 }
 
-function filterSuivisDecaissementProjetByActivite(
-  items: SuiviDecaissementPtbaProjet[],
-  idActivite: number
-): SuiviDecaissementPtbaProjet[] {
-  return items.filter((item) => item.activite_ptba_projet === idActivite)
-}
-
 function toApiPayload(
   data: SuiviDecaissementPtbaProjetFormData,
   idActivite: number,
@@ -79,12 +72,13 @@ const suiviDecaissementPtbaProjetService = {
     idActivite: number
   ): Promise<SuiviDecaissementPtbaProjet[]> {
     const response = await apiClient.request<unknown>(ENDPOINT, {
-      method: 'GET',
-    })
+          method: 'GET',
+          params: { activite_ptba_projet: idActivite },
+        })
     const items = normalizeApiList<Record<string, unknown>>(response).map(
       mapSuiviDecaissementPtbaProjetFromApi
     )
-    return filterSuivisDecaissementProjetByActivite(items, idActivite)
+    return items
   },
 
   async create(

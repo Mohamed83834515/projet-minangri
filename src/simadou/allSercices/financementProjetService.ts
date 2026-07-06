@@ -29,6 +29,15 @@ const financementProjetService = {
     const all = await this.getAll()
     return filterFinancementsByProjet(all, idProjet)
   },
+  async getByActivite(idActivite: number, idProjet: number): Promise<FinancementProjet[]> {
+    const byParam = await apiClient.request<unknown>(ENDPOINT, {
+      method: 'GET',
+      params: { activite_ptba: idActivite, projet: idProjet },
+    })
+    const items = normalizeApiList<FinancementProjet>(byParam)
+
+    return items
+  },
 
   async create(data: FinancementProjetApiPayload): Promise<FinancementProjet> {
     return apiClient.request<FinancementProjet>(ENDPOINT, {
