@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { type ColumnDef } from '@tanstack/react-table'
+import { resolveCadreAnalytiqueFormValue } from '@/simadou/lib/ptbaFormUtils'
 import { GenericTable } from '@/Global/Generic/Generictable'
 import type {
   CoutUnitairePtba,
@@ -107,13 +108,13 @@ export function CoutActiviteTable({
     const ptbasByCadre = new Map<number, Ptba[]>()
 
     ptbas.forEach((ptba) => {
-      if (typeof ptba.cadre_analytique === 'object' && ptba.cadre_analytique) {
-        const id = ptba.cadre_analytique.id_ca
-
-        if (!ptbasByCadre.has(id)) ptbasByCadre.set(id, [])
-
-        ptbasByCadre.get(id)!.push(ptba)
-      }
+      const id = resolveCadreAnalytiqueFormValue(
+        ptba.cadre_analytique,
+        cadresAnalytiques
+      )
+      if (id == null) return
+      if (!ptbasByCadre.has(id)) ptbasByCadre.set(id, [])
+      ptbasByCadre.get(id)!.push(ptba)
     })
 
     const result: TreeRow[] = []

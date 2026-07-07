@@ -91,7 +91,6 @@ export default function SuiviDecaissementPtbaManager({ activite }: Props) {
             key={activite.id_ptba}
             activite={activite}
             suivis={suivis}
-            idActivite={activite.id_ptba}
             onEdit={handleEdit}
             onAdd={handleAdd}
           />

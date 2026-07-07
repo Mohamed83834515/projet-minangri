@@ -20,9 +20,9 @@ import { useSuiviPtbaActivitesProgress } from '@/simadou/allHooks/admin/suiviPtb
 import { PtbaVersionSelect } from '@/simadou/allfonctionalities/ptba/PtbaVersionSelect'
 import {
   EMPTY_PTBA_LIST,
-  filterPtbasByVersion,
   resolvePtbaActiviteId,
 } from '@/simadou/allfonctionalities/rapport/rapportTableUtils'
+import { resolveCadreAnalytiqueFormValue } from '@/simadou/lib/ptbaFormUtils'
 import {
   buildRapportEtatActivitesExportRows,
   getRapportEtatActivitesExportColumns,
@@ -63,10 +63,9 @@ export default function ListeRapportEtatActivites() {
   const ptbaList = ptbas ?? EMPTY_PTBA_LIST
   const { data: cadresAnalytiques = [] } = useGetCadresAnalytique()
 
-  const filteredPtbas = useMemo(
-    () => filterPtbasByVersion(ptbaList, selectedVersionId),
-    [ptbaList, selectedVersionId]
-  )
+  // Le endpoint `/versions-ptbas/{id}/ptbas-programmes/` renvoie déjà les
+  // activités de la version sélectionnée : aucun re-filtrage côté client.
+  const filteredPtbas = ptbaList
 
   const activiteIds = useMemo(
     () =>
@@ -135,11 +134,13 @@ export default function ListeRapportEtatActivites() {
     const ptbasByCadre = new Map<number, Ptba[]>()
 
     filteredPtbas.forEach((ptba) => {
-      if (typeof ptba.cadre_analytique === 'object' && ptba.cadre_analytique) {
-        const id = ptba.cadre_analytique.id_ca
-        if (!ptbasByCadre.has(id)) ptbasByCadre.set(id, [])
-        ptbasByCadre.get(id)!.push(ptba)
-      }
+      const id = resolveCadreAnalytiqueFormValue(
+        ptba.cadre_analytique,
+        cadresAnalytiques
+      )
+      if (id == null) return
+      if (!ptbasByCadre.has(id)) ptbasByCadre.set(id, [])
+      ptbasByCadre.get(id)!.push(ptba)
     })
 
     const result: TreeRow[] = []

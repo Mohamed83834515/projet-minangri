@@ -4,6 +4,7 @@ import { GenericTable } from '@/Global/Generic/Generictable'
 import { useGetUnitesIndicateur } from '@/simadou/allHooks/admin/uniteIndicateurHooks'
 import type { CadreAnalytique, Ptba } from '@/simadou/allTypes'
 import { type IndicateurTache } from '@/simadou/allTypes/indicateurTache'
+import { resolveCadreAnalytiqueFormValue } from '@/simadou/lib/ptbaFormUtils'
 import { useRapportExportRegistration } from '@/simadou/allfonctionalities/rapport/useRapportExportRegistration'
 import { LineChart, Loader2 } from 'lucide-react'
 import { useEmbeddedTableState } from '@/hooks/use-embedded-table-state'
@@ -118,11 +119,13 @@ export function IndicateursTable({
     const ptbasByCadre = new Map<number, Ptba[]>()
 
     ptbas.forEach((ptba) => {
-      if (typeof ptba.cadre_analytique === 'object' && ptba.cadre_analytique) {
-        const id = ptba.cadre_analytique.id_ca
-        if (!ptbasByCadre.has(id)) ptbasByCadre.set(id, [])
-        ptbasByCadre.get(id)!.push(ptba)
-      }
+      const id = resolveCadreAnalytiqueFormValue(
+        ptba.cadre_analytique,
+        cadresAnalytiques
+      )
+      if (id == null) return
+      if (!ptbasByCadre.has(id)) ptbasByCadre.set(id, [])
+      ptbasByCadre.get(id)!.push(ptba)
     })
 
     function children(cadres: CadreAnalytique[], parentId: number) {

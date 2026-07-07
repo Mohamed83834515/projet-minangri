@@ -8,11 +8,11 @@ import { usePtbaVersionSelection } from '@/simadou/allHooks/admin/versionHooks'
 import { useGeneralParamsQuery } from '@/simadou/allHooks/generalParams/queries'
 import { PtbaVersionSelect } from '@/simadou/allfonctionalities/ptba/PtbaVersionSelect'
 import {
-  filterPtbasByVersion,
   resolvePtbaActiviteId,
   EMPTY_PTBA_LIST,
 } from '@/simadou/allfonctionalities/rapport/rapportTableUtils'
 import { ClipboardList } from 'lucide-react'
+import { normalizeIndicateurTache } from '@/simadou/lib/indicateurTacheUtils'
 import { useActiveProgrammeCode } from '@/hooks/use-active-programme'
 import { useNiveauTabsTheme } from '@/components/ui/NiveauTabs'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -45,11 +45,9 @@ export default function RapportPtbaPage() {
   const { data: config } = useGeneralParamsQuery()
   const currencyCode = config?.currencyCode
 
-  // ✅ Filtrer les PTBA par version
-  const ptbas = useMemo(
-    () => filterPtbasByVersion(ptbasRaw, selectedVersionId),
-    [ptbasRaw, selectedVersionId]
-  )
+  // Le endpoint `/versions-ptbas/{id}/ptbas-programmes/` renvoie déjà les
+  // activités de la version sélectionnée : aucun re-filtrage côté client.
+  const ptbas = ptbasRaw
 
   // ✅ Récupérer les IDs des activités
   const activiteIds = useMemo(
@@ -72,15 +70,14 @@ export default function RapportPtbaPage() {
     })
   }, [allTaches, activiteIds])
 
-  // ✅ Filtrer les indicateurs par activité
+  // ✅ Filtrer les indicateurs par activité.
+  // L'API renvoie `id_activite` et `unite_ind_tache` comme objets imbriqués :
+  // on normalise pour obtenir des ids numériques avant le filtrage.
   const indicateurs = useMemo(() => {
     const activiteIdSet = new Set(activiteIds)
-    return allIndicateurs.filter((indicateur) => {
-      return (
-        indicateur.id_activite != null &&
-        activiteIdSet.has(indicateur.id_activite)
-      )
-    })
+    return allIndicateurs
+      .map(normalizeIndicateurTache)
+      .filter((indicateur) => activiteIdSet.has(indicateur.id_activite))
   }, [allIndicateurs, activiteIds])
 
   // ✅ Filtrer les coûts par activité
