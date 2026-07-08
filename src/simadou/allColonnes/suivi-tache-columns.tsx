@@ -1,6 +1,5 @@
 import { type ColumnDef } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { DataTableColumnHeader } from '@/components/data-table'
 import { cn } from '@/lib/utils'
 import type { TacheActivitePtba } from '@/simadou/allTypes'
