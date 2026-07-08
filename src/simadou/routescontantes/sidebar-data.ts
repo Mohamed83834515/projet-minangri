@@ -157,6 +157,11 @@ export const sidebarData: SidebarData = {
               url: '/programmation/parametrage-marches',
               icon: List,
             },
+            {
+              title: 'PPMS',
+              url: '/programmation/ppms',
+              icon: FileStack,
+            },
           ],
         },
         // ── Projet ─────────────────────────────────────

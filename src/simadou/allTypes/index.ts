@@ -61,3 +61,4 @@ export * from "./decaissementPtba";
 export * from "./sourceVerification";
 export * from "./categorieActeur";
 export * from "./convention";
+export * from "./ppm";

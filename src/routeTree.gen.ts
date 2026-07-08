@@ -48,6 +48,7 @@ import { Route as AuthenticatedProgrammeCadreAnalytiqueIndexRouteImport } from '
 import { Route as AuthenticatedProgrammationSuiviPtbaIndexRouteImport } from './routes/_authenticated/programmation/suivi-ptba/index'
 import { Route as AuthenticatedProgrammationPtbaIndexRouteImport } from './routes/_authenticated/programmation/ptba/index'
 import { Route as AuthenticatedProgrammationProjetsIndexRouteImport } from './routes/_authenticated/programmation/projets/index'
+import { Route as AuthenticatedProgrammationPpmsIndexRouteImport } from './routes/_authenticated/programmation/ppms/index'
 import { Route as AuthenticatedProgrammationParametrageMarchesIndexRouteImport } from './routes/_authenticated/programmation/parametrage-marches/index'
 import { Route as AuthenticatedProgrammationIndicateursPerformanceIndexRouteImport } from './routes/_authenticated/programmation/indicateurs-performance/index'
 import { Route as AuthenticatedProgrammationIndicateursActivitesPtbaIndexRouteImport } from './routes/_authenticated/programmation/indicateurs-activites-ptba/index'
@@ -295,6 +296,12 @@ const AuthenticatedProgrammationProjetsIndexRoute =
     path: '/programmation/projets/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedProgrammationPpmsIndexRoute =
+  AuthenticatedProgrammationPpmsIndexRouteImport.update({
+    id: '/programmation/ppms/',
+    path: '/programmation/ppms/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedProgrammationParametrageMarchesIndexRoute =
   AuthenticatedProgrammationParametrageMarchesIndexRouteImport.update({
     id: '/',
@@ -512,6 +519,7 @@ export interface FileRoutesByFullPath {
   '/programmation/indicateurs-activites-ptba/': typeof AuthenticatedProgrammationIndicateursActivitesPtbaIndexRoute
   '/programmation/indicateurs-performance/': typeof AuthenticatedProgrammationIndicateursPerformanceIndexRoute
   '/programmation/parametrage-marches/': typeof AuthenticatedProgrammationParametrageMarchesIndexRoute
+  '/programmation/ppms/': typeof AuthenticatedProgrammationPpmsIndexRoute
   '/programmation/projets/': typeof AuthenticatedProgrammationProjetsIndexRoute
   '/programmation/ptba/': typeof AuthenticatedProgrammationPtbaIndexRoute
   '/programmation/suivi-ptba/': typeof AuthenticatedProgrammationSuiviPtbaIndexRoute
@@ -575,6 +583,7 @@ export interface FileRoutesByTo {
   '/programmation/indicateurs-activites-ptba': typeof AuthenticatedProgrammationIndicateursActivitesPtbaIndexRoute
   '/programmation/indicateurs-performance': typeof AuthenticatedProgrammationIndicateursPerformanceIndexRoute
   '/programmation/parametrage-marches': typeof AuthenticatedProgrammationParametrageMarchesIndexRoute
+  '/programmation/ppms': typeof AuthenticatedProgrammationPpmsIndexRoute
   '/programmation/projets': typeof AuthenticatedProgrammationProjetsIndexRoute
   '/programmation/ptba': typeof AuthenticatedProgrammationPtbaIndexRoute
   '/programmation/suivi-ptba': typeof AuthenticatedProgrammationSuiviPtbaIndexRoute
@@ -644,6 +653,7 @@ export interface FileRoutesById {
   '/_authenticated/programmation/indicateurs-activites-ptba/': typeof AuthenticatedProgrammationIndicateursActivitesPtbaIndexRoute
   '/_authenticated/programmation/indicateurs-performance/': typeof AuthenticatedProgrammationIndicateursPerformanceIndexRoute
   '/_authenticated/programmation/parametrage-marches/': typeof AuthenticatedProgrammationParametrageMarchesIndexRoute
+  '/_authenticated/programmation/ppms/': typeof AuthenticatedProgrammationPpmsIndexRoute
   '/_authenticated/programmation/projets/': typeof AuthenticatedProgrammationProjetsIndexRoute
   '/_authenticated/programmation/ptba/': typeof AuthenticatedProgrammationPtbaIndexRoute
   '/_authenticated/programmation/suivi-ptba/': typeof AuthenticatedProgrammationSuiviPtbaIndexRoute
@@ -713,6 +723,7 @@ export interface FileRouteTypes {
     | '/programmation/indicateurs-activites-ptba/'
     | '/programmation/indicateurs-performance/'
     | '/programmation/parametrage-marches/'
+    | '/programmation/ppms/'
     | '/programmation/projets/'
     | '/programmation/ptba/'
     | '/programmation/suivi-ptba/'
@@ -776,6 +787,7 @@ export interface FileRouteTypes {
     | '/programmation/indicateurs-activites-ptba'
     | '/programmation/indicateurs-performance'
     | '/programmation/parametrage-marches'
+    | '/programmation/ppms'
     | '/programmation/projets'
     | '/programmation/ptba'
     | '/programmation/suivi-ptba'
@@ -844,6 +856,7 @@ export interface FileRouteTypes {
     | '/_authenticated/programmation/indicateurs-activites-ptba/'
     | '/_authenticated/programmation/indicateurs-performance/'
     | '/_authenticated/programmation/parametrage-marches/'
+    | '/_authenticated/programmation/ppms/'
     | '/_authenticated/programmation/projets/'
     | '/_authenticated/programmation/ptba/'
     | '/_authenticated/programmation/suivi-ptba/'
@@ -1160,6 +1173,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProgrammationProjetsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/programmation/ppms/': {
+      id: '/_authenticated/programmation/ppms/'
+      path: '/programmation/ppms'
+      fullPath: '/programmation/ppms/'
+      preLoaderRoute: typeof AuthenticatedProgrammationPpmsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/programmation/parametrage-marches/': {
       id: '/_authenticated/programmation/parametrage-marches/'
       path: '/'
@@ -1468,6 +1488,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProgrammationActivitesProjetIndexRoute: typeof AuthenticatedProgrammationActivitesProjetIndexRoute
   AuthenticatedProgrammationIndicateursActivitesPtbaIndexRoute: typeof AuthenticatedProgrammationIndicateursActivitesPtbaIndexRoute
   AuthenticatedProgrammationIndicateursPerformanceIndexRoute: typeof AuthenticatedProgrammationIndicateursPerformanceIndexRoute
+  AuthenticatedProgrammationPpmsIndexRoute: typeof AuthenticatedProgrammationPpmsIndexRoute
   AuthenticatedProgrammationProjetsIndexRoute: typeof AuthenticatedProgrammationProjetsIndexRoute
   AuthenticatedProgrammationPtbaIndexRoute: typeof AuthenticatedProgrammationPtbaIndexRoute
   AuthenticatedProgrammationSuiviPtbaIndexRoute: typeof AuthenticatedProgrammationSuiviPtbaIndexRoute
@@ -1526,6 +1547,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedProgrammationIndicateursActivitesPtbaIndexRoute,
   AuthenticatedProgrammationIndicateursPerformanceIndexRoute:
     AuthenticatedProgrammationIndicateursPerformanceIndexRoute,
+  AuthenticatedProgrammationPpmsIndexRoute:
+    AuthenticatedProgrammationPpmsIndexRoute,
   AuthenticatedProgrammationProjetsIndexRoute:
     AuthenticatedProgrammationProjetsIndexRoute,
   AuthenticatedProgrammationPtbaIndexRoute:
