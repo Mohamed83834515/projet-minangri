@@ -96,8 +96,6 @@ const DashboardPage: React.FC = () => {
                 (r.bailleur && r.bailleur.toLowerCase().includes(q))
         )
     }, [projetRows, searchQuery])
-    console.log('avancementComposantesNiveau2', avancementComposantesNiveau2)
-    console.log('avancementComposantesNiveau3', avancementComposantesNiveau3)
 
     // Données pour la carte 1 : Projet Programme
     const { data: projectsPerType = [] } = useCountProjectsPerType(idProgramme || 0)

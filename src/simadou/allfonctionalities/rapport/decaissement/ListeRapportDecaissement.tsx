@@ -18,7 +18,6 @@ import { PtbaVersionSelect } from '@/simadou/allfonctionalities/ptba/PtbaVersion
 import {
   EMPTY_PTBA_LIST,
   buildPlaceholderDecaissementMap,
-  filterPtbasByVersion,
   resolvePtbaActiviteId,
 } from '@/simadou/allfonctionalities/rapport/rapportTableUtils'
 import {
@@ -49,14 +48,9 @@ export default function ListeRapportDecaissement() {
   const { data: ptbas } = useGetPtbas(Number(selectedVersionId) || 0)
   const { data: config } = useGeneralParamsQuery()
   const currencyCode = config?.currencyCode
-  const ptbaList = ptbas ?? EMPTY_PTBA_LIST
+  const filteredPtbas = ptbas ?? EMPTY_PTBA_LIST
   const { data: cadresAnalytiques = [] } = useGetCadresAnalytique()
-
-  const filteredPtbas = useMemo(
-    () => filterPtbasByVersion(ptbaList, selectedVersionId),
-    [ptbaList, selectedVersionId]
-  )
-
+  
   const decaissementByActivite = useMemo(
     () => buildPlaceholderDecaissementMap(filteredPtbas),
     [filteredPtbas]
@@ -96,9 +90,15 @@ export default function ListeRapportDecaissement() {
         const id = ptba.cadre_analytique.id_ca
         if (!ptbasByCadre.has(id)) ptbasByCadre.set(id, [])
         ptbasByCadre.get(id)!.push(ptba)
+      }else if (typeof ptba.cadre_analytique === 'number') {
+        const id = ptba.cadre_analytique
+        if (!ptbasByCadre.has(id)) ptbasByCadre.set(id, [])
+        ptbasByCadre.get(id)!.push(ptba)
       }
     })
 
+
+  console.log('ptbasByCadre', filteredPtbas);
     const result: TreeRow[] = []
 
     function children(parentId: number) {
