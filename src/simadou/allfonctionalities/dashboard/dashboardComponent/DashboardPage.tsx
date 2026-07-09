@@ -329,7 +329,7 @@ const DashboardPage: React.FC = () => {
                 anneesDisponibles={anneesDisponibles}
                 selectedAnnee={composanteSelectedAnnee}
                 onAnneeChange={setComposanteSelectedAnnee}
-                title='PAO par composante'
+                title='PAO par Programme'
                 subtitle='Avancement technique · Indicateurs · Décaissement'
             />
 
