@@ -149,7 +149,7 @@ const DashboardPage: React.FC = () => {
     // Données pour la carte 4 : Points de blocage (fictives car pas dans ton API)
     const pointsBlocageStats = useMemo(() => {
         // Données fictives basées sur le nombre de projets
-        const totalPoints = projets.length * 12 // 12 points par projet
+        const totalPoints = projets.length * 12
         const pointsResolus = Math.floor(totalPoints * 0.51)
         const pointsNonResolus = totalPoints - pointsResolus
         const pourcentageResolus = Math.round((pointsResolus / totalPoints) * 100)
