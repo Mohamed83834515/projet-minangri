@@ -329,7 +329,7 @@ const DashboardPage: React.FC = () => {
                 anneesDisponibles={anneesDisponibles}
                 selectedAnnee={composanteSelectedAnnee}
                 onAnneeChange={setComposanteSelectedAnnee}
-                title='PTBA par composante'
+                title='PAO par composante'
                 subtitle='Avancement technique · Indicateurs · Décaissement'
             />
 
@@ -350,7 +350,7 @@ const DashboardPage: React.FC = () => {
                     anneesDisponibles={anneesDisponibles}
                     selectedAnnee={selectedAnnee}
                     onAnneeChange={setSelectedAnnee}
-                    title='Avancement des activités de PTBA par Direction'
+                    title='Avancement des activités de PAO par Direction'
                 />
                 <AvancementTachesPlanSiteChart
                     data={activitesDirectionChartData}
@@ -358,7 +358,7 @@ const DashboardPage: React.FC = () => {
                     selectedAnnee={activitesDirectionSelectedAnnee}
                     onAnneeChange={setActivitesDirectionSelectedAnnee}
                     title='Avancement des Taches par Direction'
-                    subtitle='Nombre total et taux de validation par direction'
+                    subtitle='Nombre total et taux de réalisation par direction'
                     emptyMessage={`Aucune tache par direction pour l'année ${activitesDirectionSelectedAnnee}`}
                 />
                 {/* <AvancementTachesPlanSiteChart

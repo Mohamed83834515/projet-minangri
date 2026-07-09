@@ -157,7 +157,7 @@ const AvancementTachesPlanSiteChart: React.FC<
             <Bar
               yAxisId='percent'
               dataKey='pourcentageValide'
-              name='Taux de validation'
+              name='Taux de réalisation'
               fill={TAUX_VALIDATION_COLOR}
               radius={[4, 4, 0, 0]}
               barSize={28}
