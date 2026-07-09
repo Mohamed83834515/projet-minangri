@@ -9,7 +9,9 @@ import { useGetModesPassation } from '@/simadou/allHooks/admin/modePassationHook
 import { useGetNaturesMarche } from '@/simadou/allHooks/admin/natureMarcheHooks'
 import { useDeletePpm, useGetPpms } from '@/simadou/allHooks/admin/ppmHooks'
 import { useGetTypeFinancementPPM } from '@/simadou/allHooks/admin/typeFinancementPPM'
-import { useGetVersionsPPM } from '@/simadou/allHooks/admin/versionPPMHooks'
+import { usePpmVersionContext } from './PpmVersionContext'
+import { PtbaVersionSelect } from '@/simadou/allfonctionalities/ptba/PtbaVersionSelect'
+import { resolveRelationId } from '@/simadou/lib/resolveApiRelation'
 import type { Ppm } from '@/simadou/allTypes/ppm'
 import AddPpm from './AddPpm'
 
@@ -18,27 +20,36 @@ export default function ListePpm() {
   const [open, setOpen] = useDialogState<'add' | 'edit' | 'delete'>(null)
   const [currentRow, setCurrentRow] = useState<Ppm | null>(null)
 
-  const { data = [], isLoading } = useGetPpms()
-  const { data: versions = [] } = useGetVersionsPPM()
+  const { selectedVersionId, handleChangeVersion, versionOptions } =
+    usePpmVersionContext()
+
+  const { data: allPpms = [], isLoading } = useGetPpms()
   const { data: modes = [] } = useGetModesPassation()
   const { data: typesFinancement = [] } = useGetTypeFinancementPPM()
   const { data: natures = [] } = useGetNaturesMarche()
   const deleteMutation = useDeletePpm()
 
+  const ppms = useMemo(() => {
+    if (!selectedVersionId) return allPpms
+
+    const versionId = Number(selectedVersionId)
+    if (!Number.isFinite(versionId)) return allPpms
+
+    return allPpms.filter(
+      (ppm) =>
+        resolveRelationId(ppm.version_ppm, 'id_version_ppm') === versionId
+    )
+  }, [allPpms, selectedVersionId])
+
   const lookups = useMemo(
     () => ({
-      versionsById: new Map(
-        versions
-          .filter((v) => v.id_version_ppm != null)
-          .map((v) => [v.id_version_ppm!, v])
-      ),
       modesById: new Map(modes.map((m) => [m.id_mode_passation, m])),
       typesFinancementById: new Map(
         typesFinancement.map((t) => [t.id_type_financement_ppm, t])
       ),
       naturesById: new Map(natures.map((n) => [n.id_nature_marche, n])),
     }),
-    [versions, modes, typesFinancement, natures]
+    [modes, typesFinancement, natures]
   )
 
   const columns = useMemo(
@@ -49,7 +60,7 @@ export default function ListePpm() {
   return (
     <div className='space-y-2'>
       <GenericTable
-        data={data}
+        data={ppms}
         columns={columns}
         search={search}
         navigate={navigate}
@@ -58,7 +69,14 @@ export default function ListePpm() {
         searchPlaceholder='Filtrer les PPM...'
         defaultPageSize={10}
         showViewOptions={false}
-        emptyMessage='Aucun PPM trouvé.'
+        emptyMessage='Aucun PPM trouvé pour cette version.'
+        toolbarEndSlot={
+          <PtbaVersionSelect
+            options={versionOptions}
+            value={selectedVersionId}
+            onChange={handleChangeVersion}
+          />
+        }
       />
 
       <GenericDialogs<Ppm, 'add' | 'edit' | 'delete'>

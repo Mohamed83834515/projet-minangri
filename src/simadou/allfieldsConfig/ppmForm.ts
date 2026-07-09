@@ -35,15 +35,6 @@ export const getPpmFormConfig = (): FormConfig => ({
       gridCols: 2,
     },
     {
-      name: 'version_ppm',
-      label: 'Version PPM',
-      type: 'select',
-      placeholder: 'Sélectionner une version PPM',
-      required: true,
-      options: [],
-      gridCols: 2,
-    },
-    {
       name: 'methode_passation',
       label: 'Méthode de passation',
       type: 'select',

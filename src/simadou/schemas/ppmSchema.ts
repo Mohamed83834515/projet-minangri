@@ -21,4 +21,8 @@ export const ppmSchema = z.object({
   nature_marche: fkField('La nature de marché'),
 })
 
+/** Schéma affiché dans le formulaire (version injectée depuis la toolbar). */
+export const ppmFormSchema = ppmSchema.omit({ version_ppm: true })
+
 export type PpmFormData = z.infer<typeof ppmSchema>
+export type PpmFormInput = z.infer<typeof ppmFormSchema>

@@ -5,7 +5,6 @@ import type { ModePassation } from '@/simadou/allTypes/modePassation'
 import type { NatureMarche } from '@/simadou/allTypes/natureMarche'
 import type { Ppm } from '@/simadou/allTypes/ppm'
 import type { TypeFinancementPPM } from '@/simadou/allTypes/typeFinancementPPM'
-import type { VersionPPM } from '@/simadou/allTypes/versionPPM'
 import { formatNumber } from '@/simadou/allSercices/montantFormater'
 import { resolveRelationId } from '@/simadou/lib/resolveApiRelation'
 import { Trash2, UserPen } from 'lucide-react'
@@ -13,7 +12,6 @@ import { Trash2, UserPen } from 'lucide-react'
 type PpmDialogType = 'add' | 'edit' | 'delete'
 
 type PpmLookups = {
-  versionsById: Map<number, VersionPPM>
   modesById: Map<number, ModePassation>
   typesFinancementById: Map<number, TypeFinancementPPM>
   naturesById: Map<number, NatureMarche>
@@ -91,23 +89,6 @@ export const buildPpmColumns = (
       <DataTableColumnHeader column={column} title="N° appel d'offre" />
     ),
     cell: ({ row }) => <div>{row.original.numero_appel_offre}</div>,
-  },
-  {
-    id: 'version_ppm',
-    accessorKey: 'version_ppm',
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Version PPM' />
-    ),
-    cell: ({ row }) => (
-      <div>
-        {resolveLabel(
-          row.original.version_ppm,
-          'id_version_ppm',
-          lookups.versionsById,
-          ['numero_version_ppm']
-        )}
-      </div>
-    ),
   },
   {
     id: 'methode_passation',

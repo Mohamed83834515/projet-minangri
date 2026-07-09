@@ -12,11 +12,16 @@ import { useGetModesPassation } from '@/simadou/allHooks/admin/modePassationHook
 import { useGetNaturesMarche } from '@/simadou/allHooks/admin/natureMarcheHooks'
 import { useSavePpm } from '@/simadou/allHooks/admin/ppmHooks'
 import { useGetTypeFinancementPPM } from '@/simadou/allHooks/admin/typeFinancementPPM'
-import { useGetVersionsPPM } from '@/simadou/allHooks/admin/versionPPMHooks'
+import { usePpmVersionContext } from './PpmVersionContext'
 import { getPpmFormConfig } from '@/simadou/allfieldsConfig/ppmForm'
 import type { Ppm } from '@/simadou/allTypes/ppm'
 import { resolveRelationId } from '@/simadou/lib/resolveApiRelation'
-import { ppmSchema, type PpmFormData } from '@/simadou/schemas/ppmSchema'
+import {
+  ppmFormSchema,
+  type PpmFormData,
+  type PpmFormInput,
+} from '@/simadou/schemas/ppmSchema'
+import { toast } from 'sonner'
 
 type Props = {
   open: boolean
@@ -28,10 +33,32 @@ function resolveFkValue(value: unknown, idKey: string): number | null {
   return resolveRelationId(value, idKey)
 }
 
+function resolveVersionPpmValue(
+  row: Ppm | null | undefined,
+  selectedVersionId: string | null
+): number | undefined {
+  // À la création : toujours la version sélectionnée dans la toolbar.
+  if (!row) {
+    if (!selectedVersionId?.trim()) return undefined
+    const parsed = Number(selectedVersionId)
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined
+  }
+
+  const fromRow = resolveFkValue(row.version_ppm, 'id_version_ppm')
+  if (fromRow != null && fromRow > 0) return fromRow
+
+  if (selectedVersionId?.trim()) {
+    const parsed = Number(selectedVersionId)
+    if (Number.isFinite(parsed) && parsed > 0) return parsed
+  }
+
+  return undefined
+}
+
 export default function AddPpm({ open, onOpenChange, currentRow }: Props) {
   const isEdit = !!currentRow
+  const { selectedVersionId } = usePpmVersionContext()
 
-  const { data: versions = [] } = useGetVersionsPPM()
   const { data: modes = [] } = useGetModesPassation()
   const { data: typesFinancement = [] } = useGetTypeFinancementPPM()
   const { data: natures = [] } = useGetNaturesMarche()
@@ -40,14 +67,6 @@ export default function AddPpm({ open, onOpenChange, currentRow }: Props) {
     const config = getPpmFormConfig()
     const selectOptions: Record<string, { value: number; label: string }[]> =
       {
-        version_ppm: versions
-          .filter((version) => version.id_version_ppm != null)
-          .map((version) => ({
-            value: version.id_version_ppm!,
-            label:
-              version.numero_version_ppm?.trim() ||
-              String(version.id_version_ppm),
-          })),
         methode_passation: modes.map((mode) => ({
           value: mode.id_mode_passation,
           label: `${mode.code_mode_passation} - ${mode.intitule_mode_passation}`,
@@ -69,9 +88,9 @@ export default function AddPpm({ open, onOpenChange, currentRow }: Props) {
         return { ...field, options }
       }),
     }
-  }, [versions, modes, typesFinancement, natures])
+  }, [modes, typesFinancement, natures])
 
-  const defaultValues = useMemo<PpmFormData>(() => {
+  const defaultValues = useMemo<PpmFormInput>(() => {
     if (isEdit && currentRow) {
       return {
         intitule_ppm: currentRow.intitule_ppm ?? '',
@@ -85,8 +104,6 @@ export default function AddPpm({ open, onOpenChange, currentRow }: Props) {
             currentRow.type_financement,
             'id_type_financement_ppm'
           ) ?? 0,
-        version_ppm:
-          resolveFkValue(currentRow.version_ppm, 'id_version_ppm') ?? 0,
         nature_marche:
           resolveFkValue(currentRow.nature_marche, 'id_nature_marche') ?? 0,
       }
@@ -99,7 +116,6 @@ export default function AddPpm({ open, onOpenChange, currentRow }: Props) {
       numero_appel_offre: 0,
       methode_passation: 0,
       type_financement: 0,
-      version_ppm: 0,
       nature_marche: 0,
     }
   }, [currentRow, isEdit])
@@ -107,6 +123,24 @@ export default function AddPpm({ open, onOpenChange, currentRow }: Props) {
   const mutation = useSavePpm(isEdit, currentRow, () => {
     onOpenChange(false)
   })
+
+  const onSubmit = (data: PpmFormInput) => {
+    const versionPpm = resolveVersionPpmValue(currentRow, selectedVersionId)
+
+    if (!versionPpm) {
+      toast.error(
+        "Sélectionnez une version PPM dans la liste avant d'ajouter un PPMS."
+      )
+      return
+    }
+
+    const payload: PpmFormData = {
+      ...data,
+      version_ppm: versionPpm,
+    }
+
+    mutation.mutate(payload)
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -125,9 +159,9 @@ export default function AddPpm({ open, onOpenChange, currentRow }: Props) {
         <DynamicForm
           key={isEdit ? currentRow?.id_ppm : 'new-ppm'}
           config={formConfig}
-          schema={ppmSchema}
+          schema={ppmFormSchema}
           defaultValues={defaultValues}
-          onSubmit={(data: PpmFormData) => mutation.mutate(data)}
+          onSubmit={onSubmit}
           isLoading={mutation.isPending}
           submitText={isEdit ? 'Mettre à jour' : 'Ajouter'}
           loadingText='Enregistrement…'
