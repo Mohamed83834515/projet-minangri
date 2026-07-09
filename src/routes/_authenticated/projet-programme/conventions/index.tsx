@@ -4,7 +4,9 @@ import ListeConvention from '@/simadou/allfonctionalities/parametrage/convention
 import { createFileRoute } from '@tanstack/react-router'
 import { FileSignature } from 'lucide-react'
 
-export const Route = createFileRoute('/_authenticated/parametrage/conventions/')({
+export const Route = createFileRoute(
+  '/_authenticated/projet-programme/conventions/',
+)({
   component: RouteComponent,
 })
 

@@ -76,11 +76,6 @@ export const sidebarData: SidebarData = {
               icon: Handshake,
             },
             {
-              title: 'Conventions',
-              url: '/parametrage/conventions',
-              icon: FileSignature,
-            },
-            {
               title: 'Zones agroécologiques',
               url: '/parametrage/zone-de-collecte',
               icon: MapPin,
@@ -178,6 +173,11 @@ export const sidebarData: SidebarData = {
               title: 'Unités de gestion',
               url: '/projet-programme/unites-de-gestion',
               icon: LayoutGrid,
+            },
+            {
+              title: 'Conventions',
+              url: '/projet-programme/conventions',
+              icon: FileSignature,
             },
           ],
         },

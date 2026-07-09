@@ -39,6 +39,7 @@ import { Route as AuthenticatedRapportEtatDesActivitesIndexRouteImport } from '.
 import { Route as AuthenticatedRapportDecaissementIndexRouteImport } from './routes/_authenticated/rapport/decaissement/index'
 import { Route as AuthenticatedProjetProgrammeUnitesDeGestionIndexRouteImport } from './routes/_authenticated/projet-programme/unites-de-gestion/index'
 import { Route as AuthenticatedProjetProgrammeProjetsIndexRouteImport } from './routes/_authenticated/projet-programme/projets/index'
+import { Route as AuthenticatedProjetProgrammeConventionsIndexRouteImport } from './routes/_authenticated/projet-programme/conventions/index'
 import { Route as AuthenticatedProgrammePagesTestIndexRouteImport } from './routes/_authenticated/programme/pagesTest/index'
 import { Route as AuthenticatedProgrammeListeIndexRouteImport } from './routes/_authenticated/programme/liste/index'
 import { Route as AuthenticatedProgrammeIndicateursPerformanceIndexRouteImport } from './routes/_authenticated/programme/indicateurs-performance/index'
@@ -60,7 +61,6 @@ import { Route as AuthenticatedParametragePlansDeSiteIndexRouteImport } from './
 import { Route as AuthenticatedParametragePartenaireFinancierIndexRouteImport } from './routes/_authenticated/parametrage/partenaire-financier/index'
 import { Route as AuthenticatedParametrageLocalitesIndexRouteImport } from './routes/_authenticated/parametrage/localites/index'
 import { Route as AuthenticatedParametrageDictionnaireIndicateursIndexRouteImport } from './routes/_authenticated/parametrage/dictionnaire-indicateurs/index'
-import { Route as AuthenticatedParametrageConventionsIndexRouteImport } from './routes/_authenticated/parametrage/conventions/index'
 import { Route as AuthenticatedParametrageAutresIndexRouteImport } from './routes/_authenticated/parametrage/autres/index'
 import { Route as AuthenticatedParametrageActeursIndexRouteImport } from './routes/_authenticated/parametrage/acteurs/index'
 import { Route as AuthenticatedSuiviResultatsSuiviIndicateursIdRouteImport } from './routes/_authenticated/suivi-resultats/suivi-indicateurs/$id'
@@ -242,6 +242,12 @@ const AuthenticatedProjetProgrammeProjetsIndexRoute =
     path: '/projet-programme/projets/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedProjetProgrammeConventionsIndexRoute =
+  AuthenticatedProjetProgrammeConventionsIndexRouteImport.update({
+    id: '/projet-programme/conventions/',
+    path: '/projet-programme/conventions/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedProgrammePagesTestIndexRoute =
   AuthenticatedProgrammePagesTestIndexRouteImport.update({
     id: '/programme/pagesTest/',
@@ -367,12 +373,6 @@ const AuthenticatedParametrageDictionnaireIndicateursIndexRoute =
   AuthenticatedParametrageDictionnaireIndicateursIndexRouteImport.update({
     id: '/parametrage/dictionnaire-indicateurs/',
     path: '/parametrage/dictionnaire-indicateurs/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedParametrageConventionsIndexRoute =
-  AuthenticatedParametrageConventionsIndexRouteImport.update({
-    id: '/parametrage/conventions/',
-    path: '/parametrage/conventions/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedParametrageAutresIndexRoute =
@@ -507,7 +507,6 @@ export interface FileRoutesByFullPath {
   '/suivi-resultats/suivi-indicateurs/$id': typeof AuthenticatedSuiviResultatsSuiviIndicateursIdRoute
   '/parametrage/acteurs/': typeof AuthenticatedParametrageActeursIndexRoute
   '/parametrage/autres/': typeof AuthenticatedParametrageAutresIndexRoute
-  '/parametrage/conventions/': typeof AuthenticatedParametrageConventionsIndexRoute
   '/parametrage/dictionnaire-indicateurs/': typeof AuthenticatedParametrageDictionnaireIndicateursIndexRoute
   '/parametrage/localites/': typeof AuthenticatedParametrageLocalitesIndexRoute
   '/parametrage/partenaire-financier/': typeof AuthenticatedParametragePartenaireFinancierIndexRoute
@@ -529,6 +528,7 @@ export interface FileRoutesByFullPath {
   '/programme/indicateurs-performance/': typeof AuthenticatedProgrammeIndicateursPerformanceIndexRoute
   '/programme/liste/': typeof AuthenticatedProgrammeListeIndexRoute
   '/programme/pagesTest/': typeof AuthenticatedProgrammePagesTestIndexRoute
+  '/projet-programme/conventions/': typeof AuthenticatedProjetProgrammeConventionsIndexRoute
   '/projet-programme/projets/': typeof AuthenticatedProjetProgrammeProjetsIndexRoute
   '/projet-programme/unites-de-gestion/': typeof AuthenticatedProjetProgrammeUnitesDeGestionIndexRoute
   '/rapport/decaissement/': typeof AuthenticatedRapportDecaissementIndexRoute
@@ -571,7 +571,6 @@ export interface FileRoutesByTo {
   '/suivi-resultats/suivi-indicateurs/$id': typeof AuthenticatedSuiviResultatsSuiviIndicateursIdRoute
   '/parametrage/acteurs': typeof AuthenticatedParametrageActeursIndexRoute
   '/parametrage/autres': typeof AuthenticatedParametrageAutresIndexRoute
-  '/parametrage/conventions': typeof AuthenticatedParametrageConventionsIndexRoute
   '/parametrage/dictionnaire-indicateurs': typeof AuthenticatedParametrageDictionnaireIndicateursIndexRoute
   '/parametrage/localites': typeof AuthenticatedParametrageLocalitesIndexRoute
   '/parametrage/partenaire-financier': typeof AuthenticatedParametragePartenaireFinancierIndexRoute
@@ -593,6 +592,7 @@ export interface FileRoutesByTo {
   '/programme/indicateurs-performance': typeof AuthenticatedProgrammeIndicateursPerformanceIndexRoute
   '/programme/liste': typeof AuthenticatedProgrammeListeIndexRoute
   '/programme/pagesTest': typeof AuthenticatedProgrammePagesTestIndexRoute
+  '/projet-programme/conventions': typeof AuthenticatedProjetProgrammeConventionsIndexRoute
   '/projet-programme/projets': typeof AuthenticatedProjetProgrammeProjetsIndexRoute
   '/projet-programme/unites-de-gestion': typeof AuthenticatedProjetProgrammeUnitesDeGestionIndexRoute
   '/rapport/decaissement': typeof AuthenticatedRapportDecaissementIndexRoute
@@ -641,7 +641,6 @@ export interface FileRoutesById {
   '/_authenticated/suivi-resultats/suivi-indicateurs/$id': typeof AuthenticatedSuiviResultatsSuiviIndicateursIdRoute
   '/_authenticated/parametrage/acteurs/': typeof AuthenticatedParametrageActeursIndexRoute
   '/_authenticated/parametrage/autres/': typeof AuthenticatedParametrageAutresIndexRoute
-  '/_authenticated/parametrage/conventions/': typeof AuthenticatedParametrageConventionsIndexRoute
   '/_authenticated/parametrage/dictionnaire-indicateurs/': typeof AuthenticatedParametrageDictionnaireIndicateursIndexRoute
   '/_authenticated/parametrage/localites/': typeof AuthenticatedParametrageLocalitesIndexRoute
   '/_authenticated/parametrage/partenaire-financier/': typeof AuthenticatedParametragePartenaireFinancierIndexRoute
@@ -663,6 +662,7 @@ export interface FileRoutesById {
   '/_authenticated/programme/indicateurs-performance/': typeof AuthenticatedProgrammeIndicateursPerformanceIndexRoute
   '/_authenticated/programme/liste/': typeof AuthenticatedProgrammeListeIndexRoute
   '/_authenticated/programme/pagesTest/': typeof AuthenticatedProgrammePagesTestIndexRoute
+  '/_authenticated/projet-programme/conventions/': typeof AuthenticatedProjetProgrammeConventionsIndexRoute
   '/_authenticated/projet-programme/projets/': typeof AuthenticatedProjetProgrammeProjetsIndexRoute
   '/_authenticated/projet-programme/unites-de-gestion/': typeof AuthenticatedProjetProgrammeUnitesDeGestionIndexRoute
   '/_authenticated/rapport/decaissement/': typeof AuthenticatedRapportDecaissementIndexRoute
@@ -711,7 +711,6 @@ export interface FileRouteTypes {
     | '/suivi-resultats/suivi-indicateurs/$id'
     | '/parametrage/acteurs/'
     | '/parametrage/autres/'
-    | '/parametrage/conventions/'
     | '/parametrage/dictionnaire-indicateurs/'
     | '/parametrage/localites/'
     | '/parametrage/partenaire-financier/'
@@ -733,6 +732,7 @@ export interface FileRouteTypes {
     | '/programme/indicateurs-performance/'
     | '/programme/liste/'
     | '/programme/pagesTest/'
+    | '/projet-programme/conventions/'
     | '/projet-programme/projets/'
     | '/projet-programme/unites-de-gestion/'
     | '/rapport/decaissement/'
@@ -775,7 +775,6 @@ export interface FileRouteTypes {
     | '/suivi-resultats/suivi-indicateurs/$id'
     | '/parametrage/acteurs'
     | '/parametrage/autres'
-    | '/parametrage/conventions'
     | '/parametrage/dictionnaire-indicateurs'
     | '/parametrage/localites'
     | '/parametrage/partenaire-financier'
@@ -797,6 +796,7 @@ export interface FileRouteTypes {
     | '/programme/indicateurs-performance'
     | '/programme/liste'
     | '/programme/pagesTest'
+    | '/projet-programme/conventions'
     | '/projet-programme/projets'
     | '/projet-programme/unites-de-gestion'
     | '/rapport/decaissement'
@@ -844,7 +844,6 @@ export interface FileRouteTypes {
     | '/_authenticated/suivi-resultats/suivi-indicateurs/$id'
     | '/_authenticated/parametrage/acteurs/'
     | '/_authenticated/parametrage/autres/'
-    | '/_authenticated/parametrage/conventions/'
     | '/_authenticated/parametrage/dictionnaire-indicateurs/'
     | '/_authenticated/parametrage/localites/'
     | '/_authenticated/parametrage/partenaire-financier/'
@@ -866,6 +865,7 @@ export interface FileRouteTypes {
     | '/_authenticated/programme/indicateurs-performance/'
     | '/_authenticated/programme/liste/'
     | '/_authenticated/programme/pagesTest/'
+    | '/_authenticated/projet-programme/conventions/'
     | '/_authenticated/projet-programme/projets/'
     | '/_authenticated/projet-programme/unites-de-gestion/'
     | '/_authenticated/rapport/decaissement/'
@@ -1110,6 +1110,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProjetProgrammeProjetsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/projet-programme/conventions/': {
+      id: '/_authenticated/projet-programme/conventions/'
+      path: '/projet-programme/conventions'
+      fullPath: '/projet-programme/conventions/'
+      preLoaderRoute: typeof AuthenticatedProjetProgrammeConventionsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/programme/pagesTest/': {
       id: '/_authenticated/programme/pagesTest/'
       path: '/programme/pagesTest'
@@ -1255,13 +1262,6 @@ declare module '@tanstack/react-router' {
       path: '/parametrage/dictionnaire-indicateurs'
       fullPath: '/parametrage/dictionnaire-indicateurs/'
       preLoaderRoute: typeof AuthenticatedParametrageDictionnaireIndicateursIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/parametrage/conventions/': {
-      id: '/_authenticated/parametrage/conventions/'
-      path: '/parametrage/conventions'
-      fullPath: '/parametrage/conventions/'
-      preLoaderRoute: typeof AuthenticatedParametrageConventionsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/parametrage/autres/': {
@@ -1477,7 +1477,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProjetProgrammeProjetsIdRoute: typeof AuthenticatedProjetProgrammeProjetsIdRouteWithChildren
   AuthenticatedSuiviResultatsSuiviIndicateursIdRoute: typeof AuthenticatedSuiviResultatsSuiviIndicateursIdRoute
   AuthenticatedParametrageActeursIndexRoute: typeof AuthenticatedParametrageActeursIndexRoute
-  AuthenticatedParametrageConventionsIndexRoute: typeof AuthenticatedParametrageConventionsIndexRoute
   AuthenticatedParametrageDictionnaireIndicateursIndexRoute: typeof AuthenticatedParametrageDictionnaireIndicateursIndexRoute
   AuthenticatedParametrageLocalitesIndexRoute: typeof AuthenticatedParametrageLocalitesIndexRoute
   AuthenticatedParametragePartenaireFinancierIndexRoute: typeof AuthenticatedParametragePartenaireFinancierIndexRoute
@@ -1498,6 +1497,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProgrammeIndicateursPerformanceIndexRoute: typeof AuthenticatedProgrammeIndicateursPerformanceIndexRoute
   AuthenticatedProgrammeListeIndexRoute: typeof AuthenticatedProgrammeListeIndexRoute
   AuthenticatedProgrammePagesTestIndexRoute: typeof AuthenticatedProgrammePagesTestIndexRoute
+  AuthenticatedProjetProgrammeConventionsIndexRoute: typeof AuthenticatedProjetProgrammeConventionsIndexRoute
   AuthenticatedProjetProgrammeProjetsIndexRoute: typeof AuthenticatedProjetProgrammeProjetsIndexRoute
   AuthenticatedProjetProgrammeUnitesDeGestionIndexRoute: typeof AuthenticatedProjetProgrammeUnitesDeGestionIndexRoute
   AuthenticatedRapportDecaissementIndexRoute: typeof AuthenticatedRapportDecaissementIndexRoute
@@ -1525,8 +1525,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedSuiviResultatsSuiviIndicateursIdRoute,
   AuthenticatedParametrageActeursIndexRoute:
     AuthenticatedParametrageActeursIndexRoute,
-  AuthenticatedParametrageConventionsIndexRoute:
-    AuthenticatedParametrageConventionsIndexRoute,
   AuthenticatedParametrageDictionnaireIndicateursIndexRoute:
     AuthenticatedParametrageDictionnaireIndicateursIndexRoute,
   AuthenticatedParametrageLocalitesIndexRoute:
@@ -1566,6 +1564,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProgrammeListeIndexRoute: AuthenticatedProgrammeListeIndexRoute,
   AuthenticatedProgrammePagesTestIndexRoute:
     AuthenticatedProgrammePagesTestIndexRoute,
+  AuthenticatedProjetProgrammeConventionsIndexRoute:
+    AuthenticatedProjetProgrammeConventionsIndexRoute,
   AuthenticatedProjetProgrammeProjetsIndexRoute:
     AuthenticatedProjetProgrammeProjetsIndexRoute,
   AuthenticatedProjetProgrammeUnitesDeGestionIndexRoute:
