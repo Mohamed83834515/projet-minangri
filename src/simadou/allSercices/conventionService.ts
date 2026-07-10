@@ -1,19 +1,33 @@
 import { apiClient } from '@/axios/api'
-import type { Convention } from '@/simadou/allTypes/convention'
-import type { ConventionFormData } from '@/simadou/schemas/conventionSchema'
+import type { Convention, ConventionApiPayload } from '@/simadou/allTypes/convention'
+import { filterConventionsByProjet } from '@/simadou/lib/conventionUtils'
+import { normalizeApiList } from './apiListUtils'
 
 const ENDPOINT = '/conventions/'
 
 export const conventionService = {
   async getAll(): Promise<Convention[]> {
-    return apiClient.request<Convention[]>(ENDPOINT, { method: 'GET' })
+    const response = await apiClient.request<unknown>(ENDPOINT, { method: 'GET' })
+    return normalizeApiList<Convention>(response)
   },
 
-  async getById(id: number): Promise<Convention> {
-    return apiClient.request<Convention>(`${ENDPOINT}${id}/`, { method: 'GET' })
+  async getByProjet(idProjet: number): Promise<Convention[]> {
+    try {
+      const byParam = await apiClient.request<unknown>(ENDPOINT, {
+        method: 'GET',
+        params: { projet: idProjet },
+      })
+      const items = normalizeApiList<Convention>(byParam)
+      if (items.length > 0) return items
+    } catch {
+      // Repli filtrage client
+    }
+
+    const all = await this.getAll()
+    return filterConventionsByProjet(all, idProjet)
   },
 
-  async create(data: ConventionFormData): Promise<Convention> {
+  async create(data: ConventionApiPayload): Promise<Convention> {
     return apiClient.request<Convention>(ENDPOINT, {
       method: 'POST',
       data: {
@@ -23,10 +37,7 @@ export const conventionService = {
     })
   },
 
-  async update(
-    id: number,
-    data: ConventionFormData
-  ): Promise<Convention> {
+  async update(id: number, data: ConventionApiPayload): Promise<Convention> {
     return apiClient.request<Convention>(`${ENDPOINT}${id}/`, {
       method: 'PUT',
       data: {

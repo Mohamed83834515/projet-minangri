@@ -1,6 +1,8 @@
-import type { FormConfig } from '@/Global/types/formConfig'
+import type { FormConfig, SelectOption } from '@/Global/types/formConfig'
 
-export const getConventionFormConfig = (): FormConfig => ({
+export const getConventionFormConfig = (
+  partenaireOptions: SelectOption[] = []
+): FormConfig => ({
   fields: [
     {
       name: 'code_convention',
@@ -43,11 +45,11 @@ export const getConventionFormConfig = (): FormConfig => ({
     },
     {
       name: 'partenaire_conv',
-      label: 'Partenaire',
+      label: 'Partenaire financier',
       type: 'select',
-      placeholder: 'Sélectionner un partenaire',
+      placeholder: 'Sélectionner un partenaire financier',
       required: false,
-      options: [],
+      options: partenaireOptions,
       gridCols: 1,
     },
   ],

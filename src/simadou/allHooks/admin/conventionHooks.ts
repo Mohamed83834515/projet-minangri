@@ -1,48 +1,64 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { getApiErrorMessage } from '@/lib/api-error-message'
+import type { ConventionApiPayload } from '@/simadou/allTypes/convention'
 import { conventionService } from '@/simadou/allSercices/conventionService'
-import type { ConventionFormData } from '@/simadou/schemas/conventionSchema'
 
 export const conventionQueryKeys = {
   all: ['conventions'] as const,
-  list: () => [...conventionQueryKeys.all, 'list'] as const,
+  byProjet: (idProjet: number) =>
+    [...conventionQueryKeys.all, 'projet', idProjet] as const,
 }
 
-export const useGetConventions = () =>
+export const useGetConventionsByProjet = (idProjet?: number) =>
   useQuery({
-    queryKey: conventionQueryKeys.list(),
-    queryFn: () => conventionService.getAll(),
+    queryKey: conventionQueryKeys.byProjet(idProjet ?? 0),
+    queryFn: () => conventionService.getByProjet(idProjet!),
+    enabled: idProjet != null && idProjet > 0,
   })
 
-export const useSaveConvention = (
-  isEdit: boolean,
-  currentRow?: { id_convention?: number } | null,
-  onSuccess?: () => void
-) => {
+export const useCreateConventionProjet = (idProjet: number) => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (data: ConventionFormData) =>
-      isEdit && currentRow?.id_convention
-        ? conventionService.update(currentRow.id_convention, data)
-        : conventionService.create(data),
+    mutationFn: (data: ConventionApiPayload) => conventionService.create(data),
     meta: { suppressGlobalErrorToast: true },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: conventionQueryKeys.list(),
+        queryKey: conventionQueryKeys.byProjet(idProjet),
       })
-      toast.success(
-        isEdit ? 'Convention modifiée avec succès' : 'Convention créée avec succès'
-      )
-      onSuccess?.()
+      toast.success('Convention créée avec succès')
     },
-    onError: () => {
-      toast.error('Erreur lors de la sauvegarde de la convention')
+    onError: (error) => {
+      toast.error(
+        getApiErrorMessage(error, 'Erreur lors de la création de la convention')
+      )
     },
   })
 }
 
-export const useDeleteConvention = () => {
+export const useUpdateConventionProjet = (idProjet: number) => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: ConventionApiPayload }) =>
+      conventionService.update(id, data),
+    meta: { suppressGlobalErrorToast: true },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: conventionQueryKeys.byProjet(idProjet),
+      })
+      toast.success('Convention modifiée avec succès')
+    },
+    onError: (error) => {
+      toast.error(
+        getApiErrorMessage(error, 'Erreur lors de la modification de la convention')
+      )
+    },
+  })
+}
+
+export const useDeleteConventionProjet = (idProjet: number) => {
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -50,12 +66,14 @@ export const useDeleteConvention = () => {
     meta: { suppressGlobalErrorToast: true },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: conventionQueryKeys.list(),
+        queryKey: conventionQueryKeys.byProjet(idProjet),
       })
       toast.success('Convention supprimée avec succès')
     },
-    onError: () => {
-      toast.error('Erreur lors de la suppression de la convention')
+    onError: (error) => {
+      toast.error(
+        getApiErrorMessage(error, 'Erreur lors de la suppression de la convention')
+      )
     },
   })
 }

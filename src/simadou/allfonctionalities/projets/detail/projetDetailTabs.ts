@@ -3,6 +3,7 @@ import {
   ClipboardList,
   Coins,
   Eye,
+  FileSignature,
   FileText,
   Layout,
   LayoutDashboard,
@@ -16,6 +17,7 @@ export type ProjetDetailTabKey =
   | 'financement'
   | 'ptba'
   | 'suivi_ptba'
+  | 'conventions'
   | 'results_framework'
   | 'cmr_indicators'
   | 'documents'
@@ -58,6 +60,12 @@ export const projetDetailTabs: ProjetDetailTab[] = [
     name: 'Suivi PTBA',
     icon: Eye,
     description: "Suivi d'avancement des activités PTBA du projet.",
+  },
+  {
+    key: 'conventions',
+    name: 'Conventions',
+    icon: FileSignature,
+    description: 'Conventions rattachées au projet.',
   },
   {
     key: 'results_framework',
