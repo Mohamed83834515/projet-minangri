@@ -54,8 +54,15 @@ export function buildBailleurOptionsFromSignataires(
   }))
 }
 
+export type BailleurRef =
+  | number
+  | Acteur
+  | Partial<Acteur>
+  | null
+  | undefined
+
 export function resolveBailleurLabel(
-  value: FinancementProjet['bailleur'],
+  value: BailleurRef,
   signatairesById?: Map<number, Acteur>
 ): string {
   const embedded =

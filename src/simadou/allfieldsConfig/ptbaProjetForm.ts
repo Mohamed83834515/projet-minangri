@@ -1,9 +1,7 @@
 import type { FormConfig, SelectOption } from '../../Global/types/formConfig'
-import { getActeurs } from '../allHooks/admin/acteurHooks'
-import { getLocalites } from '../allHooks/admin/localiteHooks'
-import { getPersonnels } from '../allHooks/admin/personnelHooks'
-import { getTypeActivites } from '../allHooks/admin/typeActivitesHooks'
-import { getUgls } from '../allHooks/admin/uglHooks'
+import type { Acteur } from '../allTypes/acteur'
+import type { Localite } from '../allTypes/localite'
+import type { Personnel, TypeActivite, UGL } from '../allTypes'
 
 const chronogrammeOptions = [
   { label: 'Jan', value: 'Jan' },
@@ -20,50 +18,57 @@ const chronogrammeOptions = [
   { label: 'Déc', value: 'Déc' },
 ]
 
-const localites = await getLocalites()
-const acteurs = await getActeurs()
-const personnels = await getPersonnels()
-const ugls = await getUgls()
-const typeActivitesData = await getTypeActivites();
+function localiteOptions(localites: Localite[]): SelectOption[] {
+  return localites
+    .filter((localite) => {
+      if (typeof localite.niveau_loca === 'object' && localite.niveau_loca !== null) {
+        return localite.niveau_loca.nombre_nlc === 1
+      }
+      return localite.niveau_loca === 1
+    })
+    .map((localite) => ({
+      value: localite.id_loca as number,
+      label: localite.intitule_loca,
+    }))
+}
 
+function acteurOptions(acteurs: Acteur[]): SelectOption[] {
+  return acteurs
+    .filter((acteur) => acteur.id_acteur !== undefined)
+    .map((acteur) => ({
+      value: acteur.id_acteur as number,
+      label: acteur.nom_acteur,
+    }))
+}
 
-const localiteOptions = localites
-  .filter((localite) => {
-    if (typeof localite.niveau_loca === 'object' && localite.niveau_loca !== null) {
-      return localite.niveau_loca.nombre_nlc === 1
-    }
-    return localite.niveau_loca === 1
-  })
-  .map((localite) => ({
-    value: localite.id_loca as number,
-    label: localite.intitule_loca,
+function personnelOptions(personnels: Personnel[]): SelectOption[] {
+  return personnels.map((p) => ({
+    value: p.n_personnel!,
+    label: `${p.prenom_perso} ${p.nom_perso}`,
   }))
+}
 
-const acteurOptions = acteurs
-  .filter((acteur) => acteur.id_acteur !== undefined)
-  .map((acteur) => ({
-    value: acteur.id_acteur as number,
-    label: acteur.nom_acteur,
+function uglOptions(ugls: UGL[]): SelectOption[] {
+  return ugls.map((ugl) => ({
+    value: ugl.code_ugl,
+    label: ugl.nom_ugl,
   }))
+}
 
-const personnelOptions = personnels.map((p) => ({
-  value: p.n_personnel!,
-  label: `${p.prenom_perso} ${p.nom_perso}`,
-}))
-
-
-const uglOptions = ugls.map((ugl) => ({
-  value: ugl.code_ugl,
-  label: ugl.nom_ugl,
-}))
-const typeActivitesOptions = typeActivitesData?.map((item: any) => (
-  {
-    label: item.intutile_type,
-    value: String(item.code_type)
-  })) || [];
+function typeActivitesOptions(typeActivites: TypeActivite[]): SelectOption[] {
+  return typeActivites.map((item) => ({
+    label: item.intutile_type as string,
+    value: String(item.code_type),
+  }))
+}
 
 export function getPtbaProjetFormConfig(
   activiteProjetOptions: SelectOption[],
+  localites: Localite[] = [],
+  acteurs: Acteur[] = [],
+  personnels: Personnel[] = [],
+  ugls: UGL[] = [],
+  typeActivites: TypeActivite[] = [],
 ): FormConfig {
   return {
     steps: [
@@ -71,15 +76,13 @@ export function getPtbaProjetFormConfig(
       { step: 2, title: 'Coordonnées' },
     ],
     fields: [
-
-      // select - Type activité
       {
-        name: "type_activite",
-        label: "Type activité",
-        type: "select",
+        name: 'type_activite',
+        label: 'Type activité',
+        type: 'select',
         placeholder: "Sélectionner un type d'activité",
         required: true,
-        options: typeActivitesOptions, // À remplir dynamiquement depuis l'API
+        options: typeActivitesOptions(typeActivites),
         gridCols: 2,
         formStep: 1,
       },
@@ -92,7 +95,6 @@ export function getPtbaProjetFormConfig(
         gridCols: 2,
         formStep: 1,
       },
-
       {
         name: 'code_actvite_projet',
         label: 'Plan Analytique',
@@ -129,27 +131,17 @@ export function getPtbaProjetFormConfig(
         type: 'multiselect',
         placeholder: 'Sélectionner une ou plusieurs localités',
         required: true,
-        options: localiteOptions,
+        options: localiteOptions(localites),
         gridCols: 1,
         formStep: 2,
       },
-
-      // {
-      //   name: 'cout_ptba',
-      //   label: 'Cout Ptba',
-      //   type: 'number',
-      //   placeholder: "le cout de l'activite du ptba ",
-      //   required: true,
-      //   gridCols: 2,
-      //   formStep: 2,
-      // },
       {
         name: 'partenaire_conserne_ptba',
         label: 'Partenaires concernés',
         type: 'multiselect',
         placeholder: 'Sélectionner un ou plusieurs partenaires',
         required: true,
-        options: acteurOptions,
+        options: acteurOptions(acteurs),
         gridCols: 1,
         formStep: 2,
       },
@@ -159,7 +151,7 @@ export function getPtbaProjetFormConfig(
         type: 'select',
         placeholder: 'Sélectionner un responsable (optionnel)',
         required: false,
-        options: personnelOptions,
+        options: personnelOptions(personnels),
         gridCols: 2,
         formStep: 2,
       },
@@ -169,7 +161,7 @@ export function getPtbaProjetFormConfig(
         type: 'select',
         placeholder: 'Sélectionner une unité de gestion (optionnel)',
         required: false,
-        options: uglOptions,
+        options: uglOptions(ugls),
         gridCols: 2,
         formStep: 2,
       },

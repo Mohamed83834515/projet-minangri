@@ -1,5 +1,10 @@
 import { useMemo } from 'react'
 import { toast } from 'sonner'
+import { useGetActeurs } from '@/simadou/allHooks/admin/acteurHooks'
+import { useGetLocalites } from '@/simadou/allHooks/admin/sharedHooks'
+import { useGetPersonnels } from '@/simadou/allHooks/admin/personnelHooks'
+import { useGetTypeActivites } from '@/simadou/allHooks/admin/typeActivitesHooks'
+import { useGetUgls } from '@/simadou/allHooks/admin/uglHooks'
 import {
   Dialog,
   DialogContent,
@@ -61,7 +66,12 @@ export default function AddPtbaProjet({
   const {  selectedVersionId} = usePtbaVersionSelection(codeProgramme)
   const reel_version = localStorage.getItem('selectedVersionId') ?? selectedVersionId 
   const { data: activites = [] } = useGetActivitesProjetLastNiveau(codeProjet)
-console.log('last', activites)
+  const { data: acteurs = [] } = useGetActeurs()
+  const { data: localites = [] } = useGetLocalites()
+  const { data: personnels = [] } = useGetPersonnels()
+  const { data: ugls = [] } = useGetUgls()
+  const { data: typeActivites = [] } = useGetTypeActivites()
+
   const activiteOptions = useMemo((): SelectOption[] =>
     activites?.map((activite: ActiviteProjet) => ({
       value: activite.id_activite_projet,
@@ -70,10 +80,17 @@ console.log('last', activites)
     [activites]
   )
 
-
   const formConfig = useMemo(
-    () => getPtbaProjetFormConfig(activiteOptions),
-    [activiteOptions]
+    () =>
+      getPtbaProjetFormConfig(
+        activiteOptions,
+        localites,
+        acteurs,
+        personnels,
+        ugls,
+        typeActivites
+      ),
+    [activiteOptions, localites, acteurs, personnels, ugls, typeActivites]
   )
 
   const defaultValues = useMemo((): PtbaProjetFormData => {

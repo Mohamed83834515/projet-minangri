@@ -1,4 +1,6 @@
 import type { ColumnDef } from '@tanstack/react-table'
+import { ClipboardList } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { DataTableColumnHeader } from '@/components/data-table'
 import { buildEditDeleteActionsColumn } from '@/Global/Tableaux/buildEditDeleteActionsColumn'
 import type { Acteur } from '@/simadou/allTypes/acteur'
@@ -17,10 +19,12 @@ export function buildConventionProjetColumns({
   signatairesById,
   onEdit,
   onDeleteRequest,
+  onOpenSuivi,
 }: {
   signatairesById: Map<number, Acteur>
   onEdit: (row: Convention) => void
   onDeleteRequest: (row: Convention) => void
+  onOpenSuivi: (row: Convention) => void
 }): ColumnDef<Convention>[] {
   return [
     {
@@ -84,6 +88,62 @@ export function buildConventionProjetColumns({
       ),
       cell: ({ row }) =>
         resolveBailleurLabel(row.original.partenaire_conv, signatairesById),
+    },
+    {
+      id: 'document_fichier',
+      accessorKey: 'document_fichier',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title='Document' />
+      ),
+      cell: ({ row }) => {
+        const url = row.original.document_fichier
+        if (!url) return <span className='text-xs text-muted-foreground'>—</span>
+        return (
+          <a
+            href={url}
+            target='_blank'
+            rel='noopener noreferrer'
+            className='text-xs text-primary underline'
+          >
+            Voir
+          </a>
+        )
+      },
+      enableSorting: false,
+      enableHiding: false,
+    },
+    {
+      id: 'suivi',
+      header: ({ column }) => (
+        <DataTableColumnHeader
+          column={column}
+          title='Suivis des resultats'
+          className='w-full text-center'
+        />
+      ),
+      cell: ({ row }) => (
+        <div className='flex justify-center'>
+          <Button
+            type='button'
+            variant='outline'
+            size='sm'
+            className='gap-2 border-yellow-200 bg-yellow-50 text-yellow-700 transition-all duration-200 hover:bg-yellow-100 hover:text-yellow-800 dark:border-yellow-800 dark:bg-yellow-950/30 dark:text-yellow-400 dark:hover:bg-yellow-950/50'
+            onClick={() => onOpenSuivi(row.original)}
+            aria-label='Ouvrir le suivi de la convention'
+            title='Suivi décaissement et observations'
+          >
+            <ClipboardList className='h-4 w-4' />
+            <span className='text-xs font-medium'>Suivre</span>
+          </Button>
+        </div>
+      ),
+      meta: {
+        thClassName: 'text-center w-[100px]',
+        className: 'text-center align-middle',
+      },
+      size: 100,
+      enableSorting: false,
+      enableHiding: false,
     },
     buildEditDeleteActionsColumn<Convention>({
       onEdit,

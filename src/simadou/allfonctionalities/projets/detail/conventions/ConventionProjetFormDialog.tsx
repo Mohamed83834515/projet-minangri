@@ -41,8 +41,8 @@ export default function ConventionProjetFormDialog({
   )
 
   const formConfig = useMemo(
-    () => getConventionFormConfig(partenaireOptions),
-    [partenaireOptions]
+    () => getConventionFormConfig(partenaireOptions, isEditing),
+    [partenaireOptions, isEditing]
   )
 
   const defaultValues = useMemo(
@@ -55,6 +55,7 @@ export default function ConventionProjetFormDialog({
       date_signature_conv: formatDateForInput(convention?.date_signature_conv),
       etat_conv: isEditing ? 'modifier' : 'ajouter',
       partenaire_conv: resolvePartenaireConventionId(convention?.partenaire_conv),
+      document_fichier: convention?.document_fichier ?? null,
     }),
     [convention, isEditing]
   )
@@ -72,6 +73,7 @@ export default function ConventionProjetFormDialog({
       etat_conv: isEditing ? 'modifier' : 'ajouter',
       partenaire_conv: data.partenaire_conv ?? null,
       projet: idProjet,
+      document_fichier: data.document_fichier ?? null,
     }
 
     if (isEditing && convention?.id_convention) {
@@ -87,7 +89,7 @@ export default function ConventionProjetFormDialog({
 
   return (
     <DynamicForm
-      key={`convention-projet-${convention?.id_convention ?? 'new'}`}
+      key={`convention-projet-${convention?.id_convention ?? 'new'}-${convention?.document_fichier ?? ''}`}
       config={formConfig}
       schema={conventionFormSchema}
       defaultValues={defaultValues}

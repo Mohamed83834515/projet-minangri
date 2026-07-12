@@ -1,7 +1,8 @@
 import type { FormConfig, SelectOption } from '@/Global/types/formConfig'
 
 export const getConventionFormConfig = (
-  partenaireOptions: SelectOption[] = []
+  partenaireOptions: SelectOption[] = [],
+  isEdit = false
 ): FormConfig => ({
   fields: [
     {
@@ -50,6 +51,16 @@ export const getConventionFormConfig = (
       placeholder: 'Sélectionner un partenaire financier',
       required: false,
       options: partenaireOptions,
+      gridCols: 1,
+    },
+    {
+      name: 'document_fichier',
+      label: 'Document',
+      type: 'file',
+      accept: 'application/pdf,image/*,.doc,.docx',
+      maxSize: 10,
+      helperText: 'PDF, images ou documents (max 10 Mo)',
+      required: !isEdit,
       gridCols: 1,
     },
   ],

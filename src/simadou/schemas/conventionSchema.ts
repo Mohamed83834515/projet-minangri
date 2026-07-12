@@ -1,5 +1,10 @@
 import { z } from "zod";
 
+const documentFichierSchema = z.union([
+  z.instanceof(File),
+  z.string().min(1),
+]);
+
 // Schéma de validation pour les conventions
 export const conventionSchema = z.object({
   // ID de la convention (auto-généré)
@@ -99,6 +104,8 @@ export const conventionSchema = z.object({
     .min(1, "L'ID du partenaire doit être positif")
     .optional()
     .nullable(),
+
+  document_fichier: documentFichierSchema.optional().nullable(),
 });
 
 // Schéma avec validations contextuelles pour le formulaire

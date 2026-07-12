@@ -9,6 +9,7 @@ export interface Convention extends Record<string, unknown> {
   montant_conv: number
   date_signature_conv: string
   etat_conv: string
+  document_fichier?: string | null
   partenaire_conv?: number | Partial<Acteur> | null
   projet?: number | Partial<Projet> | null
 }
@@ -22,4 +23,5 @@ export type ConventionApiPayload = {
   etat_conv?: string
   partenaire_conv?: number | null
   projet: number
+  document_fichier?: File | string | null
 }

@@ -21,6 +21,9 @@ import {
   useGetConventionsByProjet,
 } from '@/simadou/allHooks/admin/conventionHooks'
 import ConventionProjetFormDialog from './ConventionProjetFormDialog'
+import ConventionTabbedDialog from './ConventionTabbedDialog'
+import SuiviDecaissementConventionManager from './suivi-decaissement/SuiviDecaissementConventionManager'
+import SuiviAvancementConventionManager from './suivi-avancement/SuiviAvancementConventionManager'
 
 type ProjetConventionPanelProps = {
   projet: Projet
@@ -41,6 +44,8 @@ export default function ProjetConventionPanel({
   const [deleteOpen, setDeleteOpen] = useDialogState<'delete'>(null)
   const [conventionToDelete, setConventionToDelete] =
     useState<Convention | null>(null)
+  const [suiviConvention, setSuiviConvention] = useState<Convention | null>(null)
+  const [showSuiviModal, setShowSuiviModal] = useState(false)
 
   const signatairesById = useMemo(
     () =>
@@ -71,6 +76,11 @@ export default function ProjetConventionPanel({
     [setDeleteOpen]
   )
 
+  const onOpenSuivi = useCallback((convention: Convention) => {
+    setSuiviConvention(convention)
+    setShowSuiviModal(true)
+  }, [])
+
   const handleCloseForm = () => {
     setFormOpen(false)
     setSelectedConvention(null)
@@ -82,8 +92,9 @@ export default function ProjetConventionPanel({
         signatairesById,
         onEdit: handleEdit,
         onDeleteRequest: handleDeleteRequest,
+        onOpenSuivi,
       }),
-    [signatairesById, handleEdit, handleDeleteRequest]
+    [signatairesById, handleEdit, handleDeleteRequest, onOpenSuivi]
   )
 
   const handleConfirmDelete = (row: Convention) => {
@@ -176,6 +187,40 @@ export default function ProjetConventionPanel({
           onDelete={handleConfirmDelete}
         />
       )}
+
+      <ConventionTabbedDialog
+        convention={suiviConvention}
+        open={showSuiviModal}
+        onOpenChange={(isOpen) => {
+          setShowSuiviModal(isOpen)
+          if (!isOpen) setSuiviConvention(null)
+        }}
+        defaultTab='decaissement'
+        tabs={
+          suiviConvention
+            ? [
+                {
+                  value: 'decaissement',
+                  label: 'Suivi décaissement',
+                  content: (
+                    <SuiviDecaissementConventionManager
+                      convention={suiviConvention}
+                    />
+                  ),
+                },
+                {
+                  value: 'observation',
+                  label: 'Observation globale',
+                  content: (
+                    <SuiviAvancementConventionManager
+                      convention={suiviConvention}
+                    />
+                  ),
+                },
+              ]
+            : []
+        }
+      />
     </div>
   )
 }
