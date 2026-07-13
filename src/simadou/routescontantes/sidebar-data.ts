@@ -16,6 +16,7 @@ import {
   FileStack,
   BarChart2,
   Target,
+  FileSignature,
   LineChart,
   TrendingUp,
   FileBarChart,
@@ -140,6 +141,11 @@ export const sidebarData: SidebarData = {
               title: 'PAO',
               url: '/programmation/ptba',
               icon: ClipboardList,
+            },
+            {
+              title: 'Contrats de performance',
+              url: '/programmation/contrat-performance',
+              icon: FileSignature,
             },
             {
               title: 'Suivi du PAO',

@@ -10,6 +10,7 @@ export * from "./cadreSecteur";
 export * from "./cadreStrategique";
 export * from "./cadreStrategiqueConfig";
 export * from "./convention";
+export * from "./contratPerformance";
 export * from "./coutUnitairePtba";
 export * from "./dictionnaireIndicateur";
 export * from "./dashboardProjet";

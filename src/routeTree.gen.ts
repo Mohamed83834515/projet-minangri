@@ -52,6 +52,7 @@ import { Route as AuthenticatedProgrammationPpmsIndexRouteImport } from './route
 import { Route as AuthenticatedProgrammationParametrageMarchesIndexRouteImport } from './routes/_authenticated/programmation/parametrage-marches/index'
 import { Route as AuthenticatedProgrammationIndicateursPerformanceIndexRouteImport } from './routes/_authenticated/programmation/indicateurs-performance/index'
 import { Route as AuthenticatedProgrammationIndicateursActivitesPtbaIndexRouteImport } from './routes/_authenticated/programmation/indicateurs-activites-ptba/index'
+import { Route as AuthenticatedProgrammationContratPerformanceIndexRouteImport } from './routes/_authenticated/programmation/contrat-performance/index'
 import { Route as AuthenticatedProgrammationActivitesProjetIndexRouteImport } from './routes/_authenticated/programmation/activites-projet/index'
 import { Route as AuthenticatedProgrammationActivitesProgrammeIndexRouteImport } from './routes/_authenticated/programmation/activites-programme/index'
 import { Route as AuthenticatedParametrageZoneDeCollecteIndexRouteImport } from './routes/_authenticated/parametrage/zone-de-collecte/index'
@@ -320,6 +321,12 @@ const AuthenticatedProgrammationIndicateursActivitesPtbaIndexRoute =
     path: '/programmation/indicateurs-activites-ptba/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedProgrammationContratPerformanceIndexRoute =
+  AuthenticatedProgrammationContratPerformanceIndexRouteImport.update({
+    id: '/programmation/contrat-performance/',
+    path: '/programmation/contrat-performance/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedProgrammationActivitesProjetIndexRoute =
   AuthenticatedProgrammationActivitesProjetIndexRouteImport.update({
     id: '/programmation/activites-projet/',
@@ -508,6 +515,7 @@ export interface FileRoutesByFullPath {
   '/parametrage/zone-de-collecte/': typeof AuthenticatedParametrageZoneDeCollecteIndexRoute
   '/programmation/activites-programme/': typeof AuthenticatedProgrammationActivitesProgrammeIndexRoute
   '/programmation/activites-projet/': typeof AuthenticatedProgrammationActivitesProjetIndexRoute
+  '/programmation/contrat-performance/': typeof AuthenticatedProgrammationContratPerformanceIndexRoute
   '/programmation/indicateurs-activites-ptba/': typeof AuthenticatedProgrammationIndicateursActivitesPtbaIndexRoute
   '/programmation/indicateurs-performance/': typeof AuthenticatedProgrammationIndicateursPerformanceIndexRoute
   '/programmation/parametrage-marches/': typeof AuthenticatedProgrammationParametrageMarchesIndexRoute
@@ -571,6 +579,7 @@ export interface FileRoutesByTo {
   '/parametrage/zone-de-collecte': typeof AuthenticatedParametrageZoneDeCollecteIndexRoute
   '/programmation/activites-programme': typeof AuthenticatedProgrammationActivitesProgrammeIndexRoute
   '/programmation/activites-projet': typeof AuthenticatedProgrammationActivitesProjetIndexRoute
+  '/programmation/contrat-performance': typeof AuthenticatedProgrammationContratPerformanceIndexRoute
   '/programmation/indicateurs-activites-ptba': typeof AuthenticatedProgrammationIndicateursActivitesPtbaIndexRoute
   '/programmation/indicateurs-performance': typeof AuthenticatedProgrammationIndicateursPerformanceIndexRoute
   '/programmation/parametrage-marches': typeof AuthenticatedProgrammationParametrageMarchesIndexRoute
@@ -640,6 +649,7 @@ export interface FileRoutesById {
   '/_authenticated/parametrage/zone-de-collecte/': typeof AuthenticatedParametrageZoneDeCollecteIndexRoute
   '/_authenticated/programmation/activites-programme/': typeof AuthenticatedProgrammationActivitesProgrammeIndexRoute
   '/_authenticated/programmation/activites-projet/': typeof AuthenticatedProgrammationActivitesProjetIndexRoute
+  '/_authenticated/programmation/contrat-performance/': typeof AuthenticatedProgrammationContratPerformanceIndexRoute
   '/_authenticated/programmation/indicateurs-activites-ptba/': typeof AuthenticatedProgrammationIndicateursActivitesPtbaIndexRoute
   '/_authenticated/programmation/indicateurs-performance/': typeof AuthenticatedProgrammationIndicateursPerformanceIndexRoute
   '/_authenticated/programmation/parametrage-marches/': typeof AuthenticatedProgrammationParametrageMarchesIndexRoute
@@ -709,6 +719,7 @@ export interface FileRouteTypes {
     | '/parametrage/zone-de-collecte/'
     | '/programmation/activites-programme/'
     | '/programmation/activites-projet/'
+    | '/programmation/contrat-performance/'
     | '/programmation/indicateurs-activites-ptba/'
     | '/programmation/indicateurs-performance/'
     | '/programmation/parametrage-marches/'
@@ -772,6 +783,7 @@ export interface FileRouteTypes {
     | '/parametrage/zone-de-collecte'
     | '/programmation/activites-programme'
     | '/programmation/activites-projet'
+    | '/programmation/contrat-performance'
     | '/programmation/indicateurs-activites-ptba'
     | '/programmation/indicateurs-performance'
     | '/programmation/parametrage-marches'
@@ -840,6 +852,7 @@ export interface FileRouteTypes {
     | '/_authenticated/parametrage/zone-de-collecte/'
     | '/_authenticated/programmation/activites-programme/'
     | '/_authenticated/programmation/activites-projet/'
+    | '/_authenticated/programmation/contrat-performance/'
     | '/_authenticated/programmation/indicateurs-activites-ptba/'
     | '/_authenticated/programmation/indicateurs-performance/'
     | '/_authenticated/programmation/parametrage-marches/'
@@ -1188,6 +1201,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProgrammationIndicateursActivitesPtbaIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/programmation/contrat-performance/': {
+      id: '/_authenticated/programmation/contrat-performance/'
+      path: '/programmation/contrat-performance'
+      fullPath: '/programmation/contrat-performance/'
+      preLoaderRoute: typeof AuthenticatedProgrammationContratPerformanceIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/programmation/activites-projet/': {
       id: '/_authenticated/programmation/activites-projet/'
       path: '/programmation/activites-projet'
@@ -1465,6 +1485,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedParametrageZoneDeCollecteIndexRoute: typeof AuthenticatedParametrageZoneDeCollecteIndexRoute
   AuthenticatedProgrammationActivitesProgrammeIndexRoute: typeof AuthenticatedProgrammationActivitesProgrammeIndexRoute
   AuthenticatedProgrammationActivitesProjetIndexRoute: typeof AuthenticatedProgrammationActivitesProjetIndexRoute
+  AuthenticatedProgrammationContratPerformanceIndexRoute: typeof AuthenticatedProgrammationContratPerformanceIndexRoute
   AuthenticatedProgrammationIndicateursActivitesPtbaIndexRoute: typeof AuthenticatedProgrammationIndicateursActivitesPtbaIndexRoute
   AuthenticatedProgrammationIndicateursPerformanceIndexRoute: typeof AuthenticatedProgrammationIndicateursPerformanceIndexRoute
   AuthenticatedProgrammationPpmsIndexRoute: typeof AuthenticatedProgrammationPpmsIndexRoute
@@ -1520,6 +1541,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedProgrammationActivitesProgrammeIndexRoute,
   AuthenticatedProgrammationActivitesProjetIndexRoute:
     AuthenticatedProgrammationActivitesProjetIndexRoute,
+  AuthenticatedProgrammationContratPerformanceIndexRoute:
+    AuthenticatedProgrammationContratPerformanceIndexRoute,
   AuthenticatedProgrammationIndicateursActivitesPtbaIndexRoute:
     AuthenticatedProgrammationIndicateursActivitesPtbaIndexRoute,
   AuthenticatedProgrammationIndicateursPerformanceIndexRoute:
