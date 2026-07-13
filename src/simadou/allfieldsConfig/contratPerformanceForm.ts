@@ -1,5 +1,5 @@
 import type { FormConfig, SelectOption } from '@/Global/types/formConfig'
-import type {  UGL } from '@/simadou/allTypes'
+import type { UGL } from '@/simadou/allTypes'
 
 function uglOptions(ugls: UGL[]): SelectOption[] {
   return ugls.map((item) => ({ value: item.id_ugl, label: item.nom_ugl }))
@@ -78,7 +78,7 @@ export const getContratPerformanceFormConfig = (
     {
       name: 'note_globale',
       label: 'Note globale',
-      type: 'text',
+      type: 'number',
       placeholder: 'Ex : 0.2',
       formStep: 2,
       gridCols: 2,

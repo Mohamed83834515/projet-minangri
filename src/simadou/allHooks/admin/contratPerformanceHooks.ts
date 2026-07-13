@@ -62,14 +62,14 @@ export const useUpdateContratPerformance = (id: number) => {
   })
 }
 
-export const useDeleteContratPerformance = () => {
+export const useDeleteContratPerformance = (programmeId?: number) => {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: (id: number) => contratPerformanceService.delete(id),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: contratPerformanceQueryKeys.all(),
+        queryKey: contratPerformanceQueryKeys.all(programmeId),
       })
       toast.success('Contrat de performance supprimé avec succès')
     },

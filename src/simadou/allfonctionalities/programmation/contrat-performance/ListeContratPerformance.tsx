@@ -24,7 +24,7 @@ export default function ListeContratPerformance() {
 
   const { selectedVersionId, handleChangeVersion, versionOptions } = usePtbaVersionSelection(programmeCode)
   const { data: contrats = [] } = useGetContratsPerformance(programmeId)
-  const deleteMutation = useDeleteContratPerformance()
+  const deleteMutation = useDeleteContratPerformance(programmeId)
 
   const filteredContrats = useMemo(() => {
     if (!selectedVersionId) return contrats
