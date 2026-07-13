@@ -35,6 +35,7 @@ import { Route as AuthenticatedProgrammationParametrageMarchesRouteRouteImport }
 import { Route as AuthenticatedParametrageAutresRouteRouteImport } from './routes/_authenticated/parametrage/autres/route'
 import { Route as AuthenticatedSuiviResultatsSuiviIndicateursIndexRouteImport } from './routes/_authenticated/suivi-resultats/suivi-indicateurs/index'
 import { Route as AuthenticatedRapportPtbaIndexRouteImport } from './routes/_authenticated/rapport/ptba/index'
+import { Route as AuthenticatedRapportIndicateursIndexRouteImport } from './routes/_authenticated/rapport/indicateurs/index'
 import { Route as AuthenticatedRapportEtatDesActivitesIndexRouteImport } from './routes/_authenticated/rapport/etat-des-activites/index'
 import { Route as AuthenticatedRapportDecaissementIndexRouteImport } from './routes/_authenticated/rapport/decaissement/index'
 import { Route as AuthenticatedProjetProgrammeUnitesDeGestionIndexRouteImport } from './routes/_authenticated/projet-programme/unites-de-gestion/index'
@@ -217,6 +218,12 @@ const AuthenticatedRapportPtbaIndexRoute =
   AuthenticatedRapportPtbaIndexRouteImport.update({
     id: '/rapport/ptba/',
     path: '/rapport/ptba/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRapportIndicateursIndexRoute =
+  AuthenticatedRapportIndicateursIndexRouteImport.update({
+    id: '/rapport/indicateurs/',
+    path: '/rapport/indicateurs/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedRapportEtatDesActivitesIndexRoute =
@@ -541,6 +548,7 @@ export interface FileRoutesByFullPath {
   '/projet-programme/unites-de-gestion/': typeof AuthenticatedProjetProgrammeUnitesDeGestionIndexRoute
   '/rapport/decaissement/': typeof AuthenticatedRapportDecaissementIndexRoute
   '/rapport/etat-des-activites/': typeof AuthenticatedRapportEtatDesActivitesIndexRoute
+  '/rapport/indicateurs/': typeof AuthenticatedRapportIndicateursIndexRoute
   '/rapport/ptba/': typeof AuthenticatedRapportPtbaIndexRoute
   '/suivi-resultats/suivi-indicateurs/': typeof AuthenticatedSuiviResultatsSuiviIndicateursIndexRoute
   '/parametrage/autres/fonction/': typeof AuthenticatedParametrageAutresFonctionIndexRoute
@@ -606,6 +614,7 @@ export interface FileRoutesByTo {
   '/projet-programme/unites-de-gestion': typeof AuthenticatedProjetProgrammeUnitesDeGestionIndexRoute
   '/rapport/decaissement': typeof AuthenticatedRapportDecaissementIndexRoute
   '/rapport/etat-des-activites': typeof AuthenticatedRapportEtatDesActivitesIndexRoute
+  '/rapport/indicateurs': typeof AuthenticatedRapportIndicateursIndexRoute
   '/rapport/ptba': typeof AuthenticatedRapportPtbaIndexRoute
   '/suivi-resultats/suivi-indicateurs': typeof AuthenticatedSuiviResultatsSuiviIndicateursIndexRoute
   '/parametrage/autres/fonction': typeof AuthenticatedParametrageAutresFonctionIndexRoute
@@ -677,6 +686,7 @@ export interface FileRoutesById {
   '/_authenticated/projet-programme/unites-de-gestion/': typeof AuthenticatedProjetProgrammeUnitesDeGestionIndexRoute
   '/_authenticated/rapport/decaissement/': typeof AuthenticatedRapportDecaissementIndexRoute
   '/_authenticated/rapport/etat-des-activites/': typeof AuthenticatedRapportEtatDesActivitesIndexRoute
+  '/_authenticated/rapport/indicateurs/': typeof AuthenticatedRapportIndicateursIndexRoute
   '/_authenticated/rapport/ptba/': typeof AuthenticatedRapportPtbaIndexRoute
   '/_authenticated/suivi-resultats/suivi-indicateurs/': typeof AuthenticatedSuiviResultatsSuiviIndicateursIndexRoute
   '/_authenticated/parametrage/autres/fonction/': typeof AuthenticatedParametrageAutresFonctionIndexRoute
@@ -748,6 +758,7 @@ export interface FileRouteTypes {
     | '/projet-programme/unites-de-gestion/'
     | '/rapport/decaissement/'
     | '/rapport/etat-des-activites/'
+    | '/rapport/indicateurs/'
     | '/rapport/ptba/'
     | '/suivi-resultats/suivi-indicateurs/'
     | '/parametrage/autres/fonction/'
@@ -813,6 +824,7 @@ export interface FileRouteTypes {
     | '/projet-programme/unites-de-gestion'
     | '/rapport/decaissement'
     | '/rapport/etat-des-activites'
+    | '/rapport/indicateurs'
     | '/rapport/ptba'
     | '/suivi-resultats/suivi-indicateurs'
     | '/parametrage/autres/fonction'
@@ -883,6 +895,7 @@ export interface FileRouteTypes {
     | '/_authenticated/projet-programme/unites-de-gestion/'
     | '/_authenticated/rapport/decaissement/'
     | '/_authenticated/rapport/etat-des-activites/'
+    | '/_authenticated/rapport/indicateurs/'
     | '/_authenticated/rapport/ptba/'
     | '/_authenticated/suivi-resultats/suivi-indicateurs/'
     | '/_authenticated/parametrage/autres/fonction/'
@@ -1093,6 +1106,13 @@ declare module '@tanstack/react-router' {
       path: '/rapport/ptba'
       fullPath: '/rapport/ptba/'
       preLoaderRoute: typeof AuthenticatedRapportPtbaIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/rapport/indicateurs/': {
+      id: '/_authenticated/rapport/indicateurs/'
+      path: '/rapport/indicateurs'
+      fullPath: '/rapport/indicateurs/'
+      preLoaderRoute: typeof AuthenticatedRapportIndicateursIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/rapport/etat-des-activites/': {
@@ -1523,6 +1543,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProjetProgrammeUnitesDeGestionIndexRoute: typeof AuthenticatedProjetProgrammeUnitesDeGestionIndexRoute
   AuthenticatedRapportDecaissementIndexRoute: typeof AuthenticatedRapportDecaissementIndexRoute
   AuthenticatedRapportEtatDesActivitesIndexRoute: typeof AuthenticatedRapportEtatDesActivitesIndexRoute
+  AuthenticatedRapportIndicateursIndexRoute: typeof AuthenticatedRapportIndicateursIndexRoute
   AuthenticatedRapportPtbaIndexRoute: typeof AuthenticatedRapportPtbaIndexRoute
   AuthenticatedSuiviResultatsSuiviIndicateursIndexRoute: typeof AuthenticatedSuiviResultatsSuiviIndicateursIndexRoute
 }
@@ -1597,6 +1618,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedRapportDecaissementIndexRoute,
   AuthenticatedRapportEtatDesActivitesIndexRoute:
     AuthenticatedRapportEtatDesActivitesIndexRoute,
+  AuthenticatedRapportIndicateursIndexRoute:
+    AuthenticatedRapportIndicateursIndexRoute,
   AuthenticatedRapportPtbaIndexRoute: AuthenticatedRapportPtbaIndexRoute,
   AuthenticatedSuiviResultatsSuiviIndicateursIndexRoute:
     AuthenticatedSuiviResultatsSuiviIndicateursIndexRoute,
