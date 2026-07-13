@@ -71,7 +71,6 @@ export const conventionService = {
     return apiClient.request<Convention>(ENDPOINT, {
       method: 'POST',
       data: file ? toFormData(data, file) : toJsonPayload(data),
-      ...(file ? { headers: { 'Content-Type': 'multipart/form-data' } } : {}),
     })
   },
 
@@ -80,7 +79,6 @@ export const conventionService = {
     return apiClient.request<Convention>(`${ENDPOINT}${id}/`, {
       method: 'PUT',
       data: file ? toFormData(data, file) : toJsonPayload(data),
-      ...(file ? { headers: { 'Content-Type': 'multipart/form-data' } } : {}),
     })
   },
 

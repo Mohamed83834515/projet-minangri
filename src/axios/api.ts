@@ -31,6 +31,14 @@ const EXCLUDED = ['/auth/login']
 
 const isExcluded = (url?: string) => EXCLUDED.some((e) => url?.includes(e))
 
+// Request interceptor — let the browser set multipart boundary for FormData
+api.interceptors.request.use((config) => {
+  if (config.data instanceof FormData) {
+    delete config.headers['Content-Type']
+  }
+  return config
+})
+
 // Response interceptor
 
 api.interceptors.response.use(

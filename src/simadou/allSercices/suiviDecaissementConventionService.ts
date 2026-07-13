@@ -79,7 +79,6 @@ const suiviDecaissementConventionService = {
       data: file
         ? toFormData(data, idConvention, file)
         : toJsonPayload(data, idConvention),
-      ...(file ? { headers: { 'Content-Type': 'multipart/form-data' } } : {}),
     })
     return mapFromApi(raw)
   },
@@ -98,7 +97,6 @@ const suiviDecaissementConventionService = {
         data: file
           ? toFormData(data, idConvention, file)
           : toJsonPayload(data, idConvention),
-        ...(file ? { headers: { 'Content-Type': 'multipart/form-data' } } : {}),
       }
     )
     return mapFromApi(raw)
