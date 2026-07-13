@@ -27,6 +27,12 @@ export const contratPerformanceService = {
     return normalizeApiList<ContratPerformance>(response)
   },
 
+  async getById(id: number): Promise<ContratPerformance> {
+    return apiClient.request<ContratPerformance>(`${ENDPOINT}${id}/`, {
+      method: 'GET',
+    })
+  },
+
   async create(data: ContratPerformancePayload): Promise<ContratPerformance> {
     return apiClient.request<ContratPerformance>(ENDPOINT, {
       method: 'POST',

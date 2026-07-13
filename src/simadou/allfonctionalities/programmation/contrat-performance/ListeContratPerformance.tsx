@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { GenericTable } from '@/Global/Generic/Generictable'
 import { useEmbeddedTableState } from '@/hooks/use-embedded-table-state'
 import { useActiveProgrammeCode, useActiveProgrammeId } from '@/hooks/use-active-programme'
@@ -15,6 +16,7 @@ import { buildContratPerformanceColumns } from '@/simadou/allColonnes/contrat-pe
 
 export default function ListeContratPerformance() {
   const { search, navigate } = useEmbeddedTableState()
+  const routerNavigate = useNavigate()
   const programmeId = useActiveProgrammeId()
   const programmeCode = useActiveProgrammeCode()
   const [open, setOpen] = useDialogState<'add' | 'edit' | 'delete'>(null)
@@ -30,9 +32,18 @@ export default function ListeContratPerformance() {
     return contrats.filter((contrat) => typeof contrat.version_ptba === 'object' && contrat.version_ptba?.id_version_ptba === selectedVersionNumber)
   }, [contrats, selectedVersionId])
 
+  const handleDetail = (contrat: ContratPerformance) => {
+    if (!contrat.id_contrat) return
+
+    routerNavigate({
+      to: '/programmation/contrat-performance/$id',
+      params: { id: String(contrat.id_contrat) },
+    })
+  }
+
   const columns = useMemo(
-    () => buildContratPerformanceColumns(setOpen, setCurrentRow),
-    [setOpen, setCurrentRow]
+    () => buildContratPerformanceColumns(setOpen, setCurrentRow, handleDetail),
+    [setOpen, setCurrentRow, routerNavigate]
   )
 
   return (

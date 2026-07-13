@@ -16,6 +16,14 @@ export const useGetContratsPerformance = (programmeId?: number) => {
   })
 }
 
+export const useGetContratPerformance = (id: number | string | undefined) => {
+  return useQuery({
+    queryKey: contratPerformanceQueryKeys.detail(Number(id)),
+    queryFn: () => contratPerformanceService.getById(Number(id)),
+    enabled: id != null && id !== '' && Number(id) > 0,
+  })
+}
+
 export const useCreateContratPerformance = () => {
   const queryClient = useQueryClient()
 

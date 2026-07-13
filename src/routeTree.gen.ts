@@ -66,6 +66,7 @@ import { Route as AuthenticatedParametrageActeursIndexRouteImport } from './rout
 import { Route as AuthenticatedSuiviResultatsSuiviIndicateursIdRouteImport } from './routes/_authenticated/suivi-resultats/suivi-indicateurs/$id'
 import { Route as AuthenticatedProjetProgrammeProjetsIdRouteImport } from './routes/_authenticated/projet-programme/projets/$id'
 import { Route as AuthenticatedProgrammationProjetsIdRouteImport } from './routes/_authenticated/programmation/projets/$id'
+import { Route as AuthenticatedProgrammationContratPerformanceIdRouteImport } from './routes/_authenticated/programmation/contrat-performance/$id'
 import { Route as authSetPasswordUidTokenRouteImport } from './routes/(auth)/set-password/$uid/$token'
 import { Route as AuthenticatedProjetProgrammeProjetsIdIndexRouteImport } from './routes/_authenticated/projet-programme/projets/$id/index'
 import { Route as AuthenticatedProgrammationParametrageMarchesVersionsPpmIndexRouteImport } from './routes/_authenticated/programmation/parametrage-marches/versions-ppm/index'
@@ -405,6 +406,12 @@ const AuthenticatedProgrammationProjetsIdRoute =
     path: '/programmation/projets/$id',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedProgrammationContratPerformanceIdRoute =
+  AuthenticatedProgrammationContratPerformanceIdRouteImport.update({
+    id: '/programmation/contrat-performance/$id',
+    path: '/programmation/contrat-performance/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const authSetPasswordUidTokenRoute = authSetPasswordUidTokenRouteImport.update({
   id: '/(auth)/set-password/$uid/$token',
   path: '/set-password/$uid/$token',
@@ -502,6 +509,7 @@ export interface FileRoutesByFullPath {
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/users/': typeof AuthenticatedUsersIndexRoute
   '/set-password/$uid/$token': typeof authSetPasswordUidTokenRoute
+  '/programmation/contrat-performance/$id': typeof AuthenticatedProgrammationContratPerformanceIdRoute
   '/programmation/projets/$id': typeof AuthenticatedProgrammationProjetsIdRoute
   '/projet-programme/projets/$id': typeof AuthenticatedProjetProgrammeProjetsIdRouteWithChildren
   '/suivi-resultats/suivi-indicateurs/$id': typeof AuthenticatedSuiviResultatsSuiviIndicateursIdRoute
@@ -567,6 +575,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
   '/set-password/$uid/$token': typeof authSetPasswordUidTokenRoute
+  '/programmation/contrat-performance/$id': typeof AuthenticatedProgrammationContratPerformanceIdRoute
   '/programmation/projets/$id': typeof AuthenticatedProgrammationProjetsIdRoute
   '/suivi-resultats/suivi-indicateurs/$id': typeof AuthenticatedSuiviResultatsSuiviIndicateursIdRoute
   '/parametrage/acteurs': typeof AuthenticatedParametrageActeursIndexRoute
@@ -636,6 +645,7 @@ export interface FileRoutesById {
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
   '/(auth)/set-password/$uid/$token': typeof authSetPasswordUidTokenRoute
+  '/_authenticated/programmation/contrat-performance/$id': typeof AuthenticatedProgrammationContratPerformanceIdRoute
   '/_authenticated/programmation/projets/$id': typeof AuthenticatedProgrammationProjetsIdRoute
   '/_authenticated/projet-programme/projets/$id': typeof AuthenticatedProjetProgrammeProjetsIdRouteWithChildren
   '/_authenticated/suivi-resultats/suivi-indicateurs/$id': typeof AuthenticatedSuiviResultatsSuiviIndicateursIdRoute
@@ -706,6 +716,7 @@ export interface FileRouteTypes {
     | '/settings/'
     | '/users/'
     | '/set-password/$uid/$token'
+    | '/programmation/contrat-performance/$id'
     | '/programmation/projets/$id'
     | '/projet-programme/projets/$id'
     | '/suivi-resultats/suivi-indicateurs/$id'
@@ -771,6 +782,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/users'
     | '/set-password/$uid/$token'
+    | '/programmation/contrat-performance/$id'
     | '/programmation/projets/$id'
     | '/suivi-resultats/suivi-indicateurs/$id'
     | '/parametrage/acteurs'
@@ -839,6 +851,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/'
     | '/_authenticated/users/'
     | '/(auth)/set-password/$uid/$token'
+    | '/_authenticated/programmation/contrat-performance/$id'
     | '/_authenticated/programmation/projets/$id'
     | '/_authenticated/projet-programme/projets/$id'
     | '/_authenticated/suivi-resultats/suivi-indicateurs/$id'
@@ -1299,6 +1312,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProgrammationProjetsIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/programmation/contrat-performance/$id': {
+      id: '/_authenticated/programmation/contrat-performance/$id'
+      path: '/programmation/contrat-performance/$id'
+      fullPath: '/programmation/contrat-performance/$id'
+      preLoaderRoute: typeof AuthenticatedProgrammationContratPerformanceIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/(auth)/set-password/$uid/$token': {
       id: '/(auth)/set-password/$uid/$token'
       path: '/set-password/$uid/$token'
@@ -1473,6 +1493,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
+  AuthenticatedProgrammationContratPerformanceIdRoute: typeof AuthenticatedProgrammationContratPerformanceIdRoute
   AuthenticatedProgrammationProjetsIdRoute: typeof AuthenticatedProgrammationProjetsIdRoute
   AuthenticatedProjetProgrammeProjetsIdRoute: typeof AuthenticatedProjetProgrammeProjetsIdRouteWithChildren
   AuthenticatedSuiviResultatsSuiviIndicateursIdRoute: typeof AuthenticatedSuiviResultatsSuiviIndicateursIdRoute
@@ -1517,6 +1538,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
+  AuthenticatedProgrammationContratPerformanceIdRoute:
+    AuthenticatedProgrammationContratPerformanceIdRoute,
   AuthenticatedProgrammationProjetsIdRoute:
     AuthenticatedProgrammationProjetsIdRoute,
   AuthenticatedProjetProgrammeProjetsIdRoute:

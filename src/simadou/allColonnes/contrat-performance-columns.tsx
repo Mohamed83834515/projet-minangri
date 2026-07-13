@@ -1,13 +1,14 @@
 import type { ColumnDef } from '@tanstack/react-table'
 import type { Dispatch, SetStateAction } from 'react'
-import { Pencil, Trash2 } from 'lucide-react'
+import { Eye, Pencil, Trash2 } from 'lucide-react'
 import { DataTableColumnHeader } from '@/components/data-table'
 import { GenericRowActions } from '@/Global/Tableaux/GenericRowActions'
 import type { ContratPerformance } from '@/simadou/allTypes/contratPerformance'
 
 export function buildContratPerformanceColumns(
     setOpen: (dialog: 'add' | 'edit' | 'delete' | null) => void,
-    setCurrentRow: Dispatch<SetStateAction<ContratPerformance | null>>
+    setCurrentRow: Dispatch<SetStateAction<ContratPerformance | null>>,
+    onDetail?: (contrat: ContratPerformance) => void
 ): ColumnDef<ContratPerformance>[] {
     return [
         {
@@ -47,6 +48,11 @@ export function buildContratPerformanceColumns(
                 <GenericRowActions
                     row={row}
                     actions={[
+                        {
+                            label: 'Détail',
+                            icon: <Eye size={16} />,
+                            onClick: (contrat) => onDetail?.(contrat),
+                        },
                         {
                             label: 'Modifier',
                             icon: <Pencil size={16} />,
