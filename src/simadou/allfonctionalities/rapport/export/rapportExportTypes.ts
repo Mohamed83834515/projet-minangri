@@ -20,6 +20,26 @@ export type RapportExportGantt = {
   activeByRow: number[][]
 }
 
+/**
+ * En-tête fusionné au-dessus d'un groupe de colonnes contiguës
+ * (ex. « Valeur Cible » au-dessus de T1–T4). Les colonnes hors groupe
+ * sont fusionnées verticalement sur les deux lignes d'en-tête.
+ */
+export type RapportExportHeaderGroup = {
+  header: string
+  /** Ids des colonnes couvertes — elles doivent être contiguës. */
+  columnIds: string[]
+}
+
+/**
+ * Bloc de texte affiché avant le tableau (pages en portrait dans les
+ * exports Word/PDF, feuille dédiée dans Excel).
+ */
+export type RapportExportPreambleBlock = {
+  type: 'title' | 'heading' | 'paragraph' | 'list'
+  text: string
+}
+
 export type RapportExportTableData = {
   columns: RapportExportColumn[]
   rows: string[][]
@@ -27,6 +47,10 @@ export type RapportExportTableData = {
   visibleColumnIds?: string[]
   /** Colonnes mensuelles colorées du diagramme de Gantt. */
   gantt?: RapportExportGantt
+  /** En-têtes fusionnés au-dessus de groupes de colonnes. */
+  headerGroups?: RapportExportHeaderGroup[]
+  /** Texte affiché avant le tableau dans les exports. */
+  preamble?: RapportExportPreambleBlock[]
 }
 
 export type RapportExportRegistration = {
@@ -43,6 +67,8 @@ export type RapportExportPayload = {
   visibleColumnIds?: string[]
   isLoading?: boolean
   gantt?: RapportExportGantt
+  headerGroups?: RapportExportHeaderGroup[]
+  preamble?: RapportExportPreambleBlock[]
 }
 
 export type RapportExportDocumentMeta = {

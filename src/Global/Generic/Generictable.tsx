@@ -267,6 +267,8 @@ export function GenericTable<TData>({
                       'px-4 py-1.5 text-xs font-semibold tracking-wider uppercase',
                       'align-middle break-words whitespace-normal text-muted-foreground',
                       'border-r border-border/30 last:border-r-0',
+                      // Colonne mère fusionnée sur plusieurs filles → centrée
+                      header.colSpan > 1 && 'text-center',
                       header.column.columnDef.meta?.className,
                       header.column.columnDef.meta?.thClassName
                     )}

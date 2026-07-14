@@ -95,4 +95,56 @@ describe('exportRapportWord', () => {
     // La ligne de section porte bien une fusion sur toute la largeur.
     expect(xml).toMatch(/<w:gridSpan w:val="6"/)
   })
+
+  it('en-têtes fusionnés + préambule : deux lignes d’en-tête et section portrait', async () => {
+    const xml = await exportAndReadXml(
+      buildPayload({
+        headerGroups: [{ header: 'Détail', columnIds: ['activite', 'tache'] }],
+        preamble: [
+          { type: 'title', text: 'PREAMBULE' },
+          {
+            type: 'paragraph',
+            text: 'Considérant le Programme SIMANDOU 2040 ;',
+          },
+        ],
+      })
+    )
+
+    // Deux sections : préambule en portrait, tableau en paysage.
+    expect((xml.match(/<w:sectPr/g) ?? []).length).toBe(2)
+    expect(xml).toContain('PREAMBULE')
+    expect(xml).toContain('Considérant le Programme SIMANDOU 2040 ;')
+    expect(xml).toMatch(/w:orient="landscape"/)
+
+    // La bannière d'en-tête ouvre le document, avant le préambule.
+    expect(xml.indexOf('Rapport — Tâches PTBA')).toBeGreaterThanOrEqual(0)
+    expect(xml.indexOf('Rapport — Tâches PTBA')).toBeLessThan(
+      xml.indexOf('PREAMBULE')
+    )
+
+    const grids = [...xml.matchAll(/<w:tblGrid>.*?<\/w:tblGrid>/gs)]
+    expect(grids.length).toBeGreaterThanOrEqual(2)
+
+    const dataTableXml = xml.slice(grids[1].index)
+    const gridColumns = (grids[1][0].match(/<w:gridCol/g) ?? []).length
+    expect(gridColumns).toBe(3)
+
+    const rows = [...dataTableXml.matchAll(/<w:tr\b.*?<\/w:tr>/gs)]
+    // 2 lignes d'en-tête + 1 section + 2 lignes de données
+    expect(rows.length).toBe(5)
+
+    // Chaque ligne (en-têtes fusionnés compris) occupe exactement le grid.
+    rows.forEach((row) => {
+      expect(occupiedGridColumns(row[0])).toBe(gridColumns)
+    })
+
+    // Groupe fusionné horizontalement sur la première ligne d'en-tête,
+    // colonne hors groupe fusionnée verticalement sur les deux lignes.
+    expect(rows[0][0]).toMatch(/<w:gridSpan w:val="2"/)
+    expect(rows[0][0]).toMatch(/<w:vMerge w:val="restart"/)
+    expect(rows[1][0]).toMatch(/<w:vMerge/)
+
+    // Le texte de la colonne mère fusionnée est centré.
+    expect(rows[0][0]).toMatch(/<w:jc w:val="center"/)
+  })
 })

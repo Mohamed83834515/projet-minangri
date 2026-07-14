@@ -1,6 +1,7 @@
 import type {
   RapportExportColumn,
   RapportExportDocumentMeta,
+  RapportExportHeaderGroup,
   RapportExportRowMeta,
 } from './rapportExportTypes'
 
@@ -64,6 +65,46 @@ export function filterExportRows(
     rows: rows.map((row) => indices.map((index) => row[index] ?? '')),
     rowMetas,
   }
+}
+
+/** Plage d'indices de colonnes couverte par un en-tête fusionné. */
+export type ResolvedHeaderGroupRange = {
+  header: string
+  /** Index de la première colonne couverte. */
+  start: number
+  /** Index de la dernière colonne couverte (inclus). */
+  end: number
+}
+
+/**
+ * Résout les groupes d'en-tête en plages d'indices sur les colonnes
+ * effectivement exportées. Un groupe dont les colonnes ne sont plus
+ * contiguës (ou plus visibles) après filtrage est ignoré.
+ */
+export function resolveHeaderGroupRanges(
+  columns: RapportExportColumn[],
+  headerGroups?: RapportExportHeaderGroup[]
+): ResolvedHeaderGroupRange[] {
+  if (!headerGroups?.length) return []
+
+  const ranges: ResolvedHeaderGroupRange[] = []
+
+  for (const group of headerGroups) {
+    const ids = new Set(group.columnIds)
+    const indices = columns
+      .map((column, index) => (ids.has(column.id) ? index : -1))
+      .filter((index) => index >= 0)
+
+    if (indices.length === 0) continue
+
+    const start = Math.min(...indices)
+    const end = Math.max(...indices)
+    if (end - start + 1 !== indices.length) continue
+
+    ranges.push({ header: group.header, start, end })
+  }
+
+  return ranges.sort((a, b) => a.start - b.start)
 }
 
 export function downloadBlob(blob: Blob, filename: string) {

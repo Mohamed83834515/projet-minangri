@@ -1,15 +1,24 @@
 import jsPDF from 'jspdf'
-import autoTable, { type Styles } from 'jspdf-autotable'
+import autoTable, {
+  type CellDef,
+  type RowInput,
+  type Styles,
+} from 'jspdf-autotable'
 import { mergeGanttColumns } from './rapportExportGanttColumns'
 import { EXPORT_CELL_ALIGN } from './rapportExportLayout'
 import { RAPPORT_EXPORT_THEME as theme } from './rapportExportTheme'
-import type { RapportExportPayload } from './rapportExportTypes'
+import type {
+  RapportExportPayload,
+  RapportExportPreambleBlock,
+} from './rapportExportTypes'
 import {
   buildExportFilename,
   buildRapportDocumentMeta,
   detectAlignment,
   downloadBlob,
   filterExportRows,
+  resolveHeaderGroupRanges,
+  type ResolvedHeaderGroupRange,
 } from './rapportExportUtils'
 
 function hexRgb(hex: string): [number, number, number] {
@@ -26,6 +35,96 @@ const GANTT_PDF_COLUMN_WIDTH = 9
 /** Part max de la largeur utile réservée aux colonnes du Gantt. */
 const GANTT_PDF_MAX_WIDTH_RATIO = 0.5
 
+/**
+ * Lignes d'en-tête autoTable : une seule ligne sans groupes, deux lignes
+ * quand des en-têtes fusionnés sont définis (rowSpan pour les colonnes hors
+ * groupe, colSpan pour le libellé du groupe).
+ */
+function buildPdfHead(
+  columns: { header: string }[],
+  groupRanges: ResolvedHeaderGroupRange[]
+): RowInput[] {
+  if (groupRanges.length === 0) {
+    return [columns.map((c) => c.header)]
+  }
+
+  const rangeByColumn = new Map<number, ResolvedHeaderGroupRange>()
+  groupRanges.forEach((range) => {
+    for (let i = range.start; i <= range.end; i += 1) {
+      rangeByColumn.set(i, range)
+    }
+  })
+
+  const top: CellDef[] = []
+  const bottom: CellDef[] = []
+
+  columns.forEach((column, index) => {
+    const range = rangeByColumn.get(index)
+
+    if (!range) {
+      top.push({ content: column.header, rowSpan: 2 })
+      return
+    }
+
+    if (index === range.start) {
+      top.push({
+        content: range.header,
+        colSpan: range.end - range.start + 1,
+      })
+    }
+    bottom.push({ content: column.header })
+  })
+
+  return [top, bottom]
+}
+
+/**
+ * Rend le préambule sur des pages en portrait (avec sauts de page), avant
+ * le tableau qui, lui, reste en paysage.
+ */
+function renderPreamblePdf(doc: jsPDF, blocks: RapportExportPreambleBlock[]) {
+  const pageWidth = doc.internal.pageSize.getWidth()
+  const pageHeight = doc.internal.pageSize.getHeight()
+  const marginX = 18
+  const maxWidth = pageWidth - marginX * 2
+  const bottom = pageHeight - 18
+
+  let y = 36
+
+  const ensureSpace = (needed: number) => {
+    if (y + needed > bottom) {
+      doc.addPage()
+      y = 22
+    }
+  }
+
+  doc.setTextColor(...hexRgb(theme.text))
+
+  blocks.forEach((block) => {
+    const isTitle = block.type === 'title'
+    const isHeading = block.type === 'heading'
+    const indent = block.type === 'list' ? 6 : 0
+
+    doc.setFont('helvetica', isTitle || isHeading ? 'bold' : 'normal')
+    doc.setFontSize(isTitle ? 13 : isHeading ? 10.5 : 10)
+
+    const lineHeight = isTitle ? 6.5 : 5.2
+    const lines: string[] = doc.splitTextToSize(block.text, maxWidth - indent)
+
+    ensureSpace(lines.length * lineHeight + (isHeading ? 4 : 0))
+
+    if (isHeading) y += 3
+
+    if (isTitle) {
+      doc.text(lines, pageWidth / 2, y, { align: 'center' })
+    } else {
+      doc.text(lines, marginX + indent, y)
+    }
+
+    y += lines.length * lineHeight + (isTitle ? 5 : 2)
+  })
+}
+
 export async function exportRapportPdf(payload: RapportExportPayload) {
   const meta = buildRapportDocumentMeta(payload.pageTitle)
 
@@ -39,16 +138,61 @@ export async function exportRapportPdf(payload: RapportExportPayload) {
   const { columns, rows, ganttStartIndex, ganttColumnCount, isGanttActive } =
     mergeGanttColumns(filtered.columns, filtered.rows, payload.gantt)
   const rowMetas = filtered.rowMetas
+  const headerGroupRanges = resolveHeaderGroupRanges(
+    filtered.columns,
+    payload.headerGroups
+  )
 
-  const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' })
+  const hasPreamble = Boolean(payload.preamble?.length)
 
-  const pageWidth = doc.internal.pageSize.getWidth()
+  // Avec préambule : pages de texte en portrait, tableau en paysage.
+  const doc = new jsPDF({
+    orientation: hasPreamble ? 'portrait' : 'landscape',
+    unit: 'mm',
+    format: 'a4',
+  })
+
+  // Largeur de la première page (portrait avec préambule) pour la bannière.
+  const bannerWidth = doc.internal.pageSize.getWidth()
 
   const green = hexRgb(theme.green)
   const yellow = hexRgb(theme.yellow)
   const red = hexRgb(theme.red)
   const greenLight = hexRgb(theme.greenLight)
 
+  // HEADER DOCUMENT (sur la première page)
+  doc.setFillColor(...green)
+  doc.rect(0, 0, bannerWidth, 22, 'F')
+
+  doc.setFillColor(...red)
+  doc.rect(0, 22, bannerWidth / 3, 2, 'F')
+
+  doc.setFillColor(...yellow)
+  doc.rect(bannerWidth / 3, 22, bannerWidth / 3, 2, 'F')
+
+  doc.setFillColor(...green)
+  doc.rect((bannerWidth / 3) * 2, 22, bannerWidth / 3, 2, 'F')
+
+  doc.setTextColor(255, 255, 255)
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(16)
+  doc.text(meta.title, bannerWidth / 2, 11, { align: 'center' })
+
+  doc.setFont('helvetica', 'normal')
+  doc.setFontSize(9)
+  doc.text(meta.subtitle, bannerWidth / 2, 18, {
+    align: 'center',
+    maxWidth: bannerWidth - 20,
+  })
+
+  // PREAMBULE (portrait) puis bascule en paysage pour le tableau
+  if (hasPreamble) {
+    renderPreamblePdf(doc, payload.preamble!)
+    doc.addPage('a4', 'landscape')
+  }
+
+  // Géométrie du tableau, calculée sur la page paysage courante.
+  const pageWidth = doc.internal.pageSize.getWidth()
   const usableWidth = pageWidth - 20
 
   // Colonnes du Gantt étroites (plafonnées à la moitié de la page), le
@@ -63,30 +207,8 @@ export async function exportRapportPdf(payload: RapportExportPayload) {
   const dataColWidth =
     (usableWidth - ganttColWidth * ganttColumnCount) / ganttStartIndex
 
-  // HEADER DOCUMENT
-  doc.setFillColor(...green)
-  doc.rect(0, 0, pageWidth, 22, 'F')
-
-  doc.setFillColor(...red)
-  doc.rect(0, 22, pageWidth / 3, 2, 'F')
-
-  doc.setFillColor(...yellow)
-  doc.rect(pageWidth / 3, 22, pageWidth / 3, 2, 'F')
-
-  doc.setFillColor(...green)
-  doc.rect((pageWidth / 3) * 2, 22, pageWidth / 3, 2, 'F')
-
-  doc.setTextColor(255, 255, 255)
-  doc.setFont('helvetica', 'bold')
-  doc.setFontSize(16)
-  doc.text(meta.title, pageWidth / 2, 11, { align: 'center' })
-
-  doc.setFont('helvetica', 'normal')
-  doc.setFontSize(9)
-  doc.text(meta.subtitle, pageWidth / 2, 18, {
-    align: 'center',
-    maxWidth: pageWidth - 20,
-  })
+  // Sans bannière sur la page du tableau (cas préambule), on remonte le tableau.
+  const tableTop = hasPreamble ? 15 : 28
 
   // GROUP PTBA (ROWSPAN LOGIC)
   const groupSpans = new Map<string | number, number>()
@@ -101,9 +223,9 @@ export async function exportRapportPdf(payload: RapportExportPayload) {
 
   // TABLE
   autoTable(doc, {
-    startY: 28,
+    startY: tableTop,
 
-    head: [columns.map((c) => c.header)],
+    head: buildPdfHead(columns, headerGroupRanges),
     body: rows.map((row) =>
       row.map((cell) =>
         String(cell ?? '')
@@ -146,7 +268,7 @@ export async function exportRapportPdf(payload: RapportExportPayload) {
       {}
     ),
 
-    margin: { top: 28, left: 10, right: 10, bottom: 14 },
+    margin: { top: tableTop, left: 10, right: 10, bottom: 14 },
 
     tableWidth: usableWidth,
 
@@ -229,17 +351,22 @@ export async function exportRapportPdf(payload: RapportExportPayload) {
   })
 
   // FOOTER : passe finale pour un « Page X sur N » exact sur toutes les pages
-  const pageHeight = doc.internal.pageSize.getHeight()
+  // (dimensions relues par page : portrait et paysage peuvent coexister).
   const pageCount = doc.getNumberOfPages()
 
   for (let page = 1; page <= pageCount; page += 1) {
     doc.setPage(page)
+    const footerWidth = doc.internal.pageSize.getWidth()
+    const footerHeight = doc.internal.pageSize.getHeight()
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(8)
     doc.setTextColor(...hexRgb(theme.textMuted))
-    doc.text(`Page ${page} sur ${pageCount}`, pageWidth - 10, pageHeight - 6, {
-      align: 'right',
-    })
+    doc.text(
+      `Page ${page} sur ${pageCount}`,
+      footerWidth - 10,
+      footerHeight - 6,
+      { align: 'right' }
+    )
   }
 
   downloadBlob(

@@ -225,6 +225,11 @@ export const sidebarData: SidebarData = {
               url: '/rapport/indicateurs',
               icon: LineChart,
             },
+            {
+              title: 'Contrats de performance',
+              url: '/rapport/contrat-performance',
+              icon: FileSignature,
+            },
           ],
         },
       ],
