@@ -186,9 +186,9 @@ export function getFixedCodeLengthForNiveau(
     : niveaux
 
   const niveauConfig = scoped.find(
-    (n) => Number(n.code_number_nca) === niveauCodeNumber
+    (n) => Number(n.nombre_nca) === niveauCodeNumber
   )
-  return Number(niveauConfig?.nombre_nca) || 2
+  return Number(niveauConfig?.code_number_nca) || 2
 }
 
 export function getNiveauCadreAnalytiqueLibelle(

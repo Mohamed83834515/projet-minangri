@@ -47,13 +47,13 @@ export default function CadreAnalytiqueFormPanel({
   const createMutation = useCreateCadreAnalytique()
   const updateMutation = useUpdateCadreAnalytique(programmeId)
   const { data: acteurs = [], isLoading: isLoadingActeurs } = useGetActeurs()
-
   const codeLength = getFixedCodeLengthForNiveau(
     niveaux,
     niveauCodeNumber,
     codeProgramme
   )
 
+  console.log('niveauCodeNumber', niveauCodeNumber)
   const showParent = niveauCodeNumber > 1
 
   const showBudget = useMemo(() => {
