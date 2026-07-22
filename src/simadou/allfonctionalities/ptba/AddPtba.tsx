@@ -85,8 +85,8 @@ const AddPtba = ({ open, onOpenChange, currentRow }: OpenPropsPTBA) => {
       partenaire_conserne_ptba:
         typeof currentRow?.partenaire_conserne_ptba === 'object'
           ? (currentRow?.partenaire_conserne_ptba as Acteur[]).map(
-              (p) => p.id_acteur
-            )
+            (p) => p.id_acteur
+          )
           : [],
 
       code_activite_ptba: currentRow?.code_activite_ptba || '',
@@ -185,16 +185,19 @@ const AddPtba = ({ open, onOpenChange, currentRow }: OpenPropsPTBA) => {
           </DialogDescription>
         </DialogHeader>
 
-        <StepDynamicForm
-          key={`${currentRow?.id_ptba ?? 'new'}-${open}`}
-          config={formConfig}
-          schema={ptbaSchema}
-          defaultValues={defaultValues}
-          onSubmit={onSubmit}
-          isLoading={mutation.isPending}
-          submitText={isEdit ? 'Modifier' : 'Ajouter'}
-          loadingText={isEdit ? 'Modification...' : 'Ajout en cours...'}
-        />
+        {/* Conteneur avec défilement */}
+        <div className="max-h-[70vh] overflow-y-auto pr-2 -mr-2">
+          <StepDynamicForm
+            key={`${currentRow?.id_ptba ?? 'new'}-${open}`}
+            config={formConfig}
+            schema={ptbaSchema}
+            defaultValues={defaultValues}
+            onSubmit={onSubmit}
+            isLoading={mutation.isPending}
+            submitText={isEdit ? 'Modifier' : 'Ajouter'}
+            loadingText={isEdit ? 'Modification...' : 'Ajout en cours...'}
+          />
+        </div>
       </DialogContent>
     </Dialog>
   )
