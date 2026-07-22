@@ -136,7 +136,7 @@ export default function NiveauCadreAnalytiqueManager() {
 
       const fresh = await queryClient.fetchQuery({
         queryKey: niveauCadreAnalytiqueQueryKeys.all,
-        queryFn: () => niveauCadreAnalytiqueService.getAll(),
+        queryFn: () => niveauCadreAnalytiqueService.getAll(codeProgramme),
       })
       const synced = sortNiveauxCadreAnalytique(
         filterNiveauxByProgramme(fresh, codeProgramme, programmeId)
