@@ -81,7 +81,7 @@ export const sidebarData: SidebarData = {
               icon: MapPin,
             },
             {
-              title: 'Cadre Organique du MINAGRI',
+              title: 'Cadre Organique du MMAFP',
               url: '/parametrage/plans-de-site',
               icon: ClipboardList,
             },
