@@ -36,6 +36,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { useGetTypeActivites } from '@/simadou/allHooks/admin/typeActivitesHooks'
+import { useGetLocalites } from '@/simadou/allHooks/admin/localiteHooks'
+import { useGetActeurs } from '@/simadou/allHooks/admin/acteurHooks'
+import { useGetPersonnels } from '@/simadou/allHooks/admin/personnelHooks'
+import { useGetCadreStrategiques } from '@/simadou/allHooks/admin/cadreStrategiqueHooks'
+import { useGetUgls } from '@/simadou/allHooks/admin/uglHooks'
 
 export interface OpenPropsPTBA {
   open: boolean
@@ -48,24 +54,30 @@ const AddPtba = ({ open, onOpenChange, currentRow }: OpenPropsPTBA) => {
   const { selectedVersionId } = usePtbaVersionSelection(codeProgramme)
   const { data: cadresAnalytique = [] } = useGetCadresAnalytique()
   const { data: niveaux = [] } = useGetNiveauxCadreAnalytique()
+  const { data: types_activites = [] } = useGetTypeActivites()
+  const { data: localites = [] } = useGetLocalites()
+  const { data: acteurs = [] } = useGetActeurs()
+  const { data: personnels = [] } = useGetPersonnels()
+  const { data: cadres_strategiques = [] } = useGetCadreStrategiques()
+  const { data: ugls = [] } = useGetUgls()
 
   // Fonction utilitaire (hors du composant)
-const getHighestLevelId = (niveauxx: any[]) => {
-  if (!niveauxx || niveauxx.length === 0) return null;
+  const getHighestLevelId = (niveauxx: any[]) => {
+    if (!niveauxx || niveauxx.length === 0) return null;
 
-  const highestLevel = niveauxx.reduce((max, current) =>
-    current.nombre_nca > max.nombre_nca ? current : max
-  );
+    const highestLevel = niveauxx.reduce((max, current) =>
+      current.nombre_nca > max.nombre_nca ? current : max
+    );
 
-  return highestLevel.id_nca;
-};
+    return highestLevel.id_nca;
+  };
 
-// Dans votre composant React
-const highestLevelId = useMemo(() => {
-  return getHighestLevelId(niveaux);
-}, [niveaux]);
+  // Dans votre composant React
+  const highestLevelId = useMemo(() => {
+    return getHighestLevelId(niveaux);
+  }, [niveaux]);
 
-console.log('ID du niveau le plus élevé:', highestLevelId);
+  console.log('ID du niveau le plus élevé:', highestLevelId);
   const selectedCadreId = useMemo(
     () =>
       resolveCadreAnalytiqueFormValue(
@@ -83,10 +95,79 @@ console.log('ID du niveau le plus élevé:', highestLevelId);
       }),
     [cadresAnalytique, highestLevelId, selectedCadreId]
   )
+  // Transformation des données en options avec useMemo
+  const typeActivitesOptions = useMemo(() => {
+    return types_activites?.map((item: any) => ({
+      label: item.intutile_type,
+      value: String(item.code_type)
+    })) || [];
+  }, [types_activites]);
+
+  const localiteOptions = useMemo(() => {
+    return localites
+      .filter((localite) => {
+        if (typeof localite.niveau_loca === 'object' && localite.niveau_loca !== null) {
+          return localite.niveau_loca.nombre_nlc === 1;
+        }
+        return localite.niveau_loca === 1;
+      })
+      .map((localite) => ({
+        value: localite.id_loca as number,
+        label: localite.intitule_loca,
+      }));
+  }, [localites]);
+
+  const acteurOptions = useMemo(() => {
+    return acteurs
+      .filter((acteur) => acteur.id_acteur !== undefined)
+      .map((acteur) => ({
+        value: acteur.id_acteur as number,
+        label: acteur.nom_acteur,
+      }));
+  }, [acteurs]);
+
+  const personnelOptions = useMemo(() => {
+    return personnels.map((p) => ({
+      value: p.n_personnel!,
+      label: `${p.prenom_perso} ${p.nom_perso}`,
+    }));
+  }, [personnels]);
+
+  const uglOptions = useMemo(() => {
+    return ugls.map((ugl) => ({
+      value: ugl.code_ugl,
+      label: ugl.nom_ugl,
+    }));
+  }, [ugls]);
+
+  const cadreStrategiqueOptions = useMemo(() => {
+    return cadres_strategiques.map((cadre) => ({
+      value: cadre.id_cs,
+      label: `${cadre.code_cs} - ${cadre.intutile_cs}`,
+    }));
+  }, [cadres_strategiques]);
+
+  // Utilisation dans le formConfig
   const formConfig = useMemo(
-    () => getPtbaFormConfig(cadreAnalytiqueOptions),
-    [cadreAnalytiqueOptions]
-  )
+    () => getPtbaFormConfig(
+      cadreAnalytiqueOptions,
+      typeActivitesOptions,
+      localiteOptions,
+      acteurOptions,
+      personnelOptions,
+      uglOptions,
+      cadreStrategiqueOptions
+    ),
+    [
+      cadreAnalytiqueOptions,
+      typeActivitesOptions,
+      localiteOptions,
+      acteurOptions,
+      personnelOptions,
+      uglOptions,
+      cadreStrategiqueOptions
+    ]
+  );
   const defaultValues = useMemo(
     (): PtbaFormData => ({
       localites_ptba:
