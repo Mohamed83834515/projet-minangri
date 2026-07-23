@@ -95,17 +95,21 @@ const AddPtba = ({ open, onOpenChange, currentRow }: OpenPropsPTBA) => {
       }),
     [cadresAnalytique, highestLevelId, selectedCadreId]
   )
-  // Transformation des données en options avec useMemo
   const typeActivitesOptions = useMemo(() => {
-    return types_activites?.map((item: any) => ({
-      label: item.intutile_type,
-      value: String(item.code_type)
-    })) || [];
+    if (!types_activites || types_activites.length === 0) return [];
+    return types_activites
+      .filter(item => item?.code_type != null)
+      .map((item: any) => ({
+        label: item.intutile_type || 'Sans nom',
+        value: String(item.code_type),
+      }));
   }, [types_activites]);
 
   const localiteOptions = useMemo(() => {
+    if (!localites || localites.length === 0) return [];
     return localites
       .filter((localite) => {
+        if (!localite) return false;
         if (typeof localite.niveau_loca === 'object' && localite.niveau_loca !== null) {
           return localite.niveau_loca.nombre_nlc === 1;
         }
@@ -113,38 +117,48 @@ const AddPtba = ({ open, onOpenChange, currentRow }: OpenPropsPTBA) => {
       })
       .map((localite) => ({
         value: localite.id_loca as number,
-        label: localite.intitule_loca,
+        label: localite.intitule_loca || 'Sans nom',
       }));
   }, [localites]);
 
   const acteurOptions = useMemo(() => {
+    if (!acteurs || acteurs.length === 0) return [];
     return acteurs
-      .filter((acteur) => acteur.id_acteur !== undefined)
+      .filter((acteur) => acteur?.id_acteur != null)
       .map((acteur) => ({
         value: acteur.id_acteur as number,
-        label: acteur.nom_acteur,
+        label: acteur.nom_acteur || 'Sans nom',
       }));
   }, [acteurs]);
 
   const personnelOptions = useMemo(() => {
-    return personnels.map((p) => ({
-      value: p.n_personnel!,
-      label: `${p.prenom_perso} ${p.nom_perso}`,
-    }));
+    if (!personnels || personnels.length === 0) return [];
+    return personnels
+      .filter(p => p?.n_personnel != null)
+      .map((p) => ({
+        value: p.n_personnel!,
+        label: `${p.prenom_perso || ''} ${p.nom_perso || ''}`.trim() || 'Sans nom',
+      }));
   }, [personnels]);
 
   const uglOptions = useMemo(() => {
-    return ugls.map((ugl) => ({
-      value: ugl.code_ugl,
-      label: ugl.nom_ugl,
-    }));
+    if (!ugls || ugls.length === 0) return [];
+    return ugls
+      .filter(ugl => ugl?.code_ugl != null)
+      .map((ugl) => ({
+        value: ugl.code_ugl,
+        label: ugl.nom_ugl || 'Sans nom',
+      }));
   }, [ugls]);
 
   const cadreStrategiqueOptions = useMemo(() => {
-    return cadres_strategiques.map((cadre) => ({
-      value: cadre.id_cs,
-      label: `${cadre.code_cs} - ${cadre.intutile_cs}`,
-    }));
+    if (!cadres_strategiques || cadres_strategiques.length === 0) return [];
+    return cadres_strategiques
+      .filter(cadre => cadre?.id_cs != null)
+      .map((cadre) => ({
+        value: cadre.id_cs,
+        label: `${cadre.code_cs || ''} - ${cadre.intutile_cs || ''}`.trim() || 'Sans nom',
+      }));
   }, [cadres_strategiques]);
 
   // Utilisation dans le formConfig
