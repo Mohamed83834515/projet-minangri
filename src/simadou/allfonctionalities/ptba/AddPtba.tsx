@@ -15,8 +15,7 @@ import {
 } from '@/simadou/allTypes/entities'
 import { getPtbaFormConfig } from '@/simadou/allfieldsConfig/ptbaForm'
 import {
-  buildCadreAnalytiqueSelectOptions,
-  getPtbaCadreAnalytiqueNiveauCode,
+  buildCadreAnalytiqueSelectOptions
 } from '@/simadou/lib/cadreAnalytiqueUtils'
 import {
   resolveCadreAnalytiqueFormValue,
@@ -50,10 +49,23 @@ const AddPtba = ({ open, onOpenChange, currentRow }: OpenPropsPTBA) => {
   const { data: cadresAnalytique = [] } = useGetCadresAnalytique()
   const { data: niveaux = [] } = useGetNiveauxCadreAnalytique()
 
-  const ptbaNiveauCode = useMemo(() => {
-    return getPtbaCadreAnalytiqueNiveauCode(niveaux)
-  }, [niveaux])
+  // Fonction utilitaire (hors du composant)
+const getHighestLevelId = (niveauxx: any[]) => {
+  if (!niveauxx || niveauxx.length === 0) return null;
 
+  const highestLevel = niveauxx.reduce((max, current) =>
+    current.nombre_nca > max.nombre_nca ? current : max
+  );
+
+  return highestLevel.id_nca;
+};
+
+// Dans votre composant React
+const highestLevelId = useMemo(() => {
+  return getHighestLevelId(niveaux);
+}, [niveaux]);
+
+console.log('ID du niveau le plus élevé:', highestLevelId);
   const selectedCadreId = useMemo(
     () =>
       resolveCadreAnalytiqueFormValue(
@@ -66,10 +78,10 @@ const AddPtba = ({ open, onOpenChange, currentRow }: OpenPropsPTBA) => {
   const cadreAnalytiqueOptions = useMemo(
     () =>
       buildCadreAnalytiqueSelectOptions(cadresAnalytique, {
-        niveauCodeNumber: ptbaNiveauCode,
+        niveauCodeNumber: highestLevelId,
         includeCadreIds: selectedCadreId ? [selectedCadreId] : [],
       }),
-    [cadresAnalytique, ptbaNiveauCode, selectedCadreId]
+    [cadresAnalytique, highestLevelId, selectedCadreId]
   )
   const formConfig = useMemo(
     () => getPtbaFormConfig(cadreAnalytiqueOptions),
