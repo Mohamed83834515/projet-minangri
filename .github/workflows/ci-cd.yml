@@ -3,10 +3,10 @@ name: CI/CD pipeline
 on:
   push:
     branches:
-      - mmafp
+      - master
   pull_request:
     branches:
-      - mmafp
+      - master
 
 jobs:
   build:
@@ -36,7 +36,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "dist/**"
-          target: "/var/www/ruche-sectoriel.net/mmafp"
+          target: "/var/www/ruche-sectoriel.net/admin"
           strip_components: 1
 
 
