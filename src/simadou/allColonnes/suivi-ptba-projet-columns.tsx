@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { DataTableColumnHeader } from '@/components/data-table'
 import { buildColumns } from '@/Global/Tableaux/column-builder'
 import type { Ptba } from '@/simadou/allTypes'
-import TacheAvancementProgressBar from '@/simadou/allfonctionalities/suivi-ptba/TacheAvancementProgressBar'
+import TacheAvancementProgressBar from '../allfonctionalities/projets/detail/ptba/TacheAvancementProgressBar'
 
 export type SuiviPtbaColumnHandlers = {
   onOpenSuivi: (activite: Ptba) => void

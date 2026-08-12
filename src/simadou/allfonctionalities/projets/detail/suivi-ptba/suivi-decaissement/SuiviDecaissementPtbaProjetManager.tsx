@@ -12,13 +12,10 @@ import {
   toRegionLabelMap,
   toTypePartLabelMap,
 } from '@/simadou/lib/suiviDecaissementPtbaProjetUtils'
-import {
-  ActiviteTabbedSubViewHeader,
-  useActiviteTabbedSubView,
-} from '@/simadou/allfonctionalities/suivi-ptba/ActiviteTabbedDialogContext'
-import ActiviteTabbedFormPanel from '@/simadou/allfonctionalities/suivi-ptba/ActiviteTabbedFormPanel'
 import SuiviDecaissementPtbaProjetForm from './SuiviDecaissementPtbaProjetForm'
 import SuiviDecaissementPtbaProjetList from './SuiviDecaissementPtbaProjetList'
+import { ActiviteTabbedSubViewHeader, useActiviteTabbedSubView } from '../ActiviteTabbedDialogContext'
+import ActiviteTabbedFormPanel from '../ActiviteTabbedFormPanel'
 
 type Props = {
   projet: Projet

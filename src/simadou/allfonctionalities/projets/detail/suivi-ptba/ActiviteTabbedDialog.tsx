@@ -12,35 +12,36 @@ import {
   useNiveauTabsTheme,
 } from '@/components/ui/NiveauTabs'
 import { DIALOG_SIZES, type DialogSize } from '@/Global/Forms/dialog'
-import type { Convention } from '@/simadou/allTypes/convention'
+import type { Ptba } from '@/simadou/allTypes'
 import {
-  conventionModalTitle,
-  ConventionTableHeading,
-} from './convention-modal-utils'
-import { ActiviteTabbedDialogProvider } from '../suivi-ptba/ActiviteTabbedDialogContext'
-export type ConventionTabConfig = {
+  activiteModalTitle,
+  ActiviteTableHeading,
+} from './activite-modal-utils'
+import { ActiviteTabbedDialogProvider } from './ActiviteTabbedDialogContext'
+
+export type ActiviteTabConfig = {
   value: string
   label: string
   content: ReactNode
 }
 
-type ConventionTabbedDialogProps = {
-  convention: Convention | null
+type ActiviteTabbedDialogProps = {
+  activite: Ptba | null
   open: boolean
   onOpenChange: (open: boolean) => void
-  tabs: ConventionTabConfig[]
+  tabs: ActiviteTabConfig[]
   defaultTab?: string
   title?: string
 }
 
-export default function ConventionTabbedDialog({
-  convention,
+export default function ActiviteTabbedDialog({
+  activite,
   open,
   onOpenChange,
   tabs,
   defaultTab,
   title,
-}: ConventionTabbedDialogProps) {
+}: ActiviteTabbedDialogProps) {
   const [subViewActive, setSubViewActive] = useState(false)
   const [subViewSize, setSubViewSize] = useState<DialogSize>('form')
   const [activeTab, setActiveTab] = useState(defaultTab ?? tabs[0]?.value ?? '')
@@ -49,7 +50,7 @@ export default function ConventionTabbedDialog({
 
   useEffect(() => {
     if (open) setActiveTab(initialTab)
-  }, [open, initialTab, convention?.id_convention])
+  }, [open, initialTab, activite?.id_ptba])
 
   const handleOpenChange = (next: boolean) => {
     if (!next) {
@@ -76,20 +77,17 @@ export default function ConventionTabbedDialog({
         aria-describedby={undefined}
       >
         <DialogTitle className='sr-only'>
-          {title ?? conventionModalTitle(convention, 'Suivi convention')}
+          {title ?? activiteModalTitle(activite, 'Suivi activité PTBA')}
         </DialogTitle>
 
-        {convention && tabs.length > 0 && (
+        {activite && tabs.length > 0 && (
           <ActiviteTabbedDialogProvider setSubViewActive={handleSetSubViewActive}>
             {!subViewActive && (
-              <ConventionTableHeading
-                convention={convention}
-                className='rounded-t-md border-0 bg-transparent px-0 py-1'
-              />
+              <ActiviteTableHeading activite={activite} className='rounded-t-md border-0 bg-transparent px-0 py-1' />
             )}
 
             <Tabs
-              key={`${convention.id_convention}-${tabs.length}`}
+              key={`${activite.id_ptba}-${tabs.length}`}
               value={activeTab}
               onValueChange={setActiveTab}
               className='flex min-h-0 w-full flex-1 flex-col'

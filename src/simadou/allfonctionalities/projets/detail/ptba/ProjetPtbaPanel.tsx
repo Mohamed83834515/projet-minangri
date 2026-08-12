@@ -13,14 +13,14 @@ import {
   useGetPtbasProjetsByVersion,
 } from '@/simadou/allHooks/admin/ptbaProjetHooks'
 import { useProjetPtbaVersionSelection } from '@/simadou/allHooks/admin/versionHooks'
-import ActiviteTabbedDialog from '@/simadou/allfonctionalities/ptba/ActiviteTabbedDialog'
-import { PtbaVersionSelect } from '@/simadou/allfonctionalities/ptba/PtbaVersionSelect'
 import AddPtbaProjet from './AddPtbaProjet'
 import TacheActiviteProjetManager from './tache-activite-projet/TacheActiviteManager'
 import IndicateurTacheProjetManager from './indicateur-tache-projet/IndicateurTacheManager'
 import CoutActivitePtbaGridPanel from './cout-activite/CoutActivitePtbaGridPanel'
 import { useGeneralParamsQuery } from '@/simadou/allHooks/generalParams/queries'
 import { buildPtbasProjetColumns } from '@/simadou/allColonnes/ptbas-projet-columns'
+import { PtbaVersionSelect } from '../suivi-ptba/PtbaVersionSelect'
+import ActiviteTabbedDialog from '../suivi-ptba/ActiviteTabbedDialog'
 
 type ProjetPtbaPanelProps = {
   projet: Projet
@@ -128,36 +128,36 @@ export default function ProjetPtbaPanel({ projet }: ProjetPtbaPanelProps) {
         tabs={
           planifierActivite
             ? [
-                {
-                  value: 'taches',
-                  label: 'Planification des tâches',
-                  content: (
-                    <TacheActiviteProjetManager activite={planifierActivite} />
-                  ),
-                },
-                {
-                  value: 'indicateurs',
-                  label: 'Planification des indicateurs',
-                  content: (
-                    <IndicateurTacheProjetManager activite={planifierActivite} />
-                  ),
-                },
-                {
-                  value: 'cout-activite',
-                  label: 'Coût activité PTBA',
-                  content: (
-                    <CoutActivitePtbaGridPanel
-                      activite={planifierActivite}
-                      projet={projet}
-                      versionPtbaId={
-                        Number(planifierActivite.version_ptba) ||
-                        selectedVersionPtbaId
-                      }
-                      anneePtbaYear={selectedVersion?.annee_ptba}
-                    />
-                  ),
-                },
-              ]
+              {
+                value: 'taches',
+                label: 'Planification des tâches',
+                content: (
+                  <TacheActiviteProjetManager activite={planifierActivite} />
+                ),
+              },
+              {
+                value: 'indicateurs',
+                label: 'Planification des indicateurs',
+                content: (
+                  <IndicateurTacheProjetManager activite={planifierActivite} />
+                ),
+              },
+              {
+                value: 'cout-activite',
+                label: 'Coût activité PTBA',
+                content: (
+                  <CoutActivitePtbaGridPanel
+                    activite={planifierActivite}
+                    projet={projet}
+                    versionPtbaId={
+                      Number(planifierActivite.version_ptba) ||
+                      selectedVersionPtbaId
+                    }
+                    anneePtbaYear={selectedVersion?.annee_ptba}
+                  />
+                ),
+              },
+            ]
             : []
         }
       />

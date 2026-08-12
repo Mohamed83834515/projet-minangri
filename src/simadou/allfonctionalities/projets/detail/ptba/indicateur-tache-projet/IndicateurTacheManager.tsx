@@ -4,18 +4,15 @@ import { Loader2 } from 'lucide-react'
 import type { Ptba } from '@/simadou/allTypes'
 import { IndicateurTache } from '@/simadou/allTypes/indicateurTache'
 import { DataTableToolbarOutlineButton } from '@/components/data-table/toolbar-outline-button'
-import {
-  ActiviteTabbedSubViewHeader,
-  useActiviteTabbedSubView,
-  useActiviteTabbedToolbarAction,
-} from '@/simadou/allfonctionalities/ptba/ActiviteTabbedDialogContext'
-import ActiviteTabbedFormPanel from '@/simadou/allfonctionalities/suivi-ptba/ActiviteTabbedFormPanel'
 import IndicateurTacheProjetForm from './IndicateurTacheForm'
 import IndicateurTacheListProjet from './IndicateurTacheList'
 import {
   suiviPtbaQueryKeys,
   useGetIndicateursProjetByActivite,
 } from '@/simadou/allHooks/admin/indicateurTacheProjetHooks'
+import { ActiviteTabbedSubViewHeader, useActiviteTabbedSubView } from '../../suivi-ptba/ActiviteTabbedDialogContext'
+import ActiviteTabbedFormPanel from '../../suivi-ptba/ActiviteTabbedFormPanel'
+import { useActiviteTabbedToolbarAction } from '../ActiviteTabbedDialogContext'
 
 type IndicateurTacheManagerProps = {
   activite: Ptba

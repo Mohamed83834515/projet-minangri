@@ -2,15 +2,11 @@ import { useState, useMemo, useCallback } from 'react'
 import { Loader2 } from 'lucide-react'
 import type { Ptba, TacheActivitePtba } from '@/simadou/allTypes'
 import { DataTableToolbarOutlineButton } from '@/components/data-table/toolbar-outline-button'
-import {
-  ActiviteTabbedSubViewHeader,
-  useActiviteTabbedSubView,
-  useActiviteTabbedToolbarAction,
-} from '@/simadou/allfonctionalities/ptba/ActiviteTabbedDialogContext'
-import ActiviteTabbedFormPanel from '@/simadou/allfonctionalities/suivi-ptba/ActiviteTabbedFormPanel'
 import TacheActiviteProjetForm from './TacheActiviteForm'
 import TacheActiviteProjetList from './TacheActiviteList'
 import { useGetTachesByActiviteProjet } from '@/simadou/allHooks/admin/tacheActiviteProjetHooks'
+import { ActiviteTabbedSubViewHeader, useActiviteTabbedSubView, useActiviteTabbedToolbarAction } from '../ActiviteTabbedDialogContext'
+import ActiviteTabbedFormPanel from '../../suivi-ptba/ActiviteTabbedFormPanel'
 
 type TacheActivitePtbaManagerProps = {
   activite: Ptba

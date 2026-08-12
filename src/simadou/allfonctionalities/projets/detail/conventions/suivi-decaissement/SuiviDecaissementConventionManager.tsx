@@ -2,15 +2,12 @@ import { useMemo, useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import type { Convention } from '@/simadou/allTypes/convention'
 import type { SuiviDecaissementConvention } from '@/simadou/allTypes/suiviDecaissementConvention'
-import { sumSuiviDecaissementConventionMontant } from '@/simadou/allColonnes/suivi-decaissement-convention-columns'
 import { useGetSuiviDecaissementByConvention } from '@/simadou/allHooks/admin/suiviConventionHooks'
-import {
-  ActiviteTabbedSubViewHeader,
-  useActiviteTabbedSubView,
-} from '@/simadou/allfonctionalities/suivi-ptba/ActiviteTabbedDialogContext'
-import ActiviteTabbedFormPanel from '@/simadou/allfonctionalities/suivi-ptba/ActiviteTabbedFormPanel'
 import SuiviDecaissementConventionForm from './SuiviDecaissementConventionForm'
 import SuiviDecaissementConventionList from './SuiviDecaissementConventionList'
+import { ActiviteTabbedSubViewHeader, useActiviteTabbedSubView } from '../../suivi-ptba/ActiviteTabbedDialogContext'
+import { sumSuiviDecaissementConventionMontant } from '@/simadou/allColonnes/suivi-decaissement-convention-columns'
+import ActiviteTabbedFormPanel from '../../suivi-ptba/ActiviteTabbedFormPanel'
 
 type Props = {
   convention: Convention

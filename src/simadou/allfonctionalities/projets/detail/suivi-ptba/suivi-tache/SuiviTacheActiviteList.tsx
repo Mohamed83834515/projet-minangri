@@ -3,11 +3,7 @@ import { GenericTable } from '@/Global/Generic/Generictable'
 import { useEmbeddedTableState } from '@/hooks/use-embedded-table-state'
 import type { TacheActivitePtba } from '@/simadou/allTypes'
 import type { SuiviTacheActivite } from '@/simadou/allTypes/suiviTacheActivite'
-import {
-  buildSuiviTacheColumns,
-  type SuiviTacheTableRow,
-} from '@/simadou/allColonnes/suivi-tache-columns'
-
+import { buildSuiviTacheColumns, SuiviTacheTableRow } from '@/simadou/allColonnes/suivi-tache-projet-columns'
 type SuiviTacheActiviteListProps = {
   taches: TacheActivitePtba[]
   suivis: SuiviTacheActivite[]

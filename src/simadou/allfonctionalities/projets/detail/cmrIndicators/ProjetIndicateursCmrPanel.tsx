@@ -21,7 +21,7 @@ import useDialogState from '@/hooks/use-dialog-state'
 import { useEmbeddedTableState } from '@/hooks/use-embedded-table-state'
 import type { Projet } from '@/simadou/allTypes'
 import type { IndicateurCmrProjet } from '@/simadou/allTypes/indicateurCmrProjet'
-import { buildIndicateurCmrColumns } from '@/simadou/allColonnes/indicateur-cmr-columns'
+import { buildIndicateurCmrColumns } from '@/simadou/allColonnes/indicateur-cmr-projet-columns'
 import {
   useDeleteIndicateurCmrProjet,
   useGetIndicateursCmrProjet,

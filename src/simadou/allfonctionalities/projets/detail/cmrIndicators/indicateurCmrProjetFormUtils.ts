@@ -8,12 +8,7 @@ import {
   resolveRelationCode,
   resolveRelationId,
 } from '@/simadou/lib/resolveApiRelation'
-import {
-  buildDictionnaireIndicateurSelectOptions,
-  resolveReferentielCmrId,
-} from '@/simadou/allfonctionalities/politique/indicateurs-cmr/indicateurCmrFormUtils'
-
-export { buildDictionnaireIndicateurSelectOptions, resolveReferentielCmrId }
+import { resolveReferentielCmrId } from './indicateurCmrFormProjetUtils'
 export { filterIndicateursForCadreResultat }
 
 export function filterCadresResultatByNiveau(

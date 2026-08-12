@@ -7,13 +7,10 @@ import {
   suiviConventionQueryKeys,
   useGetSuiviAvancementByConvention,
 } from '@/simadou/allHooks/admin/suiviConventionHooks'
-import {
-  ActiviteTabbedSubViewHeader,
-  useActiviteTabbedSubView,
-} from '@/simadou/allfonctionalities/suivi-ptba/ActiviteTabbedDialogContext'
-import ActiviteTabbedFormPanel from '@/simadou/allfonctionalities/suivi-ptba/ActiviteTabbedFormPanel'
 import SuiviAvancementConventionForm from './SuiviAvancementConventionForm'
 import SuiviAvancementConventionList from './SuiviAvancementConventionList'
+import { ActiviteTabbedSubViewHeader, useActiviteTabbedSubView } from '../../suivi-ptba/ActiviteTabbedDialogContext'
+import ActiviteTabbedFormPanel from '../../suivi-ptba/ActiviteTabbedFormPanel'
 
 type Props = {
   convention: Convention

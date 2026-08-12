@@ -2,15 +2,15 @@ import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import type { Ptba } from '@/simadou/allTypes'
 import { IndicateurTache } from '@/simadou/allTypes/indicateurTache'
-import { getValeurCibleIndicateur } from '@/simadou/allColonnes/suivi-indicateur-columns'
 import {
   useGetAllSuivisIndicateursProjet,
   useGetIndicateursProjetByActivite,
 } from '@/simadou/allHooks/admin/suiviPtbaProjetHooks'
 import SuiviIndicateurActiviteTable from './SuiviIndicateurActiviteTable'
 import SuiviIndicateurInlineManager from './SuiviIndicateurInlineManager'
-import { ActiviteTabbedSubViewHeader, useActiviteTabbedSubView } from '@/simadou/allfonctionalities/suivi-ptba/ActiviteTabbedDialogContext'
-import ActiviteTabbedFormPanel from '@/simadou/allfonctionalities/suivi-ptba/ActiviteTabbedFormPanel'
+import { ActiviteTabbedSubViewHeader, useActiviteTabbedSubView } from '../ActiviteTabbedDialogContext'
+import ActiviteTabbedFormPanel from '../ActiviteTabbedFormPanel'
+import { getValeurCibleIndicateur } from '@/simadou/allColonnes/suivi-indicateur-columns'
 
 type SuiviIndicateurManagerProps = {
   activite: Ptba

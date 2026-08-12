@@ -2,13 +2,13 @@ import { useMemo, useState, useCallback } from 'react'
 import { GenericTable } from '@/Global/Generic/Generictable'
 import { useEmbeddedTableState } from '@/hooks/use-embedded-table-state'
 import type { TacheActivitePtba } from '@/simadou/allTypes'
-import { buildTachePtbaColumns, TachePtbaTableRow } from '@/simadou/allColonnes/tache-activites-columns'
 import useDialogState from '@/hooks/use-dialog-state'
 import { toast } from 'sonner'
 import { GenericDeleteDialog } from '@/Global/Tableaux/GenericDeleteDialog'
 import { useDeleteTachePtbaProjet } from '@/simadou/allHooks/admin/tacheActiviteProjetHooks'
 import { useGetPersonnels } from '@/simadou/allHooks/admin/personnelHooks'
 import { resolvePersonnelLabel } from '@/simadou/lib/resolveApiRelation'
+import { buildTachePtbaColumns, TachePtbaTableRow } from '@/simadou/allColonnes/tache-activites-columns'
 
 type SuiviTacheActiviteListProps = {
   taches: TacheActivitePtba[]

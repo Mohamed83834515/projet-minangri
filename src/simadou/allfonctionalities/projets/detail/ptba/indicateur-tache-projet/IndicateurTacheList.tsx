@@ -5,8 +5,8 @@ import { useEmbeddedTableState } from '@/hooks/use-embedded-table-state'
 import useDialogState from '@/hooks/use-dialog-state'
 import { GenericDeleteDialog } from '@/Global/Tableaux/GenericDeleteDialog'
 import { IndicateurTache } from '@/simadou/allTypes/indicateurTache'
-import { buildIndicateurTacheColumns } from '@/simadou/allColonnes/indicateur-taches-columns'
 import { useDeleteSuiviIndicateurProjet } from '@/simadou/allHooks/admin/indicateurTacheProjetHooks'
+import { buildIndicateurTacheColumns } from '@/simadou/allColonnes/indicateur-taches-columns'
 
 type IndicateurTacheListProps = {
   indicateurs: IndicateurTache[]

@@ -11,15 +11,14 @@ import { useEmbeddedTableState } from '@/hooks/use-embedded-table-state'
 import type { Projet, Ptba } from '@/simadou/allTypes'
 import type { PtbaProjet } from '@/simadou/allTypes/ptbaProjet'
 import { useGetPtbasProjetsByVersion } from '@/simadou/allHooks/admin/ptbaProjetHooks'
-import { useSuiviPtbaProjetActivitesProgress } from '@/simadou/allHooks/admin/suiviPtbaProjetHooks'
 import { useProjetPtbaVersionSelection } from '@/simadou/allHooks/admin/versionHooks'
-import ActiviteTabbedDialog from '@/simadou/allfonctionalities/suivi-ptba/ActiviteTabbedDialog'
 import SuiviTacheActiviteProjetManager from './suivi-tache/SuiviTacheActiviteManager'
 import SuiviIndicateurProjetManager from './suivi-indicateur/SuiviIndicateurManager'
 import SuiviAvancementContratProjetManager from './suivi-avancement-contrat/SuiviAvancementContratManager'
 import SuiviDecaissementPtbaProjetManager from './suivi-decaissement/SuiviDecaissementPtbaProjetManager'
 import { buildSuiviPtbaProjetColumns } from '@/simadou/allColonnes/suivi-ptba-projet-columns'
-import { PtbaVersionSelect } from '@/simadou/allfonctionalities/ptba/PtbaVersionSelect'
+import ActiviteTabbedDialog from './ActiviteTabbedDialog'
+import { PtbaVersionSelect } from './PtbaVersionSelect'
 
 type ProjetSuiviPtbaPanelProps = {
   projet: Projet
@@ -51,19 +50,6 @@ export default function ProjetSuiviPtbaPanel({
   )
   const ptbas = ptbasByVersion?.ptbas_projets ?? EMPTY_PTBAS
 
-  const activiteIds = useMemo(
-    () =>
-      ptbas
-        .map((a) => a.id_ptba)
-        .filter((id): id is number => Number.isFinite(id)),
-    [ptbas]
-  )
-
-  const {
-    tachesByActivite,
-    avancementByActivite,
-    isLoading: progressLoading,
-  } = useSuiviPtbaProjetActivitesProgress(activiteIds)
 
   const onOpenSuivi = useCallback((activite: Ptba) => {
     setSuiviActivite(activite as PtbaProjet)
@@ -80,17 +66,8 @@ export default function ProjetSuiviPtbaPanel({
       buildSuiviPtbaProjetColumns({
         onOpenSuivi,
         onOpenObservations,
-        tachesByActivite,
-        avancementByActivite,
-        progressLoading,
       }),
-    [
-      onOpenSuivi,
-      onOpenObservations,
-      tachesByActivite,
-      avancementByActivite,
-      progressLoading,
-    ]
+    [onOpenSuivi, onOpenObservations]
   )
 
   return (
@@ -137,42 +114,42 @@ export default function ProjetSuiviPtbaPanel({
         tabs={
           suiviActivite
             ? [
-                {
-                  value: 'taches',
-                  label: 'Suivi des tâches',
-                  content: (
-                    <SuiviTacheActiviteProjetManager activite={suiviActivite} />
-                  ),
-                },
-                {
-                  value: 'indicateurs',
-                  label: 'Suivi des indicateurs',
-                  content: (
-                    <SuiviIndicateurProjetManager activite={suiviActivite} />
-                  ),
-                },
-                {
-                  value: 'decaissement',
-                  label: 'Suivi décaissement',
-                  content: (
-                    <SuiviDecaissementPtbaProjetManager
-                      key={suiviActivite.id_ptba}
-                      projet={projet}
-                      activite={suiviActivite}
-                    />
-                  ),
-                },
-                {
-                  value: 'avancement-contrat',
-                  label: "Observation globale sur l'activité",
-                  content: (
-                    <SuiviAvancementContratProjetManager
-                      key={suiviActivite.id_ptba}
-                      activite={suiviActivite}
-                    />
-                  ),
-                },
-              ]
+              {
+                value: 'taches',
+                label: 'Suivi des tâches',
+                content: (
+                  <SuiviTacheActiviteProjetManager activite={suiviActivite} />
+                ),
+              },
+              {
+                value: 'indicateurs',
+                label: 'Suivi des indicateurs',
+                content: (
+                  <SuiviIndicateurProjetManager activite={suiviActivite} />
+                ),
+              },
+              {
+                value: 'decaissement',
+                label: 'Suivi décaissement',
+                content: (
+                  <SuiviDecaissementPtbaProjetManager
+                    key={suiviActivite.id_ptba}
+                    projet={projet}
+                    activite={suiviActivite}
+                  />
+                ),
+              },
+              {
+                value: 'avancement-contrat',
+                label: "Observation globale sur l'activité",
+                content: (
+                  <SuiviAvancementContratProjetManager
+                    key={suiviActivite.id_ptba}
+                    activite={suiviActivite}
+                  />
+                ),
+              },
+            ]
             : []
         }
       />

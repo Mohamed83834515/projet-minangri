@@ -14,9 +14,9 @@ import {
 import { useGetTachesByActiviteProjet } from '@/simadou/allHooks/admin/tacheActiviteProjetHooks'
 import SuiviTacheActiviteForm from './SuiviTacheActiviteForm'
 import SuiviTacheActiviteList from './SuiviTacheActiviteList'
-import { ActiviteTabbedSubViewHeader, useActiviteTabbedSubView } from '@/simadou/allfonctionalities/suivi-ptba/ActiviteTabbedDialogContext'
-import ActiviteTabbedFormPanel from '@/simadou/allfonctionalities/suivi-ptba/ActiviteTabbedFormPanel'
-import TacheAvancementProgressBar from '@/simadou/allfonctionalities/suivi-ptba/TacheAvancementProgressBar'
+import { ActiviteTabbedSubViewHeader, useActiviteTabbedSubView } from '../ActiviteTabbedDialogContext'
+import ActiviteTabbedFormPanel from '../ActiviteTabbedFormPanel'
+import TacheAvancementProgressBar from '../../ptba/TacheAvancementProgressBar'
 
 type SuiviTacheActiviteManagerProps = {
   activite: Ptba
@@ -88,32 +88,32 @@ export default function SuiviTacheActiviteProjetManager({
 
   return (
     <div className='flex min-h-0 flex-1 flex-col overflow-hidden'>
-        {showForm && selectedTache ? (
-          <ActiviteTabbedFormPanel
-            header={
-              <ActiviteTabbedSubViewHeader
-                sectionLabel={`Suivi — ${selectedTache.intutile_tache_gt}`}
-                className='shrink-0 border-0 px-0 pb-0 text-base font-semibold text-foreground'
-              />
-            }
-          >
-            <SuiviTacheActiviteForm
-              tache={selectedTache}
-              suivi={editingSuivi}
-              idActivite={activite.id_ptba}
-              onClose={handleCloseForm}
-              onSuccess={handleSuccess}
+      {showForm && selectedTache ? (
+        <ActiviteTabbedFormPanel
+          header={
+            <ActiviteTabbedSubViewHeader
+              sectionLabel={`Suivi — ${selectedTache.intutile_tache_gt}`}
+              className='shrink-0 border-0 px-0 pb-0 text-base font-semibold text-foreground'
             />
-          </ActiviteTabbedFormPanel>
-        ) : (
-          <div className='min-h-0 flex-1 overflow-y-auto px-3 py-2 sm:px-4 sm:py-3'>
-            <SuiviTacheActiviteList
-              taches={filteredTaches}
-              suivis={suivisForTaches}
-              onSuivre={handleSuivre}
-            />
-          </div>
-        )}
+          }
+        >
+          <SuiviTacheActiviteForm
+            tache={selectedTache}
+            suivi={editingSuivi}
+            idActivite={activite.id_ptba}
+            onClose={handleCloseForm}
+            onSuccess={handleSuccess}
+          />
+        </ActiviteTabbedFormPanel>
+      ) : (
+        <div className='min-h-0 flex-1 overflow-y-auto px-3 py-2 sm:px-4 sm:py-3'>
+          <SuiviTacheActiviteList
+            taches={filteredTaches}
+            suivis={suivisForTaches}
+            onSuivre={handleSuivre}
+          />
+        </div>
+      )}
 
       {!showForm && (
         <div className='shrink-0 border-t bg-muted/40 px-3 py-2 text-sm sm:px-4'>

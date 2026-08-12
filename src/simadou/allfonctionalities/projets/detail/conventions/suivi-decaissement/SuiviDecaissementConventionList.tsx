@@ -6,8 +6,8 @@ import { GenericDeleteDialog } from '@/Global/Tableaux/GenericDeleteDialog'
 import useDialogState from '@/hooks/use-dialog-state'
 import { useEmbeddedTableState } from '@/hooks/use-embedded-table-state'
 import type { SuiviDecaissementConvention } from '@/simadou/allTypes/suiviDecaissementConvention'
-import { buildSuiviDecaissementConventionColumns } from '@/simadou/allColonnes/suivi-decaissement-convention-columns'
 import { useDeleteSuiviDecaissementConvention } from '@/simadou/allHooks/admin/suiviConventionHooks'
+import { buildSuiviDecaissementConventionColumns } from '@/simadou/allColonnes/suivi-decaissement-convention-columns'
 
 type Props = {
   suivis: SuiviDecaissementConvention[]
