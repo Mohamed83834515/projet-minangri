@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { ProgrammeSwitcher } from './programme-switcher'
+import { ProjetSwitcher } from './projet-switcher'
 
 type HeaderProps = React.HTMLAttributes<HTMLElement> & {
   fixed?: boolean
@@ -51,6 +52,7 @@ export function Header({ className, fixed, children, ...props }: HeaderProps) {
         <div className='ml-auto flex items-center gap-3'>
           <Separator orientation='vertical' className='hidden h-8 sm:block' />
           <ProgrammeSwitcher />
+          <ProjetSwitcher />
         </div>
       </div>
     </header>

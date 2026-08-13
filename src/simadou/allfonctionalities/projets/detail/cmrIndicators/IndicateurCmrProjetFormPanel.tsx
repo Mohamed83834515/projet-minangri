@@ -16,7 +16,6 @@ import {
 import { useGetDictionnaireIndicateurs } from '@/simadou/allHooks/admin/dictionnaireIndicateurHooks'
 import {
   buildCadreResultatSelectOptions,
-  buildDictionnaireIndicateurSelectOptions,
   buildIndicateurCadreResultatSelectOptions,
   filterCadresResultatByNiveau,
   filterIndicateursForCadreResultat,
@@ -25,9 +24,9 @@ import {
   resolveCadreResultatById,
   resolveIndicateurIopId,
   resolveIndicateurIopLabel,
-  resolveReferentielCmrId,
   resolveResultatCmrProjetLabel,
 } from './indicateurCmrProjetFormUtils'
+import { buildDictionnaireIndicateurSelectOptions, resolveReferentielCmrId } from './indicateurCmrFormProjetUtils'
 
 export default function IndicateurCmrProjetFormPanel({
   indicateur,
@@ -95,8 +94,8 @@ export default function IndicateurCmrProjetFormPanel({
     const populatedIndicateur =
       indicateur?.indicateur_iop ??
       (indicateur?.resultat_cmr != null &&
-      typeof indicateur.resultat_cmr === 'object' &&
-      'id_indicateur_cr_iop' in indicateur.resultat_cmr
+        typeof indicateur.resultat_cmr === 'object' &&
+        'id_indicateur_cr_iop' in indicateur.resultat_cmr
         ? (indicateur.resultat_cmr as unknown as IndicateurCadreResultat)
         : null)
 

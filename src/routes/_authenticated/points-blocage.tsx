@@ -1,12 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useProjetStore } from '@/stores/projet-store'
-import ProjetDashboard from '@/simadou/allfonctionalities/projets/detail/ProjetDashboard'
+import ProjetPointsBlocagePanel from '@/simadou/allfonctionalities/projets/detail/points-blocage/ProjetPointsBlocagePanel'
 
-export const Route = createFileRoute('/_authenticated/')({
-  component: DashboardProjetWrapper,
+export const Route = createFileRoute('/_authenticated/points-blocage')({
+  component: ProjetPointsBlocagePanelWrapper,
 })
 
-function DashboardProjetWrapper() {
+function ProjetPointsBlocagePanelWrapper() {
   const activeProjet = useProjetStore((s) => s.activeProjet)
 
   if (!activeProjet) {
@@ -17,5 +17,5 @@ function DashboardProjetWrapper() {
     )
   }
 
-  return <ProjetDashboard projet={activeProjet} />
+  return <ProjetPointsBlocagePanel projet={activeProjet} />
 }

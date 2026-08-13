@@ -21,6 +21,7 @@ import { type NavCollapsible, type NavItem, type NavLink } from './types'
 import { HEADER_COLORS, useColorStore } from '@/stores/others/color-store'
 import { useLayout } from '@/stores/others/layout-store'
 import { ProgrammeSwitcher } from './programme-switcher'
+import { ProjetSwitcher } from './projet-switcher'
 import { SignOutDialog } from '@/components/others/sign-out-dialog'
 import useDialogState from '@/hooks/use-dialog-state'
 import { Button } from '@/components/ui/button'
@@ -575,6 +576,7 @@ export function AppTopbar({ user }: UserProps) {
               <SearchDesktop />
             </div>
             <ProgrammeSwitcher onHeader />
+            <ProjetSwitcher onHeader />
             <ThemeSwitch />
             <ConfigDrawer />
             {user && (

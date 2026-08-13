@@ -14,6 +14,7 @@ import { ThemeSwitch } from '@/components/others/theme-switch'
 import { LogoGroup } from '@/components/others/logo-group'
 import { AppTopbar } from './top-nav'
 import { ActiveProgrammeProvider } from './active-programme-provider'
+import { ActiveProjetProvider } from './active-projet-provider'
 import { useSearchStore } from '@/stores/others/search-store'
 import { useLayout } from '@/stores/others/layout-store'
 import { useMe } from '@/simadou/allHooks/auth/authHooks'
@@ -45,10 +46,12 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
 
   return (
     <ActiveProgrammeProvider>
-      <AuthenticatedLayoutInner defaultOpen={defaultOpen}>
-        {children}
-      </AuthenticatedLayoutInner>
-      <CommandMenu />
+      <ActiveProjetProvider>
+        <AuthenticatedLayoutInner defaultOpen={defaultOpen}>
+          {children}
+        </AuthenticatedLayoutInner>
+        <CommandMenu />
+      </ActiveProjetProvider>
     </ActiveProgrammeProvider>
   )
 }

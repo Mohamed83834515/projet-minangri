@@ -1,12 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useProjetStore } from '@/stores/projet-store'
-import ProjetDashboard from '@/simadou/allfonctionalities/projets/detail/ProjetDashboard'
+import ProjetSuiviPtbaPanel from '@/simadou/allfonctionalities/projets/detail/suivi-ptba/ProjetSuiviPtbaPanel'
 
-export const Route = createFileRoute('/_authenticated/')({
-  component: DashboardProjetWrapper,
+export const Route = createFileRoute('/_authenticated/suivi-ptba')({
+  component: ProjetSuiviPtbaPanelWrapper,
 })
 
-function DashboardProjetWrapper() {
+function ProjetSuiviPtbaPanelWrapper() {
   const activeProjet = useProjetStore((s) => s.activeProjet)
 
   if (!activeProjet) {
@@ -17,5 +17,5 @@ function DashboardProjetWrapper() {
     )
   }
 
-  return <ProjetDashboard projet={activeProjet} />
+  return <ProjetSuiviPtbaPanel projet={activeProjet} />
 }

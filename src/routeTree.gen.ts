@@ -11,6 +11,15 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedSuiviPtbaRouteImport } from './routes/_authenticated/suivi-ptba'
+import { Route as AuthenticatedPtbaRouteImport } from './routes/_authenticated/ptba'
+import { Route as AuthenticatedPointsBlocageRouteImport } from './routes/_authenticated/points-blocage'
+import { Route as AuthenticatedIndicateursCmrRouteImport } from './routes/_authenticated/indicateurs-cmr'
+import { Route as AuthenticatedFinancementRouteImport } from './routes/_authenticated/financement'
+import { Route as AuthenticatedDocumentsRouteImport } from './routes/_authenticated/documents'
+import { Route as AuthenticatedConventionsRouteImport } from './routes/_authenticated/conventions'
+import { Route as AuthenticatedCadreResultatsRouteImport } from './routes/_authenticated/cadre-resultats'
+import { Route as AuthenticatedActivitesRouteImport } from './routes/_authenticated/activites'
 import { Route as errors503RouteImport } from './routes/(errors)/503'
 import { Route as errors500RouteImport } from './routes/(errors)/500'
 import { Route as errors404RouteImport } from './routes/(errors)/404'
@@ -43,6 +52,56 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSuiviPtbaRoute = AuthenticatedSuiviPtbaRouteImport.update({
+  id: '/suivi-ptba',
+  path: '/suivi-ptba',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPtbaRoute = AuthenticatedPtbaRouteImport.update({
+  id: '/ptba',
+  path: '/ptba',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPointsBlocageRoute =
+  AuthenticatedPointsBlocageRouteImport.update({
+    id: '/points-blocage',
+    path: '/points-blocage',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedIndicateursCmrRoute =
+  AuthenticatedIndicateursCmrRouteImport.update({
+    id: '/indicateurs-cmr',
+    path: '/indicateurs-cmr',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFinancementRoute =
+  AuthenticatedFinancementRouteImport.update({
+    id: '/financement',
+    path: '/financement',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDocumentsRoute = AuthenticatedDocumentsRouteImport.update({
+  id: '/documents',
+  path: '/documents',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedConventionsRoute =
+  AuthenticatedConventionsRouteImport.update({
+    id: '/conventions',
+    path: '/conventions',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCadreResultatsRoute =
+  AuthenticatedCadreResultatsRouteImport.update({
+    id: '/cadre-resultats',
+    path: '/cadre-resultats',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedActivitesRoute = AuthenticatedActivitesRouteImport.update({
+  id: '/activites',
+  path: '/activites',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const errors503Route = errors503RouteImport.update({
@@ -190,6 +249,15 @@ export interface FileRoutesByFullPath {
   '/404': typeof errors404Route
   '/500': typeof errors500Route
   '/503': typeof errors503Route
+  '/activites': typeof AuthenticatedActivitesRoute
+  '/cadre-resultats': typeof AuthenticatedCadreResultatsRoute
+  '/conventions': typeof AuthenticatedConventionsRoute
+  '/documents': typeof AuthenticatedDocumentsRoute
+  '/financement': typeof AuthenticatedFinancementRoute
+  '/indicateurs-cmr': typeof AuthenticatedIndicateursCmrRoute
+  '/points-blocage': typeof AuthenticatedPointsBlocageRoute
+  '/ptba': typeof AuthenticatedPtbaRoute
+  '/suivi-ptba': typeof AuthenticatedSuiviPtbaRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
@@ -215,6 +283,15 @@ export interface FileRoutesByTo {
   '/404': typeof errors404Route
   '/500': typeof errors500Route
   '/503': typeof errors503Route
+  '/activites': typeof AuthenticatedActivitesRoute
+  '/cadre-resultats': typeof AuthenticatedCadreResultatsRoute
+  '/conventions': typeof AuthenticatedConventionsRoute
+  '/documents': typeof AuthenticatedDocumentsRoute
+  '/financement': typeof AuthenticatedFinancementRoute
+  '/indicateurs-cmr': typeof AuthenticatedIndicateursCmrRoute
+  '/points-blocage': typeof AuthenticatedPointsBlocageRoute
+  '/ptba': typeof AuthenticatedPtbaRoute
+  '/suivi-ptba': typeof AuthenticatedSuiviPtbaRoute
   '/': typeof AuthenticatedIndexRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
@@ -243,6 +320,15 @@ export interface FileRoutesById {
   '/(errors)/404': typeof errors404Route
   '/(errors)/500': typeof errors500Route
   '/(errors)/503': typeof errors503Route
+  '/_authenticated/activites': typeof AuthenticatedActivitesRoute
+  '/_authenticated/cadre-resultats': typeof AuthenticatedCadreResultatsRoute
+  '/_authenticated/conventions': typeof AuthenticatedConventionsRoute
+  '/_authenticated/documents': typeof AuthenticatedDocumentsRoute
+  '/_authenticated/financement': typeof AuthenticatedFinancementRoute
+  '/_authenticated/indicateurs-cmr': typeof AuthenticatedIndicateursCmrRoute
+  '/_authenticated/points-blocage': typeof AuthenticatedPointsBlocageRoute
+  '/_authenticated/ptba': typeof AuthenticatedPtbaRoute
+  '/_authenticated/suivi-ptba': typeof AuthenticatedSuiviPtbaRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
@@ -273,6 +359,15 @@ export interface FileRouteTypes {
     | '/404'
     | '/500'
     | '/503'
+    | '/activites'
+    | '/cadre-resultats'
+    | '/conventions'
+    | '/documents'
+    | '/financement'
+    | '/indicateurs-cmr'
+    | '/points-blocage'
+    | '/ptba'
+    | '/suivi-ptba'
     | '/errors/$error'
     | '/settings/account'
     | '/settings/appearance'
@@ -298,6 +393,15 @@ export interface FileRouteTypes {
     | '/404'
     | '/500'
     | '/503'
+    | '/activites'
+    | '/cadre-resultats'
+    | '/conventions'
+    | '/documents'
+    | '/financement'
+    | '/indicateurs-cmr'
+    | '/points-blocage'
+    | '/ptba'
+    | '/suivi-ptba'
     | '/'
     | '/errors/$error'
     | '/settings/account'
@@ -325,6 +429,15 @@ export interface FileRouteTypes {
     | '/(errors)/404'
     | '/(errors)/500'
     | '/(errors)/503'
+    | '/_authenticated/activites'
+    | '/_authenticated/cadre-resultats'
+    | '/_authenticated/conventions'
+    | '/_authenticated/documents'
+    | '/_authenticated/financement'
+    | '/_authenticated/indicateurs-cmr'
+    | '/_authenticated/points-blocage'
+    | '/_authenticated/ptba'
+    | '/_authenticated/suivi-ptba'
     | '/_authenticated/'
     | '/_authenticated/errors/$error'
     | '/_authenticated/settings/account'
@@ -370,6 +483,69 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/suivi-ptba': {
+      id: '/_authenticated/suivi-ptba'
+      path: '/suivi-ptba'
+      fullPath: '/suivi-ptba'
+      preLoaderRoute: typeof AuthenticatedSuiviPtbaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/ptba': {
+      id: '/_authenticated/ptba'
+      path: '/ptba'
+      fullPath: '/ptba'
+      preLoaderRoute: typeof AuthenticatedPtbaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/points-blocage': {
+      id: '/_authenticated/points-blocage'
+      path: '/points-blocage'
+      fullPath: '/points-blocage'
+      preLoaderRoute: typeof AuthenticatedPointsBlocageRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/indicateurs-cmr': {
+      id: '/_authenticated/indicateurs-cmr'
+      path: '/indicateurs-cmr'
+      fullPath: '/indicateurs-cmr'
+      preLoaderRoute: typeof AuthenticatedIndicateursCmrRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/financement': {
+      id: '/_authenticated/financement'
+      path: '/financement'
+      fullPath: '/financement'
+      preLoaderRoute: typeof AuthenticatedFinancementRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/documents': {
+      id: '/_authenticated/documents'
+      path: '/documents'
+      fullPath: '/documents'
+      preLoaderRoute: typeof AuthenticatedDocumentsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/conventions': {
+      id: '/_authenticated/conventions'
+      path: '/conventions'
+      fullPath: '/conventions'
+      preLoaderRoute: typeof AuthenticatedConventionsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/cadre-resultats': {
+      id: '/_authenticated/cadre-resultats'
+      path: '/cadre-resultats'
+      fullPath: '/cadre-resultats'
+      preLoaderRoute: typeof AuthenticatedCadreResultatsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/activites': {
+      id: '/_authenticated/activites'
+      path: '/activites'
+      fullPath: '/activites'
+      preLoaderRoute: typeof AuthenticatedActivitesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/(errors)/503': {
@@ -583,6 +759,15 @@ const AuthenticatedProjetProgrammeProjetsIdRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
+  AuthenticatedActivitesRoute: typeof AuthenticatedActivitesRoute
+  AuthenticatedCadreResultatsRoute: typeof AuthenticatedCadreResultatsRoute
+  AuthenticatedConventionsRoute: typeof AuthenticatedConventionsRoute
+  AuthenticatedDocumentsRoute: typeof AuthenticatedDocumentsRoute
+  AuthenticatedFinancementRoute: typeof AuthenticatedFinancementRoute
+  AuthenticatedIndicateursCmrRoute: typeof AuthenticatedIndicateursCmrRoute
+  AuthenticatedPointsBlocageRoute: typeof AuthenticatedPointsBlocageRoute
+  AuthenticatedPtbaRoute: typeof AuthenticatedPtbaRoute
+  AuthenticatedSuiviPtbaRoute: typeof AuthenticatedSuiviPtbaRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
@@ -594,6 +779,15 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
+  AuthenticatedActivitesRoute: AuthenticatedActivitesRoute,
+  AuthenticatedCadreResultatsRoute: AuthenticatedCadreResultatsRoute,
+  AuthenticatedConventionsRoute: AuthenticatedConventionsRoute,
+  AuthenticatedDocumentsRoute: AuthenticatedDocumentsRoute,
+  AuthenticatedFinancementRoute: AuthenticatedFinancementRoute,
+  AuthenticatedIndicateursCmrRoute: AuthenticatedIndicateursCmrRoute,
+  AuthenticatedPointsBlocageRoute: AuthenticatedPointsBlocageRoute,
+  AuthenticatedPtbaRoute: AuthenticatedPtbaRoute,
+  AuthenticatedSuiviPtbaRoute: AuthenticatedSuiviPtbaRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,

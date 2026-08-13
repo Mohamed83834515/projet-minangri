@@ -1,12 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useProjetStore } from '@/stores/projet-store'
-import ProjetDashboard from '@/simadou/allfonctionalities/projets/detail/ProjetDashboard'
+import ProjetCadreResultatsPanel from '@/simadou/allfonctionalities/projets/detail/resultsFramework/ProjetCadreResultatsPanel'
 
-export const Route = createFileRoute('/_authenticated/')({
-  component: DashboardProjetWrapper,
+export const Route = createFileRoute('/_authenticated/cadre-resultats')({
+  component: ProjetCadreResultatsPanelWrapper,
 })
 
-function DashboardProjetWrapper() {
+function ProjetCadreResultatsPanelWrapper() {
   const activeProjet = useProjetStore((s) => s.activeProjet)
 
   if (!activeProjet) {
@@ -17,5 +17,5 @@ function DashboardProjetWrapper() {
     )
   }
 
-  return <ProjetDashboard projet={activeProjet} />
+  return <ProjetCadreResultatsPanel projet={activeProjet} />
 }
