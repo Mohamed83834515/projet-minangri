@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useRouterState } from '@tanstack/react-router'
 import {
-  type Cell,
   type ColumnDef,
   type SortingState,
   type VisibilityState,
@@ -14,7 +13,6 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { detectAlignment } from '@/simadou/allfonctionalities/rapport/export/rapportExportUtils'
 import { cn } from '@/lib/utils'
 import { type NavigateFn, useTableUrlState } from '@/hooks/use-table-url-state'
 import {
@@ -115,7 +113,6 @@ export function GenericTable<TData>({
   onExportContext,
   isLoading: isLoadingProp = false,
   initialState,
-  customRowRenderer,
 }: GenericTableProps<TData>) {
   const [rowSelection, setRowSelection] = useState({})
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
@@ -239,7 +236,7 @@ export function GenericTable<TData>({
           'rounded-xl border border-border/60 shadow-sm',
           'overflow-x-auto', // scroll horizontal si contenu dépasse (ex: dialog étroit)
           isLoading &&
-            'pointer-events-none opacity-50 transition-opacity duration-200 select-none',
+          'pointer-events-none opacity-50 transition-opacity duration-200 select-none',
           tableContainerClassName
         )}
       >
@@ -293,9 +290,9 @@ export function GenericTable<TData>({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                     </TableHead>
                   )
                 })}
@@ -313,41 +310,10 @@ export function GenericTable<TData>({
                   'hover:bg-primary/5 data-[state=selected]:bg-primary/10',
                   onRowClick && 'cursor-pointer'
                 )
-
-                const cellClassName = (
-                  cell?: Cell<TData, unknown> | number
-                ) => {
-                  const cll =
-                    typeof cell === 'number' ? row.getAllCells()[cell] : cell
-                  const align = detectAlignment(cll?.getValue())
-
-                  return cn(
-                    'px-4 py-2.5 align-top text-sm',
-                    // Force l'affichage complet du texte — écrase truncate/whitespace-nowrap des colonnes enfants
-                    'break-words whitespace-normal',
-                    '[&_*]:!overflow-visible [&_*]:!text-clip [&_*]:!whitespace-normal',
-                    'border-r border-border/20 last:border-r-0',
-                    `text-${align} justify-${align}`,
-                    typeof cell === 'number'
-                      ? ''
-                      : cell?.column.columnDef.meta?.className,
-                    typeof cell === 'number'
-                      ? ''
-                      : cell?.column.columnDef.meta?.tdClassName
-                  )
-                }
-
-                if (customRowRenderer) {
-                  return customRowRenderer(row.original, rowIdx, {
-                    rowClassName,
-                    cellClassName: (cellIdx) => cellClassName(cellIdx),
-                  })
-                }
-
                 return (
                   <TableRow key={row.id} className={rowClassName}>
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className={cellClassName(cell)}>
+                      <TableCell key={cell.id} className={`px-4 py-2.5 align-top text-sm border-r border-border/20 last:border-r-0`}>
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext()

@@ -10,8 +10,8 @@ import {
   DetailViewLoading,
 } from '@/Global/Detail/DetailFields'
 import { useGetIndicateurCmr } from '@/simadou/allHooks/admin/indicateurCmrHooks'
-import { resolveResultatCmrLabel } from '@/simadou/allfonctionalities/politique/indicateurs-cmr/indicateurCmrFormUtils'
 import { resolveRelationCode } from '@/simadou/lib/resolveApiRelation'
+import { resolveResultatCmrLabel } from './indicateurCmrFormProjetUtils'
 
 function formatReferentiel(value: unknown): string {
   if (value == null) return ''
@@ -19,7 +19,7 @@ function formatReferentiel(value: unknown): string {
     const code = resolveRelationCode(value, 'code_ref_ind')
     const intitule =
       typeof (value as { intitule_ref_ind?: string }).intitule_ref_ind ===
-      'string'
+        'string'
         ? (value as { intitule_ref_ind: string }).intitule_ref_ind
         : null
     if (code && intitule) return `${code} — ${intitule}`

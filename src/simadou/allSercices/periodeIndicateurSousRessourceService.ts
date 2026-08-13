@@ -7,8 +7,8 @@ import {
   type PeriodeSousRessourceType,
   type PeriodeSousRessourceWritePayload,
 } from '@/simadou/allTypes/periodeIndicateurSousRessource'
-import { buildSousRessourceDocumentsFormData } from '@/simadou/allfonctionalities/suivi-resultats/suivi-indicateurs/sous-ressource/periodeSousRessourceFormUtils'
 import { normalizeApiList } from './apiListUtils'
+import { buildSousRessourceDocumentsFormData } from './periodeSousRessourceFormUtils'
 
 const PERIODE_BASE_URL = '/periodes-indicateurs/'
 
