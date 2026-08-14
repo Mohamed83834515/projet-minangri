@@ -13,14 +13,13 @@ import { useLayout } from '@/stores/others/layout-store'
 import { CHART_COLORS, useColor } from '@/stores/others/color-store'
 import { useMe } from '@/simadou/allHooks/auth/authHooks'
 import simadouLogo from '@/assets/images/SimandouImg.png'
-import { useGeneralParamsQuery } from '@/simadou/allHooks/generalParams/queries'
 import { useFilteredSidebar } from '@/simadou/allHooks/admin/use-filtered-sidebar'
+import { useProjetCode, useProjetIntitule } from '@/stores/projet-store'
 export function AppSidebar() {
   const { collapsible, variant } = useLayout()
   const { color } = useColor()
   const { stroke } = CHART_COLORS[color]
   const { data: user } = useMe()
-  const { data: config } = useGeneralParamsQuery()
   const sidebarData = useFilteredSidebar()
   return (
     <Sidebar
@@ -40,9 +39,9 @@ export function AppSidebar() {
           </div>
           <div className='grid flex-1 text-start text-sm leading-tight'>
             <span className='truncate font-semibold'>
-              {config?.systemTitle || "SISE CEP Agriculture PS2040"}
+              {useProjetIntitule() || "PDCVR"}
             </span>
-            <span className='truncate text-xs'>{config?.structureSigle}</span>
+            <span className='truncate text-xs'>{useProjetCode()}</span>
           </div>
         </div>
       </SidebarHeader>

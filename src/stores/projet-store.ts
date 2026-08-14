@@ -7,9 +7,7 @@ const STATIC_PROJET_CODE = 'PDCVR'
 const defaultProjet: Projet = {
   id_projet: 0,
   code_projet: STATIC_PROJET_CODE,
-  intitule_projet: 'Projet PDCVR',
-  // Ajoute ici toutes les autres propriétés requises par le type Projet
-  // avec des valeurs par défaut
+  intitule_projet: 'Chargement du projet PDCVR...',
 } as Projet
 
 interface ProjetStore {
@@ -26,3 +24,19 @@ export const useProjetStore = create<ProjetStore>()((set) => ({
   setActiveProjet: (projet) => set({ activeProjet: projet }),
   setProjets: (projets) => set({ projets }),
 }))
+
+// Hooks personnalisés pour récupérer les informations du projet actif
+export const useProjetCode = () => {
+  const activeProjet = useProjetStore((state) => state.activeProjet)
+  return activeProjet?.code_projet || STATIC_PROJET_CODE
+}
+
+export const useProjetIntitule = () => {
+  const activeProjet = useProjetStore((state) => state.activeProjet)
+  return activeProjet?.intitule_projet || 'Projet PDCVR'
+}
+
+export const useProjetId = () => {
+  const activeProjet = useProjetStore((state) => state.activeProjet)
+  return activeProjet?.id_projet || 0
+}
