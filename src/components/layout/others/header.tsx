@@ -2,8 +2,6 @@ import { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
-import { ProgrammeSwitcher } from './programme-switcher'
-import { ProjetSwitcher } from './projet-switcher'
 
 type HeaderProps = React.HTMLAttributes<HTMLElement> & {
   fixed?: boolean
@@ -35,8 +33,8 @@ export function Header({ className, fixed, children, ...props }: HeaderProps) {
         className={cn(
           'relative flex h-full items-center gap-3 p-4 sm:gap-4',
           offset > 10 &&
-            fixed &&
-            'after:absolute after:inset-0 after:-z-10 after:bg-background/20 after:backdrop-blur-lg'
+          fixed &&
+          'after:absolute after:inset-0 after:-z-10 after:bg-background/20 after:backdrop-blur-lg'
         )}
       >
         {/* Gauche : trigger sidebar */}
@@ -51,8 +49,8 @@ export function Header({ className, fixed, children, ...props }: HeaderProps) {
         {/* Droite : programme actif (mis en avant) */}
         <div className='ml-auto flex items-center gap-3'>
           <Separator orientation='vertical' className='hidden h-8 sm:block' />
-          <ProgrammeSwitcher />
-          <ProjetSwitcher />
+          {/* <ProgrammeSwitcher />
+          <ProjetSwitcher /> */}
         </div>
       </div>
     </header>

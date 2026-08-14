@@ -20,8 +20,6 @@ import { SidebarTrigger } from '@/components/ui/sidebar'
 import { type NavCollapsible, type NavItem, type NavLink } from './types'
 import { HEADER_COLORS, useColorStore } from '@/stores/others/color-store'
 import { useLayout } from '@/stores/others/layout-store'
-import { ProgrammeSwitcher } from './programme-switcher'
-import { ProjetSwitcher } from './projet-switcher'
 import { SignOutDialog } from '@/components/others/sign-out-dialog'
 import useDialogState from '@/hooks/use-dialog-state'
 import { Button } from '@/components/ui/button'
@@ -564,19 +562,19 @@ export function AppTopbar({ user }: UserProps) {
 
           {/* Contrôles droite */}
           <div className="_tb-ctrl" style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-            <button
+            {/* <button
               onClick={() => setMobileSearchOpen(true)}
               className="_tb-ibtn md:hidden"
               aria-label={t('Rechercher')}
               style={{ color: headerText }}
             >
               <Search size={17} aria-hidden />
-            </button>
+            </button> */}
             <div className="hidden md:flex me-1">
               <SearchDesktop />
             </div>
-            <ProgrammeSwitcher onHeader />
-            <ProjetSwitcher onHeader />
+            {/* <ProgrammeSwitcher onHeader />
+            <ProjetSwitcher onHeader /> */}
             <ThemeSwitch />
             <ConfigDrawer />
             {user && (

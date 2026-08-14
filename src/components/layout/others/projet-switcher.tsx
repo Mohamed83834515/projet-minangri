@@ -24,7 +24,6 @@ function projetLabel(projet: Projet): string {
 export function ProjetSwitcher({ onHeader = false }: ProjetSwitcherProps) {
   const activeProjet = useProjetStore((s) => s.activeProjet)
   const projets = useProjetStore((s) => s.projets)
-  const setActiveProjet = useProjetStore((s) => s.setActiveProjet)
   const [open, setOpen] = useState(false)
 
   const isLoading = projets.length === 0 && !activeProjet
@@ -34,7 +33,6 @@ export function ProjetSwitcher({ onHeader = false }: ProjetSwitcherProps) {
       setOpen(false)
       return
     }
-    setActiveProjet(projet)
     setOpen(false)
   }
 
@@ -61,22 +59,22 @@ export function ProjetSwitcher({ onHeader = false }: ProjetSwitcherProps) {
           style={
             onHeader
               ? {
-                  color: 'var(--header-text)',
-                  borderColor:
-                    'color-mix(in srgb, var(--chart-color-3) 55%, transparent)',
-                  backgroundColor:
-                    'color-mix(in srgb, var(--chart-color-3) 18%, rgba(255,255,255,0.08))',
-                  boxShadow:
-                    '0 0 0 1px color-mix(in srgb, var(--chart-color-3) 30%, transparent)',
-                }
+                color: 'var(--header-text)',
+                borderColor:
+                  'color-mix(in srgb, var(--chart-color-3) 55%, transparent)',
+                backgroundColor:
+                  'color-mix(in srgb, var(--chart-color-3) 18%, rgba(255,255,255,0.08))',
+                boxShadow:
+                  '0 0 0 1px color-mix(in srgb, var(--chart-color-3) 30%, transparent)',
+              }
               : {
-                  borderColor:
-                    'color-mix(in srgb, var(--chart-color-3) 45%, transparent)',
-                  backgroundColor:
-                    'color-mix(in srgb, var(--chart-color-3) 10%, transparent)',
-                  boxShadow:
-                    '0 0 0 1px color-mix(in srgb, var(--chart-color-3) 20%, transparent)',
-                }
+                borderColor:
+                  'color-mix(in srgb, var(--chart-color-3) 45%, transparent)',
+                backgroundColor:
+                  'color-mix(in srgb, var(--chart-color-3) 10%, transparent)',
+                boxShadow:
+                  '0 0 0 1px color-mix(in srgb, var(--chart-color-3) 20%, transparent)',
+              }
           }
         >
           {isLoading ? (

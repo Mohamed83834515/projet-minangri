@@ -8,6 +8,9 @@ export const projetService = {
   async getAll(idProgramme: number): Promise<Projet[]> {
     return await apiClient.request<Projet[]>(`${BASE_URL}?programme_projet=${idProgramme}`)
   },
+  async getAllWithOutProgramme(): Promise<Projet[]> {
+    return await apiClient.request<Projet[]>(`${BASE_URL}`)
+  },
 
   async getAllWithfilter(idProgramme: number, idVersion: number): Promise<Projet[]> {
     return await apiClient.request<Projet[]>(`${BASE_URL}?programme_projet=${idProgramme}&ptbas_projet__version_ptba=${idVersion}`)

@@ -82,6 +82,7 @@ async function resolveProjetByRouteId(
 
 export const projetQueryKeys = {
   all: ['projets'] as const,
+  getAllWithOutProgramme: ['projets-all-out'] as const,
   byProgramme: (idProgramme: number | undefined) =>
     [...projetQueryKeys.all, 'programme', idProgramme] as const,
   byProgrammeWithFilter: (idProgramme: number | undefined, idVersions: number) =>

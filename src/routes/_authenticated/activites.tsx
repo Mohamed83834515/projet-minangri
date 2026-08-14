@@ -8,7 +8,6 @@ export const Route = createFileRoute('/_authenticated/activites')({
 
 function ProjetActivitesPanelWrapper() {
   const activeProjet = useProjetStore((s) => s.activeProjet)
-
   if (!activeProjet) {
     return (
       <div className="flex h-full items-center justify-center p-8 text-muted-foreground">
