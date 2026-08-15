@@ -14,6 +14,9 @@ import {
   BookOpen,
   CalendarClock,
   ClipboardCheck,
+  UserCog,
+  MapPin,
+  Settings,
 } from 'lucide-react'
 import { type SidebarData } from '../../components/layout/others/types'
 
@@ -37,7 +40,23 @@ export const sidebarData: SidebarData = {
       items: [
         { title: 'Tableau de bord', url: '/', icon: LayoutDashboard },
         {
-          title: 'Plan Stratégique',
+          title: 'Paramétrage',
+          icon: Settings,
+          items: [
+            {
+              title: 'Localités',
+              url: '/parametrage/localites',
+              icon: MapPin,
+            },
+            {
+              title: 'Utilisateurs',
+              url: '/parametrage/utilisateurs',
+              icon: UserCog,
+            },
+          ],
+        },
+        {
+          title: 'Cadre de Résultats',
           icon: BookOpen,
           items: [
             { title: 'Activités (Plan analytique)', url: '/activites', icon: Activity },
@@ -47,7 +66,7 @@ export const sidebarData: SidebarData = {
           ],
         },
         {
-          title: 'Planification',
+          title: 'Programmation',
           icon: CalendarClock,
           items: [
             { title: 'PTBA', url: '/ptba', icon: ListTodo },
